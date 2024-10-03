@@ -42,12 +42,13 @@
 ### Feature branch & Pull request
 - Geef relevante namen aan je branch en pull request (PR)
 - Koppel de branch en/of de pr aan de trello taak
+- Pull request vereist goedkeuring van 2 reviewers voordat deze gemerged kan worden
 
 <br />
 
 ### Mergen
 - Altijd via een pull request
-- Pas merge als PR is goedgekeurd
+- Pas merge als PR is goedgekeurd (door min. 2 reviewers)
 - Feature branches moeten altijd naar develop worden gemerged
 - Zorg dat de nieuwste versie van develop in je branch zit (zonder conflicts ;) )
 
