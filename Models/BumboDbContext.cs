@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 using Microsoft.EntityFrameworkCore;
 
 namespace BumboApp.Models;
@@ -36,6 +37,8 @@ public partial class BumboDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         OnModelCreatingPartial(modelBuilder);
+        modelBuilder.Entity<User>()
+            .Property<string>("password").IsRequired();
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

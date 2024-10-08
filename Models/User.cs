@@ -17,8 +17,5 @@ namespace BumboApp.Models
         [Required]
         [StringLength(255)]
         public string LastName { get; set; }
-        [Required]
-        [StringLength(45)]
-        public string Password { get; set; }
     }
 }
