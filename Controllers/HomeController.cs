@@ -15,6 +15,7 @@ namespace BumboApp.Controllers
 
         public IActionResult Index()
         {
+            System.Console.WriteLine("Hello World");
             return View();
         }
 
