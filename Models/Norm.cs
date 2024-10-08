@@ -6,7 +6,7 @@ namespace BumboApp.Models
         [Key]
         public int Id { get; set; }
         [Required]
-        public int Value { get; set; } //TODO Was called Norm in KD as well, any alternative names?
+        public int Value { get; set; }
         [Required]
         public NormType NormType { get; set; }
         [Required]

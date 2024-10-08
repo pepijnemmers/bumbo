@@ -8,7 +8,7 @@ namespace BumboApp.Models
         public int Id { get; set; }
         [Required]
         [StringLength(255)]
-        public string Name { get; set; } = null!; //TODO is dit goed?
+        public string Name { get; set; }
         [Required]
         public DateOnly StartDate { get; set; }
         [Required]

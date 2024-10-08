@@ -9,7 +9,7 @@ namespace BumboApp.Models
         public DateOnly Date {  get; set; }
         [Required]
         [StringLength(255)]
-        public string Department { get; set; } = null!;
+        public string Department { get; set; }
         [Required]
         public float NeededHours { get; set; }
         [Required]

@@ -9,12 +9,16 @@ namespace BumboApp.Models
         [Required]
         public Role Role { get; set; }
         [Required]
-        public string Email { get; set; } = null!;
+        [StringLength(255)]
+        public string Email { get; set; }
         [Required]
-        public string FirstName { get; set; } = null!;
+        [StringLength(255)]
+        public string FirstName { get; set; }
         [Required]
-        public string LastName { get; set; } = null!;
+        [StringLength(255)]
+        public string LastName { get; set; }
         [Required]
-        public string Password { get; set; } = null!;
+        [StringLength(45)]
+        public string Password { get; set; }
     }
 }

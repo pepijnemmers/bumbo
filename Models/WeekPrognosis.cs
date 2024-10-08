@@ -9,6 +9,6 @@ namespace BumboApp.Models
         [Required]
         public DateOnly StartDate { get; set; }
         [Required]
-        public List<Prognosis> Prognoses { get; set; } = null!;
+        public List<Prognosis> Prognoses { get; set; }
     }
 }
