@@ -2,7 +2,7 @@
 
 namespace BumboApp.Controllers
 {
-    public class NormsController : Controller
+    public class NormsController : MainController
     {
         public IActionResult Index()
         {

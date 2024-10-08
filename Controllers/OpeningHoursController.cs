@@ -2,7 +2,7 @@
 
 namespace BumboApp.Controllers
 {
-    public class OpeningHoursController : Controller
+    public class OpeningHoursController : MainController
     {
         public IActionResult Index()
         {

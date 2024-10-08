@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace BumboApp.Controllers
 {
-    public class LoginController : Controller
+    public class LoginController : MainController
     {
         public IActionResult Index()
         {

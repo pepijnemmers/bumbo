@@ -2,7 +2,7 @@
 
 namespace BumboApp.Controllers
 {
-    public class ExpectationsController : Controller
+    public class ExpectationsController : MainController
     {
         public IActionResult Index()
         {

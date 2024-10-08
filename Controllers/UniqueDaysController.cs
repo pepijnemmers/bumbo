@@ -2,7 +2,7 @@
 
 namespace BumboApp.Controllers
 {
-    public class UniqueDaysController : Controller
+    public class UniqueDaysController : MainController
     {
         public IActionResult Edit()
         {

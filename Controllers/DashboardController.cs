@@ -2,7 +2,7 @@
 
 namespace BumboApp.Controllers
 {
-    public class DashboardController : Controller
+    public class DashboardController : MainController
     {
         public IActionResult Index()
         {

@@ -2,7 +2,7 @@
 
 namespace BumboApp.Controllers
 {
-    public class PrognosesController : Controller
+    public class PrognosesController : MainController
     {
         public IActionResult Index()
         {
