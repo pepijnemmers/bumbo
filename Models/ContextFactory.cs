@@ -17,7 +17,7 @@ namespace BumboApp.Models
         {
 
             var builder = new DbContextOptionsBuilder<BumboDbContext>();
-            builder.UseSqlServer(Configuration.GetConnectionString("FirstAndSecond"));
+            builder.UseSqlServer(Configuration.GetConnectionString("BumboDb"));
 
             return new BumboDbContext(builder.Options);
         }
