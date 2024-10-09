@@ -2,4 +2,22 @@
     Layout = "_LayoutWithoutNav";
     ViewData["Title"] = "Inloggen";
 }
-<h1>Login bij Bumbo</h1>
+<!--<h1>Login bij Bumbo</h1>-->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-7 banner-col">
+            <img src="~/img/bumbo-banner.png" class="img-fluid" alt="Bumbo Banner">
+        </div>
+        <div class="col-lg-5 bg-white banner-col">
+            <form>
+                <h1>Log in bij Bumbo</h1>
+                <label for="gebruikersnaam">Gebruikersnaam</label>
+                <input type="text" id="gebruikersnaam" class="form-control" placeholder="Gebruikersnaam"
+                required autofocus>
+                <label for"wachtwoord">Wachtwoord</label>
+                <input type="password" id="wachtwoord" placeholder="Wachtwoord" class="form-control">
+                <button class="btn btn-lg btn-dark">Sign in</button>
+            </form>
+        </div>
+    </div>
+</div>
