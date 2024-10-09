@@ -5,42 +5,151 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Bumbo App</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BumboApp.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BumboApp</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+    <div class="container-fluid h-100">
+        <div class="row h-100">
+            <aside class="aside-nav col-auto py-3 mh-100 overflow-y-scroll d-flex bg-white">
+                <nav class="d-flex flex-column justify-content-between">
+                    <div>
+                        <a class="logo align-items-center d-flex gap-3 mb-4 px-2" asp-area="" asp-controller="Dashboard" asp-action="Index">
+                            <img alt="Logo" src="img/icon.png" />
+                            <span>
+                                Bumbo
+                            </span>
+                        </a>
+                        <a class="nav-link active" asp-area="" asp-controller="Dashboard" asp-action="Index">
+                            <i class="fa-solid fa-house"></i>
+                            Dashboard
+                        </a>
+                        <a class="nav-link" asp-area="" asp-controller="Norms" asp-action="Index">
+                            <i class="fa-solid fa-square-pen"></i>
+                            Normeringen
+                        </a>
+                        <a class="nav-link" asp-area="" asp-controller="Prognoses" asp-action="Index">
+                            <i class="fa-solid fa-file-lines"></i>
+                            Prognoses
+                        </a>
+                        <a class="nav-link" asp-area="" asp-controller="Expectations" asp-action="Index">
+                            <i class="fa-solid fa-layer-group"></i>
+                            Verwachtingen
+                        </a>
+                        <a class="nav-link" asp-area="" asp-controller="OpeningHours" asp-action="Index">
+                            <i class="fa-solid fa-clock"></i>
+                            Openingstijden
+                        </a>
+                    </div>
+                    <div>
+                        <a class="nav-link logout" asp-area="" asp-controller="Login" asp-action="Logout">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            Uitloggen
+                        </a>
+                    </div>
+                </nav>
+            </aside>
+            <div class="col p-0">
+                <header class="topbar bg-white py-2">
+                    <div class="container d-flex align-items-center justify-content-between">
+                        <h1>@ViewData["Title"]</h1>
+                        <nav class="d-flex align-items-center gap-3">
+                            <a class="new-prognosis" asp-area="" asp-controller="Prognoses" asp-action="Index" asp-route-id="new">
+                                <i class="fa-solid fa-plus"></i>
+                            </a>
+                            <a class="profile" asp-area="" asp-controller="Profile" asp-action="Index">
+                                <img class="profile-icon" src="img/profile-icon.png" alt="profiel"/>
+                            </a>
+                        </nav>
+                    </div>
+                </header>
+                
+                <div class="container">
+                    <main role="main" class="py-4">
+                        @RenderBody()
+                    </main>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - BumboApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
-    </footer>
+    </div>
+<!--
+<aside role="complementary" class="sidebar">
+    <div class="logo">
+        <img alt="Logo" height="40" src="https://storage.googleapis.com/a1aa/image/II88eg2lQdzrU6u63lDVv4Crxf0bQcQbRu8XGHvYncfhjDKnA.jpg" width="40"/>
+        <span>
+            Bumbo
+        </span>
+    </div>
+    <a class="nav-link active" href="#">
+        <i class="fas fa-home">
+        </i>
+        Dashboard
+    </a>
+    <a class="nav-link" href="#">
+        <i class="fas fa-calendar-alt">
+        </i>
+        Roosters
+    </a>
+    <a class="nav-link" href="#">
+        <i class="fas fa-chart-line">
+        </i>
+        Normeringen
+    </a>
+    <a class="nav-link" href="#">
+        <i class="fas fa-file-alt">
+        </i>
+        Prognoses
+    </a>
+    <a class="nav-link" href="#">
+        <i class="fas fa-th-large">
+        </i>
+        Verwachtingen
+    </a>
+    <a class="nav-link" href="#">
+        <i class="fas fa-clock">
+        </i>
+        Openingstijden
+    </a>
+    <a class="nav-link" href="#">
+        <i class="fas fa-users">
+        </i>
+        Werknemers
+    </a>
+    <a class="nav-link" href="#">
+        <i class="fas fa-comments">
+        </i>
+        Meldingen
+        <span class="badge bg-primary ms-2">
+            1
+        </span>
+    </a>
+    <a class="nav-link" href="#">
+        <i class="fas fa-cog">
+        </i>
+        Instellingen
+    </a>
+    <div class="logout">
+        <button>
+            Uitloggen
+        </button>
+    </div>
+</aside>
+
+<div class="content">
+    <div class="topbar">
+        <div>
+        </div>
+        <div class="profile">
+            <i class="fas fa-plus">
+            </i>
+            <img alt="Profile Picture" height="40" src="https://storage.googleapis.com/a1aa/image/sGqe8aD5n10kNySwxiil3dtCODCP87EYxncqwAUAwAB34gyJA.jpg" width="40"/>
+        </div>
+    </div>
+</div>
+-->
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

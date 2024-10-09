@@ -11,6 +11,11 @@ namespace BumboApp.Controllers
             return View();
         }
 
+        public void Logout()
+        {
+            // todo: implement logout
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
