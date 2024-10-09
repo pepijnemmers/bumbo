@@ -1,24 +1,12 @@
-using BumboApp.Models;
+﻿using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace BumboApp.Controllers
 {
-    public class HomeController : MainController
+    public class LoginController : MainController
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
         public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
         {
             return View();
         }
