@@ -1,0 +1,94 @@
+html, 
+body {
+    height: 100%;
+}
+
+/* aside */
+.aside-nav {
+    box-shadow: 5px 0 8px -3px rgba(0, 0, 0, .15);
+    z-index: 999999;
+    inset: 0;
+}
+
+.aside-nav .logo {
+    font-weight: bold;
+    color: var(--bs-body-color);
+    text-decoration: none;
+    font-size: 1.5rem;
+}
+.aside-nav .logo span {
+    margin-bottom: 3px;
+}
+
+.aside-nav .nav-link {
+    color: var(--bs-body-sec-color);
+    padding: .7rem 2rem;
+    margin-bottom: .5em;
+    border-radius: .5em;
+    font-weight: 500;
+}
+.aside-nav .nav-link i[class^="fa-"] {
+    font-size: 1.3em;
+    text-align: center;
+    width: 25px;
+    margin-right: .6em;
+}
+
+.aside-nav .nav-link.active {
+    color: var(--accent-color);
+    background-color: var(--accent-color-sec);
+    font-weight: 700;
+}
+.aside-nav .nav-link:not(.active):hover,
+.aside-nav .nav-link:not(.active):focus {
+    color: var(--bs-body-color);
+    background-color: var(--bs-gray-200);
+}
+.aside-nav .nav-link.active:hover,
+.aside-nav .nav-link.active:focus {
+    color: var(--bs-white);
+    background-color: var(--accent-color);
+}
+
+.aside-nav .nav-link.logout {
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
+}
+.aside-nav .nav-link.logout:hover,
+.aside-nav .nav-link.logout:focus {
+     color: var(--bs-white);
+     background-color: var(--bs-danger);
+}
+
+@media screen and (max-width: 768px) {
+    .aside-nav {
+        position: fixed;
+    }
+}
+
+/* topbar */
+.topbar {
+    box-shadow: 0 5px 8px -3px rgba(0, 0, 0, .15);
+    z-index: 999998;
+}
+
+.topbar h1 {
+    font-size: 1.5rem;
+}
+
+.topbar .new-prognosis {
+    font-size: 2rem;
+    color: var(--bs-primary);
+}
+
+.topbar .profile-icon {
+    height: 45px;
+}
+
+.mobile-menu-icon {
+    all: unset;
+    font-size: 2rem;
+    color: var(--bs-primary);
+    padding: .1em .45em;
+    border-radius: .2em;
+}

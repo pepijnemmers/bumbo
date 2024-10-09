@@ -1,3 +1,22 @@
+/**
+  OVERRIDE OF BOOTSTRAP COLORS
+ */
+:root,
+[data-bs-theme=light] {
+  --bs-body-bg: #FBFBFB;
+  --bs-primary: #5D7285;
+  --bs-secondary: #6c757d;
+  --bs-success: #198754;
+  --bs-info: #0dcaf0;
+  --bs-warning: #ffc107;
+  --bs-danger: #dc3545;
+  --bs-body-color: #212529;
+  --bs-body-sec-color: #3c4b57;
+  --accent-color: #EEB617;
+  --accent-color-sec: #FFFAED;
+}
+
+/* Site */
 html {
   font-size: 14px;
 }
