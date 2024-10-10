@@ -34,7 +34,7 @@ public partial class BumboDbContext : DbContext
     {
         OnModelCreatingPartial(modelBuilder);
         modelBuilder.Entity<User>()
-            .Property<string>("password").IsRequired();
+            .Property<string>("Password").IsRequired();
 
         modelBuilder.Entity<WeekPrognosis>().HasData(
     new WeekPrognosis { Id = 1, StartDate = new DateOnly(2024, 10, 7) }
@@ -181,6 +181,36 @@ public partial class BumboDbContext : DbContext
                 WeekDay = "Sunday",
                 OpeningTime = new TimeOnly(11, 0),
                 ClosingTime = new TimeOnly(19, 0)
+            }
+        );
+
+        modelBuilder.Entity<User>().HasData(
+            new
+            {
+                Id = 1,
+                Role = Role.Manager,
+                Email = "john.doe@example.com",
+                FirstName = "John",
+                LastName = "Doe",
+                Password = "qwer1234"
+            },
+            new
+            {
+                Id = 2,
+                Role = Role.Manager,
+                Email = "jane.smith@example.com",
+                FirstName = "Jane",
+                LastName = "Smith",
+                Password = "asdf1234"
+            },
+            new
+            {
+                Id = 3,
+                Role = Role.Manager,
+                Email = "emily.jones@example.com",
+                FirstName = "Emily",
+                LastName = "Jones",
+                Password = "zxcv1234"
             }
         );
     }
