@@ -6,6 +6,8 @@ namespace BumboApp.Models
         [Key]
         public int Id { get; set; }
         [Required]
+        public NormActivity Activity { get; set; }
+        [Required]
         public int Value { get; set; }
         [Required]
         public NormType NormType { get; set; }

@@ -85,11 +85,11 @@ public partial class BumboDbContext : DbContext
 
         // Seed data for Norms
         modelBuilder.Entity<Norm>().HasData(
-                    new Norm { Id = 1, Value = 5, NormType = NormType.Minutes, CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0) },
-                    new Norm { Id = 2, Value = 30, NormType = NormType.MinutesPerColi, CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0) },
-                    new Norm { Id = 3, Value = 30, NormType = NormType.CustomersPerHour, CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0) },
-                    new Norm { Id = 4, Value = 100, NormType = NormType.CustomersPerHour, CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0) },
-                    new Norm { Id = 5, Value = 30, NormType = NormType.SecondsPerMeter, CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0) }
+                    new Norm { Id = 1, Activity = NormActivity.ColiUitladen, Value = 5, NormType = NormType.Minutes, CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0) },
+                    new Norm { Id = 2, Activity = NormActivity.VakkenVullen, Value = 30, NormType = NormType.MinutesPerColi, CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0) },
+                    new Norm { Id = 3, Activity = NormActivity.Kassa, Value = 30, NormType = NormType.CustomersPerHour, CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0) },
+                    new Norm { Id = 4, Activity = NormActivity.Vers, Value = 100, NormType = NormType.CustomersPerHour, CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0) },
+                    new Norm { Id = 5, Activity = NormActivity.Spiegelen, Value = 30, NormType = NormType.SecondsPerMeter, CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0) }
         );
 
         // Seed data for Expectations
