@@ -6,7 +6,7 @@ namespace BumboApp.Models
         [Key]
         public int Id { get; set; }
         [Required]
-        public int WeekPrognosesId { get; set; }
+        public int WeekPrognosisId { get; set; }
         [Required]
         public DateOnly Date {  get; set; }
         [Required]

@@ -4,6 +4,7 @@ using BumboApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BumboApp.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    partial class BumboDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241010090042_SeedPrognosisData")]
+    partial class SeedPrognosisData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,155 +45,6 @@ namespace BumboApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Expectations");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Date = new DateOnly(2024, 10, 14),
-                            ExpectedCargo = 32,
-                            ExpectedCustomers = 850
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Date = new DateOnly(2024, 10, 15),
-                            ExpectedCargo = 40,
-                            ExpectedCustomers = 900
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Date = new DateOnly(2024, 10, 16),
-                            ExpectedCargo = 50,
-                            ExpectedCustomers = 980
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Date = new DateOnly(2024, 10, 17),
-                            ExpectedCargo = 60,
-                            ExpectedCustomers = 1050
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Date = new DateOnly(2024, 10, 18),
-                            ExpectedCargo = 45,
-                            ExpectedCustomers = 870
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Date = new DateOnly(2024, 10, 19),
-                            ExpectedCargo = 38,
-                            ExpectedCustomers = 810
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Date = new DateOnly(2024, 10, 20),
-                            ExpectedCargo = 55,
-                            ExpectedCustomers = 1000
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Date = new DateOnly(2024, 10, 21),
-                            ExpectedCargo = 33,
-                            ExpectedCustomers = 830
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Date = new DateOnly(2024, 10, 22),
-                            ExpectedCargo = 48,
-                            ExpectedCustomers = 920
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Date = new DateOnly(2024, 10, 23),
-                            ExpectedCargo = 42,
-                            ExpectedCustomers = 880
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Date = new DateOnly(2024, 10, 24),
-                            ExpectedCargo = 60,
-                            ExpectedCustomers = 1050
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Date = new DateOnly(2024, 10, 25),
-                            ExpectedCargo = 36,
-                            ExpectedCustomers = 840
-                        },
-                        new
-                        {
-                            Id = 13,
-                            Date = new DateOnly(2024, 10, 26),
-                            ExpectedCargo = 53,
-                            ExpectedCustomers = 980
-                        },
-                        new
-                        {
-                            Id = 14,
-                            Date = new DateOnly(2024, 10, 27),
-                            ExpectedCargo = 50,
-                            ExpectedCustomers = 950
-                        },
-                        new
-                        {
-                            Id = 15,
-                            Date = new DateOnly(2024, 10, 28),
-                            ExpectedCargo = 37,
-                            ExpectedCustomers = 820
-                        },
-                        new
-                        {
-                            Id = 16,
-                            Date = new DateOnly(2024, 10, 29),
-                            ExpectedCargo = 47,
-                            ExpectedCustomers = 930
-                        },
-                        new
-                        {
-                            Id = 17,
-                            Date = new DateOnly(2024, 10, 30),
-                            ExpectedCargo = 35,
-                            ExpectedCustomers = 850
-                        },
-                        new
-                        {
-                            Id = 18,
-                            Date = new DateOnly(2024, 10, 31),
-                            ExpectedCargo = 52,
-                            ExpectedCustomers = 1000
-                        },
-                        new
-                        {
-                            Id = 19,
-                            Date = new DateOnly(2024, 11, 1),
-                            ExpectedCargo = 40,
-                            ExpectedCustomers = 890
-                        },
-                        new
-                        {
-                            Id = 20,
-                            Date = new DateOnly(2024, 11, 2),
-                            ExpectedCargo = 60,
-                            ExpectedCustomers = 1050
-                        },
-                        new
-                        {
-                            Id = 21,
-                            Date = new DateOnly(2024, 11, 3),
-                            ExpectedCargo = 44,
-                            ExpectedCustomers = 870
-                        });
                 });
 
             modelBuilder.Entity("BumboApp.Models.Norm", b =>
@@ -213,43 +67,6 @@ namespace BumboApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Norms");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
-                            NormType = 0,
-                            Value = 5
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
-                            NormType = 1,
-                            Value = 30
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
-                            NormType = 2,
-                            Value = 30
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
-                            NormType = 2,
-                            Value = 100
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
-                            NormType = 3,
-                            Value = 30
-                        });
                 });
 
             modelBuilder.Entity("BumboApp.Models.OpeningHour", b =>
@@ -267,50 +84,6 @@ namespace BumboApp.Migrations
                     b.HasKey("WeekDay");
 
                     b.ToTable("OpeningHours");
-
-                    b.HasData(
-                        new
-                        {
-                            WeekDay = "Monday",
-                            ClosingTime = new TimeOnly(21, 0, 0),
-                            OpeningTime = new TimeOnly(7, 0, 0)
-                        },
-                        new
-                        {
-                            WeekDay = "Tuesday",
-                            ClosingTime = new TimeOnly(21, 0, 0),
-                            OpeningTime = new TimeOnly(7, 0, 0)
-                        },
-                        new
-                        {
-                            WeekDay = "Wednesday",
-                            ClosingTime = new TimeOnly(21, 0, 0),
-                            OpeningTime = new TimeOnly(7, 0, 0)
-                        },
-                        new
-                        {
-                            WeekDay = "Thursday",
-                            ClosingTime = new TimeOnly(21, 0, 0),
-                            OpeningTime = new TimeOnly(7, 0, 0)
-                        },
-                        new
-                        {
-                            WeekDay = "Friday",
-                            ClosingTime = new TimeOnly(21, 0, 0),
-                            OpeningTime = new TimeOnly(7, 0, 0)
-                        },
-                        new
-                        {
-                            WeekDay = "Saturday",
-                            ClosingTime = new TimeOnly(21, 0, 0),
-                            OpeningTime = new TimeOnly(7, 0, 0)
-                        },
-                        new
-                        {
-                            WeekDay = "Sunday",
-                            ClosingTime = new TimeOnly(19, 0, 0),
-                            OpeningTime = new TimeOnly(11, 0, 0)
-                        });
                 });
 
             modelBuilder.Entity("BumboApp.Models.Prognosis", b =>
@@ -559,32 +332,6 @@ namespace BumboApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UniqueDays");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            EndDate = new DateOnly(2024, 10, 20),
-                            Factor = 1.25f,
-                            Name = "Customer Appreciation Day",
-                            StartDate = new DateOnly(2024, 10, 20)
-                        },
-                        new
-                        {
-                            Id = 2,
-                            EndDate = new DateOnly(2024, 10, 20),
-                            Factor = 1.5f,
-                            Name = "VIP Shopping Day",
-                            StartDate = new DateOnly(2024, 10, 20)
-                        },
-                        new
-                        {
-                            Id = 3,
-                            EndDate = new DateOnly(2024, 10, 29),
-                            Factor = 1.8f,
-                            Name = "Weekend Sale",
-                            StartDate = new DateOnly(2024, 10, 28)
-                        });
                 });
 
             modelBuilder.Entity("BumboApp.Models.User", b =>
