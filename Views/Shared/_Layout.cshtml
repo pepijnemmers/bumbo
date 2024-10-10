@@ -26,23 +26,23 @@
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
-                        <a class="nav-link active" asp-area="" asp-controller="Dashboard" asp-action="Index">
+                        <a class="nav-link @(Context.Request.Path == "/dashboard" || Context.Request.Path == "/" ? "active" : "")" asp-area="" asp-controller="Dashboard" asp-action="Index">
                             <i class="fa-solid fa-house"></i>
                             Dashboard
                         </a>
-                        <a class="nav-link" asp-area="" asp-controller="Norms" asp-action="Index">
+                        <a class="nav-link @(Context.Request.Path == "/norms" ? "active" : "")" asp-area="" asp-controller="Norms" asp-action="Index">
                             <i class="fa-solid fa-square-pen"></i>
                             Normeringen
                         </a>
-                        <a class="nav-link" asp-area="" asp-controller="Prognoses" asp-action="Index">
+                        <a class="nav-link @(Context.Request.Path == "/prognoses" ? "active" : "")" asp-area="" asp-controller="Prognoses" asp-action="Index">
                             <i class="fa-solid fa-file-lines"></i>
                             Prognoses
                         </a>
-                        <a class="nav-link" asp-area="" asp-controller="Expectations" asp-action="Index">
+                        <a class="nav-link @(Context.Request.Path == "/expectations" ? "active" : "")" asp-area="" asp-controller="Expectations" asp-action="Index">
                             <i class="fa-solid fa-layer-group"></i>
                             Verwachtingen
                         </a>
-                        <a class="nav-link" asp-area="" asp-controller="OpeningHours" asp-action="Index">
+                        <a class="nav-link @(Context.Request.Path == "/openinghours" ? "active" : "")" asp-area="" asp-controller="OpeningHours" asp-action="Index">
                             <i class="fa-solid fa-clock"></i>
                             Openingstijden
                         </a>
