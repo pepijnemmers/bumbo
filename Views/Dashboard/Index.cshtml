@@ -1,4 +1,32 @@
 ﻿@{
     ViewData["Title"] = "Dashboard";
 }
-<h5>Dashboard index</h5>
+
+<div class="container dashboard">
+    <div class="row gap-3">
+        <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="Dashboard" asp-action="Index">
+            <i class="fa-solid fa-house fs-4 mb-2"></i>
+            Dashboard
+        </a>
+        <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="Norms" asp-action="Index">
+            <i class="fa-solid fa-square-pen fs-4 mb-2"></i>
+            Normeringen
+        </a>
+        <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="Prognoses" asp-action="Index">
+            <i class="fa-solid fa-file-lines fs-4 mb-2"></i>
+            Prognoses
+        </a>
+        <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="Expectations" asp-action="Index">
+            <i class="fa-solid fa-layer-group fs-4 mb-2"></i>
+            Verwachtingen
+        </a>
+        <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="OpeningHours" asp-action="Index">
+            <i class="fa-solid fa-clock fs-4 mb-2"></i>
+            Openingstijden
+        </a>
+        <a class="col d-flex flex-column align-items-center btn btn-outline-danger py-4" asp-area="" asp-controller="Login" asp-action="Logout">
+            <i class="fa-solid fa-right-from-bracket fs-4 mb-2"></i>
+            Uitloggen
+        </a>
+    </div>
+</div>
