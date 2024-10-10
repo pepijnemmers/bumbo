@@ -1,4 +1,99 @@
-﻿@{
+﻿
+@model List<WeekPrognosis>
+@using System.Globalization
+@{
     ViewData["Title"] = "Prognoses";
 }
-<h5>Prognoses index</h5>
+
+<div class="container mt-4">
+
+    <div class="container mt-4">
+        <div class="row align-items-center mb-3">
+            <div class="col">
+                <h2>Overview</h2>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary btn-sm d-inline-block">Nieuwe Prognose</button>
+            </div>
+        </div>
+    @if (!Model.Any())
+    {
+        <!-- Display this alert if there are no items -->
+        <div class="alert alert-warning" role="alert">
+            There are no items to display.
+        </div>
+    }
+    else
+    {
+
+        <table class="table rounded">
+            <thead class="table-light">
+                <tr>
+                    <th>Week</th>
+                    <th>Begin datum</th>
+                    <th>Eind datum</th>
+                    <th>Acties</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                        DateTime startDateTime = item.StartDate.ToDateTime(TimeOnly.MinValue); // Sets the time to midnight
+                        int weekNumber = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(startDateTime,new CalendarWeekRule(),item.StartDate.DayOfWeek);
+                    <tr>
+                        <td class=" col-2">@weekNumber</td>
+                        <td class =" col-4">@item.StartDate</td> 
+                        <td class=" col-4">@item.StartDate.AddDays(7)</td> 
+                        <td class=" col-1">
+                            <a asp-controller="prognoses" asp-action="update">
+                                <img style="width: 20px; height: auto" src="~/img/Update_Logo.png" alt="Alternate Text" />
+                            </a>
+                                <a asp-controller ="prognoses" asp-action="details">
+                                <img style="width: 20px; height: auto" src="~/img/Details_Logo.png" alt="Alternate Text" />
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+
+            <nav class=" align-content-end" aria-label="">
+                <ul class="d-flex justify-content-end list-unstyled">
+
+                    @if (!(ViewBag.PageNumber <= 1))
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-controller="Prognoses" asp-action="index" aria-label="begin ">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" asp-controller= "Prognoses" asp-action="index" asp-rout-page="@ViewBag.PageNumber - 1 "aria-label="Previous">
+                                <span aria-hidden="true">&larr;</span>
+                            </a>
+                        </li>
+                        <li class="page-item"><a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@(ViewBag.PageNumber - 1)">@(ViewBag.PageNumber - 1)</a></li>
+                    }
+
+                    <li class="page-item"><a class="page-link btn-dark" asp-controller="Prognoses" asp-action="index" asp-route-page="@ViewBag.PageNumber">@ViewBag.PageNumber</a></li>
+                
+                 @if (!(ViewBag.PageNumber >= ViewBag.MaxPages))
+                 {
+                        <li class="page-item"><a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@(ViewBag.PageNumber + 1)">@(ViewBag.PageNumber + 1)</a></li>
+                    <li class="page-item">
+                        <a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@ViewBag.PageNumber + 1" aria-label="next">
+                            <span aria-hidden="true">&rarr;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                            <a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@ViewBag.MaxPages" aria-label="last">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                 }
+            </ul>
+        </nav>
+
+    }
+</div>
