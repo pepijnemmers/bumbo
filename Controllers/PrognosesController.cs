@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BumboApp.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BumboApp.Controllers
 {
@@ -8,9 +10,14 @@ namespace BumboApp.Controllers
         {
             return View();
         }
-        public IActionResult Details()
+        public IActionResult Details(int id)
         {
-            return View();
+            WeekPrognosis wp = null;
+            foreach (WeekPrognosis selectedWp in _context.WeekPrognoses.Include(wp => wp.Prognoses))
+            {
+                if (selectedWp.Id == id) wp = selectedWp;
+            }
+            return View(wp);
         }
         public IActionResult Update()
         {
