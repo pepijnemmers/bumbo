@@ -5,6 +5,7 @@
 [data-bs-theme=light] {
   --bs-body-bg: #FBFBFB;
   --bs-primary: #5D7285;
+  --bs-primary-dark: #2f3b43;
   --bs-secondary: #6c757d;
   --bs-success: #198754;
   --bs-info: #0dcaf0;
@@ -14,6 +15,50 @@
   --bs-body-sec-color: #3c4b57;
   --accent-color: #EEB617;
   --accent-color-sec: #FFFAED;
+}
+
+/* buttons */
+.btn-primary {
+  color: #fff;
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.btn-primary:hover {
+  color: #fff;
+  background-color: var(--bs-primary-dark);
+  border-color: var(--bs-primary-dark);
+}
+
+.btn-primary:disabled,
+.btn-primary.disabled {
+  color: #fff;
+  background-color: #6e717c;
+  border-color: #6e717c;
+}
+
+.btn-outline-primary {
+  color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.btn-outline-primary:hover {
+  color: #fff;
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+/* Button size */
+.btn-lg {
+  padding: 0.5rem 1rem;
+  font-size: 1.25rem;
+  border-radius: 0.3rem;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 0.2rem;
 }
 
 /* Site */
@@ -38,4 +83,11 @@ html {
 
 body {
   margin-bottom: 60px;
+}
+
+@media screen and (min-width: 768px) {
+  /* Dashboard */
+  .dashboard .col.btn {
+    min-width: 25%;
+  }
 }
