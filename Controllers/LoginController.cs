@@ -1,6 +1,8 @@
 ﻿using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging.Abstractions;
 using System.Diagnostics;
+using System.Runtime.Intrinsics.X86;
 
 namespace BumboApp.Controllers
 {
@@ -9,6 +11,23 @@ namespace BumboApp.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        public IActionResult Login(User model, string password)
+        {
+            var user = _context.Users.SingleOrDefault(u => u.Email == model.Email);
+            if (user != null)
+            {
+                var dbPassword = _context.Entry(user).Property("Password").CurrentValue as string;
+                if (dbPassword == password)
+                {
+                    Console.WriteLine(user.FirstName);
+                    return RedirectToAction("index", "Dashboard");
+                }
+            }
+
+            Console.WriteLine("geen user");
+            return RedirectToAction("index", "Login");
         }
 
         public void Logout()
