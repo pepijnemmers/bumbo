@@ -6,7 +6,8 @@ namespace BumboApp.Controllers
 {
     public class MainController : Controller
     {
-        private BumboDbContext _context;
+        protected BumboDbContext _context;
+        protected User? LoggedInUser;
         public MainController()
         {
             _context = new BumboDbContext();

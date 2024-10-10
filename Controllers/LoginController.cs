@@ -21,6 +21,7 @@ namespace BumboApp.Controllers
                 var dbPassword = _context.Entry(user).Property("Password").CurrentValue as string;
                 if (dbPassword == password)
                 {
+                    LoggedInUser = user;
                     return RedirectToAction("index", "Dashboard");
                 }
             }
