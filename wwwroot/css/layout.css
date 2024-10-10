@@ -7,6 +7,7 @@ body {
 .aside-nav {
     box-shadow: 5px 0 8px -3px rgba(0, 0, 0, .15);
     z-index: 999999;
+    inset: 0;
 }
 
 .aside-nav .logo {
@@ -59,6 +60,12 @@ body {
      background-color: var(--bs-danger);
 }
 
+@media screen and (max-width: 768px) {
+    .aside-nav {
+        position: fixed;
+    }
+}
+
 /* topbar */
 .topbar {
     box-shadow: 0 5px 8px -3px rgba(0, 0, 0, .15);
@@ -76,4 +83,12 @@ body {
 
 .topbar .profile-icon {
     height: 45px;
+}
+
+.mobile-menu-icon {
+    all: unset;
+    font-size: 2rem;
+    color: var(--bs-primary);
+    padding: .1em .45em;
+    border-radius: .2em;
 }
