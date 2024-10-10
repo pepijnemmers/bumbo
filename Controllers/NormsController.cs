@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BumboApp.Controllers
 {
@@ -6,7 +7,8 @@ namespace BumboApp.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            var norms = _context.Norms.ToList();
+            return View(norms);
         }
     }
 }

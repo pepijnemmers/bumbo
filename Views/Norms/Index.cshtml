@@ -1,4 +1,5 @@
-﻿@{
+﻿@model List<BumboApp.Models.Norm>
+@{
     ViewData["Title"] = "Normeringen";
 }
 <h5>Normeringen</h5>
@@ -13,30 +14,27 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <th scope="row">Coli uitladen</th>
-                    <td>5 minuten</td>
-                </tr>
-                <tr>
-                    <th scope="row">Vakken vullen</th>
-                    <td>30 minuten per coli</td>
-                </tr>
-                <tr>
-                    <th scope="row">Kassa</th>
-                    <td>30 klanten per uur</td>
-                </tr>
-                <tr>
-                    <th scope="row">Vers</th>
-                    <td>100 klanten per uur</td>
-                </tr>
-                <tr>
-                    <th scope="row">Spiegelen</th>
-                    <td>30 seconde per meter</td>
-                </tr>
+                
+                @*
+                    TODO: correct filteren&limiteren
+                *@
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <th scope="row">@item.Activity</th>
+                            <td>@item.Value <b>@item.NormType</b></td>
+                        </tr>
+                    }
+                }
             </tbody>
         </table>
     </div>
 
+    @*
+        TODO: Tabel met eerdere normeringen en correct filteren&limiteren
+    *@
     <div>
         <table class="table">
             <thead>
@@ -50,54 +48,29 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                </tr>
-                <tr>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                </tr>
-                <tr>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                </tr>
-                <tr>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                </tr>
-                <tr>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                </tr>
-                <tr>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                    <td>Item</td>
-                </tr>
+
+                @if (Model != null && Model.Count > 5)
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.CreatedAt</td>
+                            @*vv Filter on Activity vv*@
+                            <td>@item.Value</td>
+                            <td>@item.Value</td>
+                            <td>@item.Value</td>
+                            <td>@item.Value</td>
+                            <td>@item.Value</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td>Er zijn geen eerdere normeringen</td>
+                    </tr>
+                    
+                }
             </tbody>
         </table>
     </div>
