@@ -15,6 +15,13 @@ public partial class BumboDbContext : DbContext
         : base(options)
     {
     }
+    
+    private IConfiguration Configuration => new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json")
+        .Build();
+    
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        => optionsBuilder.UseSqlServer(Configuration.GetConnectionString("BumboDb"));
 
     public virtual DbSet<Expectation> Expectations { get; set; }
 
