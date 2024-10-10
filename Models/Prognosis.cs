@@ -6,10 +6,11 @@ namespace BumboApp.Models
         [Key]
         public int Id { get; set; }
         [Required]
+        public int WeekPrognosesId { get; set; }
+        [Required]
         public DateOnly Date {  get; set; }
         [Required]
-        [StringLength(255)]
-        public string Department { get; set; }
+        public Department Department { get; set; }
         [Required]
         public float NeededHours { get; set; }
         [Required]
