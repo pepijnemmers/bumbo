@@ -26,6 +26,7 @@ namespace BumboApp.Controllers
 
             ViewData["Year"] = year;
             ViewData["WeekNr"] = weekNumber;
+            
 
             return View(wp);
         }
@@ -61,6 +62,7 @@ namespace BumboApp.Controllers
                 {
                     existingPrognosis.NeededHours = prognosis.NeededHours;
                     existingPrognosis.NeededEmployees = prognosis.NeededEmployees;
+                    //Console.WriteLine(existingPrognosis.NeededHours + " | " + existingPrognosis.NeededEmployees);
                 }
             }
 

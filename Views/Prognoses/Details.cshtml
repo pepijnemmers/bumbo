@@ -4,23 +4,25 @@
 
 @model BumboApp.Models.WeekPrognosis
 
-@if (Model == null)
-{
-    <p>Geen prognose TODO</p>
-}
-else
-{
+
 
     <div class="row justify-content-between">
 
         <div class="col-md-3">Prognose week @ViewData["WeekNr"]</div>
         <div class="col-md-3">
             <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@ViewData["Year"]-@((int)ViewData["WeekNr"]-1)">&lt;</a>
-            @Model.StartDate - @Model.StartDate.AddDays(6)
+        week @ViewData["WeekNr"] - @ViewData["Year"]
             <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@ViewData["Year"]-@((int)ViewData["WeekNr"]+1)">&gt;</a>
         </div>
     </div>
-    <div id="overview" class="row flex-nowrap my-3 border">
+
+@if (Model == null)
+{
+    <div class="border">Geen prognose voor deze week</div>
+}
+else
+{
+    <div id="overview" class="row  my-3 border flex-nowrap">
         <div class="col">
             <p>Afdeling</p>
             <p>Vers</p>
@@ -34,7 +36,7 @@ else
                 <p>@day</p>
                 @foreach (Department department in Department.GetValues(typeof(Department)))
                 {
-                    <p>@Model.Prognoses.Single(p => p.Department == department && p.Date.DayOfWeek == day).NeededHours | @Model.Prognoses.Single(p => p.Department == department && p.Date.DayOfWeek == day).NeededEmployees</p>
+                    <p>@Model.Prognoses.Single(p => p.Department == department && p.Date.DayOfWeek == day).NeededEmployees | @Model.Prognoses.Single(p => p.Department == department && p.Date.DayOfWeek == day).NeededHours</p>
                 }
             </div>
         }
@@ -64,8 +66,8 @@ else
                                 <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Date" value="@prognosis.Date" />
                                 <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Department" value="@prognosis.Department" />
 
-                                <input type="number" class="form-control form-control-sm col-6" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededHours" value="@prognosis.NeededHours" />
                                 <input type="number" class="form-control form-control-sm col-6" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededEmployees" value="@prognosis.NeededEmployees" />
+                                <input type="number" class="form-control form-control-sm col-6" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededHours" value="@prognosis.NeededHours" />
                             </div>
                         }
                     }
@@ -75,8 +77,7 @@ else
 
 
 
-        <div class="row justify-content-between">
-            <div class="col-md-3">Legenda <br /> aantal medewerkers | aantal uur</div>
+        <div class="row justify-content-end">
             <div class="w-auto">
                 <button class="btn btn-primary">OPNIEUW BEREKENEN</button>
                 <button type="submit" class="btn btn-primary">OPSLAAN</button>
@@ -87,22 +88,24 @@ else
     <div class="row justify-content-between">
         <div class="col-md-3">Legenda <br /> aantal medewerkers | aantal uur</div>
 
-        <button class="btn btn-primary w-auto" onclick="myFunction()">BEWERKEN</button>
+        <button id="editButton" class="btn btn-primary w-auto" onclick="toggleEdit()">BEWERKEN</button>
     </div>
 
     <script>
-        function myFunction() {
+        function toggleEdit() {
             var form = document.getElementById("form");
             var overview = document.getElementById("overview");
+            var editButton = document.getElementById("editButton");
 
             if (form.style.display === "none") {
                 overview.style.display = "none";
                 form.style.display = "block";
+                editButton.textContent = "ANNULEREN";
             } else {
-                overview.style.display = "block";
                 form.style.display = "none";
+                overview.style.display = "flex";
+                editButton.textContent = "BEWERKEN";
             }
         }
     </script>
 }
-
