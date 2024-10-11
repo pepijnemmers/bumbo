@@ -4,33 +4,105 @@
 
 @model BumboApp.Models.WeekPrognosis
 
-<div class="row justify-content-between">
-    <div class="col-md-3">Prognose week @Model.StartDate</div>
-    <div class="col-md-3">navigatie</div>
-</div>
-<div class="row my-3 border">
-    <div class="col">
-        <p>Afdeling</p>
-        <p>Vers</p>
-        <p>Vakkenvullen</p>
-        <p>Kassa</p>
+@if (Model == null)
+{
+    <p>Geen prognose TODO</p>
+}
+else
+{
+
+    <div class="row justify-content-between">
+
+        <div class="col-md-3">Prognose week @ViewData["WeekNr"]</div>
+        <div class="col-md-3">
+            <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@ViewData["Year"]-@((int)ViewData["WeekNr"]-1)">&lt;</a>
+            @Model.StartDate - @Model.StartDate.AddDays(6)
+            <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@ViewData["Year"]-@((int)ViewData["WeekNr"]+1)">&gt;</a>
+        </div>
+    </div>
+    <div id="overview" class="row flex-nowrap my-3 border">
+        <div class="col">
+            <p>Afdeling</p>
+            <p>Vers</p>
+            <p>Vakkenvullen</p>
+            <p>Kassa</p>
+        </div>
+
+        @foreach (DayOfWeek day in DayOfWeek.GetValues(typeof(DayOfWeek)))
+        {
+            <div class="col">
+                <p>@day</p>
+                @foreach (Department department in Department.GetValues(typeof(Department)))
+                {
+                    <p>@Model.Prognoses.Single(p => p.Department == department && p.Date.DayOfWeek == day).NeededHours | @Model.Prognoses.Single(p => p.Department == department && p.Date.DayOfWeek == day).NeededEmployees</p>
+                }
+            </div>
+        }
     </div>
 
-    @foreach (DayOfWeek day in DayOfWeek.GetValues(typeof(DayOfWeek)))
-    {
-    <div class="col">
-        <p>@day</p>
-            @foreach (Department department in Department.GetValues(typeof(Department)))
+
+    <form id="form" style="display: none" asp-action="Update" method="post">
+        <div class="row my-3 border">
+            <div class="col">
+                <p>Afdeling</p>
+                <p>Vers</p>
+                <p>Vakkenvullen</p>
+                <p>Kassa</p>
+            </div>
+            @foreach (DayOfWeek day in DayOfWeek.GetValues(typeof(DayOfWeek)))
             {
-                <p>@Model.Prognoses.Single(p => p.Department == department && p.Date.DayOfWeek == day).NeededHours | @Model.Prognoses.Single(p => p.Department == department && p.Date.DayOfWeek == day).NeededEmployees</p>
+                <div class="col">
+                    <p>@day</p>
+                    @foreach (Department department in Department.GetValues(typeof(Department)))
+                    {
+                        var prognosis = Model.Prognoses.SingleOrDefault(p => p.Department == department && p.Date.DayOfWeek == day);
+
+                        @if (prognosis != null)
+                        {
+                            <div class="input-group mb-2">
+                                <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Id" value="@prognosis.Id" />
+                                <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Date" value="@prognosis.Date" />
+                                <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Department" value="@prognosis.Department" />
+
+                                <input type="number" class="form-control form-control-sm col-6" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededHours" value="@prognosis.NeededHours" />
+                                <input type="number" class="form-control form-control-sm col-6" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededEmployees" value="@prognosis.NeededEmployees" />
+                            </div>
+                        }
+                    }
+                </div>
             }
         </div>
-    }
-    <!--@foreach weekday @foreach department -->
 
 
 
-</div>
-<div class="col-md-6 border">
-    <div>Speciale dagen<br>Prognose vermenigvuldigd met de factor TODO</div>
-</div>
+        <div class="row justify-content-between">
+            <div class="col-md-3">Legenda <br /> aantal medewerkers | aantal uur</div>
+            <div class="w-auto">
+                <button class="btn btn-primary">OPNIEUW BEREKENEN</button>
+                <button type="submit" class="btn btn-primary">OPSLAAN</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="row justify-content-between">
+        <div class="col-md-3">Legenda <br /> aantal medewerkers | aantal uur</div>
+
+        <button class="btn btn-primary w-auto" onclick="myFunction()">BEWERKEN</button>
+    </div>
+
+    <script>
+        function myFunction() {
+            var form = document.getElementById("form");
+            var overview = document.getElementById("overview");
+
+            if (form.style.display === "none") {
+                overview.style.display = "none";
+                form.style.display = "block";
+            } else {
+                overview.style.display = "block";
+                form.style.display = "none";
+            }
+        }
+    </script>
+}
+

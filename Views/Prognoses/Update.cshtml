@@ -1,4 +1,51 @@
 ﻿@{
     ViewData["Title"] = "Prognose bewerken";
 }
-<h5>Prognoses update</h5>
+
+@model BumboApp.Models.WeekPrognosis
+
+<div class="row justify-content-between">
+    <div class="col-md-3">Prognose week @Model.StartDate</div>
+</div>
+
+<form asp-action="Update" method="post">
+    <div class="row my-3 border">
+        <div class="col">
+            <p>Afdeling</p>
+            <p>Vers</p>
+            <p>Vakkenvullen</p>
+            <p>Kassa</p>
+        </div>
+        @foreach (DayOfWeek day in DayOfWeek.GetValues(typeof(DayOfWeek)))
+        {
+            <div class="col">
+                <p>@day</p>
+                @foreach (Department department in Department.GetValues(typeof(Department)))
+                {
+                    var prognosis = Model.Prognoses.SingleOrDefault(p => p.Department == department && p.Date.DayOfWeek == day);
+
+                    @if (prognosis != null)
+                    {
+                        <div class="input-group mb-2">
+                            <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Id" value="@prognosis.Id" />
+                            <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Date" value="@prognosis.Date" />
+                            <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Department" value="@prognosis.Department" />
+
+                            <input type="number" class="form-control form-control-sm col-6" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededHours" value="@prognosis.NeededHours" />
+                            <input type="number" class="form-control form-control-sm col-6" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededEmployees" value="@prognosis.NeededEmployees" />
+                        </div>
+                    }
+                }
+            </div>
+        }
+    </div>
+
+    <div class="row justify-content-between">
+        <div class="col-md-3">Legenda <br /> aantal medewerkers | aantal uur</div>
+        <div class="w-auto">
+            <button class="btn btn-primary">OPNIEUW BEREKENEN</button>
+            <button type="submit" class="btn btn-primary">OPSLAAN</button>
+        </div>
+    </div>
+</form>
+
