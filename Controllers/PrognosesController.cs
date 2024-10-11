@@ -8,16 +8,15 @@ namespace BumboApp.Controllers
     {
         private readonly int _pageSize = 5; //a constant for how many items per list page
         private readonly int _standardPage = 1; // a constant for the standard pagenumber
-        public IActionResult Index(int? page, bool? overviewDesc)
+        public IActionResult Index(int? page, bool overviewDesc = false)
         {
-            overviewDesc = overviewDesc ?? false;
             List<WeekPrognosis> prognoses = _context.WeekPrognoses
                 .OrderBy(p => p.StartDate)
                 .ToList();
             List<WeekPrognosis> prognosesForPage = new List<WeekPrognosis>();
 
             string imageUrl = "~/img/UpArrow.png";
-            if (!(bool)overviewDesc)
+            if (!overviewDesc)
             {
                 imageUrl = "~/img/DownArrow.png";
                 prognoses.Reverse();
