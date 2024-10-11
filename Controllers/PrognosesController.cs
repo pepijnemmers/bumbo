@@ -1,9 +1,5 @@
-﻿using Azure;
-using BumboApp.Models;
+﻿using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 
 
 namespace BumboApp.Controllers
@@ -48,7 +44,7 @@ namespace BumboApp.Controllers
 
             return View(prognosesForPage);
         }
-            public IActionResult Details(String id)
+        public IActionResult Details(String id)
         {
             return View();
         }
