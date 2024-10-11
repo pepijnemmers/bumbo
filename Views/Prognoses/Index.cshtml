@@ -13,7 +13,7 @@
                 <h2>Overview</h2>
             </div>
             <div class="col-auto">
-                <button class="btn btn-primary btn-sm d-inline-block">Nieuwe Prognose</button>
+                <a asp-controller="Prognoses" asp-action="CreatePrognosis" class="btn btn-primary btn-sm d-inline-block">Nieuwe Prognose</a>
             </div>
         </div>
     @if (!Model.Any())
@@ -29,7 +29,7 @@
         <table class="table rounded">
             <thead class="table-light">
                 <tr>
-                    <th>Week</th>
+                        <th><a asp-controller="Prognoses" asp-action="Index" asp-route-OverviewDesc="@(!ViewBag.OverviewDesc)" class="text-decoration-none text-dark ">Week <img style="width: 20px; height: auto" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow" /></a></th>
                     <th>Begin datum</th>
                     <th>Eind datum</th>
                     <th>Acties</th>
@@ -38,16 +38,18 @@
             <tbody>
                 @foreach (var item in Model)
                 {
-                        DateTime startDateTime = item.StartDate.ToDateTime(TimeOnly.MinValue); // Sets the time to midnight
+                        DateTime startDateTime = item.StartDate.ToDateTime(TimeOnly.MinValue);
                         int weekNumber = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(startDateTime,new CalendarWeekRule(),item.StartDate.DayOfWeek);
                     <tr>
                         <td class=" col-2">@weekNumber</td>
                         <td class =" col-4">@item.StartDate</td> 
                         <td class=" col-4">@item.StartDate.AddDays(7)</td> 
                         <td class=" col-1">
-                            <a asp-controller="prognoses" asp-action="update">
-                                <img style="width: 20px; height: auto" src="~/img/Update_Logo.png" alt="Alternate Text" />
-                            </a>
+                            @if(!(item.StartDate <= DateOnly.FromDateTime(DateTime.Now))){
+                                    <a asp-controller="prognoses" asp-action="update">
+                                        <img style="width: 20px; height: auto" src="~/img/Update_Logo.png" alt="Alternate Text" />
+                                    </a>
+                            }
                                 <a asp-controller ="prognoses" asp-action="details">
                                 <img style="width: 20px; height: auto" src="~/img/Details_Logo.png" alt="Alternate Text" />
                             </a>
@@ -64,7 +66,7 @@
                     @if (!(ViewBag.PageNumber <= 1))
                     {
                         <li class="page-item">
-                            <a class="page-link" asp-controller="Prognoses" asp-action="index" aria-label="begin ">
+                            <a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-OverviewDesc="@ViewBag.OverviewDesc" aria-label="begin ">
                                 <span aria-hidden="true">&laquo;</span>
                             </a>
                         </li>
@@ -73,21 +75,21 @@
                                 <span aria-hidden="true">&larr;</span>
                             </a>
                         </li>
-                        <li class="page-item"><a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@(ViewBag.PageNumber - 1)">@(ViewBag.PageNumber - 1)</a></li>
+                        <li class="page-item"><a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@(ViewBag.PageNumber - 1)" asp-route-OverviewDesc="@ViewBag.OverviewDesc">@(ViewBag.PageNumber - 1)</a></li>
                     }
 
-                    <li class="page-item"><a class="page-link btn-dark" asp-controller="Prognoses" asp-action="index" asp-route-page="@ViewBag.PageNumber">@ViewBag.PageNumber</a></li>
+                    <li class="page-item"><a class="page-link btn-dark" asp-controller="Prognoses" asp-action="index" asp-route-page="@ViewBag.PageNumber" asp-route-OverviewDesc="@ViewBag.OverviewDesc">@ViewBag.PageNumber</a></li>
                 
                  @if (!(ViewBag.PageNumber >= ViewBag.MaxPages))
                  {
-                        <li class="page-item"><a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@(ViewBag.PageNumber + 1)">@(ViewBag.PageNumber + 1)</a></li>
+                        <li class="page-item"><a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@(ViewBag.PageNumber + 1)" asp-route-OverviewDesc="@ViewBag.OverviewDesc">@(ViewBag.PageNumber + 1)</a></li>
                     <li class="page-item">
-                        <a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@ViewBag.PageNumber + 1" aria-label="next">
+                            <a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@ViewBag.PageNumber + 1" asp-route-OverviewDesc="@ViewBag.OverviewDesc" aria-label="next">
                             <span aria-hidden="true">&rarr;</span>
                         </a>
                     </li>
                     <li class="page-item">
-                            <a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@ViewBag.MaxPages" aria-label="last">
+                            <a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@ViewBag.MaxPages" asp-route-OverviewDesc="@ViewBag.OverviewDesc" aria-label="last">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
