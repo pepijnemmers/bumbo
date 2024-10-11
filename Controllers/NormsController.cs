@@ -1,14 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BumboApp.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BumboApp.Controllers
 {
     public class NormsController : MainController
     {
-        public IActionResult Index()
+        public IActionResult Index(int? page, bool overviewDesc = true)
         {
-            var norms = _context.Norms.ToList();
+            List<Norm> norms = _context.Norms.OrderByDescending(n => n.CreatedAt).ToList();
             return View(norms);
+            
         }
     }
 }
