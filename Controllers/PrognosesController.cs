@@ -10,13 +10,12 @@ namespace BumboApp.Controllers
 {
     public class PrognosesController : MainController
     {
-        private readonly BumboDbContext _dbContext = new BumboDbContext();
         private readonly int _pageSize = 5; //a constant for how many items per list page
         private readonly int _standardPage = 1; // a constant for the standard pagenumber
         public IActionResult Index(int? page, bool? overviewDesc)
         {
             overviewDesc = overviewDesc ?? false;
-            List<WeekPrognosis> prognoses = _dbContext.WeekPrognoses
+            List<WeekPrognosis> prognoses = _context.WeekPrognoses
                 .OrderBy(p => p.StartDate)
                 .ToList();
             List<WeekPrognosis> prognosesForPage = new List<WeekPrognosis>();
