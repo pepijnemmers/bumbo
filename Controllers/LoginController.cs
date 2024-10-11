@@ -25,12 +25,18 @@ namespace BumboApp.Controllers
                     return RedirectToAction("index", "Dashboard");
                 }
             }
+            
+            NotifyService.Error("Onjuiste gebruikersnaam of wachtwoord");
             return RedirectToAction("index", "Login");
         }
 
-        public void Logout()
+        [HttpGet]
+        public IActionResult Logout()
         {
-            // todo: implement logout
+            LoggedInUser = null;
+            NotifyService.Success("U bent uitgelogd");
+            
+            return RedirectToAction("index", "Login");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
