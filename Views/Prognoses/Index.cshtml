@@ -18,9 +18,9 @@
         </div>
     @if (!Model.Any())
     {
-        <!-- Display this alert if there are no items -->
+        <!-- Display this alert if there are no prognoses -->
         <div class="alert alert-warning" role="alert">
-            There are no items to display.
+            Geen prognoses in het systeem.
         </div>
     }
     else
@@ -29,8 +29,8 @@
         <table class="table rounded">
             <thead class="table-light">
                 <tr>
-                        <th><a asp-controller="Prognoses" asp-action="Index" asp-route-OverviewDesc="@(!ViewBag.OverviewDesc)" class="text-decoration-none text-dark ">Week <img style="width: 20px; height: auto" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow" /></a></th>
-                    <th>Begin datum</th>
+                        <th>Week</th>
+                        <th><a asp-controller="Prognoses" asp-action="Index" asp-route-OverviewDesc="@(!ViewBag.OverviewDesc)" class="text-decoration-none text-dark ">Begin datum<img style="width: 20px; height: auto" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow" /></a></th>
                     <th>Eind datum</th>
                     <th>Acties</th>
                 </tr>
@@ -50,7 +50,7 @@
                                         <img style="width: 20px; height: auto" src="~/img/Update_Logo.png" alt="Alternate Text" />
                                     </a>
                             }
-                                <a asp-controller ="prognoses" asp-action="details">
+                                <a asp-controller ="prognoses" asp-action="details" asp-route-id="@("" + item.StartDate.Year + "-" + weekNumber)">
                                 <img style="width: 20px; height: auto" src="~/img/Details_Logo.png" alt="Alternate Text" />
                             </a>
                         </td>
@@ -63,6 +63,7 @@
             <nav class=" align-content-end" aria-label="">
                 <ul class="d-flex justify-content-end list-unstyled">
 
+                    <!-- if there are previous pages in the list these items will be on screen-->
                     @if (!(ViewBag.PageNumber <= 1))
                     {
                         <li class="page-item">
@@ -77,9 +78,10 @@
                         </li>
                         <li class="page-item"><a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@(ViewBag.PageNumber - 1)" asp-route-OverviewDesc="@ViewBag.OverviewDesc">@(ViewBag.PageNumber - 1)</a></li>
                     }
-
+                    <!-- shows the current page-->
                     <li class="page-item"><a class="page-link btn-dark" asp-controller="Prognoses" asp-action="index" asp-route-page="@ViewBag.PageNumber" asp-route-OverviewDesc="@ViewBag.OverviewDesc">@ViewBag.PageNumber</a></li>
-                
+
+                    <!-- if there are next pages in the list these items will be on screen-->
                  @if (!(ViewBag.PageNumber >= ViewBag.MaxPages))
                  {
                         <li class="page-item"><a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@(ViewBag.PageNumber + 1)" asp-route-OverviewDesc="@ViewBag.OverviewDesc">@(ViewBag.PageNumber + 1)</a></li>

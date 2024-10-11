@@ -2,6 +2,7 @@
 using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 
 
@@ -9,42 +10,46 @@ namespace BumboApp.Controllers
 {
     public class PrognosesController : MainController
     {
-        BumboDbContext DbContext = new BumboDbContext();
+        private readonly BumboDbContext _dbContext = new BumboDbContext();
+        private readonly int _pageSize = 5; //a constant for how many items per list page
+        private readonly int _standardPage = 1; // a constant for the standard pagenumber
         public IActionResult Index(int? page, bool? overviewDesc)
         {
             overviewDesc = overviewDesc ?? false;
-            List<WeekPrognosis> prognoses = DbContext.WeekPrognoses
+            List<WeekPrognosis> prognoses = _dbContext.WeekPrognoses
                 .OrderBy(p => p.StartDate)
                 .ToList();
             List<WeekPrognosis> prognosesForPage = new List<WeekPrognosis>();
 
-            string ImageUrl = "~/img/DownArrow.png";
-            if ((bool)overviewDesc)
+            string imageUrl = "~/img/UpArrow.png";
+            if (!(bool)overviewDesc)
             {
-                ImageUrl = "~/img/UpArrow.png";
+                imageUrl = "~/img/DownArrow.png";
                 prognoses.Reverse();
             }
 
-            int currentPageNumber = page ?? 1;
-            int pageListSized = 5;
-            int maxPages = (int)(Math.Ceiling((decimal)prognoses.Count / pageListSized));
-            if(currentPageNumber <= 0) { currentPageNumber = 1; }
-            if(currentPageNumber > maxPages) { currentPageNumber = maxPages; }
+            int currentPageNumber = page ?? _standardPage;
+            int maxPages = (int)(Math.Ceiling((decimal)prognoses.Count / _pageSize));
+            if (currentPageNumber <= 0) { currentPageNumber = _standardPage; }
+            if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
 
-            for(int i = (currentPageNumber - 1)* pageListSized; i <= currentPageNumber * pageListSized && i < prognoses.Count; i++)
+            if (prognoses.Count > 0)
             {
-                prognosesForPage.Add(prognoses[i]);
+                for (int i = (currentPageNumber - 1) * _pageSize; i <= currentPageNumber * _pageSize && i < prognoses.Count; i++)
+                {
+                    prognosesForPage.Add(prognoses[i]);
+                }
             }
 
             ViewBag.PageNumber = currentPageNumber;
-            ViewBag.PageSize = pageListSized;
+            ViewBag.PageSize = _pageSize;
             ViewBag.MaxPages = maxPages;
-            ViewBag.ImageUrl = ImageUrl;
+            ViewBag.ImageUrl = imageUrl;
             ViewBag.OverviewDesc = overviewDesc;
+
             return View(prognosesForPage);
         }
-
-        public IActionResult Details()
+            public IActionResult Details(String id)
         {
             return View();
         }
