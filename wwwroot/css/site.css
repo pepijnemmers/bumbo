@@ -81,13 +81,18 @@ html {
   min-height: 100%;
 }
 
-body {
-  margin-bottom: 60px;
-}
-
 @media screen and (min-width: 768px) {
   /* Dashboard */
   .dashboard .col.btn {
     min-width: 25%;
   }
+}
+
+/*Login*/
+.banner-col {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--accent-color);
 }

@@ -10,9 +10,14 @@ namespace BumboApp.Controllers
     {
         [FromServices] 
         protected INotyfService NotifyService { get; set; } = null!;
+        protected BumboDbContext _context;
+        private static User? _loggedInUser;
+        protected static User? LoggedInUser
+        {
+            get => _loggedInUser;
+            set => _loggedInUser = value;
+        }
 
-        private BumboDbContext _context;
-        
         public MainController()
         {
             _context = new BumboDbContext();
@@ -24,9 +29,14 @@ namespace BumboApp.Controllers
         /// </summary>
         /// <param name="context">The context in which the action is executed.</param>
         public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            NotifyService = HttpContext.RequestServices.GetService<INotyfService>()!;
+        {    
             base.OnActionExecuting(context);
+            NotifyService = HttpContext.RequestServices.GetService<INotyfService>()!;
+            
+            if (LoggedInUser == null && context.HttpContext.Request.Path != "/login")
+            {
+                context.HttpContext.Response.Redirect("/Login");
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
