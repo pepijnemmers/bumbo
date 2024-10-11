@@ -1,6 +1,8 @@
 ﻿using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging.Abstractions;
 using System.Diagnostics;
+using System.Runtime.Intrinsics.X86;
 
 namespace BumboApp.Controllers
 {
@@ -11,9 +13,30 @@ namespace BumboApp.Controllers
             return View();
         }
 
-        public void Logout()
+        public IActionResult Login(User model, string password)
         {
-            // todo: implement logout
+            var user = _context.Users.SingleOrDefault(u => u.Email == model.Email);
+            if (user != null)
+            {
+                var dbPassword = _context.Entry(user).Property("Password").CurrentValue as string;
+                if (dbPassword == password)
+                {
+                    LoggedInUser = user;
+                    return RedirectToAction("index", "Dashboard");
+                }
+            }
+            
+            NotifyService.Error("Onjuiste gebruikersnaam of wachtwoord");
+            return RedirectToAction("index", "Login");
+        }
+
+        [HttpGet]
+        public IActionResult Logout()
+        {
+            LoggedInUser = null;
+            NotifyService.Success("U bent uitgelogd");
+            
+            return RedirectToAction("index", "Login");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
