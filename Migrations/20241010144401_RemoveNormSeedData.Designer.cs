@@ -4,6 +4,7 @@ using BumboApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BumboApp.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    partial class BumboDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241010144401_RemoveNormSeedData")]
+    partial class RemoveNormSeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -201,9 +204,6 @@ namespace BumboApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Activity")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -216,48 +216,6 @@ namespace BumboApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Norms");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Activity = 0,
-                            CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
-                            NormType = 0,
-                            Value = 5
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Activity = 1,
-                            CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
-                            NormType = 1,
-                            Value = 30
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Activity = 2,
-                            CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
-                            NormType = 2,
-                            Value = 30
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Activity = 3,
-                            CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
-                            NormType = 2,
-                            Value = 100
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Activity = 4,
-                            CreatedAt = new DateTime(2024, 10, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
-                            NormType = 3,
-                            Value = 30
-                        });
                 });
 
             modelBuilder.Entity("BumboApp.Models.OpeningHour", b =>
