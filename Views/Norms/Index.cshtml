@@ -5,8 +5,8 @@
 <h5>Normeringen</h5>
 
 <div class="container">
-    <div>
-        <table class="table norms-table">
+    <div class="norms-table">
+        <table class="table">
             <thead>
                 <tr>
                     <th scope="col">Activiteiten</th>
@@ -38,7 +38,7 @@
                 }
                 else
                 {
-                    foreach(string activity in Enum.GetNames(typeof(NormActivity)))
+                    foreach (string activity in Enum.GetNames(typeof(NormActivity)))
                     {
                         <tr>
                             <th scope="row">@activity</th>
@@ -48,48 +48,51 @@
                 }
             </tbody>
         </table>
+        <div class="col justify-content-end">
+            <a asp-controller="Norms" class="btn btn-primary btn-sm d-inline-block float-end">Bewerken</a>
+        </div>
     </div>
-
-    @*
-        TODO: Tabel met eerdere normeringen en correct filteren&limiteren
-    *@
+    
     <div>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Datum</th>
-                    <th scope="col">Coli uitladen</th>
-                    <th scope="col">Vakken vullen</th>
-                    <th scope="col">Kassa</th>
-                    <th scope="col">Vers</th>
-                    <th scope="col">Spiegelen</th>
-                </tr>
-            </thead>
-            <tbody>
-
+        <div class="row  my-3 border flex-nowrap">
+            @*
+            TODO: Zorgen dat de onderstaande div op een rij staat & opmaak tabel
+            *@
+            <div class="col">
+                <p>Datum</p>
+                <p>Coli uitladen</p>
+                <p>Vakken vullen</p>
+                <p>Kassa</p>
+                <p>Vers</p>
+                <p>Spiegelen</p>
+            </div>
+            <div class="col">
                 @if (Model != null)
                 {
+                    DateTime latestDate = DateTime.Now;
                     @foreach (var item in Model)
                     {
-                        <tr>
-                            <td>@item.CreatedAt</td>
-                            @*vv Filter on Activity vv*@
-                            <td>@item.Value</td>
-                            <td>@item.Value</td>
-                            <td>@item.Value</td>
-                            <td>@item.Value</td>
-                            <td>@item.Value</td>
-                        </tr>
+                        if (item.CreatedAt != latestDate)
+                        {
+                            latestDate = item.CreatedAt;
+                            <p>@latestDate</p>
+                        }
                     }
                 }
-                else
-                {
-                    <tr>
-                        <td>Er zijn geen eerdere normeringen</td>
-                    </tr>
-                    
-                }
-            </tbody>
-        </table>
+            </div>
+
+            @foreach (NormActivity activity in NormActivity.GetValues(typeof(NormActivity)))
+            {
+                <div class="col">
+                    @foreach (var item in Model)
+                    {
+                        if (item.Activity == activity)
+                        {
+                            <p>@item.Value</p>
+                        }
+                    }
+                </div>
+            }
+        </div>
     </div>
 </div>
