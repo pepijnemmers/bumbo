@@ -70,74 +70,8 @@
                     int counter = 0;
                     @foreach (var item in Model.GroupBy(i => i.CreatedAt))
                     {
-                        if (counter > 1)
+                        if (counter > 0)
                         {
-                            <tr>
-                                <td>@item.Key.ToShortDateString()</td>
-                                <td>
-                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.ColiUitladen))
-                                    {
-                                        <p>@activityItem.Value</p>
-                                    }
-                                </td>
-                                <td>
-                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.VakkenVullen))
-                                    {
-                                        <p>@activityItem.Value</p>
-                                    }
-                                </td>
-                                <td>
-                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Kassa))
-                                    {
-                                        <p>@activityItem.Value</p>
-                                    }
-                                </td>
-                                <td>
-                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Vers))
-                                    {
-                                        <p>@activityItem.Value</p>
-                                    }
-                                </td>
-                                <td>
-                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Spiegelen))
-                                    {
-                                        <p>@activityItem.Value</p>
-                                    }
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>@item.Key.ToShortDateString()</td>
-                                <td>
-                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.ColiUitladen))
-                                    {
-                                        <p>@activityItem.Value</p>
-                                    }
-                                </td>
-                                <td>
-                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.VakkenVullen))
-                                    {
-                                        <p>@activityItem.Value</p>
-                                    }
-                                </td>
-                                <td>
-                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Kassa))
-                                    {
-                                        <p>@activityItem.Value</p>
-                                    }
-                                </td>
-                                <td>
-                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Vers))
-                                    {
-                                        <p>@activityItem.Value</p>
-                                    }
-                                </td>
-                                <td>
-                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Spiegelen))
-                                    {
-                                        <p>@activityItem.Value</p>
-                                    }
-                                </td>
-                            </tr>
                             <tr>
                                 <td>@item.Key.ToShortDateString()</td>
                                 <td>
