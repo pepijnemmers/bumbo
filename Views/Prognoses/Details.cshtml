@@ -2,21 +2,21 @@
     ViewData["Title"] = "Prognose details";
 }
 
-@model BumboApp.Models.WeekPrognosis
+@model BumboApp.ViewModels.WeekPrognosisViewModel
 
 
 
-    <div class="row justify-content-between">
+<div class="row justify-content-between">
 
-        <div class="col-md-3">Prognose week @ViewData["WeekNr"]</div>
-        <div class="col-md-3">
-            <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@ViewData["Year"]-@((int)ViewData["WeekNr"]-1)">&lt;</a>
-        week @ViewData["WeekNr"] - @ViewData["Year"]
-            <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@ViewData["Year"]-@((int)ViewData["WeekNr"]+1)">&gt;</a>
-        </div>
+    <div class="col-md-3">Prognose week @Model.WeekNr</div>
+    <div class="col-md-3">
+        <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@Model.Year-@(Model.WeekNr-1)">&lt;</a>
+        week @Model.WeekNr - @Model.Year
+        <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@Model.Year-@(Model.WeekNr+1)">&gt;</a>
     </div>
+</div>
 
-@if (Model == null)
+@if (Model.Prognoses == null)
 {
     <div class="border">Geen prognose voor deze week</div>
 }
@@ -30,10 +30,11 @@ else
             <p>Kassa</p>
         </div>
 
-        @foreach (DayOfWeek day in DayOfWeek.GetValues(typeof(DayOfWeek)))
+        @for (int i = 0; i < 7; i++)
         {
+            DayOfWeek day = (DayOfWeek)((i + 1) % 7);
             <div class="col">
-                <p>@day</p>
+                <p>@Model.DutchDays[i]</p>
                 @foreach (Department department in Department.GetValues(typeof(Department)))
                 {
                     <p>@Model.Prognoses.Single(p => p.Department == department && p.Date.DayOfWeek == day).NeededEmployees | @Model.Prognoses.Single(p => p.Department == department && p.Date.DayOfWeek == day).NeededHours</p>
@@ -51,10 +52,12 @@ else
                 <p>Vakkenvullen</p>
                 <p>Kassa</p>
             </div>
-            @foreach (DayOfWeek day in DayOfWeek.GetValues(typeof(DayOfWeek)))
+
+            @for (int i = 0; i < 7; i++)
             {
+                DayOfWeek day = (DayOfWeek)((i + 1) % 7);
                 <div class="col">
-                    <p>@day</p>
+                    <p>@Model.DutchDays[i]</p>
                     @foreach (Department department in Department.GetValues(typeof(Department)))
                     {
                         var prognosis = Model.Prognoses.SingleOrDefault(p => p.Department == department && p.Date.DayOfWeek == day);
@@ -79,7 +82,7 @@ else
 
         <div class="row justify-content-end">
             <div class="w-auto">
-                <button class="btn btn-primary">OPNIEUW BEREKENEN</button>
+                <button class="btn btn-primary" asp-controller="Prognoses" asp-action="CreatePrognosis">OPNIEUW BEREKENEN</button>
                 <button type="submit" class="btn btn-primary">OPSLAAN</button>
             </div>
         </div>
@@ -87,25 +90,11 @@ else
 
     <div class="row justify-content-between">
         <div class="col-md-3">Legenda <br /> aantal medewerkers | aantal uur</div>
+        <div class="input-group mb-2">
+            <input class="form-control form-control-sm" value="aantal medewerkers" readonly />
+            <input class="form-control form-control-sm" value="aantal uur" readonly />
+        </div>
 
-        <button id="editButton" class="btn btn-primary w-auto" onclick="toggleEdit()">BEWERKEN</button>
+        <button id="prognosisEditButton" class="btn btn-primary w-auto" onclick="toggleEdit()">BEWERKEN</button>
     </div>
-
-    <script>
-        function toggleEdit() {
-            var form = document.getElementById("form");
-            var overview = document.getElementById("overview");
-            var editButton = document.getElementById("editButton");
-
-            if (form.style.display === "none") {
-                overview.style.display = "none";
-                form.style.display = "block";
-                editButton.textContent = "ANNULEREN";
-            } else {
-                form.style.display = "none";
-                overview.style.display = "flex";
-                editButton.textContent = "BEWERKEN";
-            }
-        }
-    </script>
 }

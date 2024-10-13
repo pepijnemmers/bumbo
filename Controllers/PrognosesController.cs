@@ -1,4 +1,5 @@
 ﻿using BumboApp.Models;
+using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -11,6 +12,9 @@ namespace BumboApp.Controllers
     {
         private readonly int _pageSize = 5; //a constant for how many items per list page
         private readonly int _standardPage = 1; // a constant for the standard pagenumber
+
+        string[] dutchDays = { "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag" };//Nederlandse dagen voor frontend
+
         public IActionResult Index(int? page, bool overviewDesc = false)
         {
             List<WeekPrognosis> prognoses = _context.WeekPrognoses
@@ -58,35 +62,24 @@ namespace BumboApp.Controllers
         .Include(wp => wp.Prognoses)
             .SingleOrDefault(wp => wp.StartDate == mondayOfWeek);
 
-            ViewData["Year"] = year;
-            ViewData["WeekNr"] = weekNumber;
-            
+            WeekPrognosisViewModel model = new WeekPrognosisViewModel
+            {
+                WeekNr = weekNumber,
+                Year = year,
+                Prognoses = wp?.Prognoses
+            };
 
-            return View(wp);
-        }
-        public IActionResult Update(string id)
-        {
-            var parts = id.Split('-');
-            int year = int.Parse(parts[0]);
-            int weekNumber = int.Parse(parts[1]);
-
-            DateOnly mondayOfWeek = GetMondayOfWeek(year, weekNumber);
-
-            WeekPrognosis? wp = _context.WeekPrognoses
-        .Include(wp => wp.Prognoses)
-            .SingleOrDefault(wp => wp.StartDate == mondayOfWeek);
-
-            ViewData["Year"] = year;
-            ViewData["WeekNr"] = weekNumber;
-
-            return View(wp);
+            return View(model);
         }
 
         [HttpPost]
         public IActionResult Update(List<Prognosis> prognoses)
         {
-            //MOdelstate?
-
+            if (!ModelState.IsValid)
+            {
+                Console.WriteLine("invalid modelstate");
+                return RedirectToAction("Index");
+            }
             foreach (var prognosis in prognoses)
             {
                 var existingPrognosis = _context.Prognoses
@@ -96,11 +89,11 @@ namespace BumboApp.Controllers
                 {
                     existingPrognosis.NeededHours = prognosis.NeededHours;
                     existingPrognosis.NeededEmployees = prognosis.NeededEmployees;
-                    //Console.WriteLine(existingPrognosis.NeededHours + " | " + existingPrognosis.NeededEmployees);
+                    Console.WriteLine(existingPrognosis.NeededHours + " | " + existingPrognosis.NeededEmployees);
                 }
             }
 
-            //_context.SaveChanges();
+            _context.SaveChanges();
 
             return RedirectToAction("Index");
         }
