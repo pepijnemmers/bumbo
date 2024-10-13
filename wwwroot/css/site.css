@@ -97,6 +97,7 @@ html {
     background-color: var(--accent-color);
 }
 
+/* Norms */
 .latest-norms-table {
     width: 45%;
     border: 1px solid #ddd;

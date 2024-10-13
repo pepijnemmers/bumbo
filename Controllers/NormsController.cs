@@ -6,11 +6,10 @@ namespace BumboApp.Controllers
 {
     public class NormsController : MainController
     {
-        public IActionResult Index(int? page, bool overviewDesc = true)
+        public IActionResult Index()
         {
             List<Norm> norms = _context.Norms.OrderByDescending(n => n.CreatedAt).ToList();
             return View(norms);
-            
         }
     }
 }
