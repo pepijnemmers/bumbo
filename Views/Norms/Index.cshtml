@@ -5,13 +5,13 @@
 <h5>Normeringen</h5>
 
 <div class="container">
-    <div class="norms-table">
+    <div class="latest-norms-table">
         <table class="table">
             <thead>
                 <tr>
-                    <th scope="col">Activiteiten</th>
-                    <th scope="col">Norm</th>
-                    <th scope="col"></th>
+                    <th scope="col" width="30%">Activiteiten</th>
+                    <th scope="col" width="10%">Norm</th>
+                    <th scope="col" width="60%"></th>
                 </tr>
             </thead>
             <tbody>
@@ -25,8 +25,8 @@
                         {
                             <tr>
                                 <th scope="row">@item.Activity</th>
-                                <td>@item.Value </td>
-                                <td><b>@item.NormType</b> </td>
+                                <td>@item.Value</td>
+                                <td><b>@item.NormType</b></td>
                             </tr>
                             counter++;
                         }
@@ -43,18 +43,19 @@
                         <tr>
                             <th scope="row">@activity</th>
                             <td>...</td>
+                            <td></td>
                         </tr>
                     }
                 }
             </tbody>
         </table>
-        <div class="col justify-content-end">
-            <a asp-controller="Norms" class="btn btn-primary btn-sm d-inline-block float-end">Bewerken</a>
+        <div class="edit-button">
+            <a asp-controller="Norms" class="btn btn-primary btn-sm">BEWERKEN</a>
         </div>
     </div>
     
     <div>
-        <div class="row  my-3 border flex-nowrap">
+        <div class="row my-3 border ">
             @*
             TODO: Zorgen dat de onderstaande div op een rij staat & opmaak tabel
             *@
@@ -66,7 +67,7 @@
                 <p>Vers</p>
                 <p>Spiegelen</p>
             </div>
-            <div class="col">
+            <div class="col flex-nowrap">
                 @if (Model != null)
                 {
                     DateTime latestDate = DateTime.Now;
