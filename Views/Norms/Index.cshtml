@@ -22,9 +22,36 @@
                         if (counter < 5)
                         {
                             <tr>
-                                <th scope="row">@item.Activity</th>
-                                <td>@item.Value</td>
-                                <td><b>@item.NormType</b></td>
+                                @if (item.Activity == NormActivity.ColiUitladen)
+                                {
+                                    <th scope="row">Coli uitladen</th>
+                                    <td>@item.Value</td>
+                                    <td><b>minuten</b></td>
+                                }
+                                else if (item.Activity == NormActivity.VakkenVullen)
+                                {
+                                    <th scope="row">Vakken vullen</th>
+                                    <td>@item.Value</td>
+                                    <td><b>minuten per coli</b></td>
+                                }
+                                else if (item.Activity == NormActivity.Kassa)
+                                {
+                                    <th scope="row">Kassa</th>
+                                    <td>@item.Value</td>
+                                    <td><b>klanten per uur</b></td>
+                                }
+                                else if (item.Activity == NormActivity.Vers)
+                                {
+                                    <th scope="row">Vers</th>
+                                    <td>@item.Value</td>
+                                    <td><b>klanten per uur</b></td>
+                                }
+                                else
+                                {
+                                    <th scope="row">Spiegelen</th>
+                                    <td>@item.Value</td>
+                                    <td><b>seconden per meter</b></td>
+                                }
                             </tr>
                             counter++;
                         }
@@ -39,9 +66,37 @@
                     foreach (string activity in Enum.GetNames(typeof(NormActivity)))
                     {
                         <tr>
-                            <th scope="row">@activity</th>
-                            <td>...</td>
-                            <td></td>
+                            @if (activity == "ColiUitladen")
+                            {
+                                <th scope="row">Coli uitladen</th>
+                                <td>...</td>
+                                <td><b>minuten</b></td>
+                            }
+                            else if (activity == "VakkenVullen")
+                            {
+                                <th scope="row">Vakken vullen</th>
+                                <td>...</td>
+                                <td><b>minuten per coli</b></td>
+                            }
+                            else if (activity == "Kassa")
+                            {
+                                <th scope="row">Kassa</th>
+                                <td>...</td>
+                                <td><b>klanten per uur</b></td>
+                            }
+                            else if (activity == "Vers")
+                            {
+                                <th scope="row">Vers</th>
+                                <td>...</td>
+                                <td><b>klanten per uur</b></td>
+                            }
+                            else
+                            {
+                                <th scope="row">Spiegelen</th>
+                                <td>...</td>
+                                <td><b>seconden per meter</b></td>
+                            }
+
                         </tr>
                     }
                 }
