@@ -2,8 +2,6 @@
 @{
     ViewData["Title"] = "Normeringen";
 }
-<h5>Normeringen</h5>
-
 <div class="container">
     <div class="latest-norms-table">
         <table class="table">
@@ -53,47 +51,143 @@
             <a asp-controller="Norms" class="btn btn-primary btn-sm">BEWERKEN</a>
         </div>
     </div>
-    
-    <div>
-        <div class="row my-3 border ">
-            @*
-            TODO: Zorgen dat de onderstaande div op een rij staat & opmaak tabel
-            *@
-            <div class="col">
-                <p>Datum</p>
-                <p>Coli uitladen</p>
-                <p>Vakken vullen</p>
-                <p>Kassa</p>
-                <p>Vers</p>
-                <p>Spiegelen</p>
-            </div>
-            <div class="col flex-nowrap">
+
+    <div class="all-norms-table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col" width="17%">Datum</th>
+                    <th scope="col" width="17%">Coli uitladen</th>
+                    <th scope="col" width="17%">Vakken vullen</th>
+                    <th scope="col" width="16%">Kassa</th>
+                    <th scope="col" width="16%">Vers</th>
+                    <th scope="col" width="17%">Spiegelen</th>
+                </tr>
+            </thead>
+            <tbody>
                 @if (Model != null)
                 {
-                    DateTime latestDate = DateTime.Now;
-                    @foreach (var item in Model)
+                    int counter = 0;
+                    @foreach (var item in Model.GroupBy(i => i.CreatedAt))
                     {
-                        if (item.CreatedAt != latestDate)
+                        if (counter > 1)
                         {
-                            latestDate = item.CreatedAt;
-                            <p>@latestDate</p>
+                            <tr>
+                                <td>@item.Key.ToShortDateString()</td>
+                                <td>
+                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.ColiUitladen))
+                                    {
+                                        <p>@activityItem.Value</p>
+                                    }
+                                </td>
+                                <td>
+                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.VakkenVullen))
+                                    {
+                                        <p>@activityItem.Value</p>
+                                    }
+                                </td>
+                                <td>
+                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Kassa))
+                                    {
+                                        <p>@activityItem.Value</p>
+                                    }
+                                </td>
+                                <td>
+                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Vers))
+                                    {
+                                        <p>@activityItem.Value</p>
+                                    }
+                                </td>
+                                <td>
+                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Spiegelen))
+                                    {
+                                        <p>@activityItem.Value</p>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>@item.Key.ToShortDateString()</td>
+                                <td>
+                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.ColiUitladen))
+                                    {
+                                        <p>@activityItem.Value</p>
+                                    }
+                                </td>
+                                <td>
+                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.VakkenVullen))
+                                    {
+                                        <p>@activityItem.Value</p>
+                                    }
+                                </td>
+                                <td>
+                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Kassa))
+                                    {
+                                        <p>@activityItem.Value</p>
+                                    }
+                                </td>
+                                <td>
+                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Vers))
+                                    {
+                                        <p>@activityItem.Value</p>
+                                    }
+                                </td>
+                                <td>
+                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Spiegelen))
+                                    {
+                                        <p>@activityItem.Value</p>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>@item.Key.ToShortDateString()</td>
+                                <td>
+                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.ColiUitladen))
+                                    {
+                                        <p>@activityItem.Value</p>
+                                    }
+                                </td>
+                                <td>
+                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.VakkenVullen))
+                                    {
+                                        <p>@activityItem.Value</p>
+                                    }
+                                </td>
+                                <td>
+                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Kassa))
+                                    {
+                                        <p>@activityItem.Value</p>
+                                    }
+                                </td>
+                                <td>
+                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Vers))
+                                    {
+                                        <p>@activityItem.Value</p>
+                                    }
+                                </td>
+                                <td>
+                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Spiegelen))
+                                    {
+                                        <p>@activityItem.Value</p>
+                                    }
+                                </td>
+                            </tr>
                         }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">Er zijn geen eerdere normeringen</td>
+                            </tr>
+                        }
+                        counter++;
                     }
                 }
-            </div>
-
-            @foreach (NormActivity activity in NormActivity.GetValues(typeof(NormActivity)))
-            {
-                <div class="col">
-                    @foreach (var item in Model)
-                    {
-                        if (item.Activity == activity)
-                        {
-                            <p>@item.Value</p>
-                        }
-                    }
-                </div>
-            }
-        </div>
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center">Er zijn geen eerdere normeringen</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
