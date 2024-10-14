@@ -3,7 +3,7 @@
     ViewData["Title"] = "Normeringen";
 }
 <div class="container">
-    <div class="table-container latest-norms-table">
+    <div class="table-container latest-norms-table col-12 col-lg-6">
         <table class="table">
             <thead>
                 <tr>
@@ -26,46 +26,45 @@
                 }
                 else
                 {
-                    foreach (string activity in Enum.GetNames(typeof(NormActivity)))
+                    foreach (NormActivity activity in Enum.GetValues(typeof(NormActivity)))
                     {
                         <tr>
-                            @if (activity == "ColiUitladen")
-                            {
-                                <th scope="row">Coli uitladen</th>
-                                <td>...</td>
-                                <td><b>minuten</b></td>
-                            }
-                            else if (activity == "VakkenVullen")
-                            {
-                                <th scope="row">Vakken vullen</th>
-                                <td>...</td>
-                                <td><b>minuten per coli</b></td>
-                            }
-                            else if (activity == "Kassa")
-                            {
-                                <th scope="row">Kassa</th>
-                                <td>...</td>
-                                <td><b>klanten per uur</b></td>
-                            }
-                            else if (activity == "Vers")
-                            {
-                                <th scope="row">Vers</th>
-                                <td>...</td>
-                                <td><b>klanten per uur</b></td>
-                            }
-                            else
-                            {
-                                <th scope="row">Spiegelen</th>
-                                <td>...</td>
-                                <td><b>seconden per meter</b></td>
-                            }
+                            <th scope="row">@activity.ToFriendlyString()</th>
+                            <td>...</td>
+                            <td>
+                                <b>
+                                    @switch (activity)
+                                    {
+                                        case NormActivity.ColiUitladen:
+                                            @NormType.Minutes.ToFriendlyString()
+                                            ;
+                                            break;
+                                        case NormActivity.VakkenVullen:
+                                            @NormType.MinutesPerColi.ToFriendlyString()
+                                            ;
+                                            break;
+                                        case NormActivity.Kassa:
+                                            @NormType.CustomersPerHour.ToFriendlyString()
+                                            ;
+                                            break;
+                                        case NormActivity.Vers:
+                                            @NormType.CustomersPerHour.ToFriendlyString()
+                                            ;
+                                            break;
+                                        default:
+                                            @NormType.SecondsPerMeter.ToFriendlyString()
+                                            ;
+                                            break;
+                                    }
+                                </b>
+                            </td>
                         </tr>
                     }
                 }
             </tbody>
         </table>
         <div class="edit-button">
-            <a asp-controller="Norms" class="btn btn-primary btn-sm">BEWERKEN</a>
+            <a asp-controller="Norms" class="btn btn-primary btn-sm">Bewerken</a>
         </div>
     </div>
 
@@ -73,64 +72,52 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th scope="col" width="17%">Datum</th>
-                    <th scope="col" width="17%">Coli uitladen</th>
-                    <th scope="col" width="17%">Vakken vullen</th>
-                    <th scope="col" width="16%">Kassa</th>
-                    <th scope="col" width="16%">Vers</th>
-                    <th scope="col" width="17%">Spiegelen</th>
+                    <th scope="col">Datum</th>
+                    <th scope="col">Coli uitladen</th>
+                    <th scope="col">Vakken vullen</th>
+                    <th scope="col">Kassa</th>
+                    <th scope="col">Vers</th>
+                    <th scope="col">Spiegelen</th>
                 </tr>
             </thead>
             <tbody>
-                @if (Model.NormsList != null)
+                @if (Model.NormsList.Any())
                 {
-                    int counter = 0;
                     @foreach (var item in Model.NormsList.GroupBy(i => i.CreatedAt))
                     {
-                        if (counter > 0)
-                        {
-                            <tr>
-                                <td>@item.Key.ToShortDateString()</td>
-                                <td>
-                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.ColiUitladen))
-                                    {
-                                        <p>@activityItem.Value</p>
-                                    }
-                                </td>
-                                <td>
-                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.VakkenVullen))
-                                    {
-                                        <p>@activityItem.Value</p>
-                                    }
-                                </td>
-                                <td>
-                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Kassa))
-                                    {
-                                        <p>@activityItem.Value</p>
-                                    }
-                                </td>
-                                <td>
-                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Vers))
-                                    {
-                                        <p>@activityItem.Value</p>
-                                    }
-                                </td>
-                                <td>
-                                    @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Spiegelen))
-                                    {
-                                        <p>@activityItem.Value</p>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="100%" class="text-center">Er zijn geen eerdere normeringen</td>
-                            </tr>
-                            break;
-                        }
-                        counter++;
+                        <tr>
+                            <td>@item.Key.ToShortDateString()</td>
+                            <td>
+                                @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.ColiUitladen))
+                                {
+                                    <p>@activityItem.Value</p>
+                                }
+                            </td>
+                            <td>
+                                @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.VakkenVullen))
+                                {
+                                    <p>@activityItem.Value</p>
+                                }
+                            </td>
+                            <td>
+                                @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Kassa))
+                                {
+                                    <p>@activityItem.Value</p>
+                                }
+                            </td>
+                            <td>
+                                @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Vers))
+                                {
+                                    <p>@activityItem.Value</p>
+                                }
+                            </td>
+                            <td>
+                                @foreach (var activityItem in item.Where(i => i.Activity == NormActivity.Spiegelen))
+                                {
+                                    <p>@activityItem.Value</p>
+                                }
+                            </td>
+                        </tr>
                     }
                 }
                 else
