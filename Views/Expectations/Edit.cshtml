@@ -4,23 +4,24 @@
 }
 
 <div class="table-container p-3">
-    <form method="post" asp-action="Create" onchange="showButton()">
+    <form method="post" asp-action="Update" onchange="showButton()">
+        <input type="hidden" name="Id" value="@Model.Id" />
         <div class="row">
             <div class="col-12 col-lg">
                 <label for="date">Datum</label>
                 <input type="date" id="date" name="Date" class="form-control" onchange="navigateToEdit(this.value)"
-                       value="@Model.Date.ToString("yyyy-MM-dd")" required />
+                       value="@Model.Date.ToString("yyyy-MM-dd")" required/>
                 <p class="small text-secondary">Door de datum te wijzigen, open je een andere verwachting.</p>
             </div>
             <div class="col-12 col-lg">
                 <label for="customersExpected">Aantal klanten verwacht</label>
-                <input type="number" id="customersExpected" name="ExpectedCustomers" 
-                       value="@Model.ExpectedCustomers" class="form-control" min="0" required />
+                <input type="number" id="customersExpected" name="ExpectedCustomers"
+                       value="@Model.ExpectedCustomers" class="form-control" min="0" required/>
             </div>
             <div class="col-12 col-lg">
                 <label for="cargoExpected">Aantal coli&#39;s verwacht</label>
-                <input type="number" id="cargoExpected" name="ExpectedCargo" 
-                       value="@Model.ExpectedCargo" class="form-control" min="0" required />
+                <input type="number" id="cargoExpected" name="ExpectedCargo"
+                       value="@Model.ExpectedCargo" class="form-control" min="0" required/>
             </div>
         </div>
         <div class="text-end mt-3">

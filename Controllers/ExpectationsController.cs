@@ -37,7 +37,7 @@ namespace BumboApp.Controllers
             if (date != null)
             {
                 expectation = Context.Expectations
-                    .First(e => e.Date == DateOnly.FromDateTime(DateTime.Parse(date)));
+                    .FirstOrDefault(e => e.Date == DateOnly.FromDateTime(DateTime.Parse(date)));
             }
             
             return expectation == null ? NotifyErrorAndRedirect("De verwachting die je probeert te bewerken bestaat niet.", "Index") : View(expectation);
@@ -54,9 +54,32 @@ namespace BumboApp.Controllers
         }
 
         [HttpPost]
-        public void Update(Expectation expectation)
+        public IActionResult Update(Expectation expectation)
         {
+            // validation
+            if (expectation.ExpectedCustomers < 0 || expectation.ExpectedCargo < 0)
+                return NotifyErrorAndRedirect("Het aantal verwachte klanten en verwachte coli&#39;s moet 0 of hoger zijn.", "Index");
             
+            if (!ModelState.IsValid)
+                return NotifyErrorAndRedirect("Er is iets mis gegaan. Mogelijk zijn niet alle velden ingevuld", "Index");
+            
+            // update to database using transaction
+            using var transaction = Context.Database.BeginTransaction();
+            try
+            {
+                Context.Expectations.Update(expectation);
+                Context.SaveChanges();
+                transaction.Commit();
+                NotifyService.Success("De verwachting is bijgewerkt!");
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+                transaction.Rollback();
+                NotifyService.Error("Er is iets mis gegaan bij het bewerken van de verwachting.");
+            }
+            
+            return RedirectToAction("Index");
         }
         
         [HttpPost]
