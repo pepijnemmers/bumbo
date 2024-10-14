@@ -95,29 +95,64 @@ namespace BumboApp.Controllers
 
             return View(model);
         }
-        private IActionResult HandleInvalidInput(string errorMessage)
-        {
-            NotifyService.Error(errorMessage);
-            return RedirectToAction("Index");
-        }
+
 
         [HttpPost]
         public IActionResult Update(List<Prognosis> prognoses)
         {
-            foreach (Prognosis prognosis in prognoses)
+            if (prognoses == null || !prognoses.Any())
             {
-                Prognosis existingPrognosis = _context.Prognoses
-                .Single(p => p.Department == prognosis.Department && p.Date == prognosis.Date);
+                return HandleInvalidInput("Er is iets mis gegaan bij het bewerken van de prognose.");
+            }
+            //foreach (Prognosis prognosis in prognoses)
+            //{
 
-                if (existingPrognosis != null)
+
+            //    if (existingPrognosis != null)
+            //    {
+            //        existingPrognosis.NeededHours = prognosis.NeededHours;
+            //        existingPrognosis.NeededEmployees = prognosis.NeededEmployees;
+            //    }
+            //}
+
+            using var transaction = _context.Database.BeginTransaction();
+            try
+            {
+                foreach (Prognosis prognosis in prognoses)
                 {
-                    existingPrognosis.NeededHours = prognosis.NeededHours;
-                    existingPrognosis.NeededEmployees = prognosis.NeededEmployees;
+                    Prognosis existingPrognosis = _context.Prognoses
+                        .Single(p => p.Department == prognosis.Department && p.Date == prognosis.Date);
+                    if (existingPrognosis == null)
+                    {
+                        return HandleInvalidInput("Er is iets mis gegaan. Mogelijk zijn niet alle velden ingevuld");
+                    }
+                    float employees = existingPrognosis.NeededEmployees;
+                    float hours = existingPrognosis.NeededHours;
+                    if (employees < 0 || hours < 0 || hours * 8 != employees) //TODO de seeddata voldoet niet aan deze eisen :( en floats zijn niet accuraat genoeg?
+                    {
+                        return HandleInvalidInput("De data is ongeldig");
+                    }
+                    _context.Prognoses.Update(existingPrognosis);
                 }
+
+                _context.SaveChanges();
+                transaction.Commit();
+                NotifyService.Success("De prognose is bijgewerkt!");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                transaction.Rollback();
+                NotifyService.Error("Er is iets mis gegaan bij het bewerken van de prognose.");
             }
 
-            _context.SaveChanges();
+            //_context.SaveChanges();
+            return RedirectToAction("Index");
+        }
 
+        private IActionResult HandleInvalidInput(string errorMessage)
+        {
+            NotifyService.Error(errorMessage);
             return RedirectToAction("Index");
         }
     }
