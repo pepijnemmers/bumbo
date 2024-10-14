@@ -4,19 +4,19 @@
 }
 
 <div class="table-container p-3">
-    <form method="post" asp-action="">
+    <form method="post" asp-action="Create">
         <div class="row">
             <div class="col">
                 <label for="date">Datum</label>
-                <input type="date" id="date" name="date" class="form-control"/>
+                <input type="date" id="date" name="Date" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" required />
             </div>
             <div class="col">
                 <label for="customersExpected">Aantal klanten verwacht</label>
-                <input type="number" id="customersExpected" name="customersExpected" class="form-control"/>
+                <input type="number" id="customersExpected" name="ExpectedCustomers" class="form-control" min="0" required />
             </div>
             <div class="col">
-                <label for="colisExpected">Aantal coli’s verwacht</label>
-                <input type="number" id="colisExpected" name="colisExpected" class="form-control"/>
+                <label for="cargoExpected">Aantal coli’s verwacht</label>
+                <input type="number" id="cargoExpected" name="ExpectedCargo" class="form-control" min="0" required />
             </div>
         </div>
         <div class="text-end mt-3">
