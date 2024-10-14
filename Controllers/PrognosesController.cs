@@ -8,13 +8,13 @@ namespace BumboApp.Controllers
     {
         private readonly int _pageSize = 5; //a constant for how many items per list page
         private readonly int _standardPage = 1; // a constant for the standard pagenumber
-        public IActionResult Index(int? page, bool overviewDesc = false)
+        public IActionResult Index(int page = 1, bool overviewDesc = false)
         {
             List<WeekPrognosis> prognoses = _context.WeekPrognoses
                 .OrderBy(p => p.StartDate)
                 .ToList();
+            prognoses.Reverse();
             List<WeekPrognosis> prognosesForPage = new List<WeekPrognosis>();
-
             string imageUrl = "~/img/UpArrow.png";
             if (!overviewDesc)
             {
@@ -22,14 +22,14 @@ namespace BumboApp.Controllers
                 prognoses.Reverse();
             }
 
-            int currentPageNumber = page ?? _standardPage;
+            int currentPageNumber = page;
             int maxPages = (int)(Math.Ceiling((decimal)prognoses.Count / _pageSize));
             if (currentPageNumber <= 0) { currentPageNumber = _standardPage; }
             if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
 
             if (prognoses.Count > 0)
             {
-                for (int i = (currentPageNumber - 1) * _pageSize; i <= currentPageNumber * _pageSize && i < prognoses.Count; i++)
+                for (int i = (currentPageNumber - 1) * _pageSize; (i <= currentPageNumber * _pageSize && i < prognoses.Count); i++)
                 {
                     prognosesForPage.Add(prognoses[i]);
                 }
