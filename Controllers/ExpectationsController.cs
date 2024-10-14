@@ -6,7 +6,7 @@ namespace BumboApp.Controllers
     public class ExpectationsController : MainController
     {
         private static readonly int PageSize = Configuration.GetValue<int>("Pagination:DefaultPageSize");
-        private static readonly int DefaultPage = Configuration.GetValue<int>("Pagination:DefaultPageSize");
+        private static readonly int DefaultPage = Configuration.GetValue<int>("Pagination:StartPage");
         
         public IActionResult Index(int? page)
         {
