@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BumboApp.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BumboApp.Controllers
 {
@@ -6,7 +7,39 @@ namespace BumboApp.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            List<Expectation> expectations = Read();
+            return View(expectations);
+        }
+
+        public IActionResult Edit()
+        {
+            return null;
+        }
+
+        [HttpGet]
+        public List<Expectation> Read()
+        {
+            List<Expectation> allExpectations = _context.Expectations.ToList();
+                
+            return allExpectations;
+        }
+
+        [HttpPost]
+        public void Update(Expectation expectation)
+        {
+            
+        }
+        
+        [HttpPost]
+        public void Create(Expectation expectation)
+        {
+            
+        }
+        
+        [HttpPost]
+        public void Create(List<Expectation> expectations)
+        {
+            
         }
     }
 }

@@ -1,4 +1,67 @@
-﻿@{
+﻿@model List<Expectation>
+@{
     ViewData["Title"] = "Verwachtingen";
 }
-<h5>Expectations index</h5>
+
+<div class="table-container p-3">
+    <form method="post" asp-action="">
+        <div class="row">
+            <div class="col">
+                <label for="date">Datum</label>
+                <input type="date" id="date" name="date" class="form-control"/>
+            </div>
+            <div class="col">
+                <label for="customersExpected">Aantal klanten verwacht</label>
+                <input type="number" id="customersExpected" name="customersExpected" class="form-control"/>
+            </div>
+            <div class="col">
+                <label for="colisExpected">Aantal coli’s verwacht</label>
+                <input type="number" id="colisExpected" name="colisExpected" class="form-control"/>
+            </div>
+        </div>
+        <div class="text-end mt-3">
+            <a asp-action="Create" class="btn btn-outline-primary">
+                <i class="fa-solid fa-upload"></i>
+                Bulk invoer
+            </a>
+            <button type="submit" class="btn btn-primary">Toevoegen</button>
+        </div>
+    </form>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Datum</th>
+            <th>Aantal klanten verwacht</th>
+            <th>Aantal coli’s verwacht</th>
+            <th>Acties</th>
+        </tr>
+        </thead>
+        <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="100%" class="text-center py-4">Er zijn nog geen verwachtingen...</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var expectation in Model)
+            {
+                <tr>
+                    <td>@expectation.Date.ToShortDateString()</td>
+                    <td>@expectation.ExpectedCustomers</td>
+                    <td>@expectation.ExpectedCargo</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@expectation.Id">
+                            <img width="20px" src="~/img/Update_Logo.png" alt="edit" />
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+</div>
