@@ -63,8 +63,8 @@ namespace BumboApp.Controllers
         public IActionResult Create(Expectation expectation)
         {
             // validation
-            // if (Read().Find(e => e.Date == expectation.Date) != null)
-            //     return NotifyErrorAndRedirect("De verwachting die je probeert toe te voegen bestaat al.", "Index");
+            if (Read().Find(e => e.Date == expectation.Date) != null)
+                return NotifyErrorAndRedirect("De verwachting die je probeert toe te voegen bestaat al.", "Index");
 
             if (expectation.Date <= DateOnly.FromDateTime(DateTime.Now))
                 return NotifyErrorAndRedirect("De datum van de verwachting moet in de toekomst liggen.", "Index");
