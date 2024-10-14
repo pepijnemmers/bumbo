@@ -30,9 +30,17 @@ namespace BumboApp.Controllers
             return View(expectationsForPage);
         }
 
-        public IActionResult Edit()
+        public IActionResult Edit(int? id, string? date)
         {
-            return null;
+            Expectation? expectation = Context.Expectations.Find(id);
+            
+            if (date != null)
+            {
+                expectation = Context.Expectations
+                    .First(e => e.Date == DateOnly.FromDateTime(DateTime.Parse(date)));
+            }
+            
+            return expectation == null ? NotifyErrorAndRedirect("De verwachting die je probeert te bewerken bestaat niet.", "Index") : View(expectation);
         }
 
         [HttpGet]
@@ -55,10 +63,8 @@ namespace BumboApp.Controllers
         public IActionResult Create(Expectation expectation)
         {
             // validation
-            if (false)
-            {
-                // TODO validate if there is already an expectation for this date
-            }
+            if (Read().Find(e => e.Date == expectation.Date) != null)
+                return NotifyErrorAndRedirect("De verwachting die je probeert toe te voegen bestaat al.", "Index");
 
             if (expectation.Date <= DateOnly.FromDateTime(DateTime.Now))
                 return NotifyErrorAndRedirect("De datum van de verwachting moet in de toekomst liggen.", "Index");

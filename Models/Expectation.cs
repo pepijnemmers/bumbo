@@ -1,9 +1,12 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace BumboApp.Models
 
 {
+    [Index(nameof(Date), IsUnique = true)]
+
     public class Expectation
     {
         [Key]

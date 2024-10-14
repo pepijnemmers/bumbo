@@ -6,15 +6,15 @@
 <div class="table-container p-3">
     <form method="post" asp-action="Create">
         <div class="row">
-            <div class="col">
+            <div class="col-12 col-lg">
                 <label for="date">Datum</label>
                 <input type="date" id="date" name="Date" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" required />
             </div>
-            <div class="col">
+            <div class="col-12 col-lg">
                 <label for="customersExpected">Aantal klanten verwacht</label>
                 <input type="number" id="customersExpected" name="ExpectedCustomers" class="form-control" min="0" required />
             </div>
-            <div class="col">
+            <div class="col-12 col-lg">
                 <label for="cargoExpected">Aantal coli&#39;s verwacht</label>
                 <input type="number" id="cargoExpected" name="ExpectedCargo" class="form-control" min="0" required />
             </div>
