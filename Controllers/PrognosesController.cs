@@ -75,21 +75,15 @@ namespace BumboApp.Controllers
         [HttpPost]
         public IActionResult Update(List<Prognosis> prognoses)
         {
-            if (!ModelState.IsValid)
+            foreach (Prognosis prognosis in prognoses)
             {
-                Console.WriteLine("invalid modelstate");
-                return RedirectToAction("Index");
-            }
-            foreach (var prognosis in prognoses)
-            {
-                var existingPrognosis = _context.Prognoses
+                Prognosis existingPrognosis = _context.Prognoses
                 .Single(p => p.Department == prognosis.Department && p.Date == prognosis.Date);
 
                 if (existingPrognosis != null)
                 {
                     existingPrognosis.NeededHours = prognosis.NeededHours;
                     existingPrognosis.NeededEmployees = prognosis.NeededEmployees;
-                    Console.WriteLine(existingPrognosis.NeededHours + " | " + existingPrognosis.NeededEmployees);
                 }
             }
 

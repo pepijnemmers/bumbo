@@ -7,6 +7,7 @@ document.getElementById('mobile-close-menu').addEventListener('click', function 
     document.getElementById('aside-nav-primary').classList.add('d-none');
 });
 
+//Prognoses details
 document.getElementById('prognosisEditButton').addEventListener('click', function () {
     var form = document.getElementById("form");
     var overview = document.getElementById("overview");
@@ -22,3 +23,18 @@ document.getElementById('prognosisEditButton').addEventListener('click', functio
         prognosisEditButton.textContent = "BEWERKEN";
     }
 });
+
+function updateHours(id) {
+    let employeesInput = document.getElementById(id + '-employees');
+    let hoursInput = document.getElementById(id + '-hours');
+
+    let employees = employeesInput.value;
+    hoursInput.value = employees * 8;
+}
+
+function updateEmployees(id) {
+    let hoursInput = document.getElementById(id + '-hours');
+    let employeesInput = document.getElementById(id + '-employees');
+    let hours = hoursInput.value;
+    employeesInput.value = hours / 8;
+}

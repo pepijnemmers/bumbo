@@ -37,20 +37,23 @@ else
                 <p>@Model.DutchDays[i]</p>
                 @foreach (Department department in Department.GetValues(typeof(Department)))
                 {
-                    <p>@Model.Prognoses.Single(p => p.Department == department && p.Date.DayOfWeek == day).NeededEmployees | @Model.Prognoses.Single(p => p.Department == department && p.Date.DayOfWeek == day).NeededHours</p>
+                    <p>
+                        @Model.Prognoses.Single(p => p.Department == department && p.Date.DayOfWeek == day).NeededEmployees
+                        | @Model.Prognoses.Single(p => p.Department == department && p.Date.DayOfWeek == day).NeededHours
+                    </p>
                 }
             </div>
         }
     </div>
 
-
     <form id="form" style="display: none" asp-action="Update" method="post">
         <div class="row my-3 border">
             <div class="col">
                 <p>Afdeling</p>
-                <p>Vers</p>
-                <p>Vakkenvullen</p>
-                <p>Kassa</p>
+                @foreach (Department department in Department.GetValues(typeof(Department)))
+                {
+                    <p>@department</p>
+                }
             </div>
 
             @for (int i = 0; i < 7; i++)
@@ -69,17 +72,28 @@ else
                                 <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Date" value="@prognosis.Date" />
                                 <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Department" value="@prognosis.Department" />
 
-                                <input type="number" class="form-control form-control-sm col-6" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededEmployees" value="@prognosis.NeededEmployees" />
-                                <input type="number" class="form-control form-control-sm col-6" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededHours" value="@prognosis.NeededHours" />
+                                <input id="@day+@department-employees"
+                                       class="form-control form-control-sm"
+                                       name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededEmployees"
+                                       type="number"
+                                       value="@prognosis.NeededEmployees"
+                                       min="0"
+                                       step="0.125"
+                                       oninput="updateHours('@day+@department')">
+
+                                <input id="@day+@department-hours"
+                                       class="form-control form-control-sm"
+                                       name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededHours"
+                                       type="number"
+                                       value="@prognosis.NeededHours"
+                                       min="0"
+                                       oninput="updateEmployees('@day+@department')">
                             </div>
                         }
                     }
                 </div>
             }
         </div>
-
-
-
         <div class="row justify-content-end">
             <div class="w-auto">
                 <button class="btn btn-primary" asp-controller="Prognoses" asp-action="CreatePrognosis">OPNIEUW BEREKENEN</button>
@@ -90,11 +104,6 @@ else
 
     <div class="row justify-content-between">
         <div class="col-md-3">Legenda <br /> aantal medewerkers | aantal uur</div>
-        <div class="input-group mb-2">
-            <input class="form-control form-control-sm" value="aantal medewerkers" readonly />
-            <input class="form-control form-control-sm" value="aantal uur" readonly />
-        </div>
-
         <button id="prognosisEditButton" class="btn btn-primary w-auto" onclick="toggleEdit()">BEWERKEN</button>
     </div>
 }
