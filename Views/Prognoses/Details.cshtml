@@ -11,7 +11,7 @@
     <div class="col-md-3">Prognose week @Model.WeekNr</div>
     <div class="col-md-3">
         <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@Model.StartDate.AddDays(-7).ToString("dd-MM-yyyy")">&lt;</a>
-        <bold>@Model.WeekNr</bold> (@Model.StartDate.ToString("dd/MM/yyyy") - @Model.StartDate.AddDays(6).ToString("dd/MM/yyyy"))
+        <strong>@Model.WeekNr</strong> (@Model.StartDate.ToString("dd/MM/yyyy") - @Model.StartDate.AddDays(6).ToString("dd/MM/yyyy"))
         <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@Model.StartDate.AddDays(7).ToString("dd-MM-yyyy")">&gt;</a>
     </div>
 </div>
@@ -114,7 +114,7 @@ else
 
         <div class="row justify-content-end">
             <div class="w-auto">
-                <button class="btn btn-primary" asp-controller="Prognoses" asp-action="CreatePrognosis">OPNIEUW BEREKENEN</button>
+                <button class="btn btn-primary" asp-controller="Prognoses" asp-action="CreatePrognosis">opnieuw berekenen</button>
                 <button type="submit" class="btn btn-primary">OPSLAAN</button>
             </div>
         </div>
@@ -122,6 +122,6 @@ else
 
     <div class="row justify-content-between">
         <div class="col-md-3">Legenda <br /> aantal medewerkers | aantal uur</div>
-        <button id="prognosisEditButton" class="btn btn-primary w-auto" onclick="toggleEdit()">BEWERKEN</button>
+        <button id="prognosisEditButton" class="btn btn-primary w-auto">bewerken</button>
     </div>
 }

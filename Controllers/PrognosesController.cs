@@ -3,7 +3,6 @@ using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace BumboApp.Controllers
@@ -12,8 +11,6 @@ namespace BumboApp.Controllers
     {
         private readonly int _pageSize = 5; //a constant for how many items per list page
         private readonly int _standardPage = 1; // a constant for the standard pagenumber
-
-        string[] dutchDays = { "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag" };//Nederlandse dagen voor frontend
 
         public IActionResult Index(int? page, bool overviewDesc = false)
         {

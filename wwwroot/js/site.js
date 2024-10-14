@@ -16,11 +16,11 @@ document.getElementById('prognosisEditButton').addEventListener('click', functio
     if (form.style.display === "none") {
         overview.style.display = "none";
         form.style.display = "block";
-        prognosisEditButton.textContent = "ANNULEREN";
+        prognosisEditButton.textContent = "annuleren";
     } else {
         form.style.display = "none";
         overview.style.display = "flex";
-        prognosisEditButton.textContent = "BEWERKEN";
+        prognosisEditButton.textContent = "bewerken";
     }
 });
 
