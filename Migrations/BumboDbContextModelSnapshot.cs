@@ -41,6 +41,9 @@ namespace BumboApp.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Date")
+                        .IsUnique();
+
                     b.ToTable("Expectations");
 
                     b.HasData(
