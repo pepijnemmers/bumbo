@@ -5,10 +5,29 @@ namespace BumboApp.Controllers
 {
     public class ExpectationsController : MainController
     {
-        public IActionResult Index()
+        private static readonly int PageSize = Configuration.GetValue<int>("Pagination:DefaultPageSize");
+        private static readonly int DefaultPage = Configuration.GetValue<int>("Pagination:DefaultPageSize");
+        
+        public IActionResult Index(int? page)
         {
             List<Expectation> expectations = Read();
-            return View(expectations);
+            
+            int currentPageNumber = page ?? DefaultPage;
+            int maxPages = (int)(Math.Ceiling((decimal)expectations.Count / PageSize));
+            if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
+            if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
+            
+            List<Expectation> expectationsForPage = 
+                expectations
+                .Skip((currentPageNumber - 1) * PageSize)
+                .Take(PageSize)
+                .ToList();
+
+            ViewBag.PageNumber = currentPageNumber;
+            ViewBag.PageSize = PageSize;
+            ViewBag.MaxPages = maxPages;
+
+            return View(expectationsForPage);
         }
 
         public IActionResult Edit()
@@ -19,7 +38,9 @@ namespace BumboApp.Controllers
         [HttpGet]
         public List<Expectation> Read()
         {
-            List<Expectation> allExpectations = _context.Expectations.ToList();
+            List<Expectation> allExpectations = Context.Expectations
+                .OrderBy(e => e.Date)
+                .ToList();
                 
             return allExpectations;
         }

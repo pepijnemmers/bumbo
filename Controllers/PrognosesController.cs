@@ -10,7 +10,7 @@ namespace BumboApp.Controllers
         private readonly int _standardPage = 1; // a constant for the standard pagenumber
         public IActionResult Index(int? page, bool overviewDesc = false)
         {
-            List<WeekPrognosis> prognoses = _context.WeekPrognoses
+            List<WeekPrognosis> prognoses = Context.WeekPrognoses
                 .OrderBy(p => p.StartDate)
                 .ToList();
             List<WeekPrognosis> prognosesForPage = new List<WeekPrognosis>();

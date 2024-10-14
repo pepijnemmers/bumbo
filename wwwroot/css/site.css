@@ -15,6 +15,7 @@
   --bs-body-sec-color: #3c4b57;
   --accent-color: #EEB617;
   --accent-color-sec: #FFFAED;
+  --border-clr: #ddd;
 }
 
 /* buttons */
@@ -100,12 +101,31 @@ html {
 /* utils */
 .table-container {
   background-color: var(--bs-white);
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-clr);
   border-radius: 8px;
   margin: 15px 0;
+}
+.table>:not(:last-child)>:last-child>* {
+  border-bottom-color: var(--border-clr);
+}
+.table th {
+  padding-top: .7em;
+  padding-bottom: .7em;
 }
 
 label {
   font-weight: bold;
   margin-bottom: .3em;
 }
+
+/* pagination */
+.page-link {
+  color: var(--bs-primary) !important;
+}
+
+.page-item.active .page-link {
+  color: var(--bs-white) !important;
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
