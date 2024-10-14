@@ -26,7 +26,7 @@ namespace BumboApp.Controllers
             ViewBag.PageNumber = currentPageNumber;
             ViewBag.PageSize = PageSize;
             ViewBag.MaxPages = maxPages;
-
+            
             return View(expectationsForPage);
         }
 
@@ -52,15 +52,45 @@ namespace BumboApp.Controllers
         }
         
         [HttpPost]
-        public void Create(Expectation expectation)
+        public IActionResult Create(Expectation expectation)
         {
+            // validation
+            if (false)
+            {
+                // TODO validate if there is already an expectation for this date
+            }
+
+            if (expectation.Date <= DateOnly.FromDateTime(DateTime.Now))
+                return NotifyErrorAndRedirect("De datum van de verwachting moet in de toekomst liggen.", "Index");
+
+            if (expectation.ExpectedCustomers < 0 || expectation.ExpectedCargo < 0)
+                return NotifyErrorAndRedirect("Het aantal verwachte klanten en verwachte coli&#39;s moet 0 of hoger zijn.", "Index");
             
+            if (!ModelState.IsValid)
+                return NotifyErrorAndRedirect("Er is iets mis gegaan. Mogelijk zijn niet alle velden ingevuld", "Index");
+            
+            // add to database using transaction
+            using var transaction = Context.Database.BeginTransaction();
+            try
+            {
+                Context.Expectations.Add(expectation);
+                Context.SaveChanges();
+                transaction.Commit();
+                NotifyService.Success("De verwachting is toegevoegd!");
+            }
+            catch
+            {
+                transaction.Rollback();
+                NotifyService.Error("Er is iets mis gegaan bij het toevoegen van de verwachting.");
+            }
+            
+            return RedirectToAction("Index");
         }
-        
+
         [HttpPost]
-        public void Create(List<Expectation> expectations)
+        public void BulkCreate(List<Expectation> expectations)
         {
-            
+
         }
     }
 }
