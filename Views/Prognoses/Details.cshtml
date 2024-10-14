@@ -10,9 +10,9 @@
 
     <div class="col-md-3">Prognose week @Model.WeekNr</div>
     <div class="col-md-3">
-        <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@Model.Year-@(Model.WeekNr-1)">&lt;</a>
-        week @Model.WeekNr - @Model.Year
-        <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@Model.Year-@(Model.WeekNr+1)">&gt;</a>
+        <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@Model.StartDate.AddDays(-7).ToString("dd-MM-yyyy")">&lt;</a>
+        <bold>@Model.WeekNr</bold> (@Model.StartDate.ToString("dd/MM/yyyy") - @Model.StartDate.AddDays(6).ToString("dd/MM/yyyy"))
+        <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@Model.StartDate.AddDays(7).ToString("dd-MM-yyyy")">&gt;</a>
     </div>
 </div>
 
@@ -22,7 +22,7 @@
 }
 else
 {
-    <div id="overview" class="row my-3 border">
+    <div id="overview" class="row my-3">
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -57,7 +57,7 @@ else
     </div>
 
     <form id="form" style="display: none" asp-action="Update" method="post">
-        <div class="row my-3 border">
+        <div class="row my-3">
             <table class="table table-bordered">
                 <thead>
                     <tr>

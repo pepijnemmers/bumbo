@@ -52,24 +52,56 @@ namespace BumboApp.Controllers
         }
         public IActionResult Details(string id)
         {
-            var parts = id.Split('-');
-            int year = int.Parse(parts[0]);
-            int weekNumber = int.Parse(parts[1]);
+            var dateParts = id.Split('-');
+            if (dateParts.Length != 3)
+            {
+                return HandleInvalidInput("Ongeldige link: dd-MM-yyyy verwacht");
+            }
 
-            DateOnly mondayOfWeek = GetMondayOfWeek(year, weekNumber);
+            if (!int.TryParse(dateParts[0], out int day) ||
+                !int.TryParse(dateParts[1], out int month) ||
+                !int.TryParse(dateParts[2], out int year))
+            {
+                return HandleInvalidInput("Ongeldige link: de datum bevat niet numerieke waarden");
+            }
+
+            DateOnly startDate;
+            try
+            {
+                startDate = new DateOnly(year, month, day);
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                return HandleInvalidInput("Ongeldige link: de datum bestaat niet");
+            }
+
+            DayOfWeek dayOfWeek = CultureInfo.InvariantCulture.Calendar.GetDayOfWeek(startDate.ToDateTime(new TimeOnly(0, 0)));
+            if (dayOfWeek != DayOfWeek.Monday) //Entered day is not a monday (redirect to monday of week)
+            {
+                string newId = startDate.AddDays(-(int)dayOfWeek + 1).ToString("dd-MM-yyyy");
+                return RedirectToAction("Details", new { id = newId });
+            }
+
+            int weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(startDate.AddDays(3).ToDateTime(new TimeOnly(0, 0)), CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
 
             WeekPrognosis? wp = _context.WeekPrognoses
         .Include(wp => wp.Prognoses)
-            .SingleOrDefault(wp => wp.StartDate == mondayOfWeek);
+            .SingleOrDefault(wp => wp.StartDate == startDate);
 
             WeekPrognosisViewModel model = new WeekPrognosisViewModel
             {
+                StartDate = startDate,
                 WeekNr = weekNumber,
                 Year = year,
                 Prognoses = wp?.Prognoses
             };
 
             return View(model);
+        }
+        private IActionResult HandleInvalidInput(string errorMessage)
+        {
+            NotifyService.Error(errorMessage);
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
@@ -90,15 +122,6 @@ namespace BumboApp.Controllers
             _context.SaveChanges();
 
             return RedirectToAction("Index");
-        }
-
-        public DateOnly GetMondayOfWeek(int year, int weekNumber)
-        {
-            DateOnly jan1 = new DateOnly(year, 1, 1);
-            int daysOffset = DayOfWeek.Monday - jan1.DayOfWeek;
-            DateOnly firstMonday = jan1.AddDays(daysOffset);
-
-            return firstMonday.AddDays((weekNumber - 1) * 7);
         }
     }
 }
