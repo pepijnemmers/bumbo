@@ -96,3 +96,8 @@ html {
     align-items: center;
     background-color: var(--accent-color);
 }
+
+/*Create prognosis*/
+.create-prognosis-card{
+    width: 30rem;
+}
