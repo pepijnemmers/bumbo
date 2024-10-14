@@ -97,48 +97,9 @@ html {
     background-color: var(--accent-color);
 }
 
-/* Norms */
-/*.latest-norms-table {
-    width: 50%;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 16px;
-    margin: 5px;
-}
-
-.latest-norms-table th, .latest-norms-table td {
-    border: none;
-    padding: 8px;
-    vertical-align: middle;
-}
-
-.latest-norms-table .edit-button {
-    text-align: right;
-    margin-top: 16px;
-}
-
-.all-norms-table {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    margin: 5px;
-    margin-top: 15px;
-}
-
-.all-norms-table .table {
-    border-spacing: 0 8px;
-}
-
-.all-norms-table .table th, .all-norms-table .table td {
-    border-bottom: 1px solid #ddd;
-    padding: 12px;
-    text-align: left;
-}*/
-
-/* Gemeenschappelijke stijlen voor beide tabellen */
 .table-container {
     border: 1px solid #ddd;
     border-radius: 8px;
-    padding: 16px;
     margin: 5px;
 }
 
@@ -148,17 +109,15 @@ html {
     vertical-align: middle;
 }
 
-/* Specifieke stijlen voor latest-norms-table */
 .latest-norms-table .edit-button {
     text-align: right;
-    margin-top: 16px;
+    margin: 15px;
 }
 
 .latest-norms-table{
     width: 450px;
 }
 
-/* Specifieke stijlen voor all-norms-table */
 .all-norms-table {
     margin-top: 15px;
 }
