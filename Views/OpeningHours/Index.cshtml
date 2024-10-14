@@ -58,9 +58,12 @@
                                 @item.Factor
                             </td>
                             <td>
-                                <a asp-controller="UniqueDays" asp-action="Edit">
-                                    <img style="width: 20px; height: auto" src="~/img/Update_Logo.png" alt="Alternate Text" />
-                                </a>
+                                @if (item.StartDate > DateOnly.FromDateTime(DateTime.Now))
+                                {
+                                    <a asp-controller="UniqueDays" asp-action="Edit">
+                                        <img style="width: 20px; height: auto" src="~/img/Update_Logo.png" alt="Alternate Text" />
+                                    </a>
+                                }
                             </td>
                         </tr>
                     }
@@ -108,7 +111,7 @@
                             asp-route-page="@(ViewBag.PageNumber + 1)" 
                             asp-route-OverviewDesc="@ViewBag.OverviewDesc"
                             asp-route-usePassedDates="@ViewBag.UsePassedDates" >@(ViewBag.PageNumber + 1)
-                        </a></li>
+                            </a></li>
 
                         <li class="page-item">
                             <a class="page-link" asp-controller="OpeningHours" asp-action="index" 
@@ -140,6 +143,5 @@
             }
             <a asp-controller="UniqueDays" asp-action="Add" class="btn btn-primary btn-sm d-inline-block" style="width: fit-content">toevoegen</a>
         </div>
-   
     </div>
 </div>

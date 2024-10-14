@@ -48,7 +48,6 @@ namespace BumboApp.Controllers
                 {
                     currentPage = _standardPage;
                 }
-                
             }
             else 
             { 
