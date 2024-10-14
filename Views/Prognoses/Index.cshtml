@@ -48,7 +48,7 @@ else
                                     <img style="width: 20px; height: auto" src="~/img/Update_Logo.png" alt="Alternate Text" />
                                 </a>
                         }
-                            <a asp-controller ="prognoses" asp-action="details" asp-route-id="@("" + item.StartDate.Year + "-" + weekNumber)">
+                            <a asp-controller ="prognoses" asp-action="details" asp-route-id="@item.StartDate.ToString("dd-MM-yyyy")">
                             <img style="width: 20px; height: auto" src="~/img/Details_Logo.png" alt="Alternate Text" />
                         </a>
                     </td>
