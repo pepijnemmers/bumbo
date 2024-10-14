@@ -1,64 +1,27 @@
-﻿@model List<Norm>
+﻿@model BumboApp.ViewModels.NormsViewModel
 @{
     ViewData["Title"] = "Normeringen";
 }
 <div class="container">
-    <div class="latest-norms-table">
+    <div class="table-container latest-norms-table">
         <table class="table">
             <thead>
                 <tr>
-                    <th scope="col" width="30%">Activiteiten</th>
-                    <th scope="col" width="10%">Norm</th>
-                    <th scope="col" width="60%"></th>
+                    <th scope="col">Activiteiten</th>
+                    <th scope="col">Norm</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
-                @if (Model != null && Model.Any())
+                @if ((Model.LatestNormsList != null && Model.LatestNormsList.Any()))
                 {
-                    int counter = 0;
-
-                    foreach (var item in Model)
+                    foreach (var item in Model.LatestNormsList)
                     {
-                        if (counter < 5)
-                        {
-                            <tr>
-                                @if (item.Activity == NormActivity.ColiUitladen)
-                                {
-                                    <th scope="row">Coli uitladen</th>
-                                    <td>@item.Value</td>
-                                    <td><b>minuten</b></td>
-                                }
-                                else if (item.Activity == NormActivity.VakkenVullen)
-                                {
-                                    <th scope="row">Vakken vullen</th>
-                                    <td>@item.Value</td>
-                                    <td><b>minuten per coli</b></td>
-                                }
-                                else if (item.Activity == NormActivity.Kassa)
-                                {
-                                    <th scope="row">Kassa</th>
-                                    <td>@item.Value</td>
-                                    <td><b>klanten per uur</b></td>
-                                }
-                                else if (item.Activity == NormActivity.Vers)
-                                {
-                                    <th scope="row">Vers</th>
-                                    <td>@item.Value</td>
-                                    <td><b>klanten per uur</b></td>
-                                }
-                                else
-                                {
-                                    <th scope="row">Spiegelen</th>
-                                    <td>@item.Value</td>
-                                    <td><b>seconden per meter</b></td>
-                                }
-                            </tr>
-                            counter++;
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        <tr>
+                            <th scope="row">@item.Activity.ToFriendlyString()</th>
+                            <td>@item.Value</td>
+                            <td><b>@item.NormType.ToFriendlyString()</b></td>
+                        </tr>
                     }
                 }
                 else
@@ -96,7 +59,6 @@
                                 <td>...</td>
                                 <td><b>seconden per meter</b></td>
                             }
-
                         </tr>
                     }
                 }
@@ -107,7 +69,7 @@
         </div>
     </div>
 
-    <div class="all-norms-table">
+    <div class="table-container all-norms-table">
         <table class="table">
             <thead>
                 <tr>
@@ -120,10 +82,10 @@
                 </tr>
             </thead>
             <tbody>
-                @if (Model != null)
+                @if (Model.NormsList != null)
                 {
                     int counter = 0;
-                    @foreach (var item in Model.GroupBy(i => i.CreatedAt))
+                    @foreach (var item in Model.NormsList.GroupBy(i => i.CreatedAt))
                     {
                         if (counter > 0)
                         {
@@ -164,8 +126,9 @@
                         else
                         {
                             <tr>
-                                <td colspan="6" class="text-center">Er zijn geen eerdere normeringen</td>
+                                <td colspan="100%" class="text-center">Er zijn geen eerdere normeringen</td>
                             </tr>
+                            break;
                         }
                         counter++;
                     }
@@ -173,7 +136,7 @@
                 else
                 {
                     <tr>
-                        <td colspan="6" class="text-center">Er zijn geen eerdere normeringen</td>
+                        <td colspan="100%" class="text-center">Er zijn geen eerdere normeringen</td>
                     </tr>
                 }
             </tbody>
