@@ -61,13 +61,13 @@ namespace BumboApp.Controllers
             }
 
             if (expectation.Date <= DateOnly.FromDateTime(DateTime.Now))
-                return NotifyAndRedirect("De datum van de verwachting moet in de toekomst liggen.", "Index");
+                return NotifyErrorAndRedirect("De datum van de verwachting moet in de toekomst liggen.", "Index");
 
             if (expectation.ExpectedCustomers < 0 || expectation.ExpectedCargo < 0)
-                return NotifyAndRedirect("Het aantal verwachte klanten en verwachte coli&#39;s moet 0 of hoger zijn.", "Index");
+                return NotifyErrorAndRedirect("Het aantal verwachte klanten en verwachte coli&#39;s moet 0 of hoger zijn.", "Index");
             
             if (!ModelState.IsValid)
-                return NotifyAndRedirect("Er is iets mis gegaan. Mogelijk zijn niet alle velden ingevuld", "Index");
+                return NotifyErrorAndRedirect("Er is iets mis gegaan. Mogelijk zijn niet alle velden ingevuld", "Index");
             
             // add to database using transaction
             using var transaction = Context.Database.BeginTransaction();
@@ -86,17 +86,11 @@ namespace BumboApp.Controllers
             
             return RedirectToAction("Index");
         }
-        
+
         [HttpPost]
         public void BulkCreate(List<Expectation> expectations)
         {
-            
-        }
-        
-        private IActionResult NotifyAndRedirect(string message, string redirect)
-        {
-            NotifyService.Error(message);
-            return RedirectToAction(redirect);
+
         }
     }
 }
