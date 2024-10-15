@@ -38,3 +38,12 @@ function updateEmployees(id) {
     let hours = hoursInput.value;
     employeesInput.value = hours / 8;
 }
+
+function checkDate(input) {
+    let inputField = document.getElementById("startDate");
+    let date = inputField.value;
+    let dayNumber = date.getDay();
+    if (dayNumber != 1) {
+        inputField.value.addDays(-dayNumber + 1);
+    }
+}
