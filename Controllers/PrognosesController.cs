@@ -57,6 +57,7 @@ namespace BumboApp.Controllers
             return View();
         }
 
+        [HttpPost]
         public IActionResult CalculatePrognosis() {
             return RedirectToAction("Index");
         }
