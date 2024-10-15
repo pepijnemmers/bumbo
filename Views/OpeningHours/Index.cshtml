@@ -20,117 +20,119 @@
         }
         else
         {
-            <table class="table rounded">
-                <thead class="table-light">
-                    <tr>
-                        <td class="h4 text-center p-3" colspan="4">Speciale dagen</td>
-                    </tr>
-                    <tr>
-                        <td colspan="4">prognose wordt vermenigvuldigd de factor</td>
-                    </tr>
-                    <tr>
-                        <th>Naam</th>
-                        <th class="col-5">
-                            <a asp-controller="OpeningHours" asp-action="Index" asp-route-OverviewDesc="@(!ViewBag.OverviewDesc)"
-                               asp-route-usePassedDates="@ViewBag.UsePassedDates" aria-label="begin " class="text-decoration-none text-dark d-flex align-items-center">
-                                <div class="me-2">
-                                    Startdatum <br /> Einddatum
-                                </div>
-                                <img style="width: 20px; height: auto" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow" />
-                            </a>
-                        </th>
-                        <th class=" col-3">Factor</th>
-                        <th>Acties</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
+            <div class=" table-container">
+                <table class="table rounded">
+                    <thead class="table-light">
                         <tr>
-                            <td>
-                                @item.Name;
-                            </td>
-                            <td class=" col-5">
-                                @item.StartDate <br> 
-                                @item.StartDate.AddDays(7)
-                            </td>
-                            <td class=" col-3">
-                                @item.Factor
-                            </td>
-                            <td>
-                                @if (item.StartDate > DateOnly.FromDateTime(DateTime.Now))
-                                {
-                                    <a asp-controller="UniqueDays" asp-action="Edit">
-                                        <img style="width: 20px; height: auto" src="~/img/Update_Logo.png" alt="Alternate Text" />
-                                    </a>
-                                }
-                            </td>
+                            <td class="h4 text-center p-3" colspan="4">Speciale dagen</td>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                        <tr>
+                            <td colspan="4">prognose wordt vermenigvuldigd de factor</td>
+                        </tr>
+                        <tr>
+                            <th>Naam</th>
+                            <th class="col-5">
+                                <a asp-controller="OpeningHours" asp-action="Index" asp-route-OverviewDesc="@(!ViewBag.OverviewDesc)"
+                                   asp-route-usePassedDates="@ViewBag.UsePassedDates" aria-label="begin " class="text-decoration-none text-dark d-flex align-items-center">
+                                    <div class="me-2">
+                                        Startdatum <br /> Einddatum
+                                    </div>
+                                    <img style="width: 20px; height: auto" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow" />
+                                </a>
+                            </th>
+                            <th class=" col-3">Factor</th>
+                            <th>Acties</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @item.Name;
+                                </td>
+                                <td class=" col-5">
+                                    @item.StartDate <br> 
+                                    @item.StartDate.AddDays(7)
+                                </td>
+                                <td class=" col-3">
+                                    @item.Factor
+                                </td>
+                                <td>
+                                    @if (item.StartDate > DateOnly.FromDateTime(DateTime.Now))
+                                    {
+                                        <a asp-controller="UniqueDays" asp-action="Edit">
+                                            <img style="width: 20px; height: auto" src="~/img/Update_Logo.png" alt="Alternate Text" />
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
 
-            <nav class=" align-content-end" aria-label="">
-                <ul class="d-flex justify-content-end list-unstyled">
+                <nav class=" align-content-end" aria-label="">
+                    <ul class="d-flex justify-content-end list-unstyled">
 
-                    <!-- if there are previous pages in the list these items will be on screen-->
-                    @if (!(ViewBag.PageNumber <= 1))
-                    {
-                        <li class="page-item">
-                            <a class="page-link" asp-controller="OpeningHours" asp-action="index" 
+                        <!-- if there are previous pages in the list these items will be on screen-->
+                        @if (!(ViewBag.PageNumber <= 1))
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-controller="OpeningHours" asp-action="index" 
+                                asp-route-OverviewDesc="@ViewBag.OverviewDesc" 
+                                asp-route-usePassedDates="@ViewBag.UsePassedDates"  aria-label="begin ">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a></li>
+
+                            <li class="page-item">
+                                <a class="page-link" asp-controller="OpeningHours" asp-action="index" 
+                                asp-route-page="@ViewBag.PageNumber - 1 "
+                                asp-route-OverviewDesc="@ViewBag.OverviewDesc"
+                                asp-route-usePassedDates="@ViewBag.UsePassedDates" aria-label="Previous">
+                                    <span aria-hidden="true">&larr;</span>
+                                </a> </li>
+
+                            <li class="page-item"><a class="page-link" asp-controller="OpeningHours" asp-action="index" 
+                                asp-route-page="@(ViewBag.PageNumber - 1)" 
+                                asp-route-OverviewDesc="@ViewBag.OverviewDesc" 
+                                asp-route-usePassedDates="@ViewBag.UsePassedDates">@(ViewBag.PageNumber - 1)
+                            </a></li>
+                        }
+                        <!-- shows the current page-->
+                        <li class="page-item"><a class="page-link btn-dark" asp-controller="OpeningHours" asp-action="index" 
+                            asp-route-page="@ViewBag.PageNumber" 
                             asp-route-OverviewDesc="@ViewBag.OverviewDesc" 
-                            asp-route-usePassedDates="@ViewBag.UsePassedDates"  aria-label="begin ">
-                                <span aria-hidden="true">&laquo;</span>
+                            asp-route-usePassedDates="@ViewBag.UsePassedDates" >@ViewBag.PageNumber
                             </a></li>
 
-                        <li class="page-item">
-                            <a class="page-link" asp-controller="OpeningHours" asp-action="index" 
-                            asp-route-page="@ViewBag.PageNumber - 1 "
-                            asp-route-OverviewDesc="@ViewBag.OverviewDesc"
-                            asp-route-usePassedDates="@ViewBag.UsePassedDates" aria-label="Previous">
-                                <span aria-hidden="true">&larr;</span>
-                            </a> </li>
+                        <!-- if there are next pages in the list these items will be on screen-->
+                        @if (!(ViewBag.PageNumber >= ViewBag.MaxPages))
+                        {
+                            <li class="page-item"><a class="page-link" asp-controller="OpeningHours" asp-action="index" 
+                                asp-route-page="@(ViewBag.PageNumber + 1)" 
+                                asp-route-OverviewDesc="@ViewBag.OverviewDesc"
+                                asp-route-usePassedDates="@ViewBag.UsePassedDates" >@(ViewBag.PageNumber + 1)
+                                </a></li>
 
-                        <li class="page-item"><a class="page-link" asp-controller="OpeningHours" asp-action="index" 
-                            asp-route-page="@(ViewBag.PageNumber - 1)" 
-                            asp-route-OverviewDesc="@ViewBag.OverviewDesc" 
-                            asp-route-usePassedDates="@ViewBag.UsePassedDates">@(ViewBag.PageNumber - 1)
-                        </a></li>
-                    }
-                    <!-- shows the current page-->
-                    <li class="page-item"><a class="page-link btn-dark" asp-controller="OpeningHours" asp-action="index" 
-                        asp-route-page="@ViewBag.PageNumber" 
-                        asp-route-OverviewDesc="@ViewBag.OverviewDesc" 
-                        asp-route-usePassedDates="@ViewBag.UsePassedDates" >@ViewBag.PageNumber
-                        </a></li>
+                            <li class="page-item">
+                                <a class="page-link" asp-controller="OpeningHours" asp-action="index" 
+                                asp-route-page="@ViewBag.PageNumber + 1" 
+                                asp-route-OverviewDesc="@ViewBag.OverviewDesc" 
+                                asp-route-usePassedDates="@ViewBag.UsePassedDates" aria-label="next">
+                                    <span aria-hidden="true">&rarr;</span>
+                                </a></li>
 
-                    <!-- if there are next pages in the list these items will be on screen-->
-                    @if (!(ViewBag.PageNumber >= ViewBag.MaxPages))
-                    {
-                        <li class="page-item"><a class="page-link" asp-controller="OpeningHours" asp-action="index" 
-                            asp-route-page="@(ViewBag.PageNumber + 1)" 
-                            asp-route-OverviewDesc="@ViewBag.OverviewDesc"
-                            asp-route-usePassedDates="@ViewBag.UsePassedDates" >@(ViewBag.PageNumber + 1)
-                            </a></li>
-
-                        <li class="page-item">
-                            <a class="page-link" asp-controller="OpeningHours" asp-action="index" 
-                            asp-route-page="@ViewBag.PageNumber + 1" 
-                            asp-route-OverviewDesc="@ViewBag.OverviewDesc" 
-                            asp-route-usePassedDates="@ViewBag.UsePassedDates" aria-label="next">
-                                <span aria-hidden="true">&rarr;</span>
-                            </a></li>
-
-                        <li class="page-item">
-                            <a class="page-link" asp-controller="OpeningHours" asp-action="index" 
-                            asp-route-page="@ViewBag.MaxPages" 
-                            asp-route-OverviewDesc="@ViewBag.OverviewDesc" 
-                            asp-route-usePassedDates="@ViewBag.UsePassedDates"  aria-label="last">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a></li>
-                    }
-                </ul>
-            </nav>
+                            <li class="page-item">
+                                <a class="page-link" asp-controller="OpeningHours" asp-action="index" 
+                                asp-route-page="@ViewBag.MaxPages" 
+                                asp-route-OverviewDesc="@ViewBag.OverviewDesc" 
+                                asp-route-usePassedDates="@ViewBag.UsePassedDates"  aria-label="last">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a></li>
+                        }
+                    </ul>
+                </nav>
+            </div>
         }
         <div class="align-content-between">
             @if (ViewBag.UsePassedDates != 'n')
