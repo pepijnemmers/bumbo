@@ -47,7 +47,7 @@ else
                     <td>@item.StartDate</td> 
                     <td>@item.StartDate.AddDays(7)</td> 
                     <td>
-                        @if(!(item.StartDate <= DateOnly.FromDateTime(DateTime.Now)) || true){
+                        @if(!(item.StartDate <= DateOnly.FromDateTime(DateTime.Now))){
                             <a asp-controller="prognoses" asp-action="update">
                                 <img width="20px" height="auto" class="mx-1" src="~/img/Update_Logo.png" alt="Alternate Text" />
                             </a>
