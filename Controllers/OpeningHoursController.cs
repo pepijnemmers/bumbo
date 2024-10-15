@@ -30,7 +30,7 @@ namespace BumboApp.Controllers
 
             maxPage = (int)Math.Ceiling((decimal)uniqueDays.Count / PageSize);
 
-            if (page <= 0) 
+            if (page == null|| page <= 0) 
             {
                 page = DefaultPage;
             }
