@@ -103,7 +103,7 @@ html {
 }
 
 /* utils */
-.row {
+.row:not(.flat-layout .row, .container-fluid .row) {
   margin-inline: 0;
 }
 
