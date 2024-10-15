@@ -11,7 +11,10 @@ a {
 .aside-nav {
     box-shadow: 5px 0 8px -3px rgba(0, 0, 0, .15);
     z-index: 999999;
-    inset: 0;
+    position: sticky;
+    height: 100vh;
+    top: 0;
+    left: 0;
 }
 
 .aside-nav .logo {
@@ -67,11 +70,14 @@ a {
 @media screen and (max-width: 768px) {
     .aside-nav {
         position: fixed;
+        inset: 0;
     }
 }
 
 /* topbar */
 .topbar {
+    position: sticky;
+    top: 0;
     box-shadow: 0 5px 8px -3px rgba(0, 0, 0, .15);
     z-index: 999998;
 }
