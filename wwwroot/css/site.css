@@ -106,12 +106,12 @@ html {
   margin: 15px 0;
 }
 .table>:not(:last-child)>:last-child>* {
-  border-bottom-color: var(--border-clr);
+  border-bottom: 1px solid var(--border-clr);
 }
-.table th {
-  padding-top: .7em;
-  padding-bottom: .7em;
+.table th, .table td {
+  padding: .7em;
 }
+
 
 label {
   font-weight: bold;
@@ -130,10 +130,8 @@ label {
 }
 
 /* Norms */
-.table-container th, .table-container td {
-    border: none;
-    padding: 8px;
-    vertical-align: middle;
+.latest-norms-table th, .latest-norms-table td {
+    border: none !important;
 }
 
 .latest-norms-table .edit-button {

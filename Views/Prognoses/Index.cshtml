@@ -1,19 +1,18 @@
-﻿
-@model List<WeekPrognosis>
+﻿@model List<WeekPrognosis>
 @using System.Globalization
 @{
     ViewData["Title"] = "Prognoses";
 }
-<div class="container mt-4">
-    <div class="row align-items-center mb-3">
-        <div class="col">
-            <h2>Overzicht</h2>
-        </div>
-        <div class="col-auto">
-            <a asp-controller="Prognoses" asp-action="CreatePrognosis" class="btn btn-primary btn-sm d-inline-block">Nieuwe Prognose</a>
-        </div>
+
+<div class="row align-items-center mb-3">
+    <div class="col">
+        <h2>Overzicht</h2>
+    </div>
+    <div class="col-auto">
+        <a asp-controller="Prognoses" asp-action="CreatePrognosis" class="btn btn-primary d-inline-block">Nieuwe Prognose</a>
     </div>
 </div>
+
 @if (!Model.Any())
 {
     <!-- Display this alert if there are no prognoses -->
@@ -23,39 +22,45 @@
 }
 else
 {
-
-    <table class="table rounded">
-        <thead class="table-light">
+    <div class="table-container">
+        <table class="table">
+            <thead>
             <tr>
-                    <th>Week</th>
-                    <th><a asp-controller="Prognoses" asp-action="Index" asp-route-OverviewDesc="@(!ViewBag.OverviewDesc)" class="text-decoration-none text-dark ">Begin datum<img style="width: 20px; height: auto" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow" /></a></th>
+                <th>Week</th>
+                <th>
+                    <a asp-controller="Prognoses" asp-action="Index" asp-route-OverviewDesc="@(!ViewBag.OverviewDesc)" class="text-dark">
+                        Begin datum
+                        <img width="18px" height="auto" class="mx-1" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow"/>
+                    </a>
+                </th>
                 <th>Eind datum</th>
                 <th>Acties</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             @foreach (var item in Model)
             {
-                    DateTime startDateTime = item.StartDate.ToDateTime(TimeOnly.MinValue);
-                    int weekNumber = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(startDateTime,new CalendarWeekRule(),item.StartDate.DayOfWeek);
+                DateTime startDateTime = item.StartDate.ToDateTime(TimeOnly.MinValue);
+                int weekNumber = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(startDateTime,new CalendarWeekRule(),item.StartDate.DayOfWeek);
                 <tr>
-                    <td class=" col-2">@weekNumber</td>
-                    <td class =" col-4">@item.StartDate</td> 
-                    <td class=" col-4">@item.StartDate.AddDays(7)</td> 
-                    <td class=" col-1">
-                        @if(!(item.StartDate <= DateOnly.FromDateTime(DateTime.Now))){
-                                <a asp-controller="prognoses" asp-action="update">
-                                    <img style="width: 20px; height: auto" src="~/img/Update_Logo.png" alt="Alternate Text" />
-                                </a>
+                    <td>@weekNumber</td>
+                    <td>@item.StartDate</td> 
+                    <td>@item.StartDate.AddDays(7)</td> 
+                    <td>
+                        @if(!(item.StartDate <= DateOnly.FromDateTime(DateTime.Now)) || true){
+                            <a asp-controller="prognoses" asp-action="update">
+                                <img width="20px" height="auto" class="mx-1" src="~/img/Update_Logo.png" alt="Alternate Text" />
+                            </a>
                         }
-                            <a asp-controller ="prognoses" asp-action="details" asp-route-id="@("" + item.StartDate.Year + "-" + weekNumber)">
-                            <img style="width: 20px; height: auto" src="~/img/Details_Logo.png" alt="Alternate Text" />
+                        <a asp-controller ="prognoses" asp-action="details" asp-route-id="@("" + item.StartDate.Year + "-" + weekNumber)">
+                            <img width="20px" height="auto" src="~/img/Details_Logo.png" alt="Alternate Text" />
                         </a>
                     </td>
                 </tr>
             }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 
 
         <nav class=" align-content-end" aria-label="">
