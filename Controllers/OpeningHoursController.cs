@@ -5,9 +5,7 @@ namespace BumboApp.Controllers
 {
     public class OpeningHoursController : MainController
     {
-        private readonly int _pageSize = 5; //a constant for how many items per list page
-        private readonly int _standardPage = 1;
-        public IActionResult Index(int page = 1, bool overviewDesc = false,char? usePassedDates = 'n')
+        public IActionResult Index(int? page, bool overviewDesc = false,char? usePassedDates = 'n')
         {
             int maxPage;
             string imageUrl = "~/img/UpArrow.png";
@@ -16,11 +14,11 @@ namespace BumboApp.Controllers
             List<UniqueDay> uniqueDays;
             if (usePassedDates == 'n')
             {
-                uniqueDays = _context.UniqueDays.Where(u => u.EndDate >= DateOnly.FromDateTime(DateTime.Now)).ToList();
+                uniqueDays = Context.UniqueDays.Where(u => u.EndDate >= DateOnly.FromDateTime(DateTime.Now)).ToList();
             }
             else
             {
-                uniqueDays = _context.UniqueDays.Where(u => u.EndDate < DateOnly.FromDateTime(DateTime.Now)).ToList();
+                uniqueDays = Context.UniqueDays.Where(u => u.EndDate < DateOnly.FromDateTime(DateTime.Now)).ToList();
             }
             uniqueDays.OrderBy(p => p.StartDate);
 
@@ -30,11 +28,11 @@ namespace BumboApp.Controllers
                 uniqueDays.Reverse();
             }
 
-            maxPage = (int)Math.Ceiling((decimal)uniqueDays.Count / _pageSize);
+            maxPage = (int)Math.Ceiling((decimal)uniqueDays.Count / PageSize);
 
             if (page <= 0) 
             {
-                page = _standardPage;
+                page = DefaultPage;
             }
             else if (page > maxPage) 
             {
@@ -44,16 +42,16 @@ namespace BumboApp.Controllers
                 }
                 else
                 {
-                    page = _standardPage;
+                    page = DefaultPage;
                 }
             }
-            for (int i = (page - 1) * _pageSize ; i <= page * _pageSize && i < uniqueDays.Count; i++)
+            for (int i = ((int)page - 1) * DefaultPage; i <= page * PageSize && i < uniqueDays.Count; i++)
             {
                 uniqueDaysForPage.Add(uniqueDays[i]);
             }
 
             ViewBag.PageNumber = page;
-            ViewBag.PageSize = _pageSize;
+            ViewBag.PageSize = PageSize;
             ViewBag.MaxPages = maxPage;
             ViewBag.ImageUrl = imageUrl;
             ViewBag.OverviewDesc = overviewDesc;
