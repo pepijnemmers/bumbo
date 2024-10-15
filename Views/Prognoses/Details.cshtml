@@ -1,4 +1,127 @@
 ﻿@{
     ViewData["Title"] = "Prognose details";
 }
-<h5>Prognoses details</h5>
+
+@model BumboApp.ViewModels.WeekPrognosisViewModel
+
+
+
+<div class="row justify-content-between">
+
+    <div class="col-md-3">Prognose week @Model.WeekNr</div>
+    <div class="col-md-3">
+        <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@Model.StartDate.AddDays(-7).ToString("dd-MM-yyyy")">&lt;</a>
+        <strong>@Model.WeekNr</strong> (@Model.StartDate.ToString("dd/MM/yyyy") - @Model.StartDate.AddDays(6).ToString("dd/MM/yyyy"))
+        <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@Model.StartDate.AddDays(7).ToString("dd-MM-yyyy")">&gt;</a>
+    </div>
+</div>
+
+@if (Model.Prognoses == null)
+{
+    <div class="border">Geen prognose voor deze week</div>
+}
+else
+{
+    <div id="overview" class="row my-3">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Afdeling</th>
+                    @for (int i = 0; i < 7; i++)
+                    {
+                        <th>@Model.DutchDays[i]</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Department department in Department.GetValues(typeof(Department)))
+                {
+                    <tr>
+                        <td>@department</td>
+                        @for (int i = 0; i < 7; i++)
+                        {
+                            DayOfWeek day = (DayOfWeek)((i + 1) % 7); //necessary to start with monday rather than sunday
+                            var prognosis = Model.Prognoses.SingleOrDefault(p => p.Department == department && p.Date.DayOfWeek == day);
+
+                            <td>
+                                @if (prognosis != null)
+                                {
+                                    <p>@prognosis.NeededEmployees | @prognosis.NeededHours</p>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <form id="form" style="display: none" asp-action="Update" method="post">
+        <div class="row my-3">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Afdeling</th>
+                        @for (int i = 0; i < 7; i++)
+                        {
+                            <th>@Model.DutchDays[i]</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Department department in Department.GetValues(typeof(Department)))
+                    {
+                        <tr>
+                            <td>@department</td>
+                            @for (int i = 0; i < 7; i++)
+                            {
+                                DayOfWeek day = (DayOfWeek)((i + 1) % 7); //necessary to start with monday rather than sunday
+                                var prognosis = Model.Prognoses.SingleOrDefault(p => p.Department == department && p.Date.DayOfWeek == day);
+
+                                <td>
+                                    @if (prognosis != null)
+                                    {
+                                        <div class="input-group mb-2">
+                                            <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Id" value="@prognosis.Id" />
+                                            <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Date" value="@prognosis.Date" />
+                                            <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Department" value="@prognosis.Department" />
+
+                                            <input id="@day+@department-employees"
+                                                   class="form-control form-control-sm"
+                                                   name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededEmployees"
+                                                   type="number"
+                                                   value="@prognosis.NeededEmployees"
+                                                   min="0"
+                                                   step="0.125"
+                                                   oninput="updateHours('@day+@department')">
+
+                                            <input id="@day+@department-hours"
+                                                   class="form-control form-control-sm"
+                                                   name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededHours"
+                                                   type="number"
+                                                   value="@prognosis.NeededHours"
+                                                   min="0"
+                                                   oninput="updateEmployees('@day+@department')">
+                                        </div>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row justify-content-end">
+            <div class="w-auto">
+                <button class="btn btn-primary" asp-controller="Prognoses" asp-action="CreatePrognosis">opnieuw berekenen</button>
+                <button type="submit" class="btn btn-primary">OPSLAAN</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="row justify-content-between">
+        <div class="col-md-3">Legenda <br /> aantal medewerkers | aantal uur</div>
+        <button id="prognosisEditButton" class="btn btn-primary w-auto">bewerken</button>
+    </div>
+}
