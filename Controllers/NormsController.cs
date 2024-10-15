@@ -11,8 +11,8 @@ namespace BumboApp.Controllers
         {
             var viewModel = new NormsViewModel
             {
-                NormsList = _context.Norms.OrderBy(n => n.CreatedAt).Skip(5).ToList(),
-                LatestNormsList = _context.Norms.OrderBy(n => n.CreatedAt).Take(5).ToList()
+                NormsList = Context.Norms.OrderBy(n => n.CreatedAt).Skip(5).ToList(),
+                LatestNormsList = Context.Norms.OrderBy(n => n.CreatedAt).Take(5).ToList()
             };
             return View(viewModel);
 

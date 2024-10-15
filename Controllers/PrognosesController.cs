@@ -81,7 +81,7 @@ namespace BumboApp.Controllers
 
             int weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(startDate.AddDays(3).ToDateTime(new TimeOnly(0, 0)), CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
 
-            WeekPrognosis? wp = _context.WeekPrognoses
+            WeekPrognosis? wp = Context.WeekPrognoses
         .Include(wp => wp.Prognoses)
             .SingleOrDefault(wp => wp.StartDate == startDate);
 
@@ -106,7 +106,7 @@ namespace BumboApp.Controllers
         {
             foreach (Prognosis prognosis in prognoses)
             {
-                Prognosis existingPrognosis = _context.Prognoses
+                Prognosis existingPrognosis = Context.Prognoses
                 .Single(p => p.Department == prognosis.Department && p.Date == prognosis.Date);
 
                 if (existingPrognosis != null)
@@ -116,7 +116,7 @@ namespace BumboApp.Controllers
                 }
             }
 
-            _context.SaveChanges();
+            Context.SaveChanges();
 
             return RedirectToAction("Index");
         }
