@@ -8,10 +8,11 @@ namespace BumboApp.Controllers
 {
     public class MainController : Controller
     {
-        [FromServices] 
-        protected INotyfService NotifyService { get; set; } = null!;
-        protected BumboDbContext _context;
         private static User? _loggedInUser;
+        
+        [FromServices] protected INotyfService NotifyService { get; set; } = null!;
+        protected readonly BumboDbContext Context;
+        protected static IConfiguration Configuration = null!;
         protected static User? LoggedInUser
         {
             get => _loggedInUser;
@@ -20,7 +21,13 @@ namespace BumboApp.Controllers
 
         public MainController()
         {
-            _context = new BumboDbContext();
+            Context = new BumboDbContext();
+        }
+        
+        protected IActionResult NotifyErrorAndRedirect(string message, string redirect)
+        {
+            NotifyService.Error(message);
+            return RedirectToAction(redirect);
         }
         
         /// <summary>
@@ -32,6 +39,7 @@ namespace BumboApp.Controllers
         {    
             base.OnActionExecuting(context);
             NotifyService = HttpContext.RequestServices.GetService<INotyfService>()!;
+            Configuration = HttpContext.RequestServices.GetService<IConfiguration>()!;
             
             if (LoggedInUser == null && context.HttpContext.Request.Path != "/login")
             {

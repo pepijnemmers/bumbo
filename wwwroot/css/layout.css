@@ -3,6 +3,10 @@ body {
     height: 100%;
 }
 
+a {
+    text-decoration: none;
+}
+
 /* aside */
 .aside-nav {
     box-shadow: 5px 0 8px -3px rgba(0, 0, 0, .15);

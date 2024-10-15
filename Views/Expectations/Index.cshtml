@@ -1,4 +1,91 @@
-﻿@{
+﻿@model List<Expectation>
+@{
     ViewData["Title"] = "Verwachtingen";
 }
-<h5>Expectations index</h5>
+
+<div class="table-container p-3">
+    <form method="post" asp-action="Create">
+        <div class="row">
+            <div class="col-12 col-lg">
+                <label for="date">Datum</label>
+                <input type="date" id="date" name="Date" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+            </div>
+            <div class="col-12 col-lg">
+                <label for="customersExpected">Aantal klanten verwacht</label>
+                <input type="number" id="customersExpected" name="ExpectedCustomers" class="form-control" min="0" required />
+            </div>
+            <div class="col-12 col-lg">
+                <label for="cargoExpected">Aantal coli&#39;s verwacht</label>
+                <input type="number" id="cargoExpected" name="ExpectedCargo" class="form-control" min="0" required />
+            </div>
+        </div>
+        <div class="text-end mt-3">
+            <a asp-action="Create" class="btn btn-outline-primary">
+                <i class="fa-solid fa-upload"></i>
+                Bulk invoer
+            </a>
+            <button type="submit" class="btn btn-primary">Toevoegen</button>
+        </div>
+    </form>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Datum</th>
+            <th>Aantal klanten verwacht</th>
+            <th>Aantal coli’s verwacht</th>
+            <th>Acties</th>
+        </tr>
+        </thead>
+        <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="100%" class="text-center py-4">Er zijn nog geen verwachtingen...</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var expectation in Model)
+            {
+                <tr>
+                    <td>@expectation.Date.ToShortDateString()</td>
+                    <td>@expectation.ExpectedCustomers</td>
+                    <td>@expectation.ExpectedCargo</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@expectation.Id">
+                            <img width="20px" src="~/img/Update_Logo.png" alt="edit" />
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+
+    @if (ViewBag.MaxPages > 1)
+    {
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-end px-3">
+                <li class="page-item @(ViewBag.PageNumber == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.PageNumber - 1)" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                @for (int i = 1; i <= ViewBag.MaxPages; i++)
+                {
+                <li class="page-item @(ViewBag.PageNumber == i ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                </li>
+                }
+                <li class="page-item @(ViewBag.PageNumber == ViewBag.MaxPages ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.PageNumber + 1)" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
