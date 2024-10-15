@@ -7,9 +7,6 @@ namespace BumboApp.Controllers
 {
     public class NormsController : MainController
     {
-        private static readonly int PageSize = Configuration.GetValue<int>("Pagination:DefaultPageSize");
-        private static readonly int DefaultPage = Configuration.GetValue<int>("Pagination:StartPage");
-
         public IActionResult Index(int? page)
         {
             List<Norm> norms = Context.Norms.OrderBy(n => n.CreatedAt).Skip(5).ToList();

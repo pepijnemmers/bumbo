@@ -13,6 +13,8 @@ namespace BumboApp.Controllers
         [FromServices] protected INotyfService NotifyService { get; set; } = null!;
         protected readonly BumboDbContext Context;
         protected static IConfiguration Configuration = null!;
+        protected static int PageSize;
+        protected static int DefaultPage;
         protected static User? LoggedInUser
         {
             get => _loggedInUser;
@@ -22,6 +24,10 @@ namespace BumboApp.Controllers
         public MainController()
         {
             Context = new BumboDbContext();
+            
+            // fallback values for pagination
+            PageSize = 5;
+            DefaultPage = 1;
         }
         
         protected IActionResult NotifyErrorAndRedirect(string message, string redirect)
@@ -40,6 +46,9 @@ namespace BumboApp.Controllers
             base.OnActionExecuting(context);
             NotifyService = HttpContext.RequestServices.GetService<INotyfService>()!;
             Configuration = HttpContext.RequestServices.GetService<IConfiguration>()!;
+            
+            PageSize = Configuration.GetValue<int>("Pagination:DefaultPageSize");
+            DefaultPage = Configuration.GetValue<int>("Pagination:StartPage");
             
             if (LoggedInUser == null && context.HttpContext.Request.Path != "/login")
             {
