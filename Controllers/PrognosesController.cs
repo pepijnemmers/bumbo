@@ -19,6 +19,7 @@ namespace BumboApp.Controllers
                 .OrderBy(p => p.StartDate)
                 .ToList();
             prognoses.Reverse();
+
             List<WeekPrognosis> prognosesForPage = new List<WeekPrognosis>();
             string imageUrl = "~/img/UpArrow.png";
             if (!overviewDesc)
@@ -27,20 +28,19 @@ namespace BumboApp.Controllers
                 prognoses.Reverse();
             }
 
-            int currentPageNumber = page;
             int maxPages = (int)(Math.Ceiling((decimal)prognoses.Count / _pageSize));
-            if (currentPageNumber <= 0) { currentPageNumber = _standardPage; }
-            if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
+            if (page <= 0) { page = _standardPage; }
+            if (page > maxPages) { page = maxPages; }
 
             if (prognoses.Count > 0)
             {
-                for (int i = (currentPageNumber - 1) * _pageSize; (i <= currentPageNumber * _pageSize && i < prognoses.Count); i++)
+                for (int i = (page - 1) * _pageSize; (i <= page * _pageSize && i < prognoses.Count); i++)
                 {
                     prognosesForPage.Add(prognoses[i]);
                 }
             }
 
-            ViewBag.PageNumber = currentPageNumber;
+            ViewBag.PageNumber = page;
             ViewBag.PageSize = _pageSize;
             ViewBag.MaxPages = maxPages;
             ViewBag.ImageUrl = imageUrl;

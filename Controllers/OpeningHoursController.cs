@@ -9,7 +9,6 @@ namespace BumboApp.Controllers
         private readonly int _standardPage = 1;
         public IActionResult Index(int page = 1, bool overviewDesc = false,char? usePassedDates = 'n')
         {
-            int currentPage = page;
             int maxPage;
             string imageUrl = "~/img/UpArrow.png";
             List <UniqueDay> uniqueDaysForPage = new List<UniqueDay>();
@@ -18,13 +17,12 @@ namespace BumboApp.Controllers
             if (usePassedDates == 'n')
             {
                 uniqueDays = _context.UniqueDays.Where(u => u.EndDate >= DateOnly.FromDateTime(DateTime.Now)).ToList();
-                uniqueDays.OrderBy(p => p.StartDate);
             }
             else
             {
                 uniqueDays = _context.UniqueDays.Where(u => u.EndDate < DateOnly.FromDateTime(DateTime.Now)).ToList();
-                uniqueDays.OrderBy(p => p.StartDate);
             }
+            uniqueDays.OrderBy(p => p.StartDate);
 
             if (overviewDesc)
             {
@@ -36,30 +34,25 @@ namespace BumboApp.Controllers
 
             if (page <= 0) 
             {
-                currentPage = _standardPage;
+                page = _standardPage;
             }
             else if (page > maxPage) 
             {
                 if(maxPage > 0)
                 {
-                    currentPage = maxPage;
+                    page = maxPage;
                 }
                 else
                 {
-                    currentPage = _standardPage;
+                    page = _standardPage;
                 }
             }
-            else 
-            { 
-                currentPage = page; 
-            }
-            
-            for (int i = (currentPage-1)*5 ; i <= currentPage * _pageSize && i < uniqueDays.Count; i++)
+            for (int i = (page - 1) * _pageSize ; i <= page * _pageSize && i < uniqueDays.Count; i++)
             {
                 uniqueDaysForPage.Add(uniqueDays[i]);
             }
 
-            ViewBag.PageNumber = currentPage;
+            ViewBag.PageNumber = page;
             ViewBag.PageSize = _pageSize;
             ViewBag.MaxPages = maxPage;
             ViewBag.ImageUrl = imageUrl;
