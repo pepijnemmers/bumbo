@@ -19,6 +19,10 @@
 }
 
 /* buttons */
+.btn {
+  text-transform: capitalize;
+}
+
 .btn-primary {
   color: #fff;
   background-color: var(--bs-primary);
@@ -99,6 +103,10 @@ html {
 }
 
 /* utils */
+.row {
+  margin-inline: 0;
+}
+
 .table-container {
   background-color: var(--bs-white);
   border: 1px solid var(--border-clr);
@@ -110,6 +118,9 @@ html {
 }
 .table th, .table td {
   padding: .7em;
+}
+.table tr:hover {
+  background-color: var(--bs-body-bg);
 }
 
 label {
