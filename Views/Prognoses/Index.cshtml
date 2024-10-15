@@ -5,58 +5,62 @@
     ViewData["Title"] = "Prognoses";
 }
 
-<div class="container mt-4">
+<div class="row align-items-center mb-3">
+    <div class="col">
+        <h2>Overzicht</h2>
+    </div>
+    <div class="col-auto">
+        <a asp-controller="Prognoses" asp-action="CreatePrognosis" class="btn btn-primary d-inline-block">Nieuwe Prognose</a>
+    </div>
+</div>
 
-    <div class="container mt-4">
-        <div class="row align-items-center mb-3">
-            <div class="col">
-                <h2>Overview</h2>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-dark btn-sm d-inline-block">Nieuwe Prognose</button>
-            </div>
-        </div>
-    @if (!Model.Any())
-    {
-        <!-- Display this alert if there are no items -->
-        <div class="alert alert-warning" role="alert">
-            There are no items to display.
-        </div>
-    }
-    else
-    {
-
-        <table class="table rounded">
-            <thead class="table-light">
-                <tr>
-                    <th>Week</th>
-                    <th>Begin datum</th>
-                    <th>Eind datum</th>
-                    <th>Acties</th>
-                </tr>
+@if (!Model.Any())
+{
+    <!-- Display this alert if there are no prognoses -->
+    <div class="alert alert-warning" role="alert">
+        Geen prognoses in het systeem.
+    </div>
+}
+else
+{
+    <div class="table-container">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Week</th>
+                <th>
+                    <a asp-controller="Prognoses" asp-action="Index" asp-route-OverviewDesc="@(!ViewBag.OverviewDesc)" class="text-dark">
+                        Begin datum
+                        <img width="18px" height="auto" class="mx-1" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow"/>
+                    </a>
+                </th>
+                <th>Eind datum</th>
+                <th>Acties</th>
+            </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model)
-                {
-                        DateTime startDateTime = item.StartDate.ToDateTime(TimeOnly.MinValue); // Sets the time to midnight
-                        int weekNumber = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(startDateTime,new CalendarWeekRule(),item.StartDate.DayOfWeek);
-                    <tr>
-                        <td class=" col-2">@weekNumber</td>
-                        <td class =" col-4">@item.StartDate</td> 
-                        <td class=" col-4">@item.StartDate.AddDays(7)</td> 
-                        <td class=" col-1">
-                            <a>
-                                <img style="width: 20px; height: auto" src="~/img/Update_Logo.png" alt="Alternate Text" />
+            @foreach (var item in Model)
+            {
+                DateTime startDateTime = item.StartDate.ToDateTime(TimeOnly.MinValue);
+                int weekNumber = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(startDateTime,new CalendarWeekRule(),item.StartDate.DayOfWeek);
+                <tr>
+                    <td>@weekNumber</td>
+                    <td>@item.StartDate</td> 
+                    <td>@item.StartDate.AddDays(7)</td> 
+                    <td>
+                        @if(!(item.StartDate <= DateOnly.FromDateTime(DateTime.Now))){
+                            <a asp-controller="prognoses" asp-action="update">
+                                <img width="20px" height="auto" class="mx-1" src="~/img/update-icon.svg" alt="Alternate Text" />
                             </a>
-                            <a>
-                                <img style="width: 20px; height: auto" src="~/img/Update_Logo.png" alt="Alternate Text" />
-                            </a>
-                        </td>
-                    </tr>
-                }
+                        }
+                        <a asp-controller ="prognoses" asp-action="details" asp-route-id="@("" + item.StartDate.Year + "-" + weekNumber)">
+                            <img width="20px" height="auto" src="~/img/details-icon.svg" alt="Alternate Text" />
+                        </a>
+                    </td>
+                </tr>
+            }
             </tbody>
         </table>
-
 
             <nav class=" align-content-end" aria-label="">
                 <ul class="d-flex justify-content-end list-unstyled">
@@ -97,6 +101,5 @@
                  }
             </ul>
         </nav>
-
-    }
 </div>
+}
