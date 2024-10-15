@@ -15,10 +15,10 @@ namespace BumboApp.Controllers
 
         public IActionResult Login(User model, string password)
         {
-            var user = _context.Users.SingleOrDefault(u => u.Email == model.Email);
+            var user = Context.Users.SingleOrDefault(u => u.Email == model.Email);
             if (user != null)
             {
-                var dbPassword = _context.Entry(user).Property("Password").CurrentValue as string;
+                var dbPassword = Context.Entry(user).Property("Password").CurrentValue as string;
                 if (dbPassword == password)
                 {
                     LoggedInUser = user;

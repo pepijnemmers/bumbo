@@ -7,16 +7,32 @@ namespace BumboApp.Controllers
 {
     public class NormsController : MainController
     {
-        public IActionResult Index()
+        public IActionResult Index(int? page)
         {
+            List<Norm> norms = Context.Norms.OrderBy(n => n.CreatedAt).Skip(5).ToList();
+            
+            int currentPageNumber = page ?? DefaultPage;
+            int maxPages = (int)(Math.Ceiling((decimal)norms.Count / PageSize));
+            if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
+            if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
+            
+            List<Norm> normsForPage = 
+                norms
+                .Skip((currentPageNumber - 1) * PageSize)
+                .Take(PageSize * 5)
+                .ToList();
+            
+            ViewBag.PageNumber = currentPageNumber;
+            ViewBag.PageSize = PageSize;
+            ViewBag.MaxPages = maxPages;
+            
             var viewModel = new NormsViewModel
             {
-                NormsList = _context.Norms.OrderBy(n => n.CreatedAt).Skip(5).ToList(),
-                LatestNormsList = _context.Norms.OrderBy(n => n.CreatedAt).Take(5).ToList()
+                NormsList = normsForPage,
+                LatestNormsList = Context.Norms.OrderBy(n => n.CreatedAt).Take(5).ToList()
             };
-            return View(viewModel);
-
             
+            return View(viewModel);
         }
     }
 }
