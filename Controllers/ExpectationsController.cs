@@ -69,9 +69,8 @@ namespace BumboApp.Controllers
                 transaction.Commit();
                 NotifyService.Success("De verwachting is bijgewerkt!");
             }
-            catch(Exception e)
+            catch
             {
-                Console.WriteLine(e);
                 transaction.Rollback();
                 NotifyService.Error("Er is iets mis gegaan bij het bewerken van de verwachting.");
             }
