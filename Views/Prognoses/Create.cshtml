@@ -9,7 +9,7 @@
     <div class="card p-4 create-prognosis-card">
         <div class="mb-3">
             <label for="startDate" class="form-label fw-bold">Begin Datum</label>
-            <input type="date" class="form-control" id="startDate" placeholder="Begindatum" onchange="checkDate()">
+            <input type="date" class="form-control" id="startDate" name="startDate" placeholder="Begindatum" onchange="checkDate()">
         </div>
 
         <div class="mb-2">
@@ -19,7 +19,7 @@
 
         <div class="mb-3">
             <label for="templateSelect" class="form-label fw-bold">Template</label>
-            <select class="form-select" id="templateSelect">
+            <select class="form-select" id="templateSelect" name="templateSelect">
                 <option selected>Standaard template</option>
                 <option value="1">Vorige week</option>
             </select>

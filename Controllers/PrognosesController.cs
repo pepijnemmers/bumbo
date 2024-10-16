@@ -127,7 +127,8 @@ namespace BumboApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult CalculatePrognosis() {
+        public IActionResult CalculatePrognosis(DateTime startDate, string templateSelect) {
+            Console.WriteLine(templateSelect + startDate);
             return RedirectToAction("Index");
         }
     }

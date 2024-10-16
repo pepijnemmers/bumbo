@@ -42,10 +42,11 @@ function updateEmployees(id) {
 function checkDate() {
     let startDateField = document.getElementById("startDate");
     let endDateField = document.getElementById("endDate");
+    let currentDate = new Date().setHours(0, 0, 0, 0);
 
     let date = new Date(startDateField.value);
     let dayNumber = date.getDay();
-    document.getElementById("prognosisCreateButton").disabled = (dayNumber != 1);
+    document.getElementById("prognosisCreateButton").disabled = (dayNumber != 1 || date < currentDate);
 
     date.setDate(date.getDate() + 6);
     let formattedDate = ('0' + date.getDate()).slice(-2) + '-' +
