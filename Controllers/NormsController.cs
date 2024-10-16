@@ -10,7 +10,7 @@ namespace BumboApp.Controllers
     {
         public IActionResult Index(int? page)
         {
-            List<Norm> norms = Context.Norms.OrderBy(n => n.CreatedAt).Skip(5).ToList();
+            List<Norm> norms = Context.Norms.OrderByDescending(n => n.CreatedAt).Skip(5).ToList();
             
             int currentPageNumber = page ?? DefaultPage;
             int maxPages = (int)(Math.Ceiling((decimal)norms.Count / PageSize));
@@ -30,7 +30,7 @@ namespace BumboApp.Controllers
             var viewModel = new NormsViewModel
             {
                 NormsList = normsForPage,
-                LatestNormsList = Context.Norms.OrderBy(n => n.CreatedAt).Take(5).ToList()
+                LatestNormsList = Context.Norms.OrderByDescending(n => n.CreatedAt).Take(5).ToList()
             };
             
             return View(viewModel);
@@ -39,37 +39,34 @@ namespace BumboApp.Controllers
         [HttpPost]
         public IActionResult Add(List<AddNormViewModel> addNormsList)
         {
-            foreach (var item in addNormsList)
+            if (ModelState.IsValid)
             {
-                NotifyService.Success("test");
-            }
-            //if (ModelState.IsValid)
-            //{
-            //    using var transaction = Context.Database.BeginTransaction();
+                using var transaction = Context.Database.BeginTransaction();
 
-            //    try
-            //    {
-            //        foreach (var item in addNormsList)
-            //        {
-            //            var newNormEntry = new Norm
-            //            {
-            //                Activity = item.NormActivity,
-            //                Value = item.Value,
-            //                NormType = item.NormType,
-            //                CreatedAt = DateTime.Now
-            //            };
-            //            Context.Norms.Add(newNormEntry);
-            //        }
-            //        Context.SaveChanges();
-            //        transaction.Commit();
-            //        NotifyService.Success("De normeringen zijn opgeslagen!");
-            //    }
-            //    catch
-            //    {
-            //        transaction.Rollback();
-            //        NotifyService.Error("Er is iets mis gegaan");
-            //    }
-            //}
+                try
+                {
+                    var currentTime = DateTime.Now;
+                    foreach (var item in addNormsList)
+                    {
+                        var newNormEntry = new Norm
+                        {
+                            Activity = item.Activity,
+                            Value = item.Value,
+                            NormType = item.NormType,
+                            CreatedAt = currentTime,
+                        };
+                        Context.Norms.Add(newNormEntry);
+                    }
+                    Context.SaveChanges();
+                    transaction.Commit();
+                    NotifyService.Success("De normeringen zijn opgeslagen!");
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    NotifyService.Error("Er is iets mis gegaan");
+                }
+            }
             return RedirectToAction("Index");
         }
     }
