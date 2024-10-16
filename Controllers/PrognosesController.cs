@@ -145,15 +145,41 @@ namespace BumboApp.Controllers
                     if (previousPrognosis != null)
                     {
                         Console.WriteLine("There is a prognosis for last week");
+                        copyPreviousPrognosis(startDate, previousPrognosis);
                     }
                     else
                     {
                         NotifyService.Warning("Er bestaat geen prognose voor de voorgaande week.");
                     }
-
                 }
             }
             return RedirectToAction("Index");
+        }
+
+        private void copyPreviousPrognosis(DateOnly startDate, WeekPrognosis previousPrognosis)
+        {
+            var newWeekPrognosis = new WeekPrognosis
+            {
+                StartDate = startDate,
+                Prognoses = new List<Prognosis>()
+            };
+
+            foreach (var previousPrognosisEntry in previousPrognosis.Prognoses)
+            {
+                var newPrognosis = new Prognosis
+                {
+                    Date = previousPrognosisEntry.Date.AddDays(7),
+                    Department = previousPrognosisEntry.Department,
+                    NeededHours = previousPrognosisEntry.NeededHours,
+                    NeededEmployees = previousPrognosisEntry.NeededEmployees,
+                };
+
+                newWeekPrognosis.Prognoses.Add(newPrognosis);
+            }
+
+            Context.WeekPrognoses.Add(newWeekPrognosis);
+            Context.SaveChanges();
+            Console.WriteLine("Prognose gekopieerd voor de nieuwe week");
         }
     }
 }
