@@ -37,34 +37,39 @@ namespace BumboApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult Add(List<AddNormViewModel> nieuweNormeringen)
+        public IActionResult Add(List<AddNormViewModel> addNormsList)
         {
-            //using var transaction = _context.Database.BeginTransaction();
-
-            //try
+            foreach (var item in addNormsList)
+            {
+                NotifyService.Success("test");
+            }
+            //if (ModelState.IsValid)
             //{
-            //    foreach (var item in nieuweNormeringen)
+            //    using var transaction = Context.Database.BeginTransaction();
+
+            //    try
             //    {
-            //        var newNormEntry = new Norm
+            //        foreach (var item in addNormsList)
             //        {
-            //            Activity = item.NormActivity,
-            //            Value = item.Value,
-            //            NormType = item.NormType,
-            //            CreatedAt = DateTime.Now
-            //        };
-            //        _context.Norms.Add(newNormEntry);
+            //            var newNormEntry = new Norm
+            //            {
+            //                Activity = item.NormActivity,
+            //                Value = item.Value,
+            //                NormType = item.NormType,
+            //                CreatedAt = DateTime.Now
+            //            };
+            //            Context.Norms.Add(newNormEntry);
+            //        }
+            //        Context.SaveChanges();
+            //        transaction.Commit();
+            //        NotifyService.Success("De normeringen zijn opgeslagen!");
             //    }
-            //    _context.SaveChanges();
-            //    transaction.Commit();
-            //    NotifyService.Success("De normeringen zijn opgeslagen!");
+            //    catch
+            //    {
+            //        transaction.Rollback();
+            //        NotifyService.Error("Er is iets mis gegaan");
+            //    }
             //}
-            //catch
-            //{
-            //    transaction.Rollback();
-            //    NotifyService.Error("Er is iets mis gegaan");
-            //}
-
-            NotifyService.Success("De normeringen zijn opgeslagen!");
             return RedirectToAction("Index");
         }
     }
