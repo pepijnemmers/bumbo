@@ -1,4 +1,28 @@
 ﻿@{
     ViewData["Title"] = "Speciale dag toevoegen";
 }
-<h5>Unique days add</h5>
+<div class="table-container p-3">
+    <form method="post" asp-action="Create">
+        <div class="row">
+            <div class="col-12 col-lg">
+                <label for="text">Naam</label>
+                <input type="text" id="name" name="Name" class="form-control" min=" PageSize" required />
+            </div>
+            <div class="col-12 col-lg">
+                <label for="customersExpected">Startdatum</label>
+                <input type="Date" id="bDate" name="StartDate" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+            </div>
+            <div class="col-12 col-lg">
+                <label for="cargoExpected">EindDatum</label>
+                <input type="Date" id="eDate" name="EndDate" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+            </div>
+            <div class="col-12 col-lg">
+                <label for="cargoExpected">Factor</label>
+                <input type="number" id="factor" name="Factor" class="form-control" min="0.1" step="0.1" required />
+            </div>
+        </div>
+        <div class="text-end mt-3">
+            <button type="submit" class="btn btn-primary">Toevoegen</button>
+        </div>
+    </form>
+</div>
