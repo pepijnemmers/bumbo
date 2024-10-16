@@ -48,10 +48,15 @@ function checkDate() {
     let dayNumber = date.getDay();
     document.getElementById("prognosisCreateButton").disabled = (dayNumber != 1 || date < currentDate);
 
-    date.setDate(date.getDate() + 6);
-    let formattedDate = ('0' + date.getDate()).slice(-2) + '-' +
-        ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
-        date.getFullYear(); //formatten voor dd-mm-yyyy (met 07 ipv 7)
+    if (!(dayNumber != 1 || date < currentDate)) {
+        date.setDate(date.getDate() + 6);
+        let formattedDate = ('0' + date.getDate()).slice(-2) + '-' +
+            ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+            date.getFullYear(); //formatten voor dd-mm-yyyy (met 07 ipv 7)
 
-    endDateField.textContent = formattedDate;
+        endDateField.textContent = formattedDate;
+    }
+    else {
+        endDateField.textContent = 'dd-mm-yyyy';
+    }
 }
