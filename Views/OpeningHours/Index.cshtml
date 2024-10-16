@@ -1,5 +1,4 @@
 ﻿@model List<UniqueDay>
-@using System.Globalization
 @{
     ViewData["Title"] = "Openingstijden";
 }
@@ -10,41 +9,39 @@
         <!-- here the openinghours come-->
     </div>
     <div class=" col-4">
-        @if (false)
-        {
-            <h3>Speciale dagen</h3>
-            <!-- Display this alert if there are unique days -->
-            <div class="alert alert-warning" role="alert">
-                Geen speciale dagen in het systeem.
-            </div>
-        }
-        else
-        {
-            <div class=" table-container">
-                <table class="table rounded">
-                    <thead class="table-light">
+        <div class=" table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td class="h4 text-center p-3" colspan="4">Speciale dagen</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">prognose wordt vermenigvuldigd de factor</td>
+                    </tr>
+                    <tr>
+                        <th>Naam</th>
+                        <th class="col-5">
+                            <a asp-controller="OpeningHours" asp-action="Index" asp-route-OverviewDesc="@(!ViewBag.OverviewDesc)"
+                                asp-route-usePassedDates="@ViewBag.UsePassedDates" aria-label="begin " class="text-decoration-none text-dark d-flex align-items-center">
+                                <div class="me-2">
+                                    Startdatum <br /> Einddatum
+                                </div>
+                                <img style="width: 20px; height: auto" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow" />
+                            </a>
+                        </th>
+                        <th class=" col-3">Factor</th>
+                        <th>Acties</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <!-- Display this alert if there are unique days -->
                         <tr>
-                            <td class="h4 text-center p-3" colspan="4">Speciale dagen</td>
+                            <td colspan="100%" class="text-center">Er zijn geen Speciale dagen</td>
                         </tr>
-                        <tr>
-                            <td colspan="4">prognose wordt vermenigvuldigd de factor</td>
-                        </tr>
-                        <tr>
-                            <th>Naam</th>
-                            <th class="col-5">
-                                <a asp-controller="OpeningHours" asp-action="Index" asp-route-OverviewDesc="@(!ViewBag.OverviewDesc)"
-                                   asp-route-usePassedDates="@ViewBag.UsePassedDates" aria-label="begin " class="text-decoration-none text-dark d-flex align-items-center">
-                                    <div class="me-2">
-                                        Startdatum <br /> Einddatum
-                                    </div>
-                                    <img style="width: 20px; height: auto" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow" />
-                                </a>
-                            </th>
-                            <th class=" col-3">Factor</th>
-                            <th>Acties</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                    }
+                    else{
                         @foreach (var item in Model)
                         {
                             <tr>
@@ -62,15 +59,17 @@
                                     @if (item.StartDate > DateOnly.FromDateTime(DateTime.Now))
                                     {
                                         <a asp-controller="UniqueDays" asp-action="Edit">
-                                            <img style="width: 20px; height: auto" src="~/img/Update_Logo.png" alt="Alternate Text" />
+                                            <img style="width: 20px; height: auto" src="~/img/update-icon.svg" alt="Alternate Text" />
                                         </a>
                                     }
                                 </td>
                             </tr>
                         }
-                    </tbody>
-                </table>
-
+                    }
+                </tbody>
+            </table>
+            @if(ViewBag.MaxPages > 1)
+            {
                 <nav class=" align-content-end" aria-label="">
                     <ul class="d-flex justify-content-end list-unstyled">
 
@@ -132,18 +131,18 @@
                         }
                     </ul>
                 </nav>
-            </div>
-        }
-        <div class="align-content-between">
+            }
+        </div>
+        <div>
             @if (ViewBag.UsePassedDates != 'n')
             {
                 <a asp-controller="OpeningHours" asp-action="Index" class="btn btn-primary btn-sm d-inline-block" style="width: fit-content">toekomstige dagen bekijken</a>
             }
             else
             {
-                <a asp-controller="OpeningHours" asp-action="Index" asp-route-usePassedDates='y'  class="btn btn-primary btn-sm d-inline-block" style="width: fit-content">oude dagen bekijken</a>
+                <a asp-controller="OpeningHours" asp-action="Index" asp-route-usePassedDates='y'  class="btn btn-primary btn-sm " style="width: fit-content">oude dagen bekijken</a>
             }
-            <a asp-controller="UniqueDays" asp-action="Add" class="btn btn-primary btn-sm d-inline-block" style="width: fit-content">toevoegen</a>
+            <a asp-controller="UniqueDays" asp-action="Add" class="btn btn-primary btn-sm " style="width: fit-content">toevoegen</a>
         </div>
     </div>
 </div>
