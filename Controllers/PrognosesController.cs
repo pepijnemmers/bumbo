@@ -122,8 +122,37 @@ namespace BumboApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult CalculatePrognosis(DateTime startDate, string templateSelect) {
-            Console.WriteLine(templateSelect + startDate);
+        public IActionResult CalculatePrognosis(DateOnly startDate, string templateSelect) {
+            //Check if an prognosis already excists for the startDate
+            WeekPrognosis? existingPrognosis = Context.WeekPrognoses.FirstOrDefault(p => p.StartDate == startDate);
+            if (existingPrognosis != null)
+            {
+                NotifyService.Warning("Er is al een prognose voor deze datum. Het is alleen mogelijk deze aan te passen.");
+            }
+            else {
+                Console.WriteLine("Geen een prognose");
+                //Check which template is chosen
+                if (templateSelect.Equals("Standaard template"))
+                {
+                    Console.WriteLine("Standaard template");
+                }
+                else
+                {
+                    //Check if there is a prognosis for the previous week
+                    Console.WriteLine("Vorige week");
+                    DateOnly previousWeekDate = startDate.AddDays(-7);
+                    WeekPrognosis? previousPrognosis = Context.WeekPrognoses.FirstOrDefault(p => p.StartDate == previousWeekDate);
+                    if (previousPrognosis != null)
+                    {
+                        Console.WriteLine("There is a prognosis for last week");
+                    }
+                    else
+                    {
+                        NotifyService.Warning("Er bestaat geen prognose voor de voorgaande week.");
+                    }
+
+                }
+            }
             return RedirectToAction("Index");
         }
     }
