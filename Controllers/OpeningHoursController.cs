@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using BumboApp.ViewModels;
+using BumboApp.Models;
 
 namespace BumboApp.Controllers
 {
@@ -6,9 +8,16 @@ namespace BumboApp.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            var OpeningHoursViewModel = new OpeningHoursViewModel
+            {
+                OpeningHours = Context.OpeningHours.ToList(),
+
+            };
+            return View(OpeningHoursViewModel);
         }
-        public IActionResult Update()
+
+        [HttpPost]
+        public IActionResult Update(List<OpeningHour> openingHours)
         {
             return View();
         }

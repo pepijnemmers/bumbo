@@ -1,4 +1,84 @@
 ﻿@{
     ViewData["Title"] = "Openingstijden";
 }
-<h5>Opening hours index</h5>
+
+@model BumboApp.ViewModels.OpeningHoursViewModel
+
+
+<h5>Openingstijden</h5>
+<form class="table-container" id="form" asp-action="Update" method="post">
+    <table class="table">
+        <tbody>
+            @for (int i = 0; i < 7; i++)
+            {
+                DayOfWeek day = (DayOfWeek)((i + 1) % 7); // Start with Monday
+                var dayHours = Model.OpeningHours.SingleOrDefault(h => h.WeekDay == day);
+                var isOpen = dayHours?.OpeningTime != null;
+                <tr class="align-middle">
+                    <td>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="openingHoursSwitch-@i" onchange="toggleDay(@i, this.checked)" @(isOpen ? "checked" : "") disabled />
+                            <p>@Model.DutchDays[(i + 1) % 7]</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="@(isOpen ? "d-table-cell" : "d-none")" id="openingHoursField-@i">
+                            <label for="openingHour-@i">Vanaf</label>
+                            <div class="d-inline-block" id="openingHour-text-@i">@dayHours.OpeningTime</div>
+                            <input class="d-none" id="openingHour-@i" type="time" value="@dayHours.OpeningTime" />
+                        </div>
+                        <div class="@(isOpen ? "d-none" : "d-block")" id="closedText-@i">
+                            <p>gesloten</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="@(isOpen ? "d-table-cell" : "d-none")" id="closingHoursField-@i">
+                            <label for="closingHour-@i">tot</label>
+                            <div class="d-inline-block" id="closingHour-text-@i">@dayHours.ClosingTime</div>
+                            <input class="d-none" id="closingHour-@i" type="time" value="@dayHours.ClosingTime" />
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary">Oplaan</button>
+        <a class="btn btn-primary" id="openingHoursEditButton" onclick="toggleEditOpeningHours()">bewerken</a>
+    </div>
+</form>
+
+<script>
+    function toggleEditOpeningHours() {
+        for (let i = 0; i < 7; i++) {
+            const hoursSwitch = document.getElementById(`openingHoursSwitch-${i}`);
+            const openingHour = document.getElementById(`openingHour-${i}`);
+            const openingHourText = document.getElementById(`openingHour-text-${i}`);
+            const closingHour = document.getElementById(`closingHour-${i}`);
+            const closingHourText = document.getElementById(`closingHour-text-${i}`);
+
+            const isEditable = !hoursSwitch.disabled;
+            toggleDisplay(openingHour, openingHourText, isEditable);
+            toggleDisplay(closingHour, closingHourText, isEditable);
+
+            hoursSwitch.disabled = isEditable;
+            hoursSwitch.classList.toggle('d-none', isEditable);
+        }
+    }
+
+    function toggleDisplay(inputField, textField, isEditable) {
+        inputField.classList.toggle('d-none', isEditable);
+        textField.classList.toggle('d-none', !isEditable);
+    }
+
+    function toggleDay(id, isActive) {
+        const openingField = document.getElementById(`openingHoursField-${id}`);
+        const closingField = document.getElementById(`closingHoursField-${id}`);
+        const closedText = document.getElementById(`closedText-${id}`);
+
+        // Show/hide both fields based on the isActive state
+        openingField.classList.toggle('d-none', !isActive);
+        closingField.classList.toggle('d-none', !isActive);
+        closedText.classList.toggle('d-none', isActive);
+    }
+</script>
