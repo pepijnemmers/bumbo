@@ -39,11 +39,18 @@ function updateEmployees(id) {
     employeesInput.value = hours / 8;
 }
 
-function checkDate(input) {
-    let inputField = document.getElementById("startDate");
-    let date = inputField.value;
+function checkDate() {
+    let startDateField = document.getElementById("startDate");
+    let endDateField = document.getElementById("endDate");
+
+    let date = new Date(startDateField.value);
     let dayNumber = date.getDay();
-    if (dayNumber != 1) {
-        inputField.value.addDays(-dayNumber + 1);
-    }
+    document.getElementById("prognosisCreateButton").disabled = (dayNumber != 1);
+
+    date.setDate(date.getDate() + 6);
+    let formattedDate = ('0' + date.getDate()).slice(-2) + '-' +
+        ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+        date.getFullYear(); //formatten voor dd-mm-yyyy (met 07 ipv 7)
+
+    endDateField.textContent = formattedDate;
 }
