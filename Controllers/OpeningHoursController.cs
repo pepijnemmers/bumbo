@@ -11,7 +11,6 @@ namespace BumboApp.Controllers
             var OpeningHoursViewModel = new OpeningHoursViewModel
             {
                 OpeningHours = Context.OpeningHours.ToList(),
-
             };
             return View(OpeningHoursViewModel);
         }
@@ -22,10 +21,9 @@ namespace BumboApp.Controllers
             //Validation
             foreach (var openingHour in openingHours)
             {
-                Console.WriteLine(openingHour.WeekDay + ": " + openingHour.OpeningTime + "-" + openingHour.ClosingTime);
                 if (openingHour.OpeningTime != null && openingHour.ClosingTime != null)
                 {
-                    if (openingHour.OpeningTime > openingHour.ClosingTime)
+                    if (openingHour.OpeningTime >= openingHour.ClosingTime)
                     {
                         return NotifyErrorAndRedirect("De openingstijd kan niet na de sluitingstijd zijn", "Index");
                     }
@@ -36,15 +34,12 @@ namespace BumboApp.Controllers
                 }
             }
 
-
-
             // update to database using transaction
             using var transaction = Context.Database.BeginTransaction();
             try
             {
                 foreach (var openingHour in openingHours)
                 {
-                    Console.WriteLine(openingHour.WeekDay + ": " + openingHour.OpeningTime + "-" + openingHour.ClosingTime);
                     Context.OpeningHours.Update(openingHour);
                 }
                 Context.SaveChanges();
