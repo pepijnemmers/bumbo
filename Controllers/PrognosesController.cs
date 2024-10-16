@@ -85,7 +85,7 @@ namespace BumboApp.Controllers
                 StartDate = startDate,
                 WeekNr = weekNumber,
                 Year = year,
-                Prognoses = wp?.Prognoses
+                Prognoses = wp?.Prognoses ?? new List<Prognosis>()
             };
 
             return View(model);
@@ -121,7 +121,9 @@ namespace BumboApp.Controllers
             {
                 foreach (Prognosis prognosis in prognoses)
                 {
-                    Context.Prognoses.Update(prognosis);
+                    Prognosis existingPrognosis = Context.Prognoses
+                                        .Single(p => p.Department == prognosis.Department && p.Date == prognosis.Date);
+                    Context.Prognoses.Update(existingPrognosis);
                 }
 
                 Context.SaveChanges();
