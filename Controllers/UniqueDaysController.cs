@@ -18,7 +18,7 @@ namespace BumboApp.Controllers
         public List<UniqueDay> Read()
         {
             List<UniqueDay> allUniqueDays = Context.UniqueDays
-                .OrderBy(e => e.StartDate)
+                .OrderBy(u => u.StartDate)
                 .ToList();
 
             return allUniqueDays;
@@ -28,7 +28,7 @@ namespace BumboApp.Controllers
         public IActionResult Create(UniqueDay uniqueDay)
         {
             // validation
-            if (Read().Find(u > u.StartDate == uniqueDay.StartDate && u.Name == uniqueDay.Name) != null)
+            if (Read().Find(u => u.StartDate == uniqueDay.StartDate && u.Name == uniqueDay.Name) != null)
                 return NotifyErrorAndRedirect("De Speciale dag die je probeert toe te voegen bestaat al.", "Add");
 
             if (uniqueDay.StartDate > uniqueDay.EndDate)
