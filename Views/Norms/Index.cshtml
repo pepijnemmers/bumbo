@@ -3,67 +3,169 @@
     ViewData["Title"] = "Normeringen";
 }
 <div class="table-container latest-norms-table col-12 col-lg-6">
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">Activiteiten</th>
-                <th scope="col">Norm</th>
-                <th scope="col"></th>
-            </tr>
-        </thead>
-        <tbody>
-            @if ((Model.LatestNormsList != null && Model.LatestNormsList.Any()))
-            {
-                foreach (var item in Model.LatestNormsList)
+    <div id="viewTable">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Activiteiten</th>
+                    <th scope="col">Norm</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if ((Model.LatestNormsList != null && Model.LatestNormsList.Any()))
                 {
-                    <tr>
-                        <th scope="row">@item.Activity.ToFriendlyString()</th>
-                        <td>@item.Value</td>
-                        <td><b>@item.NormType.ToFriendlyString()</b></td>
-                    </tr>
+                    foreach (var item in Model.LatestNormsList)
+                    {
+                        <tr>
+                            <th scope="row">@item.Activity.ToFriendlyString()</th>
+                            <td>@item.Value</td>
+                            <td><b>@item.NormType.ToFriendlyString()</b></td>
+                        </tr>
+                    }
                 }
-            }
-            else
-            {
-                foreach (NormActivity activity in Enum.GetValues(typeof(NormActivity)))
+                else
                 {
-                    <tr>
-                        <th scope="row">@activity.ToFriendlyString()</th>
-                        <td>...</td>
-                        <td>
-                            <b>
-                                @switch (activity)
-                                {
-                                    case NormActivity.ColiUitladen:
-                                        @NormType.Minutes.ToFriendlyString()
-                                        ;
-                                        break;
-                                    case NormActivity.VakkenVullen:
-                                        @NormType.MinutesPerColi.ToFriendlyString()
-                                        ;
-                                        break;
-                                    case NormActivity.Kassa:
-                                        @NormType.CustomersPerHour.ToFriendlyString()
-                                        ;
-                                        break;
-                                    case NormActivity.Vers:
-                                        @NormType.CustomersPerHour.ToFriendlyString()
-                                        ;
-                                        break;
-                                    default:
-                                        @NormType.SecondsPerMeter.ToFriendlyString()
-                                        ;
-                                        break;
-                                }
-                            </b>
-                        </td>
-                    </tr>
+                    foreach (NormActivity activity in Enum.GetValues(typeof(NormActivity)))
+                    {
+                        <tr>
+                            <th scope="row">@activity.ToFriendlyString()</th>
+                            <td>...</td>
+                            <td>
+                                <b>
+                                    @switch (activity)
+                                    {
+                                        case NormActivity.ColiUitladen:
+                                            @NormType.Minutes.ToFriendlyString()
+                                            ;
+                                            break;
+                                        case NormActivity.VakkenVullen:
+                                            @NormType.MinutesPerColi.ToFriendlyString()
+                                            ;
+                                            break;
+                                        case NormActivity.Kassa:
+                                            @NormType.CustomersPerHour.ToFriendlyString()
+                                            ;
+                                            break;
+                                        case NormActivity.Vers:
+                                            @NormType.CustomersPerHour.ToFriendlyString()
+                                            ;
+                                            break;
+                                        default:
+                                            @NormType.SecondsPerMeter.ToFriendlyString()
+                                            ;
+                                            break;
+                                    }
+                                </b>
+                            </td>
+                        </tr>
+                    }
                 }
-            }
-        </tbody>
-    </table>
-    <div class="edit-button">
-        <a asp-controller="Norms" class="btn btn-primary">Bewerken</a>
+            </tbody>
+        </table>
+        <div class="edit-button">
+            <button type="button" class="btn btn-primary" onclick="showEditForm()">Bewerken</button>
+        </div>
+    </div>
+
+    <div id="editForm" style="display:none;">
+        <form asp-controller="Norms" asp-action="Add" method="post">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Activiteiten</th>
+                        <th scope="col">Norm</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.LatestNormsList != null && Model.LatestNormsList.Any())
+                    {
+                        for (int i = 0; i < Model.LatestNormsList.Count; i++)
+                        {
+                            <tr>
+                                <th scope="row">@Model.LatestNormsList[i].Activity.ToFriendlyString()</th>
+                                <td>
+                                    <input type="number" name="AddNormsList[@i].Value" value="@Model.LatestNormsList[i].Value" class="form-control" min="0" required />
+                                    <input type="hidden" name="AddNormsList[@i].Activity" value="@Model.LatestNormsList[i].Activity" />
+                                    <input type="hidden" name="AddNormsList[@i].NormType" value="@Model.LatestNormsList[i].NormType" />
+                                </td>
+                                <td><b>@Model.LatestNormsList[i].NormType.ToFriendlyString()</b></td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        int counter = 0;
+                        foreach (NormActivity activity in Enum.GetValues(typeof(NormActivity)))
+                        {
+                            <tr>
+                                <th scope="row">@activity.ToFriendlyString()</th>
+                                <td>
+                                    <input type="number" name="AddNormsList[@counter].Value" class="form-control" min="0" required />
+                                    <input type="hidden" name="AddNormsList[@counter].Activity" value="@activity" />
+                                    <input type="hidden" name="AddNormsList[@counter].NormType" value="@switch (activity)
+                                        {
+                                            case NormActivity.ColiUitladen:
+                                                @NormType.Minutes.ToFriendlyString()
+;
+                                                break;
+                                            case NormActivity.VakkenVullen:
+                                                @NormType.MinutesPerColi.ToFriendlyString()
+;
+                                                break;
+                                            case NormActivity.Kassa:
+                                                @NormType.CustomersPerHour.ToFriendlyString()
+;
+                                                break;
+                                            case NormActivity.Vers:
+                                                @NormType.CustomersPerHour.ToFriendlyString()
+;
+                                                break;
+                                            default:
+                                                @NormType.SecondsPerMeter.ToFriendlyString()
+;
+                                                break;
+                                        }" />
+                                </td>
+                                <td>
+                                    <b>
+                                        @switch (activity)
+                                        {
+                                            case NormActivity.ColiUitladen:
+                                                @NormType.Minutes.ToFriendlyString()
+                                                ;
+                                                break;
+                                            case NormActivity.VakkenVullen:
+                                                @NormType.MinutesPerColi.ToFriendlyString()
+                                                ;
+                                                break;
+                                            case NormActivity.Kassa:
+                                                @NormType.CustomersPerHour.ToFriendlyString()
+                                                ;
+                                                break;
+                                            case NormActivity.Vers:
+                                                @NormType.CustomersPerHour.ToFriendlyString()
+                                                ;
+                                                break;
+                                            default:
+                                                @NormType.SecondsPerMeter.ToFriendlyString()
+                                                ;
+                                                break;
+                                        }
+                                    </b>
+                                </td>
+                            </tr>
+                            counter++;
+                        }
+                    }
+                </tbody>
+            </table>
+            <div class="edit-button">
+                <button type="button" class="btn btn-outline-primary" onclick="cancelEdit()">Annuleren</button>
+                <button type="submit" class="btn btn-primary">Opslaan</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -153,99 +255,16 @@
     }
 </div>
 
-<form asp-action="Add" method="post">
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">Activiteiten</th>
-                <th scope="col">Norm</th>
-                <th scope="col"></th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model.LatestNormsList != null && Model.LatestNormsList.Any())
-            {
-                for (int i = 0; i < Model.LatestNormsList.Count; i++)
-                {
-                    <tr>
-                        <th scope="row">@Model.LatestNormsList[i].Activity.ToFriendlyString()</th>
-                        <td>
-                            <input type="number" name="Norms[@i].Value" value="@Model.LatestNormsList[i].Value" class="form-control" min="0" required />
-                            <input type="hidden" name="Norms[@i].Activity" value="@Model.LatestNormsList[i].Activity" />
-                            <input type="hidden" name="Norms[@i].NormType" value="@Model.LatestNormsList[i].NormType" />
-                        </td>
-                        <td><b>@Model.LatestNormsList[i].NormType.ToFriendlyString()</b></td>
-                    </tr>
-                }
-            }
-            else
-            {
-                int counter = 0;
-                foreach (NormActivity activity in Enum.GetValues(typeof(NormActivity)))
-                {
-                    <tr>
-                        <th scope="row">@activity.ToFriendlyString()</th>
-                        <td>
-                            <input type="number" name="Norms[@counter].Value" class="form-control" min="0" required />
-                            <input type="hidden" name="Norms[@counter].Activity" value="@activity" />
-                            <input type="hidden" name="Norms[@counter].NormType" value="@switch (activity)
-                                {
-                                    case NormActivity.ColiUitladen:
-                                        @NormType.Minutes.ToFriendlyString()
-                                        ;
-                                        break;
-                                    case NormActivity.VakkenVullen:
-                                        @NormType.MinutesPerColi.ToFriendlyString()
-                                        ;
-                                        break;
-                                    case NormActivity.Kassa:
-                                        @NormType.CustomersPerHour.ToFriendlyString()
-                                        ;
-                                        break;
-                                    case NormActivity.Vers:
-                                        @NormType.CustomersPerHour.ToFriendlyString()
-                                        ;
-                                        break;
-                                    default:
-                                        @NormType.SecondsPerMeter.ToFriendlyString()
-                                        ;
-                                        break;
-                                }" />
-                        </td>
-                        <td>
-                            <b>
-                                @switch (activity)
-                                {
-                                    case NormActivity.ColiUitladen:
-                                        @NormType.Minutes.ToFriendlyString()
-                                        ;
-                                        break;
-                                    case NormActivity.VakkenVullen:
-                                        @NormType.MinutesPerColi.ToFriendlyString()
-                                        ;
-                                        break;
-                                    case NormActivity.Kassa:
-                                        @NormType.CustomersPerHour.ToFriendlyString()
-                                        ;
-                                        break;
-                                    case NormActivity.Vers:
-                                        @NormType.CustomersPerHour.ToFriendlyString()
-                                        ;
-                                        break;
-                                    default:
-                                        @NormType.SecondsPerMeter.ToFriendlyString()
-                                        ;
-                                        break;
-                                }
-                            </b>
-                        </td>
-                    </tr>
-                    counter++;
-                }
-            }
-        </tbody>
-    </table>
-    <div class="edit-button">
-        <button type="submit" class="btn btn-primary btn-sm">Opslaan</button>
-    </div>
-</form>
+
+
+<script>
+    function showEditForm() {
+        document.getElementById('viewTable').style.display = 'none';
+        document.getElementById('editForm').style.display = 'block';
+    }
+
+    function cancelEdit() {
+        document.getElementById('viewTable').style.display = 'block';
+        document.getElementById('editForm').style.display = 'none';
+    }
+</script>
