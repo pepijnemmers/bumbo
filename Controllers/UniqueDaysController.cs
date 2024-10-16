@@ -1,5 +1,6 @@
 ﻿using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BumboApp.Controllers
 {
@@ -63,6 +64,34 @@ namespace BumboApp.Controllers
                 .ToList();
 
             return uniqueDays;
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            var uniqueDay = Context.UniqueDays.Find(id);
+            if (uniqueDay == null)
+            {
+                return NotifyErrorAndRedirect("Speciale dag niet gevonden.", "Index", "OpeningHours");
+            }
+            if (uniqueDay.StartDate <= DateOnly.FromDateTime(DateTime.Now))
+            {
+                return NotifyErrorAndRedirect("Speciale dag al geweest.", "Index", "OpeningHours");
+            }
+
+            try
+            {
+                Context.UniqueDays.Remove(uniqueDay);
+                Context.SaveChanges();
+                NotifyService.Success("De Speciale Dag is Verwijderd");
+            }
+            catch (Exception ex)
+            {
+                return NotifyErrorAndRedirect("Fout bij verwijderen Speciale dag.", "Index", "OpeningHours");
+            }
+
+            return RedirectToAction("Index","OpeningHours");
         }
     }
 }
