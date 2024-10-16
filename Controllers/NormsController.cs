@@ -13,13 +13,13 @@ namespace BumboApp.Controllers
             List<Norm> norms = Context.Norms.OrderByDescending(n => n.CreatedAt).Skip(5).ToList();
             
             int currentPageNumber = page ?? DefaultPage;
-            int maxPages = (int)(Math.Ceiling((decimal)norms.Count / PageSize));
+            int maxPages = (int)(Math.Ceiling((decimal)norms.Count / PageSize / 5));
             if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
             if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
-            
-            List<Norm> normsForPage = 
+
+            List<Norm> normsForPage =
                 norms
-                .Skip((currentPageNumber - 1) * PageSize)
+                .Skip((currentPageNumber - 1) * PageSize * 5)
                 .Take(PageSize * 5)
                 .ToList();
             
