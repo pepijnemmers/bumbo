@@ -6,26 +6,27 @@
 
 
 <h5>Openingstijden</h5>
-<form class="table-container" id="form" asp-action="Update" method="post">
+<form class="table-container" id="opening-hours-form" asp-action="Update" method="post">
     <table class="table">
         <tbody>
             @for (int i = 0; i < 7; i++)
             {
                 DayOfWeek day = (DayOfWeek)((i + 1) % 7); // Start with Monday
-                var dayHours = Model.OpeningHours.SingleOrDefault(h => h.WeekDay == day);
-                var isOpen = dayHours?.OpeningTime != null;
+                var openingHours = Model.OpeningHours.SingleOrDefault(h => h.WeekDay == day);
+                var isOpen = openingHours?.OpeningTime != null;
                 <tr class="align-middle">
                     <td>
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="openingHoursSwitch-@i" onchange="toggleDay(@i, this.checked)" @(isOpen ? "checked" : "") disabled />
+                            <input class="d-none form-check-input" type="checkbox" role="switch" id="openingHoursSwitch-@i" onchange="toggleDay(@i, this.checked)" @(isOpen ? "checked" : "") disabled />
+                            <input type="hidden" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].WeekDay" value="@openingHours.WeekDay"/>
                             <p>@Model.DutchDays[(i + 1) % 7]</p>
                         </div>
                     </td>
                     <td>
                         <div class="@(isOpen ? "d-table-cell" : "d-none")" id="openingHoursField-@i">
                             <label for="openingHour-@i">Vanaf</label>
-                            <div class="d-inline-block" id="openingHour-text-@i">@dayHours.OpeningTime</div>
-                            <input class="d-none" id="openingHour-@i" type="time" value="@dayHours.OpeningTime" />
+                            <div class="d-inline-block" id="openingHour-text-@i">@openingHours.OpeningTime</div>
+                            <input class="d-none" id="openingHour-@i" type="time" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].OpeningTime" value="@openingHours.OpeningTime" />
                         </div>
                         <div class="@(isOpen ? "d-none" : "d-block")" id="closedText-@i">
                             <p>gesloten</p>
@@ -34,8 +35,8 @@
                     <td>
                         <div class="@(isOpen ? "d-table-cell" : "d-none")" id="closingHoursField-@i">
                             <label for="closingHour-@i">tot</label>
-                            <div class="d-inline-block" id="closingHour-text-@i">@dayHours.ClosingTime</div>
-                            <input class="d-none" id="closingHour-@i" type="time" value="@dayHours.ClosingTime" />
+                            <div class="d-inline-block" id="closingHour-text-@i">@openingHours.ClosingTime</div>
+                            <input class="d-none" id="closingHour-@i" type="time" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].ClosingTime" value="@openingHours.ClosingTime" />
                         </div>
                     </td>
                 </tr>
@@ -44,12 +45,12 @@
     </table>
     <div class="d-flex justify-content-end">
         <button type="submit" class="btn btn-primary">Oplaan</button>
-        <a class="btn btn-primary" id="openingHoursEditButton" onclick="toggleEditOpeningHours()">bewerken</a>
+        <a class="btn btn-primary" id="openingHoursEditButton">bewerken</a>
     </div>
 </form>
 
 <script>
-    function toggleEditOpeningHours() {
+    document.getElementById('openingHoursEditButton').addEventListener('click', function () {
         for (let i = 0; i < 7; i++) {
             const hoursSwitch = document.getElementById(`openingHoursSwitch-${i}`);
             const openingHour = document.getElementById(`openingHour-${i}`);
@@ -64,7 +65,7 @@
             hoursSwitch.disabled = isEditable;
             hoursSwitch.classList.toggle('d-none', isEditable);
         }
-    }
+    });
 
     function toggleDisplay(inputField, textField, isEditable) {
         inputField.classList.toggle('d-none', isEditable);
@@ -76,9 +77,25 @@
         const closingField = document.getElementById(`closingHoursField-${id}`);
         const closedText = document.getElementById(`closedText-${id}`);
 
-        // Show/hide both fields based on the isActive state
         openingField.classList.toggle('d-none', !isActive);
         closingField.classList.toggle('d-none', !isActive);
         closedText.classList.toggle('d-none', isActive);
+
+        const now = new Date();
+        const openingHourElement = document.getElementById(`openingHour-${id}`);
+        const closingHourElement = document.getElementById(`closingHour-${id}`);
+        if (!isActive) {
+            const openingHour = openingHourElement.value = null;
+            const closingHour = closingHourElement.value = null;
+        } else {
+            const openingHour = new Date(now.setHours(8, 00)).toTimeString().slice(0, 5);
+            openingHourElement.value = openingHour;
+
+            const closingHour = now.toTimeString().slice(0, 5);
+            closingHourElement.value = closingHour;
+
+            // const openingHour = document.getElementById(`openingHour-${id}`).valueAsDate = new Date().setMinutes(30);
+            // const closingHour = document.getElementById(`closingHour-${id}`).valueAsDate = new Date();
+        }
     }
 </script>
