@@ -1,19 +1,18 @@
-﻿
-@model List<WeekPrognosis>
+﻿@model List<WeekPrognosis>
 @using System.Globalization
 @{
     ViewData["Title"] = "Prognoses";
 }
-<div class="container mt-4">
-    <div class="row align-items-center mb-3">
-        <div class="col">
-            <h2>Overzicht</h2>
-        </div>
-        <div class="col-auto">
-            <a asp-controller="Prognoses" asp-action="Create" class="btn btn-primary btn-sm d-inline-block">Nieuwe Prognose</a>
-        </div>
+
+<div class="row align-items-center mb-3">
+    <div class="col">
+        <h2>Overzicht</h2>
+    </div>
+    <div class="col-auto">
+        <a asp-controller="Prognoses" asp-action="Create" class="btn btn-primary d-inline-block">Nieuwe Prognose</a>
     </div>
 </div>
+
 @if (!Model.Any())
 {
     <!-- Display this alert if there are no prognoses -->
@@ -23,77 +22,67 @@
 }
 else
 {
-
-    <table class="table rounded">
-        <thead class="table-light">
+    <div class="table-container">
+        <table class="table">
+            <thead>
             <tr>
-                    <th>Week</th>
-                    <th><a asp-controller="Prognoses" asp-action="Index" asp-route-OverviewDesc="@(!ViewBag.OverviewDesc)" class="text-decoration-none text-dark ">Begin datum<img style="width: 20px; height: auto" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow" /></a></th>
+                <th>Week</th>
+                <th>
+                    <a asp-controller="Prognoses" asp-action="Index" asp-route-OverviewDesc="@(!ViewBag.OverviewDesc)" class="text-dark">
+                        Begin datum
+                        <img width="18px" height="auto" class="mx-1" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow"/>
+                    </a>
+                </th>
                 <th>Eind datum</th>
                 <th>Acties</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             @foreach (var item in Model)
             {
-                    DateTime startDateTime = item.StartDate.ToDateTime(TimeOnly.MinValue);
-                    int weekNumber = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(startDateTime,new CalendarWeekRule(),item.StartDate.DayOfWeek);
+                DateTime startDateTime = item.StartDate.ToDateTime(TimeOnly.MinValue);
+                int weekNumber = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(startDateTime,new CalendarWeekRule(),item.StartDate.DayOfWeek);
                 <tr>
-                    <td class=" col-2">@weekNumber</td>
-                    <td class =" col-4">@item.StartDate</td> 
-                    <td class=" col-4">@item.StartDate.AddDays(7)</td> 
-                    <td class=" col-1">
+                    <td>@weekNumber</td>
+                    <td>@item.StartDate</td> 
+                    <td>@item.StartDate.AddDays(7)</td> 
+                    <td>
                         @if(!(item.StartDate <= DateOnly.FromDateTime(DateTime.Now))){
-                                <a asp-controller="prognoses" asp-action="update">
-                                    <img style="width: 20px; height: auto" src="~/img/Update_Logo.png" alt="Alternate Text" />
-                                </a>
+                            <a asp-controller="prognoses" asp-action="update">
+                                <img width="20px" height="auto" class="mx-1" src="~/img/update-icon.svg" alt="Alternate Text" />
+                            </a>
                         }
-                            <a asp-controller ="prognoses" asp-action="details" asp-route-id="@("" + item.StartDate.Year + "-" + weekNumber)">
-                            <img style="width: 20px; height: auto" src="~/img/Details_Logo.png" alt="Alternate Text" />
+                        <a asp-controller ="prognoses" asp-action="details" asp-route-id="@("" + item.StartDate.Year + "-" + weekNumber)">
+                            <img width="20px" height="auto" src="~/img/details-icon.svg" alt="Alternate Text" />
                         </a>
                     </td>
                 </tr>
             }
-        </tbody>
-    </table>
-
-
-        <nav class=" align-content-end" aria-label="">
-            <ul class="d-flex justify-content-end list-unstyled">
-
-                <!-- if there are previous pages in the list these items will be on screen-->
-                @if (!(ViewBag.PageNumber <= 1))
-                {
-                    <li class="page-item">
-                        <a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-OverviewDesc="@ViewBag.OverviewDesc" aria-label="begin ">
+            </tbody>
+        </table>
+        
+        @if (ViewBag.MaxPages > 1)
+        {
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-end px-3">
+                    <li class="page-item @(ViewBag.PageNumber == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.PageNumber - 1)" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
-                    <li class="page-item">
-                        <a class="page-link" asp-controller= "Prognoses" asp-action="index" asp-rout-page="@ViewBag.PageNumber - 1 "aria-label="Previous">
-                            <span aria-hidden="true">&larr;</span>
+                    @for (int i = 1; i <= ViewBag.MaxPages; i++)
+                    {
+                    <li class="page-item @(ViewBag.PageNumber == i ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                    </li>
+                    }
+                    <li class="page-item @(ViewBag.PageNumber == ViewBag.MaxPages ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.PageNumber + 1)" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
-                    <li class="page-item"><a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@(ViewBag.PageNumber - 1)" asp-route-OverviewDesc="@ViewBag.OverviewDesc">@(ViewBag.PageNumber - 1)</a></li>
-                }
-                <!-- shows the current page-->
-                <li class="page-item"><a class="page-link btn-dark" asp-controller="Prognoses" asp-action="index" asp-route-page="@ViewBag.PageNumber" asp-route-OverviewDesc="@ViewBag.OverviewDesc">@ViewBag.PageNumber</a></li>
-
-                <!-- if there are next pages in the list these items will be on screen-->
-                @if (!(ViewBag.PageNumber >= ViewBag.MaxPages))
-                {
-                    <li class="page-item"><a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@(ViewBag.PageNumber + 1)" asp-route-OverviewDesc="@ViewBag.OverviewDesc">@(ViewBag.PageNumber + 1)</a></li>
-                <li class="page-item">
-                        <a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@ViewBag.PageNumber + 1" asp-route-OverviewDesc="@ViewBag.OverviewDesc" aria-label="next">
-                        <span aria-hidden="true">&rarr;</span>
-                    </a>
-                </li>
-                <li class="page-item">
-                        <a class="page-link" asp-controller="Prognoses" asp-action="index" asp-route-page="@ViewBag.MaxPages" asp-route-OverviewDesc="@ViewBag.OverviewDesc" aria-label="last">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-                }
-        </ul>
-    </nav>
+                </ul>
+            </nav>
+        }
+    </div>
 }

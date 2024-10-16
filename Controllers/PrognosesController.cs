@@ -9,15 +9,11 @@ namespace BumboApp.Controllers
 {
     public class PrognosesController : MainController
     {
-        private readonly int _pageSize = 5; //a constant for how many items per list page
-        private readonly int _standardPage = 1; // a constant for the standard pagenumber
-
         public IActionResult Index(int? page, bool overviewDesc = false)
         {
-            List<WeekPrognosis> prognoses = _context.WeekPrognoses
+            List<WeekPrognosis> prognoses = Context.WeekPrognoses
                 .OrderBy(p => p.StartDate)
                 .ToList();
-            List<WeekPrognosis> prognosesForPage = new List<WeekPrognosis>();
 
             string imageUrl = "~/img/UpArrow.png";
             if (!overviewDesc)
@@ -26,22 +22,21 @@ namespace BumboApp.Controllers
                 prognoses.Reverse();
             }
 
-            int currentPageNumber = page ?? _standardPage;
-            int maxPages = (int)(Math.Ceiling((decimal)prognoses.Count / _pageSize));
-            if (currentPageNumber <= 0) { currentPageNumber = _standardPage; }
+            int currentPageNumber = page ?? DefaultPage;
+            int maxPages = (int)(Math.Ceiling((decimal)prognoses.Count / PageSize));
+            if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
             if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
 
-            if (prognoses.Count > 0)
-            {
-                for (int i = (currentPageNumber - 1) * _pageSize; i <= currentPageNumber * _pageSize && i < prognoses.Count; i++)
-                {
-                    prognosesForPage.Add(prognoses[i]);
-                }
-            }
+            List<WeekPrognosis> prognosesForPage = 
+                prognoses
+                .Skip((currentPageNumber - 1) * PageSize)
+                .Take(PageSize)
+                .ToList();
 
             ViewBag.PageNumber = currentPageNumber;
-            ViewBag.PageSize = _pageSize;
+            ViewBag.PageSize = PageSize;
             ViewBag.MaxPages = maxPages;
+            
             ViewBag.ImageUrl = imageUrl;
             ViewBag.OverviewDesc = overviewDesc;
 
@@ -81,7 +76,7 @@ namespace BumboApp.Controllers
 
             int weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(startDate.AddDays(3).ToDateTime(new TimeOnly(0, 0)), CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
 
-            WeekPrognosis? wp = _context.WeekPrognoses
+            WeekPrognosis? wp = Context.WeekPrognoses
         .Include(wp => wp.Prognoses)
             .SingleOrDefault(wp => wp.StartDate == startDate);
 
@@ -106,7 +101,7 @@ namespace BumboApp.Controllers
         {
             foreach (Prognosis prognosis in prognoses)
             {
-                Prognosis existingPrognosis = _context.Prognoses
+                Prognosis existingPrognosis = Context.Prognoses
                 .Single(p => p.Department == prognosis.Department && p.Date == prognosis.Date);
 
                 if (existingPrognosis != null)
@@ -116,7 +111,7 @@ namespace BumboApp.Controllers
                 }
             }
 
-            _context.SaveChanges();
+            Context.SaveChanges();
 
             return RedirectToAction("Index");
         }
