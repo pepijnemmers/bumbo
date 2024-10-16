@@ -20,20 +20,23 @@ namespace BumboApp.Controllers
         public IActionResult Update(UniqueDay uniqueDay)
         {
             // validation
-            if (uniqueDay.StartDate > uniqueDay.StartDate)
-                return NotifyErrorAndRedirect("Het aantal verwachte klanten en verwachte coli&#39;s moet 0 of hoger zijn.", "Index");
+            if (uniqueDay.StartDate > uniqueDay.EndDate)
+                return NotifyErrorAndRedirect("EindDatum mag niet voor de StartDatum liggen.", "Edit");
 
-            if (Read().Find())
-                return NotifyErrorAndRedirect("Het aantal verwachte klanten en verwachte coli&#39;s moet 0 of hoger zijn.", "Index");
+            if (Read().Find(u => u.StartDate == uniqueDay.StartDate && u.Name == uniqueDay.Name && uniqueDay.Id != u.Id) != null)
+                return NotifyErrorAndRedirect("Deze speciale dag bestaat al.", "Edit");
+
+            if (uniqueDay.StartDate < DateOnly.FromDateTime(DateTime.Now))
+                return NotifyErrorAndRedirect("De data moet in de toekomst liggen.", "Edit");
 
             if (!ModelState.IsValid)
-                return NotifyErrorAndRedirect("Er is iets mis gegaan. Mogelijk zijn niet alle velden ingevuld", "Index");
+                return NotifyErrorAndRedirect("Er is iets mis gegaan. Mogelijk zijn niet alle velden ingevuld", "Edit");
 
             // update to database using transaction
             using var transaction = Context.Database.BeginTransaction();
             try
             {
-                Context.Expectations.Update(expectation);
+                Context.UniqueDays.Update(uniqueDay);
                 Context.SaveChanges();
                 transaction.Commit();
                 NotifyService.Success("De verwachting is bijgewerkt!");
@@ -45,7 +48,7 @@ namespace BumboApp.Controllers
                 NotifyService.Error("Er is iets mis gegaan bij het bewerken van de verwachting.");
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index","OpeningHours");
         }
 
         [HttpGet]
