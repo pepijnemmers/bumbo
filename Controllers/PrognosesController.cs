@@ -123,10 +123,15 @@ namespace BumboApp.Controllers
                 {
                     Prognosis existingPrognosis = Context.Prognoses
                                         .Single(p => p.Department == prognosis.Department && p.Date == prognosis.Date);
-                    Context.Prognoses.Update(existingPrognosis);
+                    if (existingPrognosis != null)
+                    {
+                        existingPrognosis.NeededHours = prognosis.NeededHours;
+                        existingPrognosis.NeededEmployees = prognosis.NeededEmployees;
+                    }
+                    //Context.Prognoses.Update(prognosis);
+                    Context.SaveChanges();
                 }
 
-                Context.SaveChanges();
                 transaction.Commit();
                 NotifyService.Success("De prognose is bijgewerkt!");
             }
