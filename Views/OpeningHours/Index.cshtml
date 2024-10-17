@@ -85,7 +85,7 @@
                                 <span aria-hidden="true">&larr;</span>
                             </a>
                         </li>
-                        @for (int i = 1; i <= ViewBag.MaxPages || i <= 5; i++)
+                        @for (int i = 1; i <= ViewBag.MaxPages; i++)
                         {
                             <li class="page-item @(ViewBag.PageNumber == i ? "active" : "")">
                                 <a class="page-link" asp-action="Index" asp-route-page="@i"

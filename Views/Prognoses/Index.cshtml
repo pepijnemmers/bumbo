@@ -44,7 +44,7 @@
                     <tr>
                         <td>@weekNumber</td>
                         <td>@item.StartDate</td> 
-                        <td>@item.</td> 
+                        <td>@item.StartDate.AddDays(7)</td> 
                         <td>
                             @if(!(item.StartDate <= DateOnly.FromDateTime(DateTime.Now))){
                                 <a asp-controller="prognoses" asp-action="update">
@@ -62,49 +62,45 @@
     </table>
     @if (ViewBag.MaxPages > 1)
     {
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-end px-3">
+                <li class="page-item @(ViewBag.PageNumber == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-controller="Prognoses" asp-action="index"
+                        asp-route-OverviewDesc="@ViewBag.OverviewDesc" aria-label="begin ">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item @(ViewBag.PageNumber == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-controller="Prognoses" asp-action="index"
+                        asp-route-page="@(ViewBag.PageNumber - 1) "
+                        asp-route-OverviewDesc="@ViewBag.OverviewDesc"aria-label="Previous">
+                        <span aria-hidden="true">&larr;</span>
+                    </a>
+                </li>
+                @for (int i = 1; i <= ViewBag.MaxPages; i++)
+                {
+                    <li class="page-item @(ViewBag.PageNumber == i ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@i"
+                            asp-route-OverviewDesc="@ViewBag.OverviewDesc"
+                        >@i</a>
+                    </li>
+                }
+                <li class="page-item @(ViewBag.PageNumber == ViewBag.MaxPages ? "disabled" : "")">
+                    <a class="page-link" asp-controller="Prognoses" asp-action="index"
+                        asp-route-page="@(ViewBag.PageNumber + 1)"
+                        asp-route-OverviewDesc="@ViewBag.OverviewDesc"aria-label="next">
+                        <span aria-hidden="true">&rarr;</span>
+                    </a>
+                </li>
 
-        @if (ViewBag.MaxPages > 1)
-        {
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-end px-3">
-                    <li class="page-item @(ViewBag.PageNumber == 1 ? "disabled" : "")">
-                        <a class="page-link" asp-controller="Prognoses" asp-action="index"
-                            asp-route-OverviewDesc="@ViewBag.OverviewDesc" aria-label="begin ">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    <li class="page-item @(ViewBag.PageNumber == 1 ? "disabled" : "")">
-                        <a class="page-link" asp-controller="Prognoses" asp-action="index"
-                            asp-route-page="@(ViewBag.PageNumber - 1) "
-                            asp-route-OverviewDesc="@ViewBag.OverviewDesc"aria-label="Previous">
-                            <span aria-hidden="true">&larr;</span>
-                        </a>
-                    </li>
-                    @for (int i = 1; i <= ViewBag.MaxPages || i <= 5; i++)
-                    {
-                        <li class="page-item @(ViewBag.PageNumber == i ? "active" : "")">
-                            <a class="page-link" asp-action="Index" asp-route-page="@i"
-                                asp-route-OverviewDesc="@ViewBag.OverviewDesc"
-                            >@i</a>
-                        </li>
-                    }
-                    <li class="page-item @(ViewBag.PageNumber == ViewBag.MaxPages ? "disabled" : "")">
-                        <a class="page-link" asp-controller="Prognoses" asp-action="index"
-                            asp-route-page="@(ViewBag.PageNumber + 1)"
-                            asp-route-OverviewDesc="@ViewBag.OverviewDesc"aria-label="next">
-                            <span aria-hidden="true">&rarr;</span>
-                        </a>
-                    </li>
-
-                    <li class="page-item @(ViewBag.PageNumber == ViewBag.MaxPages ? "disabled" : "")">
-                        <a class="page-link" asp-controller="Prognoses" asp-action="index"
-                            asp-route-page="@ViewBag.MaxPages"
-                            asp-route-OverviewDesc="@ViewBag.OverviewDesc"aria-label="last">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        }
+                <li class="page-item @(ViewBag.PageNumber == ViewBag.MaxPages ? "disabled" : "")">
+                    <a class="page-link" asp-controller="Prognoses" asp-action="index"
+                        asp-route-page="@ViewBag.MaxPages"
+                        asp-route-OverviewDesc="@ViewBag.OverviewDesc"aria-label="last">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     }
 </div>
