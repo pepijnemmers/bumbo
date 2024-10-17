@@ -15,13 +15,13 @@
             <div class="col-12 col-lg">
                 <label for="beginDate">StartDatum</label>
                 <input type="date" id="bDate" name="StartDate" class="form-control"
-                       value="@Model.StartDate.ToString("yyyy-MM-dd")" min="@(DateOnly.FromDateTime(DateTime.Now))"required/>
+                       value="@Model.StartDate.ToString("yyyy-MM-dd")" min="@(DateOnly.FromDateTime(DateTime.Now).ToString("yyyy-MM-dd"))"required/>
             </div>
             
             <div class="col-12 col-lg">
                 <label for="endDate">EindDatum</label>
                 <input type="date" id="eDate" name="EndDate" class="form-control"
-                       value="@Model.EndDate.ToString("yyyy-MM-dd")"min="@(DateOnly.FromDateTime(DateTime.Now))"required/>
+                       value="@Model.EndDate.ToString("yyyy-MM-dd")" min="@(DateOnly.FromDateTime(DateTime.Now).ToString("yyyy-MM-dd"))" required />
             </div>
 
             <div class="col-12 col-lg">
