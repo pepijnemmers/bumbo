@@ -7,7 +7,6 @@ namespace BumboApp.Controllers
     {
         public IActionResult Index(int? page, bool overviewDesc = false,char? usePassedDates = 'n')
         {
-            int maxPages;
             int currentPageNumber = page ?? DefaultPage;
             string imageUrl = "~/img/UpArrow.png";
 
@@ -28,7 +27,7 @@ namespace BumboApp.Controllers
                 uniqueDays.Reverse();
             }
 
-            maxPages = (int)Math.Ceiling((decimal)uniqueDays.Count / PageSize);
+            int maxPages = (int)Math.Ceiling((decimal)uniqueDays.Count / PageSize);
             if(maxPages <= 0) { maxPages = 1; }
             if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
             if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
