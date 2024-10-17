@@ -114,16 +114,16 @@
                 </nav>
             }
         </div>
-        <div>
+        <div class="d-flex justify-content-between">
             @if (ViewBag.UsePassedDates != 'n')
             {
-                <a asp-controller="OpeningHours" asp-action="Index" class="btn btn-primary btn-sm d-inline-block" style="width: fit-content">toekomstige dagen bekijken</a>
+                <a asp-controller="OpeningHours" asp-action="Index" class="btn btn-primary btn-sm d-inline-block">toekomstige dagen bekijken</a>
             }
             else
             {
-                <a asp-controller="OpeningHours" asp-action="Index" asp-route-usePassedDates='y'  class="btn btn-primary btn-sm " style="width: fit-content">oude dagen bekijken</a>
+                <a asp-controller="OpeningHours" asp-action="Index" asp-route-usePassedDates='y'  class="btn btn-primary btn-sm ">oude dagen bekijken</a>
             }
-            <a asp-controller="UniqueDays" asp-action="Add" class="btn btn-primary btn-sm " style="width: fit-content">toevoegen</a>
+            <a asp-controller="UniqueDays" asp-action="Add" class="btn btn-primary btn-sm">toevoegen</a>
         </div>
     </div>
 </div>
