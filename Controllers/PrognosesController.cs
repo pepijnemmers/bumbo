@@ -11,6 +11,7 @@ namespace BumboApp.Controllers
     {
         public IActionResult Index(int? page, bool overviewDesc = false)
         {
+            int currentPageNumber = page ?? DefaultPage;
             List<WeekPrognosis> prognoses = Context.WeekPrognoses
                 .OrderBy(p => p.StartDate)
                 .ToList();
@@ -23,7 +24,6 @@ namespace BumboApp.Controllers
                 prognoses.Reverse();
             }
 
-            int currentPageNumber = page ?? DefaultPage;
             int maxPages = (int)(Math.Ceiling((decimal)prognoses.Count / PageSize));
             if (maxPages <= 0) { maxPages = 1; }
             if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
