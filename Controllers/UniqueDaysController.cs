@@ -48,7 +48,6 @@ namespace BumboApp.Controllers
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
                 transaction.Rollback();
                 NotifyService.Error("Er is iets mis gegaan bij het bewerken van de Speciale dag.");
             }
@@ -67,7 +66,6 @@ namespace BumboApp.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
             var uniqueDay = Context.UniqueDays.Find(id);
