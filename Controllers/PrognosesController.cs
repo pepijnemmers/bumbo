@@ -100,27 +100,23 @@ namespace BumboApp.Controllers
             {
                 return NotifyErrorAndRedirect("Er is iets mis gegaan bij het bewerken van de prognose.", "Index");
             }
-            foreach (Prognosis prognosis in prognoses)
-            {
-                Prognosis existingPrognosis = Context.Prognoses
-                                        .Single(p => p.Department == prognosis.Department && p.Date == prognosis.Date);
-                if (existingPrognosis == null)
-                {
-                    return NotifyErrorAndRedirect("Er is iets mis gegaan. Mogelijk zijn niet alle velden ingevuld", "Index");
-                }
-                float employees = existingPrognosis.NeededEmployees;
-                float hours = existingPrognosis.NeededHours;
-                if (employees < 0 || hours < 0) //TODO de seeddata voldoet niet aan deze eisen (hours * 8 != employees) :( en floats zijn niet accuraat genoeg? 
-                {
-                    return NotifyErrorAndRedirect("De data is ongeldig", "Index");
-                }
-            }
 
             using var transaction = Context.Database.BeginTransaction();
             try
             {
                 foreach (Prognosis prognosis in prognoses)
                 {
+                    float employees = prognosis.NeededEmployees;
+                    float hours = prognosis.NeededHours;
+                    if (employees < 0 || hours < 0) //TODO de seeddata voldoet niet aan deze eisen (hours * 8 != employees) :( en floats zijn niet accuraat genoeg? 
+                    {
+                        return NotifyErrorAndRedirect("De data is ongeldig, mag niet negatief zijn", "Index");
+                    }
+                    if (employees * 8 != hours)
+                    {
+                        Console.WriteLine("" + employees + "*8 != " + hours);
+                        return NotifyErrorAndRedirect("Het aantal uur moet 8 maal het aantal medewerkers zijn", "Index");
+                    }
                     Prognosis existingPrognosis = Context.Prognoses
                                         .Single(p => p.Department == prognosis.Department && p.Date == prognosis.Date);
                     if (existingPrognosis != null)
