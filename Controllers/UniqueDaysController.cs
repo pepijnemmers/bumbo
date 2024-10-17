@@ -28,7 +28,7 @@ namespace BumboApp.Controllers
         public IActionResult Create(UniqueDay uniqueDay)
         {
             // validation
-            if (Read().Find(u => u.StartDate == uniqueDay.StartDate && u.Name == uniqueDay.Name) != null)
+            if (Read().Find(u => u.StartDate == uniqueDay.StartDate && u.Name.ToLower() == uniqueDay.Name.ToLower()) != null)
                 return NotifyErrorAndRedirect("De Speciale dag die je probeert toe te voegen bestaat al.", "Index", "OpeningHours");
 
             if (uniqueDay.StartDate > uniqueDay.EndDate)

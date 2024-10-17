@@ -18,11 +18,14 @@
             </div>
             <div class="col-12 col-lg">
                 <label for="cargoExpected">Factor</label>
-                <input type="number" id="factor" name="Factor" class="form-control" min="0.1" step="any" required />
+                <input type="number" id="factor" name="Factor" class="form-control" min="0" step="any" required />
             </div>
         </div>
         <div class="text-end mt-3">
-            <button type="submit" class="btn btn-primary">Toevoegen</button>
+            <a asp-action="Index" asp-controller="OpeningHours" class="btn btn-outline-primary me-2">
+                Annuleren
+            </a>
+            <button type="submit" class="btn btn-primary" disabled>Toevoegen</button>
         </div>
     </form>
 </div>
