@@ -51,13 +51,7 @@ namespace BumboApp.Controllers
             var OpeningHoursViewModel = new OpeningHoursViewModel
             {
                 OpeningHours = Context.OpeningHours.ToList(),
-                UniqueDays = uniqueDaysForPage,
-                //PageNumber = currentPageNumber,
-                //PageSize = PageSize,
-                //MaxPages = maxPages,
-                //ImageUrl = imageUrl,
-                //OverviewDesc = overviewDesc,
-                //UsePassedDates = usePassedDates
+                UniqueDays = uniqueDaysForPage
             };
 
             return View(OpeningHoursViewModel);
