@@ -221,7 +221,7 @@ namespace BumboApp.Controllers
 
                     var expectation = Context.Expectations.FirstOrDefault(e => e.Date == currentDate);
 
-                    int calculatedHours = (int)CalculateNeededHours(expectation, norms, (Department)j);
+                    int calculatedHours = (int)CalculateNeededHours(expectation, norms, (Department)j, currentDate);
 
                     var newPrognosis = new Prognosis
                     {
@@ -240,14 +240,20 @@ namespace BumboApp.Controllers
             NotifyService.Success("Er is een prognose aangemaakt op basis van het standaard template.");
         }
 
-        private float CalculateNeededHours(Expectation expectation, List<Norm> norms, Department department)
+        private float CalculateNeededHours(Expectation expectation, List<Norm> norms, Department department, DateOnly currentDate)
         {
+            float factor = 1;
+            var uniqueDay = Context.UniqueDays.FirstOrDefault(ud => currentDate >= ud.StartDate && currentDate <= ud.EndDate);
+            if (uniqueDay != null) { 
+                factor = uniqueDay.Factor;
+            }
+
             //Vers
             if (department == Department.Vers)
             {
                 var versNorm = norms.FirstOrDefault(n => n.Activity.ToString() == "Vers");
                 float versValue = versNorm.Value;
-                float neededHours = ((60 / versValue) * expectation.ExpectedCustomers) / 60;
+                float neededHours = ((60 / versValue) * (expectation.ExpectedCustomers * factor)) / 60;
                 return neededHours;
             }
             //Vakenvullen
@@ -272,7 +278,7 @@ namespace BumboApp.Controllers
             {
                 var kassaNorm = norms.FirstOrDefault(n => n.Activity.ToString() == "Kassa");
                 float kassaValue = kassaNorm.Value;
-                float neededHours = ((60 / kassaValue) * expectation.ExpectedCustomers) / 60;
+                float neededHours = ((60 / kassaValue) * (expectation.ExpectedCustomers * factor)) / 60;
                 return neededHours;
             }
             return 0;
