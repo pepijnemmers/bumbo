@@ -12,7 +12,7 @@ namespace BumboApp.Controllers
         public IActionResult Index(int? page)
         {
             List<Norm> norms = Context.Norms.OrderByDescending(n => n.CreatedAt).Skip(_amountOfNormsInSet).ToList();
-            
+
             int currentPageNumber = page ?? DefaultPage;
             int maxPages = (int)(Math.Ceiling((decimal)norms.Count / PageSize / _amountOfNormsInSet));
             if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
@@ -23,17 +23,17 @@ namespace BumboApp.Controllers
                 .Skip((currentPageNumber - 1) * PageSize * _amountOfNormsInSet)
                 .Take(PageSize * _amountOfNormsInSet)
                 .ToList();
-            
+
             ViewBag.PageNumber = currentPageNumber;
             ViewBag.PageSize = PageSize;
             ViewBag.MaxPages = maxPages;
-            
+
             var viewModel = new NormsViewModel
             {
                 NormsList = normsForPage,
                 LatestNormsList = Context.Norms.OrderByDescending(n => n.CreatedAt).Take(_amountOfNormsInSet).ToList()
             };
-            
+
             return View(viewModel);
         }
 
@@ -42,6 +42,25 @@ namespace BumboApp.Controllers
         {
             if (ModelState.IsValid)
             {
+                var latestNormsList = Context.Norms
+                    .OrderByDescending(n => n.CreatedAt)
+                    .Take(_amountOfNormsInSet)
+                    .ToList();
+
+                bool areEqual = addNormsList.All(addNorm =>
+                    latestNormsList.Any(latestNorm =>
+                        latestNorm.Activity == addNorm.Activity &&
+                        latestNorm.Value == addNorm.Value &&
+                        latestNorm.NormType == addNorm.NormType
+                    )
+                );
+
+                if (areEqual)
+                {
+                    NotifyService.Warning("De ingevoerde normeringen zijn hetzelfde als de laatste normeringen");
+                    return RedirectToAction("Index");
+                }
+
                 using var transaction = Context.Database.BeginTransaction();
 
                 try
