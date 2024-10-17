@@ -79,7 +79,7 @@
                         </li>
                         <li class="page-item @(ViewBag.PageNumber == 1 ? "disabled" : "")">
                             <a class="page-link" asp-controller="OpeningHours" asp-action="index"
-                               asp-route-page="@ViewBag.PageNumber - 1 "
+                               asp-route-page="@(ViewBag.PageNumber - 1) "
                                asp-route-OverviewDesc="@ViewBag.OverviewDesc"
                                asp-route-usePassedDates="@ViewBag.UsePassedDates" aria-label="Previous">
                                 <span aria-hidden="true">&larr;</span>
@@ -95,7 +95,7 @@
                         }
                         <li class="page-item @(ViewBag.PageNumber == ViewBag.MaxPages ? "disabled" : "")">
                             <a class="page-link" asp-controller="OpeningHours" asp-action="index"
-                               asp-route-page="@ViewBag.PageNumber + 1"
+                               asp-route-page="@(ViewBag.PageNumber + 1)"
                                asp-route-OverviewDesc="@ViewBag.OverviewDesc"
                                asp-route-usePassedDates="@ViewBag.UsePassedDates" aria-label="next">
                                 <span aria-hidden="true">&rarr;</span>

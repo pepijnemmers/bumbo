@@ -13,9 +13,8 @@ namespace BumboApp.Controllers
         {
             int currentPageNumber = page ?? DefaultPage;
             List<WeekPrognosis> prognoses = Context.WeekPrognoses
-                .OrderBy(p => p.StartDate)
+                .OrderByDescending(p => p.StartDate)
                 .ToList();
-            prognoses.Reverse();
 
             string imageUrl = "~/img/UpArrow.png";
             if (!overviewDesc)
