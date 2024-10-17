@@ -135,17 +135,36 @@ namespace BumboApp.Controllers
                 if (templateSelect.Equals("Standaard template"))
                 {
                     Console.WriteLine("Standaard template");
+                    //Check if there excists norms and expectations
+                    for (int i = 0; i < 7; i++)
+                    {
+                        DateOnly currentDay = startDate.AddDays(i);
+                        var expectation = Context.Expectations.FirstOrDefault(e => e.Date == currentDay);
+                        if (expectation == null)
+                        {
+                            NotifyService.Warning("Er zijn geen volledige verwachtingen voor deze week.");
+                            return RedirectToAction("Index");
+                        }
+                    }
+
+                    var normExists = Context.Norms.Any();
+                    if (!normExists)
+                    {
+                        NotifyService.Warning("Er is geen normering gevonden");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Alle verwachtingen en normeringen zijn aanwezig.");
+                    }
                 }
                 else
                 {
                     //Check if there is a prognosis for the previous week
-                    Console.WriteLine("Vorige week");
                     DateOnly previousWeekDate = startDate.AddDays(-7);
-                    WeekPrognosis? previousPrognosis = Context.WeekPrognoses.FirstOrDefault(p => p.StartDate == previousWeekDate);
-                    if (previousPrognosis != null)
+                    WeekPrognosis? wp = Context.WeekPrognoses.Include(wp => wp.Prognoses).SingleOrDefault(wp => wp.StartDate == previousWeekDate);
+                    if (wp != null)
                     {
-                        Console.WriteLine("There is a prognosis for last week");
-                        copyPreviousPrognosis(startDate, previousPrognosis);
+                        CopyPreviousPrognosis(startDate, wp);
                     }
                     else
                     {
@@ -156,7 +175,7 @@ namespace BumboApp.Controllers
             return RedirectToAction("Index");
         }
 
-        private void copyPreviousPrognosis(DateOnly startDate, WeekPrognosis previousPrognosis)
+        private void CopyPreviousPrognosis(DateOnly startDate, WeekPrognosis previousPrognosis)
         {
             var newWeekPrognosis = new WeekPrognosis
             {
@@ -179,7 +198,7 @@ namespace BumboApp.Controllers
 
             Context.WeekPrognoses.Add(newWeekPrognosis);
             Context.SaveChanges();
-            Console.WriteLine("Prognose gekopieerd voor de nieuwe week");
+            NotifyService.Success("Er is een prognose aangemaakt op basis van de voorgaande week.");
         }
     }
 }
