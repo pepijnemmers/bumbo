@@ -58,7 +58,7 @@
                                 <td>
                                     @if (item.StartDate > DateOnly.FromDateTime(DateTime.Now))
                                     {
-                                        <a asp-controller="UniqueDays" asp-action="Edit">
+                                        <a asp-controller="UniqueDays" asp-action="Edit" asp-route-id = "@item.Id">
                                             <img style="width: 20px; height: auto" src="~/img/update-icon.svg" alt="Alternate Text" />
                                         </a>
                                     }

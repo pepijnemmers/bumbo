@@ -10,7 +10,6 @@ namespace BumboApp.Controllers
             int maxPages;
             int currentPageNumber = page ?? DefaultPage;
             string imageUrl = "~/img/UpArrow.png";
-            List <UniqueDay> uniqueDaysForPage = new List<UniqueDay>();
 
             List<UniqueDay> uniqueDays;
             if (usePassedDates == 'n')
@@ -30,13 +29,14 @@ namespace BumboApp.Controllers
             }
 
             maxPages = (int)Math.Ceiling((decimal)uniqueDays.Count / PageSize);
-
+            if(maxPages <= 0) { maxPages = 1; }
             if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
             if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
-            for (int i = (currentPageNumber - 1) * DefaultPage; i <= page * PageSize && i < uniqueDays.Count; i++)
-            {
-                uniqueDaysForPage.Add(uniqueDays[i]);
-            }
+            List<UniqueDay> uniqueDaysForPage =
+            uniqueDays
+            .Skip((currentPageNumber - 1) * PageSize)
+            .Take(PageSize)
+            .ToList();
 
             ViewBag.PageNumber = currentPageNumber;
             ViewBag.PageSize = PageSize;
