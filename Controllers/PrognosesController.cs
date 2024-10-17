@@ -25,7 +25,6 @@ namespace BumboApp.Controllers
             }
 
             int maxPages = (int)(Math.Ceiling((decimal)prognoses.Count / PageSize));
-            if (maxPages <= 0) { maxPages = 1; }
             if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
             if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
 
