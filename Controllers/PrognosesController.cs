@@ -228,7 +228,7 @@ namespace BumboApp.Controllers
                         Date = currentDate,
                         Department = (Department)j,
                         NeededHours = calculatedHours,
-                        NeededEmployees = calculatedHours / 8
+                        NeededEmployees = (float)(calculatedHours / 8.0)
                     };
 
                     newWeekPrognosis.Prognoses.Add(newPrognosis);
