@@ -1,4 +1,5 @@
-﻿@model List<UniqueDay>
+﻿@model BumboApp.ViewModels.OpeningHoursViewModel
+
 @{
     ViewData["Title"] = "Openingstijden";
 }
@@ -6,49 +7,48 @@
 
 <div class=" row">
     <div class=" col-8">
-        <h5>Openingstijden</h5>
-<form class="table-container" id="opening-hours-form" asp-action="Update" method="post">
-    <table class="table">
-        <tbody>
-            @for (int i = 0; i < 7; i++)
-            {
-                DayOfWeek day = (DayOfWeek)((i + 1) % 7); // Start with Monday
-                var openingHours = Model.OpeningHours.SingleOrDefault(h => h.WeekDay == day);
-                var isOpen = openingHours?.OpeningTime != null;
-                <tr class="align-middle">
-                    <td>
-                        <div class="form-check form-switch">
-                            <input class="d-none form-check-input" type="checkbox" role="switch" id="opening-hours-switch-@i" onchange="toggleDay(@i, this.checked)" @(isOpen ? "checked" : "") disabled />
-                            <input type="hidden" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].WeekDay" value="@openingHours.WeekDay" />
-                            <p>@Model.DutchDays[(i + 1) % 7]</p>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="@(isOpen ? "d-table-cell" : "d-none")" id="opening-hours-field-@i">
-                            <label for="opening-hour-@i">Vanaf</label>
-                            <div class="d-inline-block" id="opening-hour-text-@i">@openingHours.OpeningTime</div>
-                            <input class="d-none" id="opening-hour-@i" type="time" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].OpeningTime" value="@openingHours.OpeningTime" />
-                        </div>
-                        <div class="@(isOpen ? "d-none" : "d-block")" id="closedText-@i">
-                            <p>gesloten</p>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="@(isOpen ? "d-table-cell" : "d-none")" id="closing-hours-field-@i">
-                            <label for="closingHour-@i">tot</label>
-                            <div class="d-inline-block" id="closing-hour-text-@i">@openingHours.ClosingTime</div>
-                            <input class="d-none" id="closing-hour-@i" type="time" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].ClosingTime" value="@openingHours.ClosingTime" />
-                        </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <div class="d-flex justify-content-end">
-        <button type="submit" class="btn btn-primary">Oplaan</button>
-        <a class="btn btn-primary" id="opening-hours-edit-button">bewerken</a>
-    </div>
-</form>
+        <form class="table-container" id="opening-hours-form" asp-action="Update" method="post">
+            <table class="table">
+                <tbody>
+                    @for (int i = 0; i < 7; i++)
+                    {
+                        DayOfWeek day = (DayOfWeek)((i + 1) % 7); // Start with Monday
+                        var openingHours = Model.OpeningHours.SingleOrDefault(h => h.WeekDay == day);
+                        var isOpen = openingHours?.OpeningTime != null;
+                        <tr class="align-middle">
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input class="d-none form-check-input" type="checkbox" role="switch" id="opening-hours-switch-@i" onchange="toggleDay(@i, this.checked)" @(isOpen ? "checked" : "") disabled />
+                                    <input type="hidden" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].WeekDay" value="@openingHours.WeekDay" />
+                                    <p>@Model.DutchDays[(i + 1) % 7]</p>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="@(isOpen ? "d-table-cell" : "d-none")" id="opening-hours-field-@i">
+                                    <label for="opening-hour-@i">Vanaf</label>
+                                    <div class="d-inline-block" id="opening-hour-text-@i">@openingHours.OpeningTime</div>
+                                    <input class="d-none" id="opening-hour-@i" type="time" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].OpeningTime" value="@openingHours.OpeningTime" />
+                                </div>
+                                <div class="@(isOpen ? "d-none" : "d-block")" id="closedText-@i">
+                                    <p>gesloten</p>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="@(isOpen ? "d-table-cell" : "d-none")" id="closing-hours-field-@i">
+                                    <label for="closingHour-@i">tot</label>
+                                    <div class="d-inline-block" id="closing-hour-text-@i">@openingHours.ClosingTime</div>
+                                    <input class="d-none" id="closing-hour-@i" type="time" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].ClosingTime" value="@openingHours.ClosingTime" />
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-end p-3">
+                <a class="btn btn-primary mx-2" id="opening-hours-edit-button">bewerken</a>
+                <button type="submit" class="btn btn-primary">Oplaan</button>
+            </div>
+        </form>
     </div>
     <div class=" col-4">
         <div class=" table-container">
@@ -62,7 +62,7 @@
                         <th>Naam</th>
                         <th class="col-5">
                             <a asp-controller="OpeningHours" asp-action="Index" asp-route-OverviewDesc="@(!ViewBag.OverviewDesc)"
-                                asp-route-usePassedDates="@ViewBag.UsePassedDates" aria-label="begin " class="text-decoration-none text-dark d-flex align-items-center">
+                               asp-route-usePassedDates="@ViewBag.UsePassedDates" aria-label="begin " class="text-decoration-none text-dark d-flex align-items-center">
                                 <div class="me-2">
                                     Startdatum <br /> Einddatum
                                 </div>
@@ -74,22 +74,23 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if (!Model.Any())
+                    @if (!Model.UniqueDays.Any())
                     {
                         <!-- Display this alert if there are unique days -->
                         <tr>
                             <td colspan="100%" class="text-center">Er zijn geen Speciale dagen</td>
                         </tr>
                     }
-                    else{
-                        @foreach (var item in Model)
+                    else
+                    {
+                        @foreach (var item in Model.UniqueDays)
                         {
                             <tr>
                                 <td>
                                     @item.Name
                                 </td>
                                 <td class=" col-5">
-                                    @item.StartDate <br> 
+                                    @item.StartDate <br>
                                     @item.EndDate
                                 </td>
                                 <td class=" col-3">
@@ -98,7 +99,7 @@
                                 <td>
                                     @if (item.StartDate > DateOnly.FromDateTime(DateTime.Now))
                                     {
-                                        <a asp-controller="UniqueDays" asp-action="Edit" asp-route-id = "@item.Id">
+                                        <a asp-controller="UniqueDays" asp-action="Edit" asp-route-id="@item.Id">
                                             <img style="width: 20px; height: auto" src="~/img/update-icon.svg" alt="Alternate Text" />
                                         </a>
                                     }
@@ -155,17 +156,18 @@
                     </ul>
                 </nav>
             }
-        </div>
-        <div class="d-flex justify-content-between">
-            @if (ViewBag.UsePassedDates != 'n')
-            {
-                <a asp-controller="OpeningHours" asp-action="Index" class="btn btn-primary btn-sm d-inline-block">toekomstige dagen bekijken</a>
-            }
-            else
-            {
-                <a asp-controller="OpeningHours" asp-action="Index" asp-route-usePassedDates='y'  class="btn btn-primary btn-sm ">oude dagen bekijken</a>
-            }
-            <a asp-controller="UniqueDays" asp-action="Add" class="btn btn-primary btn-sm">toevoegen</a>
+
+            <div class="d-flex justify-content-end p-3">
+                @if (ViewBag.UsePassedDates != 'n')
+                {
+                    <a asp-controller="OpeningHours" asp-action="Index" class="btn btn-primary d-inline-block">toekomstige dagen bekijken</a>
+                }
+                else
+                {
+                    <a asp-controller="OpeningHours" asp-action="Index" asp-route-usePassedDates='y' class="btn btn-outline-primary mx-2">oude dagen bekijken</a>
+                }
+                <a asp-controller="UniqueDays" asp-action="Add" class="btn btn-primary">toevoegen</a>
+            </div>
         </div>
     </div>
 </div>

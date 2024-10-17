@@ -3,14 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using BumboApp.ViewModels;
 using BumboApp.Models;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Contexts;
 using System;
 
 namespace BumboApp.Controllers
 {
     public class OpeningHoursController : MainController
     {
-        public IActionResult Index(int? page, bool overviewDesc = false,char? usePassedDates = 'n')
+        public IActionResult Index(int? page, bool overviewDesc = false, char? usePassedDates = 'n')
         {
             int currentPageNumber = page ?? DefaultPage;
             string imageUrl = "~/img/UpArrow.png";
@@ -33,7 +32,7 @@ namespace BumboApp.Controllers
             }
 
             int maxPages = (int)Math.Ceiling((decimal)uniqueDays.Count / PageSize);
-            if(maxPages <= 0) { maxPages = 1; }
+            if (maxPages <= 0) { maxPages = 1; }
             if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
             if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
             List<UniqueDay> uniqueDaysForPage =
@@ -52,9 +51,16 @@ namespace BumboApp.Controllers
             var OpeningHoursViewModel = new OpeningHoursViewModel
             {
                 OpeningHours = Context.OpeningHours.ToList(),
+                UniqueDays = uniqueDaysForPage,
+                //PageNumber = currentPageNumber,
+                //PageSize = PageSize,
+                //MaxPages = maxPages,
+                //ImageUrl = imageUrl,
+                //OverviewDesc = overviewDesc,
+                //UsePassedDates = usePassedDates
             };
 
-            return View(uniqueDaysForPage);
+            return View(OpeningHoursViewModel);
         }
 
         [HttpPost]
