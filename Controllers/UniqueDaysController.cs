@@ -29,7 +29,7 @@ namespace BumboApp.Controllers
         {
             // validation
             if (Read().Find(u => u.StartDate == uniqueDay.StartDate && u.Name == uniqueDay.Name) != null)
-                return NotifyErrorAndRedirect("De Speciale dag die je probeert toe te voegen bestaat al.", "Add");
+                return NotifyErrorAndRedirect("De Speciale dag die je probeert toe te voegen bestaat al.", "Index", "OpeningHours");
 
             if (uniqueDay.StartDate > uniqueDay.EndDate)
                 return NotifyErrorAndRedirect("De startdatum moet voor of op de einddatum vallen.", "Add");
@@ -58,7 +58,7 @@ namespace BumboApp.Controllers
                 NotifyService.Error("Er is iets mis gegaan bij het toevoegen van de Speciale dag.");
             }
 
-            return RedirectToAction("Add");
+            return RedirectToAction("Index","OpeningHours");
         }
     }
 }

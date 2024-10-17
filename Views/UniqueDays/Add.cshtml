@@ -10,11 +10,11 @@
             </div>
             <div class="col-12 col-lg">
                 <label for="customersExpected">Startdatum</label>
-                <input type="Date" id="bDate" name="StartDate" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                <input type="Date" id="bDate" name="StartDate" class="form-control" min="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" required />
             </div>
             <div class="col-12 col-lg">
                 <label for="cargoExpected">EindDatum</label>
-                <input type="Date" id="eDate" name="EndDate" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                <input type="Date" id="eDate" name="EndDate" class="form-control" min="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" required />
             </div>
             <div class="col-12 col-lg">
                 <label for="cargoExpected">Factor</label>
