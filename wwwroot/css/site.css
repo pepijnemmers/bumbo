@@ -162,3 +162,7 @@ label {
     padding: 12px;
     text-align: left;
 }
+
+.opening-hours-buttons-class button {
+    display: none;
+}

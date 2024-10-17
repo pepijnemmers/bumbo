@@ -1,12 +1,11 @@
 ﻿@model BumboApp.ViewModels.OpeningHoursViewModel
-
 @{
     ViewData["Title"] = "Openingstijden";
 }
-<h5>Openingstijden en speciale dagen</h5>
 
+<h5>Openingstijden en speciale dagen</h5>
 <div class=" row">
-    <div class=" col-8">
+    <div class=" col-7">
         <form class="table-container" id="opening-hours-form" asp-action="Update" method="post">
             <table class="table">
                 <tbody>
@@ -30,7 +29,7 @@
                                     <input class="d-none" id="opening-hour-@i" type="time" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].OpeningTime" value="@openingHours.OpeningTime" />
                                 </div>
                                 <div class="@(isOpen ? "d-none" : "d-block")" id="closedText-@i">
-                                    <p>gesloten</p>
+                                    <p>Gesloten</p>
                                 </div>
                             </td>
                             <td>
@@ -44,13 +43,13 @@
                     }
                 </tbody>
             </table>
-            <div class="d-flex justify-content-end p-3">
+            <div class="opening-hours-buttons-class d-flex justify-content-end p-3" id="opening-hours-buttons">
                 <a class="btn btn-primary mx-2" id="opening-hours-edit-button">bewerken</a>
-                <button type="submit" class="btn btn-primary">Oplaan</button>
+                <button type="submit" class="btn btn-primary">Opslaan</button>
             </div>
         </form>
     </div>
-    <div class=" col-4">
+    <div class=" col-5">
         <div class=" table-container">
             <div class="pt-3 ps-3">
                 <h3>Speciale dagen</h3>
@@ -174,6 +173,11 @@
 
 <script>
     document.getElementById('opening-hours-edit-button').addEventListener('click', function () {
+        const div = document.getElementById('opening-hours-buttons');
+        div.classList.toggle('opening-hours-buttons-class');
+        const link = document.querySelector('#opening-hours-buttons a');
+        link.classList.toggle('btn-outline-primary');
+        link.classList.toggle('btn-primary');
 
         for (let i = 0; i < 7; i++) {
             const hoursSwitch = document.getElementById(`opening-hours-switch-${i}`);
