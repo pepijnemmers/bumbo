@@ -2,7 +2,7 @@
     ViewData["Title"] = "Speciale dag toevoegen";
 }
 <div class="table-container p-3">
-    <form method="post" asp-action="Create">
+    <form method="post" asp-action="Create" onchange="showButton()">
         <div class="row">
             <div class="col-12 col-lg">
                 <label for="text">Naam</label>
@@ -29,3 +29,9 @@
         </div>
     </form>
 </div>
+
+<script type="text/javascript">
+    function showButton() {
+        document.querySelector("button[type='submit']").removeAttribute("disabled");
+    }
+</script>
