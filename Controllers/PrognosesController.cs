@@ -130,11 +130,9 @@ namespace BumboApp.Controllers
                 NotifyService.Warning("Er is al een prognose voor deze datum. Het is alleen mogelijk deze aan te passen.");
             }
             else {
-                Console.WriteLine("Geen een prognose");
                 //Check which template is chosen
                 if (templateSelect.Equals("Standaard template"))
                 {
-                    Console.WriteLine("Standaard template");
                     //Check if there excists norms and expectations
                     for (int i = 0; i < 7; i++)
                     {
@@ -154,7 +152,7 @@ namespace BumboApp.Controllers
                     }
                     else
                     {
-                        Console.WriteLine("Alle verwachtingen en normeringen zijn aanwezig.");
+                        CalculateNewPrognosis(startDate);
                     }
                 }
                 else
@@ -199,6 +197,85 @@ namespace BumboApp.Controllers
             Context.WeekPrognoses.Add(newWeekPrognosis);
             Context.SaveChanges();
             NotifyService.Success("Er is een prognose aangemaakt op basis van de voorgaande week.");
+        }
+
+        private void CalculateNewPrognosis(DateOnly startDate)
+        {
+            //Finding the latest norms
+            var latestNormDate = Context.Norms.Max(n => n.CreatedAt);
+            var norms = Context.Norms.Where(n => n.CreatedAt == latestNormDate).ToList();
+
+            var newWeekPrognosis = new WeekPrognosis
+            {
+                StartDate = startDate,
+                Prognoses = new List<Prognosis>()
+            };
+
+            //loop through the days
+            for (int i = 0; i < 7; i++)
+            {
+                //loop through the departments
+                for (int j = 0; j < 3; j++)
+                {
+                    DateOnly currentDate = startDate.AddDays(i);
+
+                    var expectation = Context.Expectations.FirstOrDefault(e => e.Date == currentDate);
+
+                    int calculatedHours = (int)CalculateNeededHours(expectation, norms, (Department)j);
+
+                    var newPrognosis = new Prognosis
+                    {
+                        Date = currentDate,
+                        Department = (Department)j,
+                        NeededHours = calculatedHours,
+                        NeededEmployees = calculatedHours / 8
+                    };
+
+                    newWeekPrognosis.Prognoses.Add(newPrognosis);
+
+                }
+            }
+            Context.WeekPrognoses.Add(newWeekPrognosis);
+            Context.SaveChanges();
+            NotifyService.Success("Er is een prognose aangemaakt op basis van het standaard template.");
+        }
+
+        private float CalculateNeededHours(Expectation expectation, List<Norm> norms, Department department)
+        {
+            //Vers
+            if (department == Department.Vers)
+            {
+                var versNorm = norms.FirstOrDefault(n => n.Activity.ToString() == "Vers");
+                float versValue = versNorm.Value;
+                float neededHours = ((60 / versValue) * expectation.ExpectedCustomers) / 60;
+                return neededHours;
+            }
+            //Vakenvullen
+            else if (department == Department.Vakkenvullen)
+            {
+                int shelfMeters = 100;
+                //var coliUitladenNorm = norms.FirstOrDefault(n => n.Activity.ToString() == "Coli uitladen");
+                var coliUitladenNorm = norms.FirstOrDefault(n => n.Activity == NormActivity.ColiUitladen);
+                float coliUitladenValue = coliUitladenNorm.Value;
+
+                var vakkenVullenNorm = norms.FirstOrDefault(n => n.Activity == NormActivity.VakkenVullen);
+                float vakkenVullenValue = vakkenVullenNorm.Value;
+
+                var spiegelenNorm = norms.FirstOrDefault(n => n.Activity.ToString() == "Spiegelen");
+                float spiegelenValue = spiegelenNorm.Value;
+
+                float needeHours = ((vakkenVullenValue * expectation.ExpectedCargo) + coliUitladenValue + ((spiegelenValue * shelfMeters) / 60))/60;
+                return needeHours;
+            }
+            //Kassa
+            else if (department == Department.Kassa)
+            {
+                var kassaNorm = norms.FirstOrDefault(n => n.Activity.ToString() == "Kassa");
+                float kassaValue = kassaNorm.Value;
+                float neededHours = ((60 / kassaValue) * expectation.ExpectedCustomers) / 60;
+                return neededHours;
+            }
+            return 0;
         }
     }
 }
