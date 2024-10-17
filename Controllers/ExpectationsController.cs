@@ -118,11 +118,10 @@ namespace BumboApp.Controllers
             // validation
             if (csvFile == null || csvFile.Length == 0)
             {
-                // TODO : always ends here
                 return NotifyErrorAndRedirect("Het bestand is leeg.", "Index");
             }
             
-            if (!csvFile.FileName.EndsWith(".csv"))
+            if (!csvFile.FileName.EndsWith(".csv") && !csvFile.ContentType.Equals("text/csv"))
             {
                 return NotifyErrorAndRedirect("Het bestand moet een <strong>.csv</strong> bestand zijn.", "Index");
             }
@@ -138,10 +137,17 @@ namespace BumboApp.Controllers
             // read csv file
             using (var reader = new StreamReader(csvFile.OpenReadStream()))
             {
+                bool firstLine = true;
                 while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine();
                     var values = line.Split(delimiter);
+                    
+                    if (firstLine)
+                    {
+                        firstLine = false;
+                        continue;
+                    }
                     
                     // csv validation
                     if (values.Length != 3)
@@ -156,7 +162,7 @@ namespace BumboApp.Controllers
                         !int.TryParse(values[2], out var expectedCargo))
                     {
                         return NotifyErrorAndRedirect(
-                            "Ongeldige gegevens in CSV-bestand gevonden (regel: " + (expectations.Count + 1) + ")",
+                            "Lege regels of ongeldige gegevens in CSV-bestand gevonden (regel: " + (expectations.Count + 1) + ")",
                             "Index");
                     }
                     
