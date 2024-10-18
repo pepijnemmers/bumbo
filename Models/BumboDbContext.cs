@@ -145,49 +145,49 @@ public partial class BumboDbContext : DbContext
             }
         );
 
-        // Seed data for UniqueDay
+        // Seed data for OpeningHours
         modelBuilder.Entity<OpeningHour>().HasData(
             new OpeningHour
             {
-                WeekDay = "Monday",
-                OpeningTime = new TimeOnly(7, 0),
+                WeekDay = DayOfWeek.Monday,
+                OpeningTime = new TimeOnly(8, 0),
                 ClosingTime = new TimeOnly(21, 0)
             },
             new OpeningHour
             {
-                WeekDay = "Tuesday",
-                OpeningTime = new TimeOnly(7, 0),
+                WeekDay = DayOfWeek.Tuesday,
+                OpeningTime = new TimeOnly(8, 0),
                 ClosingTime = new TimeOnly(21, 0)
             },
             new OpeningHour
             {
-                WeekDay = "Wednesday",
-                OpeningTime = new TimeOnly(7, 0),
+                WeekDay = DayOfWeek.Wednesday,
+                OpeningTime = new TimeOnly(8, 0),
                 ClosingTime = new TimeOnly(21, 0)
             },
             new OpeningHour
             {
-                WeekDay = "Thursday",
-                OpeningTime = new TimeOnly(7, 0),
+                WeekDay = DayOfWeek.Thursday,
+                OpeningTime = new TimeOnly(8, 0),
                 ClosingTime = new TimeOnly(21, 0)
             },
             new OpeningHour
             {
-                WeekDay = "Friday",
-                OpeningTime = new TimeOnly(7, 0),
+                WeekDay = DayOfWeek.Friday,
+                OpeningTime = new TimeOnly(8, 0),
                 ClosingTime = new TimeOnly(21, 0)
             },
             new OpeningHour
             {
-                WeekDay = "Saturday",
-                OpeningTime = new TimeOnly(7, 0),
-                ClosingTime = new TimeOnly(21, 0)
+                WeekDay = DayOfWeek.Saturday,
+                OpeningTime = new TimeOnly(9, 0),
+                ClosingTime = new TimeOnly(20, 0)
             },
             new OpeningHour
             {
-                WeekDay = "Sunday",
-                OpeningTime = new TimeOnly(11, 0),
-                ClosingTime = new TimeOnly(19, 0)
+                WeekDay = DayOfWeek.Sunday,
+                OpeningTime = null,
+                ClosingTime = null
             }
         );
 

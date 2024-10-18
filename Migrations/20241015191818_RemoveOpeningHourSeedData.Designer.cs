@@ -4,6 +4,7 @@ using BumboApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BumboApp.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    partial class BumboDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241015191818_RemoveOpeningHourSeedData")]
+    partial class RemoveOpeningHourSeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,9 +43,6 @@ namespace BumboApp.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Date")
-                        .IsUnique();
 
                     b.ToTable("Expectations");
 
@@ -265,60 +265,19 @@ namespace BumboApp.Migrations
 
             modelBuilder.Entity("BumboApp.Models.OpeningHour", b =>
                 {
-                    b.Property<int>("WeekDay")
-                        .HasColumnType("int");
+                    b.Property<string>("WeekDay")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
-                    b.Property<TimeOnly?>("ClosingTime")
+                    b.Property<TimeOnly>("ClosingTime")
                         .HasColumnType("time");
 
-                    b.Property<TimeOnly?>("OpeningTime")
+                    b.Property<TimeOnly>("OpeningTime")
                         .HasColumnType("time");
 
                     b.HasKey("WeekDay");
 
                     b.ToTable("OpeningHours");
-
-                    b.HasData(
-                        new
-                        {
-                            WeekDay = 1,
-                            ClosingTime = new TimeOnly(21, 0, 0),
-                            OpeningTime = new TimeOnly(8, 0, 0)
-                        },
-                        new
-                        {
-                            WeekDay = 2,
-                            ClosingTime = new TimeOnly(21, 0, 0),
-                            OpeningTime = new TimeOnly(8, 0, 0)
-                        },
-                        new
-                        {
-                            WeekDay = 3,
-                            ClosingTime = new TimeOnly(21, 0, 0),
-                            OpeningTime = new TimeOnly(8, 0, 0)
-                        },
-                        new
-                        {
-                            WeekDay = 4,
-                            ClosingTime = new TimeOnly(21, 0, 0),
-                            OpeningTime = new TimeOnly(8, 0, 0)
-                        },
-                        new
-                        {
-                            WeekDay = 5,
-                            ClosingTime = new TimeOnly(21, 0, 0),
-                            OpeningTime = new TimeOnly(8, 0, 0)
-                        },
-                        new
-                        {
-                            WeekDay = 6,
-                            ClosingTime = new TimeOnly(20, 0, 0),
-                            OpeningTime = new TimeOnly(9, 0, 0)
-                        },
-                        new
-                        {
-                            WeekDay = 0
-                        });
                 });
 
             modelBuilder.Entity("BumboApp.Models.Prognosis", b =>
