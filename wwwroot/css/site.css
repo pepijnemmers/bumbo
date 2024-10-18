@@ -162,3 +162,8 @@ label {
     padding: 12px;
     text-align: left;
 }
+
+/*Create prognosis*/
+.create-prognosis-card {
+    width: 30rem;
+}
