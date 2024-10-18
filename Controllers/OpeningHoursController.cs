@@ -13,13 +13,12 @@ namespace BumboApp.Controllers
             List<UniqueDay> uniqueDays;
             if (usePassedDates == 'n')
             {
-                uniqueDays = Context.UniqueDays.Where(u => u.EndDate >= DateOnly.FromDateTime(DateTime.Now)).ToList();
+                uniqueDays = Context.UniqueDays.Where(u => u.EndDate >= DateOnly.FromDateTime(DateTime.Now)).OrderBy(p => p.StartDate).ToList();
             }
             else
             {
-                uniqueDays = Context.UniqueDays.Where(u => u.EndDate < DateOnly.FromDateTime(DateTime.Now)).ToList();
+                uniqueDays = Context.UniqueDays.Where(u => u.EndDate < DateOnly.FromDateTime(DateTime.Now)).OrderBy(p => p.StartDate).ToList();
             }
-            uniqueDays.OrderBy(p => p.StartDate);
 
             if (overviewDesc)
             {
