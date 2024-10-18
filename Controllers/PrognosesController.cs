@@ -115,5 +115,173 @@ namespace BumboApp.Controllers
 
             return RedirectToAction("Index");
         }
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CalculatePrognosis(DateOnly startDate, string templateSelect) {
+            //Check if an prognosis already excists for the startDate
+            WeekPrognosis? existingPrognosis = Context.WeekPrognoses.FirstOrDefault(p => p.StartDate == startDate);
+            if (existingPrognosis != null)
+            {
+                NotifyService.Warning("Er is al een prognose voor deze datum. Het is alleen mogelijk deze aan te passen.");
+            }
+            else {
+                //Check which template is chosen
+                if (templateSelect.Equals("Standaard template"))
+                {
+                    //Check if there excists norms and expectations
+                    for (int i = 0; i < 7; i++)
+                    {
+                        DateOnly currentDay = startDate.AddDays(i);
+                        var expectation = Context.Expectations.FirstOrDefault(e => e.Date == currentDay);
+                        if (expectation == null)
+                        {
+                            NotifyService.Warning("Er zijn geen volledige verwachtingen voor deze week.");
+                            return RedirectToAction("Index");
+                        }
+                    }
+
+                    var normExists = Context.Norms.Any();
+                    if (!normExists)
+                    {
+                        NotifyService.Warning("Er is geen normering gevonden");
+                    }
+                    else
+                    {
+                        CalculateNewPrognosis(startDate);
+                    }
+                }
+                else
+                {
+                    //Check if there is a prognosis for the previous week
+                    DateOnly previousWeekDate = startDate.AddDays(-7);
+                    WeekPrognosis? wp = Context.WeekPrognoses.Include(wp => wp.Prognoses).SingleOrDefault(wp => wp.StartDate == previousWeekDate);
+                    if (wp != null)
+                    {
+                        CopyPreviousPrognosis(startDate, wp);
+                    }
+                    else
+                    {
+                        NotifyService.Warning("Er bestaat geen prognose voor de voorgaande week.");
+                    }
+                }
+            }
+            return RedirectToAction("Index");
+        }
+
+        private void CopyPreviousPrognosis(DateOnly startDate, WeekPrognosis previousPrognosis)
+        {
+            var newWeekPrognosis = new WeekPrognosis
+            {
+                StartDate = startDate,
+                Prognoses = new List<Prognosis>()
+            };
+
+            foreach (var previousPrognosisEntry in previousPrognosis.Prognoses)
+            {
+                var newPrognosis = new Prognosis
+                {
+                    Date = previousPrognosisEntry.Date.AddDays(7),
+                    Department = previousPrognosisEntry.Department,
+                    NeededHours = previousPrognosisEntry.NeededHours,
+                    NeededEmployees = previousPrognosisEntry.NeededEmployees,
+                };
+
+                newWeekPrognosis.Prognoses.Add(newPrognosis);
+            }
+
+            Context.WeekPrognoses.Add(newWeekPrognosis);
+            Context.SaveChanges();
+            NotifyService.Success("Er is een prognose aangemaakt op basis van de voorgaande week.");
+        }
+
+        private void CalculateNewPrognosis(DateOnly startDate)
+        {
+            //Finding the latest norms
+            var latestNormDate = Context.Norms.Max(n => n.CreatedAt);
+            var norms = Context.Norms.Where(n => n.CreatedAt == latestNormDate).ToList();
+
+            var newWeekPrognosis = new WeekPrognosis
+            {
+                StartDate = startDate,
+                Prognoses = new List<Prognosis>()
+            };
+
+            //loop through the days
+            for (int i = 0; i < 7; i++)
+            {
+                //loop through the departments
+                for (int j = 0; j < 3; j++)
+                {
+                    DateOnly currentDate = startDate.AddDays(i);
+
+                    var expectation = Context.Expectations.FirstOrDefault(e => e.Date == currentDate);
+
+                    int calculatedHours = (int)CalculateNeededHours(expectation, norms, (Department)j, currentDate);
+
+                    var newPrognosis = new Prognosis
+                    {
+                        Date = currentDate,
+                        Department = (Department)j,
+                        NeededHours = calculatedHours,
+                        NeededEmployees = (float)(calculatedHours / 8.0)
+                    };
+
+                    newWeekPrognosis.Prognoses.Add(newPrognosis);
+
+                }
+            }
+            Context.WeekPrognoses.Add(newWeekPrognosis);
+            Context.SaveChanges();
+            NotifyService.Success("Er is een prognose aangemaakt op basis van het standaard template.");
+        }
+
+        private float CalculateNeededHours(Expectation expectation, List<Norm> norms, Department department, DateOnly currentDate)
+        {
+            float factor = 1;
+            var uniqueDay = Context.UniqueDays.FirstOrDefault(ud => currentDate >= ud.StartDate && currentDate <= ud.EndDate);
+            if (uniqueDay != null) { 
+                factor = uniqueDay.Factor;
+            }
+
+            //Vers
+            if (department == Department.Vers)
+            {
+                var versNorm = norms.FirstOrDefault(n => n.Activity.ToString() == "Vers");
+                float versValue = versNorm.Value;
+                float neededHours = ((60 / versValue) * (expectation.ExpectedCustomers * factor)) / 60;
+                return neededHours;
+            }
+            //Vakenvullen
+            else if (department == Department.Vakkenvullen)
+            {
+                int shelfMeters = 100;
+                //var coliUitladenNorm = norms.FirstOrDefault(n => n.Activity.ToString() == "Coli uitladen");
+                var coliUitladenNorm = norms.FirstOrDefault(n => n.Activity == NormActivity.ColiUitladen);
+                float coliUitladenValue = coliUitladenNorm.Value;
+
+                var vakkenVullenNorm = norms.FirstOrDefault(n => n.Activity == NormActivity.VakkenVullen);
+                float vakkenVullenValue = vakkenVullenNorm.Value;
+
+                var spiegelenNorm = norms.FirstOrDefault(n => n.Activity.ToString() == "Spiegelen");
+                float spiegelenValue = spiegelenNorm.Value;
+
+                float needeHours = ((vakkenVullenValue * expectation.ExpectedCargo) + coliUitladenValue + ((spiegelenValue * shelfMeters) / 60))/60;
+                return needeHours;
+            }
+            //Kassa
+            else if (department == Department.Kassa)
+            {
+                var kassaNorm = norms.FirstOrDefault(n => n.Activity.ToString() == "Kassa");
+                float kassaValue = kassaNorm.Value;
+                float neededHours = ((60 / kassaValue) * (expectation.ExpectedCustomers * factor)) / 60;
+                return neededHours;
+            }
+            return 0;
+        }
     }
 }
