@@ -5,7 +5,7 @@
 
 <h5>Openingstijden en speciale dagen</h5>
 <div class=" row">
-    <div class=" col-7">
+    <div class="col-12 col-xl-7">
         <form class="table-container" id="opening-hours-form" asp-action="Update" method="post">
             <table class="table">
                 <tbody>
@@ -49,7 +49,7 @@
             </div>
         </form>
     </div>
-    <div class=" col-5">
+    <div class="col-12 col-xl-5">
         <div class=" table-container">
             <div class="pt-3 ps-3">
                 <h3>Speciale dagen</h3>
@@ -178,6 +178,7 @@
         const link = document.querySelector('#opening-hours-buttons a');
         link.classList.toggle('btn-outline-primary');
         link.classList.toggle('btn-primary');
+        link.innerHTML = link.innerHTML.toLowerCase() === 'bewerken' ? 'annuleren' : 'bewerken';
 
         for (let i = 0; i < 7; i++) {
             const hoursSwitch = document.getElementById(`opening-hours-switch-${i}`);
