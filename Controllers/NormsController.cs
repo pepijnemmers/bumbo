@@ -40,13 +40,12 @@ namespace BumboApp.Controllers
         [HttpPost]
         public IActionResult Add(List<AddNormViewModel> addNormsList)
         {
-            if (ModelState.IsValid)
-            {
-                var latestNormsList = Context.Norms
-                    .OrderByDescending(n => n.CreatedAt)
-                    .Take(_amountOfNormsInSet)
-                    .ToList();
+            var latestNormsList = Context.Norms
+                .OrderByDescending(n => n.CreatedAt)
+                .Take(_amountOfNormsInSet)
+                .ToList();
 
+            if (latestNormsList != null) { 
                 bool areEqual = addNormsList.All(addNorm =>
                     latestNormsList.Any(latestNorm =>
                         latestNorm.Activity == addNorm.Activity &&
@@ -60,6 +59,7 @@ namespace BumboApp.Controllers
                     NotifyService.Warning("De ingevoerde normeringen zijn hetzelfde als de laatste normeringen");
                     return RedirectToAction("Index");
                 }
+            }
 
                 using var transaction = Context.Database.BeginTransaction();
 
@@ -86,7 +86,7 @@ namespace BumboApp.Controllers
                     transaction.Rollback();
                     NotifyService.Error("Er is iets mis gegaan");
                 }
-            }
+            
             return RedirectToAction("Index");
         }
     }

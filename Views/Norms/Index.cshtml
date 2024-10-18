@@ -102,24 +102,19 @@
                                     <input type="hidden" name="AddNormsList[@counter].NormType" value="@switch (activity)
                                         {
                                             case NormActivity.ColiUitladen:
-                                                @NormType.Minutes.ToFriendlyString()
-;
+                                                @NormType.Minutes;
                                                 break;
                                             case NormActivity.VakkenVullen:
-                                                @NormType.MinutesPerColi.ToFriendlyString()
-;
+                                                @NormType.MinutesPerColi;
                                                 break;
                                             case NormActivity.Kassa:
-                                                @NormType.CustomersPerHour.ToFriendlyString()
-;
+                                                @NormType.CustomersPerHour;
                                                 break;
                                             case NormActivity.Vers:
-                                                @NormType.CustomersPerHour.ToFriendlyString()
-;
+                                                @NormType.CustomersPerHour;
                                                 break;
                                             default:
-                                                @NormType.SecondsPerMeter.ToFriendlyString()
-;
+                                                @NormType.SecondsPerMeter;
                                                 break;
                                         }" />
                                 </td>
