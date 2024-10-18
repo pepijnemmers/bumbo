@@ -1,0 +1,26 @@
+﻿@{
+    Layout = "_LayoutWithoutNav";
+    ViewData["Title"] = "Inloggen";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-7 d-md-flex d-none banner-col">
+            <img src="~/img/bumbo-banner.png" class="img-fluid" alt="Bumbo Banner">
+        </div>
+        <div class="col-md-5 bg-white banner-col">
+            <form method="post" asp-action="Login">
+                <h1>Log in bij Bumbo</h1>
+
+                <label for="email">Email</label>
+                <input type="email" name="Email" id="email" class="form-control mb-2" placeholder="Email"
+                required autofocus>
+
+                <label for="password">Wachtwoord</label>
+                <input type="password" name="Password" id="password" placeholder="Wachtwoord" class="form-control mb-3" required>
+
+                <button class="btn btn-lg btn-primary w-100">Sign in</button>
+            </form>
+        </div>
+    </div>
+</div>
