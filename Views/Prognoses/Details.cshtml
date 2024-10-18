@@ -1,26 +1,24 @@
-﻿@{
+﻿@model BumboApp.ViewModels.WeekPrognosisViewModel
+
+@{
     ViewData["Title"] = "Prognose details";
 }
-
-@model BumboApp.ViewModels.WeekPrognosisViewModel
-
-
 
 <div class="row justify-content-between align-items-center">
     <h2 class="col d-none d-lg-block">Prognose week @Model.WeekNr</h2>
     <div class="col-12 mb-2 mb-lg-0 col-lg text-center text-lg-end">
         <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@Model.StartDate.AddDays(-7).ToString("dd-MM-yyyy")">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 18L9 12L15 6" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M15 18L9 12L15 6" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
         </a>
         <strong>
             Week @Model.WeekNr
-        </strong> 
+        </strong>
         (@Model.StartDate.ToString("dd/MM/yyyy") - @Model.StartDate.AddDays(6).ToString("dd/MM/yyyy"))
         <a asp-controller="Prognoses" asp-action="Details" asp-route-id="@Model.StartDate.AddDays(7).ToString("dd-MM-yyyy")">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 18L15 12L9 6" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M9 18L15 12L9 6" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
         </a>
     </div>
@@ -28,14 +26,14 @@
 
 @if (Model.Prognoses.Any())
 {
-    <div class="border">Geen prognose voor deze week</div>
+    <div class="table-container p-3">Geen prognose voor deze week</div>
 }
 else
 {
     <div class="d-lg-none">
         <p class="alert alert-warning" role="alert">Deze pagina is niet beschikbaar op mobiel. Gebruik een desktop.</p>
     </div>
-    
+
     <div class="table-container d-none d-lg-block">
         <div id="overview">
             <table class="table">
@@ -72,34 +70,34 @@ else
         </div>
 
         <form id="form" style="display: none" asp-action="Update" method="post">
-            <div class="row">
-                <table class="table">
-                    <thead>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Afdeling</th>
+                        @for (int i = 0; i < 7; i++)
+                        {
+                            <th>@Model.DutchDays[i]</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Department department in Department.GetValues(typeof(Department)))
+                    {
                         <tr>
-                            <th>Afdeling</th>
+                            <td>@department</td>
                             @for (int i = 0; i < 7; i++)
                             {
-                                <th>@Model.DutchDays[i]</th>
-                            }
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (Department department in Department.GetValues(typeof(Department)))
-                        {
-                            <tr>
-                                <td>@department</td>
-                                @for (int i = 0; i < 7; i++)
-                                {
-                                    DayOfWeek day = (DayOfWeek)((i + 1) % 7); //necessary to start with monday rather than sunday
-                                    var prognosis = Model.Prognoses.SingleOrDefault(p => p.Department == department && p.Date.DayOfWeek == day);
+                                DayOfWeek day = (DayOfWeek)((i + 1) % 7); //necessary to start with monday rather than sunday
+                                var prognosis = Model.Prognoses.SingleOrDefault(p => p.Department == department && p.Date.DayOfWeek == day);
 
-                                    <td>
-                                        @if (prognosis != null)
-                                        {
-                                            <div class="input-group mb-2">
-                                                <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Id" value="@prognosis.Id" />
-                                                <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Date" value="@prognosis.Date" />
-                                                <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Department" value="@prognosis.Department" />
+                                <td>
+                                    @if (prognosis != null)
+                                    {
+                                        <div class="input-group mb-2">
+                                            <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Id" value="@prognosis.Id" />
+                                            <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Date" value="@prognosis.Date" />
+                                            <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Department" value="@prognosis.Department" />
 
                                                 <input id="@day+@department-employees"
                                                        class="form-control form-control-sm"
@@ -126,7 +124,7 @@ else
                 </table>
             </div>
 
-            <div class="row justify-content-end mb-2">
+            <div class="d-flex justify-content-end m-3">
                 <div class="w-auto">
                     <button class="btn btn-outline-primary" asp-controller="Prognoses" asp-action="CreatePrognosis">opnieuw berekenen</button>
                     <button type="submit" class="btn btn-primary">Oplaan</button>
@@ -135,11 +133,13 @@ else
         </form>
 
         <div class="d-lg-flex d-none justify-content-between p-3 pt-0">
-            <div class="col-md-3">
-                <strong>Legenda</strong><br/> 
+            <div>
+                <strong>Legenda</strong><br />
                 <em>aantal medewerkers | aantal uur</em>
             </div>
-            <button id="prognosisEditButton" class="btn btn-primary w-auto">bewerken</button>
+            <div>
+                <button id="prognosisEditButton" class="btn btn-primary w-auto">bewerken</button>
+            </div>
         </div>
     </div>
 }
