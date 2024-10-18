@@ -7,4 +7,5 @@ namespace BumboApp.ViewModels
         public required List<Norm> NormsList { get; set; }
         public required List<Norm> LatestNormsList { get; set; }
     }
+
 }
