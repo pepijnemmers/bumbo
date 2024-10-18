@@ -2,6 +2,7 @@
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 
@@ -47,14 +48,14 @@ namespace BumboApp.Controllers
             var dateParts = id.Split('-');
             if (dateParts.Length != 3)
             {
-                return HandleInvalidInput("Ongeldige link: dd-MM-yyyy verwacht");
+                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", "Index");
             }
 
             if (!int.TryParse(dateParts[0], out int day) ||
                 !int.TryParse(dateParts[1], out int month) ||
                 !int.TryParse(dateParts[2], out int year))
             {
-                return HandleInvalidInput("Ongeldige link: de datum bevat niet numerieke waarden");
+                return NotifyErrorAndRedirect("Ongeldige link: de datum bevat niet numerieke waarden", "Index");
             }
 
             DateOnly startDate;
@@ -64,7 +65,7 @@ namespace BumboApp.Controllers
             }
             catch (ArgumentOutOfRangeException e)
             {
-                return HandleInvalidInput("Ongeldige link: de datum bestaat niet");
+                return NotifyErrorAndRedirect("Ongeldige link: de datum bestaat niet", "Index");
             }
 
             DayOfWeek dayOfWeek = CultureInfo.InvariantCulture.Calendar.GetDayOfWeek(startDate.ToDateTime(new TimeOnly(0, 0)));
@@ -85,34 +86,58 @@ namespace BumboApp.Controllers
                 StartDate = startDate,
                 WeekNr = weekNumber,
                 Year = year,
-                Prognoses = wp?.Prognoses
+                Prognoses = wp?.Prognoses ?? new List<Prognosis>()
             };
 
             return View(model);
         }
-        private IActionResult HandleInvalidInput(string errorMessage)
-        {
-            NotifyService.Error(errorMessage);
-            return RedirectToAction("Index");
-        }
+
 
         [HttpPost]
         public IActionResult Update(List<Prognosis> prognoses)
         {
-            foreach (Prognosis prognosis in prognoses)
+            //Validation
+            if (prognoses == null || !prognoses.Any())
             {
-                Prognosis existingPrognosis = Context.Prognoses
-                .Single(p => p.Department == prognosis.Department && p.Date == prognosis.Date);
-
-                if (existingPrognosis != null)
-                {
-                    existingPrognosis.NeededHours = prognosis.NeededHours;
-                    existingPrognosis.NeededEmployees = prognosis.NeededEmployees;
-                }
+                return NotifyErrorAndRedirect("Er is iets mis gegaan bij het bewerken van de prognose.", "Index");
             }
 
-            Context.SaveChanges();
-
+            using var transaction = Context.Database.BeginTransaction();
+            try
+            {
+                foreach (Prognosis prognosis in prognoses)
+                {
+                    float employees = prognosis.NeededEmployees;
+                    float hours = prognosis.NeededHours;
+                    if (prognosis.Date < DateOnly.FromDateTime(DateTime.Now))
+                    {
+                        return NotifyErrorAndRedirect("Deze prognose kan niet meer bewerkt worden", "Index");
+                    }
+                    if (employees < 0 || hours < 0)
+                    {
+                        return NotifyErrorAndRedirect("De data is ongeldig, mag niet negatief zijn", "Index");
+                    }
+                    if (employees * 8 != hours)
+                    {
+                        return NotifyErrorAndRedirect("Het aantal uur moet 8 maal het aantal medewerkers zijn", "Index");
+                    }
+                    Prognosis existingPrognosis = Context.Prognoses
+                                        .Single(p => p.Department == prognosis.Department && p.Date == prognosis.Date);
+                    if (existingPrognosis != null)
+                    {
+                        existingPrognosis.NeededHours = prognosis.NeededHours;
+                        existingPrognosis.NeededEmployees = prognosis.NeededEmployees;
+                    }
+                }
+                Context.SaveChanges();
+                transaction.Commit();
+                NotifyService.Success("De prognose is bijgewerkt!");
+            }
+            catch
+            {
+                transaction.Rollback();
+                NotifyService.Error("Er is iets mis gegaan bij het bewerken van de prognose.");
+            }
             return RedirectToAction("Index");
         }
 
