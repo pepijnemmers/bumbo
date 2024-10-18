@@ -44,7 +44,7 @@
                     <tr>
                         <td>@weekNumber</td>
                         <td>@item.StartDate</td> 
-                        <td>@item.StartDate.AddDays(7)</td> 
+                        <td>@item.StartDate.AddDays(6)</td> 
                         <td>
                             @if(!(item.StartDate <= DateOnly.FromDateTime(DateTime.Now))){
                                 <a asp-controller="prognoses" asp-action="details" asp-route-id="@(item.StartDate.ToString("dd-MM-yyyy"))">
