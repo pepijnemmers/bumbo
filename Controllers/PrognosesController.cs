@@ -2,6 +2,7 @@
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 
@@ -108,7 +109,11 @@ namespace BumboApp.Controllers
                 {
                     float employees = prognosis.NeededEmployees;
                     float hours = prognosis.NeededHours;
-                    if (employees < 0 || hours < 0) //TODO de seeddata voldoet niet aan deze eisen (hours * 8 != employees) :( en floats zijn niet accuraat genoeg? 
+                    if (prognosis.Date < DateOnly.FromDateTime(DateTime.Now))
+                    {
+                        return NotifyErrorAndRedirect("Deze prognose kan niet meer bewerkt worden", "Index");
+                    }
+                    if (employees < 0 || hours < 0)
                     {
                         return NotifyErrorAndRedirect("De data is ongeldig, mag niet negatief zijn", "Index");
                     }
@@ -124,10 +129,8 @@ namespace BumboApp.Controllers
                         existingPrognosis.NeededHours = prognosis.NeededHours;
                         existingPrognosis.NeededEmployees = prognosis.NeededEmployees;
                     }
-                    //Context.Prognoses.Update(prognosis);
-                    Context.SaveChanges();
                 }
-
+                Context.SaveChanges();
                 transaction.Commit();
                 NotifyService.Success("De prognose is bijgewerkt!");
             }
