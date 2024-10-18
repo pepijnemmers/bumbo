@@ -119,7 +119,6 @@ namespace BumboApp.Controllers
                     }
                     if (employees * 8 != hours)
                     {
-                        Console.WriteLine("" + employees + "*8 != " + hours);
                         return NotifyErrorAndRedirect("Het aantal uur moet 8 maal het aantal medewerkers zijn", "Index");
                     }
                     Prognosis existingPrognosis = Context.Prognoses
@@ -134,9 +133,8 @@ namespace BumboApp.Controllers
                 transaction.Commit();
                 NotifyService.Success("De prognose is bijgewerkt!");
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e);
                 transaction.Rollback();
                 NotifyService.Error("Er is iets mis gegaan bij het bewerken van de prognose.");
             }
