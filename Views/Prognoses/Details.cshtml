@@ -24,7 +24,7 @@
     </div>
 </div>
 
-@if (Model.Prognoses.Any())
+@if (!Model.Prognoses.Any())
 {
     <div class="table-container p-3">Geen prognose voor deze week</div>
 }

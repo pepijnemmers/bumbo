@@ -47,7 +47,7 @@
                         <td>@item.StartDate.AddDays(7)</td> 
                         <td>
                             @if(!(item.StartDate <= DateOnly.FromDateTime(DateTime.Now))){
-                                <a asp-controller="prognoses" asp-action="update">
+                                <a asp-controller="prognoses" asp-action="details" asp-route-id="@(item.StartDate.ToString("dd-MM-yyyy"))">
                                     <img width="20px" height="auto" class="mx-1" src="~/img/update-icon.svg" alt="Alternate Text" />
                                 </a>
                             }
