@@ -163,6 +163,12 @@ label {
     text-align: left;
 }
 
+/*Create prognosis*/
+.create-prognosis-card {
+    width: 30rem;
+}
+
+/* Opening hours view*/
 .opening-hours-buttons-class button {
     display: none;
 }

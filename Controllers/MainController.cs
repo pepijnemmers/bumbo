@@ -35,7 +35,13 @@ namespace BumboApp.Controllers
             NotifyService.Error(message);
             return RedirectToAction(redirect);
         }
-        
+
+        protected IActionResult NotifyErrorAndRedirect(string message, string redirect, string redirectController)
+        {
+            NotifyService.Error(message);
+            return RedirectToAction(redirect,redirectController);
+        }
+
         /// <summary>
         /// Called before an action method is executed.
         /// Ensures that the NotifyService is set before any action method in the MainController or its derived controllers is executed.

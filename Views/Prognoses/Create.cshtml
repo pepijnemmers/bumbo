@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "";
+}
+
+<h5>Nieuwe prognose</h5>
+
+
+<form asp-action="CalculatePrognosis" asp-controller="Prognoses" method="post">
+    <div class="card p-4 create-prognosis-card">
+        <div class="mb-3">
+            <label for="startDate" class="form-label fw-bold">Begin Datum</label>
+            <input type="date" class="form-control" id="startDate" name="startDate" placeholder="Begindatum" onchange="checkDate()">
+        </div>
+
+        <div class="mb-2">
+            <label for="endDate" class="form-label fw-bold">Eind Datum</label>
+            <p id="endDate" class="fst-italic">dd-mm-yyyy</p>
+        </div>
+
+        <div class="mb-3">
+            <label for="templateSelect" class="form-label fw-bold">Template</label>
+            <select class="form-select" id="templateSelect" name="templateSelect">
+                <option selected>Standaard template</option>
+                <option value="1">Vorige week</option>
+            </select>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <a asp-controller="Prognoses" asp-action="Index" class="btn btn-outline-primary" type="button">Annuleer</a>
+            <button class="btn btn-primary me-md-2" id="prognosisCreateButton" type="submit" disabled>Berekenen prognose</button>
+        </div>
+    </div>
+</form>
