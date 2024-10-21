@@ -12,7 +12,7 @@ namespace BumboApp.Controllers
         public IActionResult Index(int? page, bool overviewDesc = false, char? usePassedDates = 'n')
         {
             int currentPageNumber = page ?? DefaultPage;
-            string imageUrl = "~/img/UpArrow.png";
+            string imageUrl = "~/img/DownArrow.png";
 
             List<UniqueDay> uniqueDays;
             if (usePassedDates == 'n')
@@ -26,7 +26,7 @@ namespace BumboApp.Controllers
 
             if (overviewDesc)
             {
-                imageUrl = "~/img/DownArrow.png";
+                imageUrl = "~/img/UpArrow.png";
                 uniqueDays.Reverse();
             }
 
