@@ -7,7 +7,7 @@ namespace BumboApp.Controllers
 {
     public class OpeningHoursController : MainController
     {
-        public IActionResult Index(int? page, SortOrder? orderBy, bool oldDays = false)
+        public IActionResult Index(int? page, SortOrder? orderBy = SortOrder.Ascending, bool oldDays = false)
         {
             int currentPageNumber = page ?? DefaultPage;
             List<UniqueDay> uniqueDays;
