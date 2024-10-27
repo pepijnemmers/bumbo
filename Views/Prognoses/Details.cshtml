@@ -99,34 +99,36 @@ else
                                             <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Date" value="@prognosis.Date" />
                                             <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Department" value="@prognosis.Department" />
 
-                                                <input id="@day+@department-employees"
-                                                       class="form-control form-control-sm"
-                                                       name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededEmployees"
-                                                       type="number"
-                                                       value="@prognosis.NeededEmployees"
-                                                       min="0" max="1000" step="0.125"
-                                                       oninput="updateHours('@day+@department')">
+                                            <input id="@day+@department-employees"
+                                                   class="form-control form-control-sm"
+                                                   name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededEmployees"
+                                                   type="number"
+                                                   value="@prognosis.NeededEmployees"
+                                                   min="0" max="1000" step="0.125"
+                                                   lang="en"
+                                                   oninput="updateHours('@day+@department')">
 
-                                                <input id="@day+@department-hours"
-                                                       class="form-control form-control-sm"
-                                                       name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededHours"
-                                                       type="number"
-                                                       value="@prognosis.NeededHours"
-                                                       min="0" max="8000" step="1"
-                                                       oninput="updateEmployees('@day+@department')">
-                                            </div>
-                                        }
-                                    </td>
-                                }
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                                            <input id="@day+@department-hours"
+                                                   class="form-control form-control-sm"
+                                                   name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededHours"
+                                                   type="number"
+                                                   value="@prognosis.NeededHours"
+                                                   min="0" max="8000" step="1"
+                                                   lang="en"
+                                                   oninput="updateEmployees('@day+@department')">
+                                        </div>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
 
             <div class="d-flex justify-content-end m-3">
                 <div class="w-auto">
                     <button class="btn btn-outline-primary" asp-controller="Prognoses" asp-action="CreatePrognosis">opnieuw berekenen</button>
-                    <button type="submit" class="btn btn-primary">Oplaan</button>
+                    <button type="submit" class="btn btn-primary">Opslaan</button>
                 </div>
             </div>
         </form>
