@@ -1,0 +1,54 @@
+@using Microsoft.Data.SqlClient
+@code {
+    [Parameter]
+    public int PageNumber { get; set; }
+
+    [Parameter]
+    public int MaxPages { get; set; }
+
+    [Parameter]
+    public SortOrder OrderBy { get; set; }
+
+    [Parameter]
+    public bool OldDays { get; set; }
+
+    private string GenerateUrl(int page)
+    {
+        var url = $"?page={page}";
+        url += $"&orderBy={OrderBy}";
+        if (OldDays) url += $"&OldDays={OldDays}";
+        
+        return url;
+    }
+}
+
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-end px-3">
+        <li class="page-item @(PageNumber == 1 ? "disabled" : "")">
+            <a class="page-link" href="@GenerateUrl(1)" aria-label="begin">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item @(PageNumber == 1 ? "disabled" : "")">
+            <a class="page-link" href="@GenerateUrl(PageNumber - 1)" aria-label="Previous">
+                <span aria-hidden="true">&lsaquo;</span>
+            </a>
+        </li>
+        @for (int i = 1; i <= MaxPages; i++)
+        {
+            <li class="page-item @(PageNumber == i ? "active" : "")">
+                <a class="page-link" href="@GenerateUrl(i)">@i</a>
+            </li>
+        }
+        <li class="page-item @(PageNumber == MaxPages ? "disabled" : "")">
+            <a class="page-link" href="@GenerateUrl(PageNumber + 1)" aria-label="next">
+                <span aria-hidden="true">&rsaquo;</span>
+            </a>
+        </li>
+        <li class="page-item @(PageNumber == MaxPages ? "disabled" : "")">
+            <a class="page-link" href="@GenerateUrl(MaxPages)" aria-label="last">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
