@@ -127,7 +127,7 @@ else
 
             <div class="d-flex justify-content-end m-3">
                 <div class="w-auto">
-                    <button class="btn btn-outline-primary" asp-controller="Prognoses" asp-action="CreatePrognosis">opnieuw berekenen</button>
+                    <button class="btn btn-outline-primary" asp-controller="Prognoses" asp-action="Create">opnieuw berekenen</button>
                     <button type="submit" class="btn btn-primary">Opslaan</button>
                 </div>
             </div>
@@ -139,7 +139,7 @@ else
                 <em>aantal medewerkers | aantal uur</em>
             </div>
             <div>
-                <button id="prognosisEditButton" class="btn btn-primary w-auto">bewerken</button>
+                <button id="prognosisEditButton" class="btn btn-primary w-auto" @(Model.StartDate < Model.CurrentDate ? "disabled" : "")>bewerken </button>
             </div>
         </div>
     </div>

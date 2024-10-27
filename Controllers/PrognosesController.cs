@@ -84,6 +84,7 @@ namespace BumboApp.Controllers
             WeekPrognosisViewModel model = new WeekPrognosisViewModel
             {
                 StartDate = startDate,
+                CurrentDate = DateOnly.FromDateTime(DateTime.Now),
                 WeekNr = weekNumber,
                 Year = year,
                 Prognoses = wp?.Prognoses ?? new List<Prognosis>()
@@ -147,14 +148,16 @@ namespace BumboApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult CalculatePrognosis(DateOnly startDate, string templateSelect) {
+        public IActionResult CalculatePrognosis(DateOnly startDate, string templateSelect)
+        {
             //Check if an prognosis already excists for the startDate
             WeekPrognosis? existingPrognosis = Context.WeekPrognoses.FirstOrDefault(p => p.StartDate == startDate);
             if (existingPrognosis != null)
             {
                 NotifyService.Warning("Er is al een prognose voor deze datum. Het is alleen mogelijk deze aan te passen.");
             }
-            else {
+            else
+            {
                 //Check which template is chosen
                 if (templateSelect.Equals("Standaard template"))
                 {
@@ -269,7 +272,8 @@ namespace BumboApp.Controllers
         {
             float factor = 1;
             var uniqueDay = Context.UniqueDays.FirstOrDefault(ud => currentDate >= ud.StartDate && currentDate <= ud.EndDate);
-            if (uniqueDay != null) { 
+            if (uniqueDay != null)
+            {
                 factor = uniqueDay.Factor;
             }
 
@@ -295,7 +299,7 @@ namespace BumboApp.Controllers
                 var spiegelenNorm = norms.FirstOrDefault(n => n.Activity.ToString() == "Spiegelen");
                 float spiegelenValue = spiegelenNorm.Value;
 
-                float needeHours = ((vakkenVullenValue * expectation.ExpectedCargo) + coliUitladenValue + ((spiegelenValue * shelfMeters) / 60))/60;
+                float needeHours = ((vakkenVullenValue * expectation.ExpectedCargo) + coliUitladenValue + ((spiegelenValue * shelfMeters) / 60)) / 60;
                 return needeHours;
             }
             //Kassa
