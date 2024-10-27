@@ -15,14 +15,14 @@ namespace BumboApp.Controllers
             {
                 uniqueDays = Context.UniqueDays
                     .Where(u => u.EndDate >= DateOnly.FromDateTime(DateTime.Now))
-                    .OrderByDescending(p => p.StartDate)
+                    .OrderBy(p => p.StartDate)
                     .ToList();
             }
             else
             {
                 uniqueDays = Context.UniqueDays
                     .Where(u => u.EndDate < DateOnly.FromDateTime(DateTime.Now))
-                    .OrderByDescending(p => p.StartDate)
+                    .OrderBy(p => p.StartDate)
                     .ToList();
             }
 
