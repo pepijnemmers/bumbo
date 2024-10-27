@@ -131,14 +131,13 @@ namespace BumboApp.Controllers
                 }
                 Context.SaveChanges();
                 transaction.Commit();
-                NotifyService.Success("De prognose is bijgewerkt!");
+                return NotifySuccessAndRedirect("De prognose is bijgewerkt.", "Index");
             }
             catch
             {
                 transaction.Rollback();
-                NotifyService.Error("Er is iets mis gegaan bij het bewerken van de prognose.");
+                return NotifyErrorAndRedirect("Er is iets mis gegaan bij het bewerken van de prognose.", "Index");
             }
-            return RedirectToAction("Index");
         }
 
         public IActionResult Create()
@@ -148,53 +147,46 @@ namespace BumboApp.Controllers
 
         [HttpPost]
         public IActionResult CalculatePrognosis(DateOnly startDate, string templateSelect) {
-            //Check if an prognosis already excists for the startDate
+            //Check if a prognosis already exists for the startDate
             WeekPrognosis? existingPrognosis = Context.WeekPrognoses.FirstOrDefault(p => p.StartDate == startDate);
             if (existingPrognosis != null)
             {
-                NotifyService.Warning("Er is al een prognose voor deze datum. Het is alleen mogelijk deze aan te passen.");
+                return NotifyErrorAndRedirect("Er is al een prognose voor deze datum. Het is alleen mogelijk deze aan te passen.", "Index");
             }
-            else {
-                //Check which template is chosen
-                if (templateSelect.Equals("Standaard template"))
+            
+            //Check which template is chosen
+            if (templateSelect.Equals("Standaard template"))
+            {
+                //Check if there exist norms and expectations
+                for (int i = 0; i < 7; i++)
                 {
-                    //Check if there excists norms and expectations
-                    for (int i = 0; i < 7; i++)
+                    DateOnly currentDay = startDate.AddDays(i);
+                    if (Context.Expectations.FirstOrDefault(e => e.Date == currentDay) == null)
                     {
-                        DateOnly currentDay = startDate.AddDays(i);
-                        var expectation = Context.Expectations.FirstOrDefault(e => e.Date == currentDay);
-                        if (expectation == null)
-                        {
-                            NotifyService.Warning("Er zijn geen volledige verwachtingen voor deze week.");
-                            return RedirectToAction("Index");
-                        }
+                        return NotifyErrorAndRedirect("Er zijn geen (volledige) verwachtingen voor deze week.", "Index");
                     }
+                }
 
-                    var normExists = Context.Norms.Any();
-                    if (!normExists)
-                    {
-                        NotifyService.Warning("Er is geen normering gevonden");
-                    }
-                    else
-                    {
-                        CalculateNewPrognosis(startDate);
-                    }
-                }
-                else
+                if (!Context.Norms.Any())
                 {
-                    //Check if there is a prognosis for the previous week
-                    DateOnly previousWeekDate = startDate.AddDays(-7);
-                    WeekPrognosis? wp = Context.WeekPrognoses.Include(wp => wp.Prognoses).SingleOrDefault(wp => wp.StartDate == previousWeekDate);
-                    if (wp != null)
-                    {
-                        CopyPreviousPrognosis(startDate, wp);
-                    }
-                    else
-                    {
-                        NotifyService.Warning("Er bestaat geen prognose voor de voorgaande week.");
-                    }
+                    return NotifyErrorAndRedirect("Er is geen normering gevonden.", "Index");
                 }
+                
+                CalculateNewPrognosis(startDate);
             }
+            else
+            {
+                //Check if there is a prognosis for the previous week
+                DateOnly previousWeekDate = startDate.AddDays(-7);
+                WeekPrognosis? wp = Context.WeekPrognoses.Include(wp => wp.Prognoses).SingleOrDefault(wp => wp.StartDate == previousWeekDate);
+                if (wp == null)
+                {
+                    return NotifyErrorAndRedirect("Er bestaat geen prognose voor de voorgaande week.", "Index");
+                }
+                
+                CopyPreviousPrognosis(startDate, wp);
+            }
+            
             return RedirectToAction("Index");
         }
 

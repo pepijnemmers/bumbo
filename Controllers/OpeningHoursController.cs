@@ -79,15 +79,13 @@ namespace BumboApp.Controllers
                 }
                 Context.SaveChanges();
                 transaction.Commit();
-                NotifyService.Success("De openingstijden zijn bijgewerkt!");
+                return NotifySuccessAndRedirect("De openingstijden zijn bijgewerkt.", "Index");
             }
             catch
             {
                 transaction.Rollback();
-                NotifyService.Error("Er is iets mis gegaan bij het bewerken van de openingstijden.");
+                return NotifyErrorAndRedirect("Er is iets mis gegaan bij het bewerken van de openingstijden.", "Index");
             }
-
-            return RedirectToAction("Index");
         }
     }
 }
