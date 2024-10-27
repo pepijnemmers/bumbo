@@ -1,9 +1,6 @@
 ﻿using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using BumboApp.ViewModels;
-using BumboApp.Models;
-using System.Collections.Generic;
-using System;
 
 namespace BumboApp.Controllers
 {
@@ -12,19 +9,24 @@ namespace BumboApp.Controllers
         public IActionResult Index(int? page, bool overviewDesc = false, char? usePassedDates = 'n')
         {
             int currentPageNumber = page ?? DefaultPage;
-            string imageUrl = "~/img/UpArrow.png";
-
             List<UniqueDay> uniqueDays;
             if (usePassedDates == 'n')
             {
-                uniqueDays = Context.UniqueDays.Where(u => u.EndDate >= DateOnly.FromDateTime(DateTime.Now)).OrderBy(p => p.StartDate).ToList();
+                uniqueDays = Context.UniqueDays
+                    .Where(u => u.EndDate >= DateOnly.FromDateTime(DateTime.Now))
+                    .OrderByDescending(p => p.StartDate)
+                    .ToList();
             }
             else
             {
-                uniqueDays = Context.UniqueDays.Where(u => u.EndDate < DateOnly.FromDateTime(DateTime.Now)).OrderBy(p => p.StartDate).ToList();
+                uniqueDays = Context.UniqueDays
+                    .Where(u => u.EndDate < DateOnly.FromDateTime(DateTime.Now))
+                    .OrderByDescending(p => p.StartDate)
+                    .ToList();
             }
 
-            if (overviewDesc)
+            string imageUrl = "~/img/UpArrow.png";
+            if (!overviewDesc)
             {
                 imageUrl = "~/img/DownArrow.png";
                 uniqueDays.Reverse();
