@@ -10,5 +10,6 @@ namespace BumboApp.ViewModels
         public int Year { get; set; }
         public List<Prognosis> Prognoses { get; set; }
         public string[] DutchDays { get; set; } = { "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag" };
+        public int WeekPrognoseId { get; set; }
     }
 }

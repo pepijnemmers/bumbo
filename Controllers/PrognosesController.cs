@@ -87,7 +87,8 @@ namespace BumboApp.Controllers
                 CurrentDate = DateOnly.FromDateTime(DateTime.Now),
                 WeekNr = weekNumber,
                 Year = year,
-                Prognoses = wp?.Prognoses ?? new List<Prognosis>()
+                Prognoses = wp?.Prognoses ?? new List<Prognosis>(),
+                WeekPrognoseId = wp?.Id ?? -1
             };
 
             return View(model);
@@ -139,6 +140,28 @@ namespace BumboApp.Controllers
                 transaction.Rollback();
                 NotifyService.Error("Er is iets mis gegaan bij het bewerken van de prognose.");
             }
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult Delete(int weekPrognoseId)
+        {
+            WeekPrognosis? wp = Context.WeekPrognoses.SingleOrDefault(wp => wp.Id == weekPrognoseId);
+            if (wp == null)
+            {
+                return RedirectToAction("Index");
+            }
+            List<Prognosis> prognoses = Context.Prognoses.Where(p => p.WeekPrognosisId == weekPrognoseId).ToList();
+            try
+            {
+                Context.Prognoses.RemoveRange(prognoses);
+                Context.WeekPrognoses.Remove(wp);
+                Context.SaveChanges();
+            }
+            catch
+            {
+                return NotifyErrorAndRedirect("Er is iets misgegaan", "Index");
+            }
+            NotifyService.Success("Prognose succesvol verwijderd");
             return RedirectToAction("Index");
         }
 
