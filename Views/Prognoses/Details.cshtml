@@ -137,7 +137,7 @@ else
                 <em>aantal medewerkers | aantal uur</em>
             </div>
             <div>
-                <button id="prognosisEditButton" class="btn btn-primary w-auto" @(Model.StartDate < Model.CurrentDate ? "disabled" : "")>bewerken </button>
+                <button id="prognosisEditButton" class="btn btn-primary w-auto" @(Model.StartDate <= Model.CurrentDate ? "disabled" : "")>bewerken </button>
             </div>
         </div>
     </div>
