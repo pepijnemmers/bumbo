@@ -81,7 +81,7 @@
                             <tr>
                                 <th scope="row">@Model.LatestNormsList[i].Activity.ToFriendlyString()</th>
                                 <td>
-                                    <input type="number" name="AddNormsList[@i].Value" value="@Model.LatestNormsList[i].Value" class="form-control" min="1" required />
+                                    <input type="number" name="AddNormsList[@i].Value" value="@Model.LatestNormsList[i].Value" class="form-control" min="1" max="999" required />
                                     <input type="hidden" name="AddNormsList[@i].Activity" value="@Model.LatestNormsList[i].Activity" />
                                     <input type="hidden" name="AddNormsList[@i].NormType" value="@Model.LatestNormsList[i].NormType" />
                                 </td>
@@ -97,7 +97,7 @@
                             <tr>
                                 <th scope="row">@activity.ToFriendlyString()</th>
                                 <td>
-                                    <input type="number" name="AddNormsList[@counter].Value" class="form-control" min="1" required />
+                                    <input type="number" name="AddNormsList[@counter].Value" class="form-control" min="1" max="999" required />
                                     <input type="hidden" name="AddNormsList[@counter].Activity" value="@activity" />
                                     <input type="hidden" name="AddNormsList[@counter].NormType" value="@switch (activity)
                                         {
@@ -256,5 +256,6 @@
     function cancelEdit() {
         document.getElementById('viewTable').style.display = 'block';
         document.getElementById('editForm').style.display = 'none';
+        location.reload();
     }
 </script>
