@@ -43,7 +43,7 @@ namespace BumboApp.Controllers
 
             return View(prognosesForPage);
         }
-        public IActionResult Details(string id)
+        public IActionResult Details(string id, int? page, bool overviewDesc = false)
         {
             var dateParts = id.Split('-');
             if (dateParts.Length != 3)
@@ -84,10 +84,44 @@ namespace BumboApp.Controllers
             WeekPrognosisViewModel model = new WeekPrognosisViewModel
             {
                 StartDate = startDate,
+                CurrentDate = DateOnly.FromDateTime(DateTime.Now),
                 WeekNr = weekNumber,
                 Year = year,
-                Prognoses = wp?.Prognoses ?? new List<Prognosis>()
+                Prognoses = wp?.Prognoses ?? new List<Prognosis>(),
+                WeekPrognoseId = wp?.Id ?? -1
             };
+
+            int currentPageNumber = page ?? DefaultPage;
+            string imageUrl = "~/img/DownArrow.png";
+
+            List<UniqueDay> uniqueDays;
+            uniqueDays = Context.UniqueDays.Where(u => (u.StartDate >= model.StartDate && u.StartDate <= model.StartDate.AddDays(6)) || 
+            (u.EndDate >= model.StartDate && u.EndDate <= model.StartDate.AddDays(6)) || 
+            (u.StartDate < model.StartDate && u.EndDate > model.StartDate.AddDays(6)))
+                .OrderBy(p => p.StartDate).ToList();
+
+            if (overviewDesc)
+            {
+                imageUrl = "~/img/UpArrow.png";
+                uniqueDays.Reverse();
+            }
+
+            int maxPages = (int)Math.Ceiling((decimal)uniqueDays.Count / PageSize);
+            if (maxPages <= 0) { maxPages = 1; }
+            if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
+            if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
+            List<UniqueDay> uniqueDaysForPage =
+            uniqueDays
+            .Skip((currentPageNumber - 1) * PageSize)
+            .Take(PageSize)
+            .ToList();
+
+            ViewBag.PageNumber = currentPageNumber;
+            ViewBag.PageSize = PageSize;
+            ViewBag.MaxPages = maxPages;
+            ViewBag.ImageUrl = imageUrl;
+            ViewBag.OverviewDesc = overviewDesc;
+            ViewBag.UniqueDays = uniqueDaysForPage;
 
             return View(model);
         }
@@ -140,13 +174,36 @@ namespace BumboApp.Controllers
             }
         }
 
+        public IActionResult Delete(int weekPrognoseId)
+        {
+            WeekPrognosis? wp = Context.WeekPrognoses.SingleOrDefault(wp => wp.Id == weekPrognoseId);
+            if (wp == null)
+            {
+                return RedirectToAction("Index");
+            }
+            List<Prognosis> prognoses = Context.Prognoses.Where(p => p.WeekPrognosisId == weekPrognoseId).ToList();
+            try
+            {
+                Context.Prognoses.RemoveRange(prognoses);
+                Context.WeekPrognoses.Remove(wp);
+                Context.SaveChanges();
+            }
+            catch
+            {
+                return NotifyErrorAndRedirect("Er is iets misgegaan", "Index");
+            }
+            NotifyService.Success("Prognose succesvol verwijderd");
+            return RedirectToAction("Index");
+        }
+
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
-        public IActionResult CalculatePrognosis(DateOnly startDate, string templateSelect) {
+        public IActionResult CalculatePrognosis(DateOnly startDate, string templateSelect)
+        {
             //Check if a prognosis already exists for the startDate
             WeekPrognosis? existingPrognosis = Context.WeekPrognoses.FirstOrDefault(p => p.StartDate == startDate);
             if (existingPrognosis != null)
@@ -261,7 +318,8 @@ namespace BumboApp.Controllers
         {
             float factor = 1;
             var uniqueDay = Context.UniqueDays.FirstOrDefault(ud => currentDate >= ud.StartDate && currentDate <= ud.EndDate);
-            if (uniqueDay != null) { 
+            if (uniqueDay != null)
+            {
                 factor = uniqueDay.Factor;
             }
 
@@ -287,7 +345,7 @@ namespace BumboApp.Controllers
                 var spiegelenNorm = norms.FirstOrDefault(n => n.Activity.ToString() == "Spiegelen");
                 float spiegelenValue = spiegelenNorm.Value;
 
-                float needeHours = ((vakkenVullenValue * expectation.ExpectedCargo) + coliUitladenValue + ((spiegelenValue * shelfMeters) / 60))/60;
+                float needeHours = ((vakkenVullenValue * expectation.ExpectedCargo) + coliUitladenValue + ((spiegelenValue * shelfMeters) / 60)) / 60;
                 return needeHours;
             }
             //Kassa
