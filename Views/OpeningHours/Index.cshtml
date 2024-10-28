@@ -104,7 +104,7 @@
                                 @if (item.StartDate > DateOnly.FromDateTime(DateTime.Now))
                                 {
                                     <a asp-controller="UniqueDays" asp-action="Edit" asp-route-id="@item.Id">
-                                        <img style="width: 20px; height: auto" src="~/img/update-icon.svg" alt="Alternate Text" />
+                                        <img width="20px" src="~/img/update-icon.svg" alt="Alternate Text" />
                                     </a>
                                 }
                                 else
@@ -117,8 +117,8 @@
                 }
                 </tbody>
             </table>
-            
-            @if (ViewBag.MaxPages > 1 || true)
+                
+            @if (ViewBag.MaxPages > 1)
             {
                 <Component type="typeof(Pagination)"
                            render-mode="ServerPrerendered"
