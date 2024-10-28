@@ -84,6 +84,7 @@ namespace BumboApp.Controllers
             WeekPrognosisViewModel model = new WeekPrognosisViewModel
             {
                 StartDate = startDate,
+                CurrentDate = DateOnly.FromDateTime(DateTime.Now),
                 WeekNr = weekNumber,
                 Year = year,
                 Prognoses = wp?.Prognoses ?? new List<Prognosis>(),

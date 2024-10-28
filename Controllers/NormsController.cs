@@ -56,7 +56,7 @@ namespace BumboApp.Controllers
 
                 if (areEqual)
                 {
-                    NotifyService.Warning("De ingevoerde normeringen zijn hetzelfde als de laatste normeringen");
+                    NotifyService.Error("De ingevoerde normeringen zijn hetzelfde als de laatste normeringen");
                     return RedirectToAction("Index");
                 }
             }
