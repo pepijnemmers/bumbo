@@ -54,6 +54,9 @@ namespace BumboApp.Controllers
         public IActionResult Update(Expectation expectation)
         {
             // validation
+            if (expectation.Date < DateOnly.FromDateTime(DateTime.Now))
+                return NotifyErrorAndRedirect("Je kunt geen verwachtingen in het verleden bewerken.", "Index");
+            
             if (expectation.ExpectedCustomers < 0 || expectation.ExpectedCargo < 0)
                 return NotifyErrorAndRedirect("Het aantal verwachte klanten en verwachte coli&#39;s moet 0 of hoger zijn.", "Index");
             
