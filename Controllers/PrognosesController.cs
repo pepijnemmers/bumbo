@@ -2,23 +2,23 @@
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using Microsoft.Data.SqlClient;
 
 
 namespace BumboApp.Controllers
 {
     public class PrognosesController : MainController
     {
-        public IActionResult Index(int? page, bool overviewDesc = false)
+        public IActionResult Index(int? page, SortOrder? orderBy = SortOrder.Ascending)
         {
             int currentPageNumber = page ?? DefaultPage;
             List<WeekPrognosis> prognoses = Context.WeekPrognoses
-                .OrderByDescending(p => p.StartDate)
+                .OrderBy(p => p.StartDate)
                 .ToList();
 
             string imageUrl = "~/img/UpArrow.png";
-            if (!overviewDesc)
+            if (orderBy == SortOrder.Descending)
             {
                 imageUrl = "~/img/DownArrow.png";
                 prognoses.Reverse();
@@ -39,7 +39,7 @@ namespace BumboApp.Controllers
             ViewBag.MaxPages = maxPages;
 
             ViewBag.ImageUrl = imageUrl;
-            ViewBag.OverviewDesc = overviewDesc;
+            ViewBag.OrderBy = orderBy ?? SortOrder.Ascending;
 
             return View(prognosesForPage);
         }

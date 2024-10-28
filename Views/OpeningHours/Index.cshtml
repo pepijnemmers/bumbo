@@ -1,4 +1,6 @@
-﻿@model BumboApp.ViewModels.OpeningHoursViewModel
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.Data.SqlClient
+@model BumboApp.ViewModels.OpeningHoursViewModel
 @{
     ViewData["Title"] = "Openingstijden en speciale dagen";
 }
@@ -59,12 +61,15 @@
                     <tr>
                         <th>Naam</th>
                         <th class="col-5">
-                            <a asp-controller="OpeningHours" asp-action="Index" asp-route-OverviewDesc="@(!ViewBag.OverviewDesc)"
-                               asp-route-usePassedDates="@ViewBag.UsePassedDates" aria-label="begin " class="text-decoration-none text-dark d-flex align-items-center">
+                            <a asp-controller="OpeningHours"
+                               asp-action="Index"
+                               asp-route-OrderBy="@(ViewBag.OrderBy == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending)"
+                               asp-route-OldDays="@ViewBag.OldDays" aria-label="begin" class="text-decoration-none text-dark d-flex align-items-center">
                                 <div class="me-2">
-                                    Startdatum <br /> Einddatum
+                                    Startdatum <br/>
+                                    Einddatum
                                 </div>
-                                <img style="width: 20px; height: auto" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow" />
+                                <img width="20px" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow"/>
                             </a>
                         </th>
                         <th class=" col-3">Factor</th>
@@ -100,6 +105,10 @@
                                         <a asp-controller="UniqueDays" asp-action="Edit" asp-route-id="@item.Id">
                                             <img style="width: 20px; height: auto" src="~/img/update-icon.svg" alt="Alternate Text" />
                                         </a>
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
                                     }
                                 </td>
                             </tr>
@@ -156,15 +165,10 @@
             }
 
             <div class="d-flex justify-content-end p-3">
-                @if (ViewBag.UsePassedDates != 'n')
-                {
-                    <a asp-controller="OpeningHours" asp-action="Index" class="btn btn-primary d-inline-block">toekomstige dagen bekijken</a>
-                }
-                else
-                {
-                    <a asp-controller="OpeningHours" asp-action="Index" asp-route-usePassedDates='y' class="btn btn-outline-primary mx-2">oude dagen bekijken</a>
-                }
-                <a asp-controller="UniqueDays" asp-action="Add" class="btn btn-primary">toevoegen</a>
+                <a asp-controller="OpeningHours" asp-action="Index" asp-route-OldDays="@(!ViewBag.OldDays)" class="btn btn-outline-primary mx-2">
+                    @(ViewBag.OldDays ? "Toekomstige dagen bekijken" : "Oude dagen bekijken")
+                </a>
+                <a asp-controller="UniqueDays" asp-action="Add" class="btn btn-primary">Toevoegen</a>
             </div>
         </div>
     </div>

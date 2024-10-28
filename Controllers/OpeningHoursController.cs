@@ -1,32 +1,33 @@
 ﻿using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using BumboApp.ViewModels;
+using Microsoft.Data.SqlClient;
 
 namespace BumboApp.Controllers
 {
     public class OpeningHoursController : MainController
     {
-        public IActionResult Index(int? page, bool overviewDesc = false, char? usePassedDates = 'n')
+        public IActionResult Index(int? page, SortOrder? orderBy = SortOrder.Ascending, bool oldDays = false)
         {
             int currentPageNumber = page ?? DefaultPage;
             List<UniqueDay> uniqueDays;
-            if (usePassedDates == 'n')
+            if (!oldDays)
             {
                 uniqueDays = Context.UniqueDays
                     .Where(u => u.EndDate >= DateOnly.FromDateTime(DateTime.Now))
-                    .OrderByDescending(p => p.StartDate)
+                    .OrderBy(p => p.StartDate)
                     .ToList();
             }
             else
             {
                 uniqueDays = Context.UniqueDays
                     .Where(u => u.EndDate < DateOnly.FromDateTime(DateTime.Now))
-                    .OrderByDescending(p => p.StartDate)
+                    .OrderBy(p => p.StartDate)
                     .ToList();
             }
 
             string imageUrl = "~/img/UpArrow.png";
-            if (!overviewDesc)
+            if (orderBy == SortOrder.Descending)
             {
                 imageUrl = "~/img/DownArrow.png";
                 uniqueDays.Reverse();
@@ -46,8 +47,8 @@ namespace BumboApp.Controllers
             ViewBag.PageSize = PageSize;
             ViewBag.MaxPages = maxPages;
             ViewBag.ImageUrl = imageUrl;
-            ViewBag.OverviewDesc = overviewDesc;
-            ViewBag.UsePassedDates = usePassedDates;
+            ViewBag.OrderBy = orderBy ?? SortOrder.Ascending;
+            ViewBag.OldDays = oldDays;
 
             var OpeningHoursViewModel = new OpeningHoursViewModel
             {
