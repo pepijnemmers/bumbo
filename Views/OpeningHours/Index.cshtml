@@ -60,24 +60,6 @@
             </div>
             <table class="table">
                 <thead>
-                <tr>
-                    <th>Naam</th>
-                    <th class="col-5">
-                        <a asp-controller="OpeningHours"
-                           asp-action="Index"
-                           asp-route-OrderBy="@(ViewBag.OrderBy == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending)"
-                           asp-route-OldDays="@ViewBag.OldDays" aria-label="begin" class="text-decoration-none text-dark d-flex align-items-center">
-
-                            <div class="me-2">
-                                Startdatum <br/>
-                                Einddatum
-                            </div>
-                            <img width="20px" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow"/>
-                        </a>
-                    </th>
-                    <th class=" col-3">Factor</th>
-                    <th>Acties</th>
-                </tr>
                     <tr>
                         <th>Naam</th>
                         <th class="col-5">
@@ -85,6 +67,7 @@
                                asp-action="Index"
                                asp-route-OrderBy="@(ViewBag.OrderBy == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending)"
                                asp-route-OldDays="@ViewBag.OldDays" aria-label="begin" class="text-decoration-none text-dark d-flex align-items-center">
+
                                 <div class="me-2">
                                     Startdatum <br/>
                                     Einddatum

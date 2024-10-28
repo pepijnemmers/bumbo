@@ -17,10 +17,10 @@ namespace BumboApp.Controllers
                 .OrderBy(p => p.StartDate)
                 .ToList();
 
-            string imageUrl = "~/img/UpArrow.png";
+            string imageUrl = "~/img/DownArrow.png";
             if (orderBy == SortOrder.Descending)
             {
-                imageUrl = "~/img/DownArrow.png";
+                imageUrl = "~/img/UpArrow.png";
                 prognoses.Reverse();
             }
 
