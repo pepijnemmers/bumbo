@@ -1,6 +1,8 @@
 ﻿
 @model List<WeekPrognosis>
 @using System.Globalization
+@using BumboApp.Views.Components
+@using Microsoft.Data.SqlClient
 @{
     ViewData["Title"] = "Prognoses";
 }
@@ -20,9 +22,9 @@
         <tr>
             <th>Week</th>
             <th>
-                <a asp-controller="Prognoses" asp-action="Index" asp-route-OverviewDesc="@(!ViewBag.OverviewDesc)" class="text-dark">
+                <a asp-controller="Prognoses" asp-action="Index" asp-route-OrderBy="@(ViewBag.OrderBy == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending)" class="text-dark">
                     Begin datum
-                        <img style="width: 20px; height: auto" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow" />
+                    <img width="20px" src="~/img/chevron-@(ViewBag.OrderBy == SortOrder.Ascending ? "down" : "up").svg" alt="Arrow" />
                 </a>
             </th>
             <th>Eind datum</th>
@@ -46,13 +48,8 @@
                         <td>@item.StartDate</td> 
                         <td>@item.StartDate.AddDays(6)</td> 
                         <td>
-                            @if(!(item.StartDate <= DateOnly.FromDateTime(DateTime.Now))){
-                                <a asp-controller="prognoses" asp-action="details" asp-route-id="@(item.StartDate.ToString("dd-MM-yyyy"))">
-                                    <img width="20px" height="auto" class="mx-1" src="~/img/update-icon.svg" alt="Alternate Text" />
-                                </a>
-                            }
                             <a asp-controller="prognoses" asp-action="details" asp-route-id="@(item.StartDate.ToString("dd-MM-yyyy"))">
-                                <img width="20" height="auto" src="~/img/details-icon.svg" alt="Alternate Text" />
+                                <img width="20px" height="auto" src="~/img/details-icon.svg" alt="Alternate Text" />
                             </a>
                         </td>
                     </tr>
@@ -62,45 +59,9 @@
     </table>
     @if (ViewBag.MaxPages > 1)
     {
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-end px-3">
-                <li class="page-item @(ViewBag.PageNumber == 1 ? "disabled" : "")">
-                    <a class="page-link" asp-controller="Prognoses" asp-action="index"
-                        asp-route-OverviewDesc="@ViewBag.OverviewDesc" aria-label="begin ">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                <li class="page-item @(ViewBag.PageNumber == 1 ? "disabled" : "")">
-                    <a class="page-link" asp-controller="Prognoses" asp-action="index"
-                        asp-route-page="@(ViewBag.PageNumber - 1) "
-                        asp-route-OverviewDesc="@ViewBag.OverviewDesc"aria-label="Previous">
-                        <span aria-hidden="true">&larr;</span>
-                    </a>
-                </li>
-                @for (int i = 1; i <= ViewBag.MaxPages; i++)
-                {
-                    <li class="page-item @(ViewBag.PageNumber == i ? "active" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-page="@i"
-                            asp-route-OverviewDesc="@ViewBag.OverviewDesc"
-                        >@i</a>
-                    </li>
-                }
-                <li class="page-item @(ViewBag.PageNumber == ViewBag.MaxPages ? "disabled" : "")">
-                    <a class="page-link" asp-controller="Prognoses" asp-action="index"
-                        asp-route-page="@(ViewBag.PageNumber + 1)"
-                        asp-route-OverviewDesc="@ViewBag.OverviewDesc"aria-label="next">
-                        <span aria-hidden="true">&rarr;</span>
-                    </a>
-                </li>
-
-                <li class="page-item @(ViewBag.PageNumber == ViewBag.MaxPages ? "disabled" : "")">
-                    <a class="page-link" asp-controller="Prognoses" asp-action="index"
-                        asp-route-page="@ViewBag.MaxPages"
-                        asp-route-OverviewDesc="@ViewBag.OverviewDesc"aria-label="last">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+        <Component type="typeof(Pagination)"
+               render-mode="ServerPrerendered"
+               param-PageNumber="ViewBag.PageNumber"
+               param-MaxPages="ViewBag.MaxPages" />
     }
 </div>

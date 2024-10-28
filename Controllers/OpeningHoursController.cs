@@ -1,32 +1,33 @@
 ﻿using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using BumboApp.ViewModels;
-using BumboApp.Models;
-using System.Collections.Generic;
-using System;
+using Microsoft.Data.SqlClient;
 
 namespace BumboApp.Controllers
 {
     public class OpeningHoursController : MainController
     {
-        public IActionResult Index(int? page, bool overviewDesc = false, char? usePassedDates = 'n')
+        public IActionResult Index(int? page, SortOrder? orderBy = SortOrder.Ascending, bool oldDays = false)
         {
             int currentPageNumber = page ?? DefaultPage;
-            string imageUrl = "~/img/UpArrow.png";
-
             List<UniqueDay> uniqueDays;
-            if (usePassedDates == 'n')
+            if (!oldDays)
             {
-                uniqueDays = Context.UniqueDays.Where(u => u.EndDate >= DateOnly.FromDateTime(DateTime.Now)).OrderBy(p => p.StartDate).ToList();
+                uniqueDays = Context.UniqueDays
+                    .Where(u => u.EndDate >= DateOnly.FromDateTime(DateTime.Now))
+                    .OrderBy(p => p.StartDate)
+                    .ToList();
             }
             else
             {
-                uniqueDays = Context.UniqueDays.Where(u => u.EndDate < DateOnly.FromDateTime(DateTime.Now)).OrderBy(p => p.StartDate).ToList();
+                uniqueDays = Context.UniqueDays
+                    .Where(u => u.EndDate < DateOnly.FromDateTime(DateTime.Now))
+                    .OrderBy(p => p.StartDate)
+                    .ToList();
             }
 
-            if (overviewDesc)
+            if (orderBy == SortOrder.Descending)
             {
-                imageUrl = "~/img/DownArrow.png";
                 uniqueDays.Reverse();
             }
 
@@ -43,9 +44,8 @@ namespace BumboApp.Controllers
             ViewBag.PageNumber = currentPageNumber;
             ViewBag.PageSize = PageSize;
             ViewBag.MaxPages = maxPages;
-            ViewBag.ImageUrl = imageUrl;
-            ViewBag.OverviewDesc = overviewDesc;
-            ViewBag.UsePassedDates = usePassedDates;
+            ViewBag.OrderBy = orderBy ?? SortOrder.Ascending;
+            ViewBag.OldDays = oldDays;
 
             var OpeningHoursViewModel = new OpeningHoursViewModel
             {
@@ -79,15 +79,13 @@ namespace BumboApp.Controllers
                 }
                 Context.SaveChanges();
                 transaction.Commit();
-                NotifyService.Success("De openingstijden zijn bijgewerkt!");
+                return NotifySuccessAndRedirect("De openingstijden zijn bijgewerkt.", "Index");
             }
             catch
             {
                 transaction.Rollback();
-                NotifyService.Error("Er is iets mis gegaan bij het bewerken van de openingstijden.");
+                return NotifyErrorAndRedirect("Er is iets mis gegaan bij het bewerken van de openingstijden.", "Index");
             }
-
-            return RedirectToAction("Index");
         }
     }
 }

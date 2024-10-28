@@ -1,4 +1,5 @@
-﻿@model BumboApp.ViewModels.NormsViewModel
+﻿@using BumboApp.Views.Components
+@model BumboApp.ViewModels.NormsViewModel
 @{
     ViewData["Title"] = "Normeringen";
 }
@@ -81,7 +82,7 @@
                             <tr>
                                 <th scope="row">@Model.LatestNormsList[i].Activity.ToFriendlyString()</th>
                                 <td>
-                                    <input type="number" name="AddNormsList[@i].Value" value="@Model.LatestNormsList[i].Value" class="form-control" min="1" required />
+                                    <input type="number" name="AddNormsList[@i].Value" value="@Model.LatestNormsList[i].Value" class="form-control" min="1" max="999" required />
                                     <input type="hidden" name="AddNormsList[@i].Activity" value="@Model.LatestNormsList[i].Activity" />
                                     <input type="hidden" name="AddNormsList[@i].NormType" value="@Model.LatestNormsList[i].NormType" />
                                 </td>
@@ -97,7 +98,7 @@
                             <tr>
                                 <th scope="row">@activity.ToFriendlyString()</th>
                                 <td>
-                                    <input type="number" name="AddNormsList[@counter].Value" class="form-control" min="1" required />
+                                    <input type="number" name="AddNormsList[@counter].Value" class="form-control" min="1" max="999" required />
                                     <input type="hidden" name="AddNormsList[@counter].Activity" value="@activity" />
                                     <input type="hidden" name="AddNormsList[@counter].NormType" value="@switch (activity)
                                         {
@@ -222,26 +223,10 @@
     
     @if (ViewBag.MaxPages > 1)
     {
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-end px-3">
-                <li class="page-item @(ViewBag.PageNumber == 1 ? "disabled" : "")">
-                    <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.PageNumber - 1)" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                @for (int i = 1; i <= ViewBag.MaxPages; i++)
-                {
-                <li class="page-item @(ViewBag.PageNumber == i ? "active" : "")">
-                    <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
-                </li>
-                }
-                <li class="page-item @(ViewBag.PageNumber == ViewBag.MaxPages ? "disabled" : "")">
-                    <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.PageNumber + 1)" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+        <Component type="typeof(Pagination)"
+                   render-mode="ServerPrerendered"
+                   param-PageNumber="ViewBag.PageNumber"
+                   param-MaxPages="ViewBag.MaxPages" />
     }
 </div>
 
@@ -256,5 +241,6 @@
     function cancelEdit() {
         document.getElementById('viewTable').style.display = 'block';
         document.getElementById('editForm').style.display = 'none';
+        location.reload();
     }
 </script>

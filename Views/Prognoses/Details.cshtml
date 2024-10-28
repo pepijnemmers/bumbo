@@ -1,4 +1,6 @@
-﻿@model BumboApp.ViewModels.WeekPrognosisViewModel
+﻿@using BumboApp.Views.Components
+@using Microsoft.Data.SqlClient
+@model BumboApp.ViewModels.WeekPrognosisViewModel
 
 @{
     ViewData["Title"] = "Prognose details";
@@ -99,34 +101,34 @@ else
                                             <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Date" value="@prognosis.Date" />
                                             <input type="hidden" name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].Department" value="@prognosis.Department" />
 
-                                                <input id="@day+@department-employees"
-                                                       class="form-control form-control-sm"
-                                                       name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededEmployees"
-                                                       type="number"
-                                                       value="@prognosis.NeededEmployees"
-                                                       min="0" max="1000" step="0.125"
-                                                       oninput="updateHours('@day+@department')">
+                                            <input id="@day+@department-employees"
+                                                   class="form-control form-control-sm"
+                                                   name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededEmployees"
+                                                   type="number"
+                                                   value="@prognosis.NeededEmployees"
+                                                   min="0" max="1000" step="0.125"
+                                                   oninput="updateHours('@day+@department')">
 
-                                                <input id="@day+@department-hours"
-                                                       class="form-control form-control-sm"
-                                                       name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededHours"
-                                                       type="number"
-                                                       value="@prognosis.NeededHours"
-                                                       min="0" max="8000" step="1"
-                                                       oninput="updateEmployees('@day+@department')">
-                                            </div>
-                                        }
-                                    </td>
-                                }
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                                            <input id="@day+@department-hours"
+                                                   class="form-control form-control-sm"
+                                                   name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededHours"
+                                                   type="number"
+                                                   value="@prognosis.NeededHours"
+                                                   min="0" max="8000" step="1"
+                                                   oninput="updateEmployees('@day+@department')">
+                                        </div>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
 
             <div class="d-flex justify-content-end m-3">
                 <div class="w-auto">
-                    <button class="btn btn-outline-primary" asp-controller="Prognoses" asp-action="CreatePrognosis">opnieuw berekenen</button>
-                    <button type="submit" class="btn btn-primary">Oplaan</button>
+                    <button class="btn btn-outline-danger" asp-controller="Prognoses" asp-action="Delete" asp-route-weekPrognoseId="@Model.WeekPrognoseId">Verwijderen</button>
+                    <button type="submit" class="btn btn-primary">Opslaan</button>
                 </div>
             </div>
         </form>
@@ -137,8 +139,86 @@ else
                 <em>aantal medewerkers | aantal uur</em>
             </div>
             <div>
-                <button id="prognosisEditButton" class="btn btn-primary w-auto">bewerken</button>
+                <button id="prognosisEditButton" class="btn btn-primary w-auto" @(Model.StartDate <= Model.CurrentDate ? "disabled" : "")>bewerken </button>
             </div>
+        </div>
+    </div>
+<div class="col-12 col-xl-5">
+        <div class=" table-container">
+            <div class="pt-3 ps-3">
+                <h3>Speciale dagen</h3>
+                <p>Prognose wordt vermenigvuldigd met de factor</p>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Naam</th>
+                        <th class="col-5">
+                            <a asp-controller="Prognoses" 
+                               asp-action="Details"
+                               asp-route-OrderBy="@(ViewBag.OrderBy == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending)"
+                               asp-route-Id="@Model.StartDate.ToString("dd-MM-yyyy")"
+                               class="text-decoration-none text-dark d-flex align-items-center">
+                                <div class="me-2">
+                                    Startdatum <br/>
+                                    Einddatum
+                                </div>
+                                <img width="20px" src="~/img/chevron-@(ViewBag.OrderBy == SortOrder.Ascending ? "down" : "up").svg" alt="Arrow" />
+                            </a>
+                        </th>
+                        <th class=" col-3">Factor</th>
+                        <th>Acties</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if(ViewBag.UniqueDays.Count == 0)
+                    {
+                        <!-- Display this alert if there are unique days -->
+                        <tr>
+                            <td colspan="100%" class="text-center">Er zijn geen Speciale dagen</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in ViewBag.UniqueDays)
+                        {
+                            <tr>
+                                <td>
+                                    @item.Name
+                                </td>
+                                <td class=" col-5">
+                                    @item.StartDate <br>
+                                    @item.EndDate
+                                </td>
+                                <td class=" col-3">
+                                    @item.Factor
+                                </td>
+                                <td>
+                                    @if (item.StartDate > DateOnly.FromDateTime(DateTime.Now))
+                                    {
+                                        <a asp-controller="UniqueDays" asp-action="Edit" asp-route-id="@item.Id">
+                                            <img width="20px" src="~/img/update-icon.svg" alt="Alternate Text" />
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+            @if (ViewBag.MaxPages > 1)
+            {
+                <Component type="typeof(Pagination)"
+                       render-mode="ServerPrerendered"
+                       param-PageNumber="ViewBag.PageNumber"
+                       param-MaxPages="ViewBag.MaxPages" />
+            }
+            
         </div>
     </div>
 }

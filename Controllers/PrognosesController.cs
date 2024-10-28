@@ -2,25 +2,23 @@
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using Microsoft.Data.SqlClient;
 
 
 namespace BumboApp.Controllers
 {
     public class PrognosesController : MainController
     {
-        public IActionResult Index(int? page, bool overviewDesc = false)
+        public IActionResult Index(int? page, SortOrder? orderBy = SortOrder.Ascending)
         {
             int currentPageNumber = page ?? DefaultPage;
             List<WeekPrognosis> prognoses = Context.WeekPrognoses
-                .OrderByDescending(p => p.StartDate)
+                .OrderBy(p => p.StartDate)
                 .ToList();
 
-            string imageUrl = "~/img/UpArrow.png";
-            if (!overviewDesc)
+            if (orderBy == SortOrder.Descending)
             {
-                imageUrl = "~/img/DownArrow.png";
                 prognoses.Reverse();
             }
 
@@ -38,13 +36,13 @@ namespace BumboApp.Controllers
             ViewBag.PageSize = PageSize;
             ViewBag.MaxPages = maxPages;
 
-            ViewBag.ImageUrl = imageUrl;
-            ViewBag.OverviewDesc = overviewDesc;
+            ViewBag.OrderBy = orderBy ?? SortOrder.Ascending;
 
             return View(prognosesForPage);
         }
-        public IActionResult Details(string id)
+        public IActionResult Details(string id, int? page, SortOrder? orderBy = SortOrder.Ascending)
         {
+            // prognosis details
             var dateParts = id.Split('-');
             if (dateParts.Length != 3)
             {
@@ -84,14 +82,48 @@ namespace BumboApp.Controllers
             WeekPrognosisViewModel model = new WeekPrognosisViewModel
             {
                 StartDate = startDate,
+                CurrentDate = DateOnly.FromDateTime(DateTime.Now),
                 WeekNr = weekNumber,
                 Year = year,
-                Prognoses = wp?.Prognoses ?? new List<Prognosis>()
+                Prognoses = wp?.Prognoses ?? new List<Prognosis>(),
+                WeekPrognoseId = wp?.Id ?? -1
             };
+
+            // unique days
+            int currentPageNumber = page ?? DefaultPage;
+            List<UniqueDay> uniqueDays;
+            
+            uniqueDays = Context.UniqueDays
+                .Where(u => (
+                                u.StartDate >= model.StartDate && u.StartDate <= model.StartDate.AddDays(6)) || 
+                                (u.EndDate >= model.StartDate && u.EndDate <= model.StartDate.AddDays(6)) || 
+                                (u.StartDate < model.StartDate && u.EndDate > model.StartDate.AddDays(6)))
+                .OrderBy(p => p.StartDate)
+                .ToList();
+
+            if (orderBy == SortOrder.Descending)
+            {
+                uniqueDays.Reverse();
+            }
+
+            int maxPages = (int)Math.Ceiling((decimal)uniqueDays.Count / PageSize);
+            if (maxPages <= 0) { maxPages = 1; }
+            if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
+            if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
+            List<UniqueDay> uniqueDaysForPage =
+            uniqueDays
+            .Skip((currentPageNumber - 1) * PageSize)
+            .Take(PageSize)
+            .ToList();
+
+            ViewBag.PageNumber = currentPageNumber;
+            ViewBag.PageSize = PageSize;
+            ViewBag.MaxPages = maxPages;
+            ViewBag.OrderBy = orderBy ?? SortOrder.Ascending;
+            ViewBag.UniqueDays = uniqueDaysForPage;
 
             return View(model);
         }
-
 
         [HttpPost]
         public IActionResult Update(List<Prognosis> prognoses)
@@ -131,14 +163,34 @@ namespace BumboApp.Controllers
                 }
                 Context.SaveChanges();
                 transaction.Commit();
-                NotifyService.Success("De prognose is bijgewerkt!");
+                return NotifySuccessAndRedirect("De prognose is bijgewerkt.", "Index");
             }
             catch
             {
                 transaction.Rollback();
-                NotifyService.Error("Er is iets mis gegaan bij het bewerken van de prognose.");
+                return NotifyErrorAndRedirect("Er is iets mis gegaan bij het bewerken van de prognose.", "Index");
             }
-            return RedirectToAction("Index");
+        }
+
+        public IActionResult Delete(int weekPrognoseId)
+        {
+            WeekPrognosis? wp = Context.WeekPrognoses.SingleOrDefault(wp => wp.Id == weekPrognoseId);
+            if (wp == null)
+            {
+                return NotifyErrorAndRedirect("Prognose niet gevonden", "Index");
+            }
+            List<Prognosis> prognoses = Context.Prognoses.Where(p => p.WeekPrognosisId == weekPrognoseId).ToList();
+            try
+            {
+                Context.Prognoses.RemoveRange(prognoses);
+                Context.WeekPrognoses.Remove(wp);
+                Context.SaveChanges();
+            }
+            catch
+            {
+                return NotifyErrorAndRedirect("Er is iets misgegaan", "Index");
+            }
+            return NotifySuccessAndRedirect("Prognose succesvol verwijderd", "Index");
         }
 
         public IActionResult Create()
@@ -147,54 +199,48 @@ namespace BumboApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult CalculatePrognosis(DateOnly startDate, string templateSelect) {
-            //Check if an prognosis already excists for the startDate
+        public IActionResult CalculatePrognosis(DateOnly startDate, string templateSelect)
+        {
+            //Check if a prognosis already exists for the startDate
             WeekPrognosis? existingPrognosis = Context.WeekPrognoses.FirstOrDefault(p => p.StartDate == startDate);
             if (existingPrognosis != null)
             {
-                NotifyService.Warning("Er is al een prognose voor deze datum. Het is alleen mogelijk deze aan te passen.");
+                return NotifyErrorAndRedirect("Er is al een prognose voor deze datum. Het is alleen mogelijk deze aan te passen.", "Index");
             }
-            else {
-                //Check which template is chosen
-                if (templateSelect.Equals("Standaard template"))
+            
+            //Check which template is chosen
+            if (templateSelect.Equals("Standaard template"))
+            {
+                //Check if there exist norms and expectations
+                for (int i = 0; i < 7; i++)
                 {
-                    //Check if there excists norms and expectations
-                    for (int i = 0; i < 7; i++)
+                    DateOnly currentDay = startDate.AddDays(i);
+                    if (Context.Expectations.FirstOrDefault(e => e.Date == currentDay) == null)
                     {
-                        DateOnly currentDay = startDate.AddDays(i);
-                        var expectation = Context.Expectations.FirstOrDefault(e => e.Date == currentDay);
-                        if (expectation == null)
-                        {
-                            NotifyService.Warning("Er zijn geen volledige verwachtingen voor deze week.");
-                            return RedirectToAction("Index");
-                        }
+                        return NotifyErrorAndRedirect("Er zijn geen (volledige) verwachtingen voor deze week.", "Index");
                     }
+                }
 
-                    var normExists = Context.Norms.Any();
-                    if (!normExists)
-                    {
-                        NotifyService.Warning("Er is geen normering gevonden");
-                    }
-                    else
-                    {
-                        CalculateNewPrognosis(startDate);
-                    }
-                }
-                else
+                if (!Context.Norms.Any())
                 {
-                    //Check if there is a prognosis for the previous week
-                    DateOnly previousWeekDate = startDate.AddDays(-7);
-                    WeekPrognosis? wp = Context.WeekPrognoses.Include(wp => wp.Prognoses).SingleOrDefault(wp => wp.StartDate == previousWeekDate);
-                    if (wp != null)
-                    {
-                        CopyPreviousPrognosis(startDate, wp);
-                    }
-                    else
-                    {
-                        NotifyService.Warning("Er bestaat geen prognose voor de voorgaande week.");
-                    }
+                    return NotifyErrorAndRedirect("Er is geen normering gevonden.", "Index");
                 }
+                
+                CalculateNewPrognosis(startDate);
             }
+            else
+            {
+                //Check if there is a prognosis for the previous week
+                DateOnly previousWeekDate = startDate.AddDays(-7);
+                WeekPrognosis? wp = Context.WeekPrognoses.Include(wp => wp.Prognoses).SingleOrDefault(wp => wp.StartDate == previousWeekDate);
+                if (wp == null)
+                {
+                    return NotifyErrorAndRedirect("Er bestaat geen prognose voor de voorgaande week.", "Index");
+                }
+                
+                CopyPreviousPrognosis(startDate, wp);
+            }
+            
             return RedirectToAction("Index");
         }
 
@@ -269,7 +315,8 @@ namespace BumboApp.Controllers
         {
             float factor = 1;
             var uniqueDay = Context.UniqueDays.FirstOrDefault(ud => currentDate >= ud.StartDate && currentDate <= ud.EndDate);
-            if (uniqueDay != null) { 
+            if (uniqueDay != null)
+            {
                 factor = uniqueDay.Factor;
             }
 
@@ -295,7 +342,7 @@ namespace BumboApp.Controllers
                 var spiegelenNorm = norms.FirstOrDefault(n => n.Activity.ToString() == "Spiegelen");
                 float spiegelenValue = spiegelenNorm.Value;
 
-                float needeHours = ((vakkenVullenValue * expectation.ExpectedCargo) + coliUitladenValue + ((spiegelenValue * shelfMeters) / 60))/60;
+                float needeHours = ((vakkenVullenValue * expectation.ExpectedCargo) + coliUitladenValue + ((spiegelenValue * shelfMeters) / 60)) / 60;
                 return needeHours;
             }
             //Kassa

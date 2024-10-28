@@ -45,7 +45,8 @@ namespace BumboApp.Controllers
                 .Take(_amountOfNormsInSet)
                 .ToList();
 
-            if (latestNormsList != null) { 
+            if (latestNormsList != null) 
+            { 
                 bool areEqual = addNormsList.All(addNorm =>
                     latestNormsList.Any(latestNorm =>
                         latestNorm.Activity == addNorm.Activity &&
@@ -56,38 +57,35 @@ namespace BumboApp.Controllers
 
                 if (areEqual)
                 {
-                    NotifyService.Warning("De ingevoerde normeringen zijn hetzelfde als de laatste normeringen");
-                    return RedirectToAction("Index");
+                    return NotifyErrorAndRedirect("De ingevoerde normeringen zijn hetzelfde als de laatste normeringen.", "Index");
                 }
             }
-
-                using var transaction = Context.Database.BeginTransaction();
-
-                try
-                {
-                    var currentTime = DateTime.Now;
-                    foreach (var item in addNormsList)
-                    {
-                        var newNormEntry = new Norm
-                        {
-                            Activity = item.Activity,
-                            Value = item.Value,
-                            NormType = item.NormType,
-                            CreatedAt = currentTime,
-                        };
-                        Context.Norms.Add(newNormEntry);
-                    }
-                    Context.SaveChanges();
-                    transaction.Commit();
-                    NotifyService.Success("De normeringen zijn opgeslagen!");
-                }
-                catch
-                {
-                    transaction.Rollback();
-                    NotifyService.Error("Er is iets mis gegaan");
-                }
             
-            return RedirectToAction("Index");
+            using var transaction = Context.Database.BeginTransaction();
+
+            try
+            {
+                var currentTime = DateTime.Now;
+                foreach (var item in addNormsList)
+                {
+                    var newNormEntry = new Norm
+                    {
+                        Activity = item.Activity,
+                        Value = item.Value,
+                        NormType = item.NormType,
+                        CreatedAt = currentTime,
+                    };
+                    Context.Norms.Add(newNormEntry);
+                }
+                Context.SaveChanges();
+                transaction.Commit();
+                return NotifySuccessAndRedirect("De normeringen zijn opgeslagen.", "Index");
+            }
+            catch
+            {
+                transaction.Rollback();
+                return NotifyErrorAndRedirect("Er is iets mis gegaan bij het toevoegen van de normeringen.", "Index");
+            }
         }
     }
 }

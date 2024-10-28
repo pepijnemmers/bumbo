@@ -6,7 +6,10 @@
     <div class="card p-4 create-prognosis-card">
         <div class="mb-3">
             <label for="startDate" class="form-label fw-bold">Begin Datum</label>
-            <input type="date" class="form-control" id="startDate" name="startDate" placeholder="Begindatum" onchange="checkDate()">
+            <input type="date" class="form-control" id="startDate" name="startDate" placeholder="Begindatum" onchange="checkDate()" min="@DateTime.Now.ToString("yyyy-MM-dd")">
+            <div id="mondayWarning" class="small text-danger d-none fst-italic fs-6">
+                De geselecteerde datum moet een maandag zijn.
+            </div>
         </div>
 
         <div class="mb-2">

@@ -42,11 +42,18 @@ function updateEmployees(id) {
 function checkDate() {
     let startDateField = document.getElementById("startDate");
     let endDateField = document.getElementById("endDate");
+    let warningMessage = document.getElementById("mondayWarning");
     let currentDate = new Date().setHours(0, 0, 0, 0);
 
     let date = new Date(startDateField.value);
     let dayNumber = date.getDay();
     document.getElementById("prognosisCreateButton").disabled = (dayNumber != 1 || date < currentDate);
+
+    if (dayNumber != 1) {
+        warningMessage.classList.remove("d-none");
+    } else {
+        warningMessage.classList.add("d-none");
+    }
 
     if (!(dayNumber != 1 || date < currentDate)) {
         date.setDate(date.getDate() + 6);
