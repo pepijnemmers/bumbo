@@ -93,7 +93,9 @@ namespace BumboApp.Controllers
             string imageUrl = "~/img/DownArrow.png";
 
             List<UniqueDay> uniqueDays;
-            uniqueDays = Context.UniqueDays.Where(u => (u.StartDate >= model.StartDate && u.StartDate <= model.StartDate.AddDays(6)) || (u.EndDate >= model.StartDate && u.EndDate <= model.StartDate.AddDays(6)))
+            uniqueDays = Context.UniqueDays.Where(u => (u.StartDate >= model.StartDate && u.StartDate <= model.StartDate.AddDays(6)) || 
+            (u.EndDate >= model.StartDate && u.EndDate <= model.StartDate.AddDays(6)) || 
+            (u.StartDate < model.StartDate && u.EndDate > model.StartDate.AddDays(6)))
                 .OrderBy(p => p.StartDate).ToList();
 
             if (overviewDesc)
