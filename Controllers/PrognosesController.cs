@@ -43,7 +43,7 @@ namespace BumboApp.Controllers
 
             return View(prognosesForPage);
         }
-        public IActionResult Details(string id)
+        public IActionResult Details(string id, int? page, bool overviewDesc = false)
         {
             var dateParts = id.Split('-');
             if (dateParts.Length != 3)
@@ -90,6 +90,38 @@ namespace BumboApp.Controllers
                 Prognoses = wp?.Prognoses ?? new List<Prognosis>(),
                 WeekPrognoseId = wp?.Id ?? -1
             };
+
+            int currentPageNumber = page ?? DefaultPage;
+            string imageUrl = "~/img/DownArrow.png";
+
+            List<UniqueDay> uniqueDays;
+            uniqueDays = Context.UniqueDays.Where(u => (u.StartDate >= model.StartDate && u.StartDate <= model.StartDate.AddDays(6)) || 
+            (u.EndDate >= model.StartDate && u.EndDate <= model.StartDate.AddDays(6)) || 
+            (u.StartDate < model.StartDate && u.EndDate > model.StartDate.AddDays(6)))
+                .OrderBy(p => p.StartDate).ToList();
+
+            if (overviewDesc)
+            {
+                imageUrl = "~/img/UpArrow.png";
+                uniqueDays.Reverse();
+            }
+
+            int maxPages = (int)Math.Ceiling((decimal)uniqueDays.Count / PageSize);
+            if (maxPages <= 0) { maxPages = 1; }
+            if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
+            if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
+            List<UniqueDay> uniqueDaysForPage =
+            uniqueDays
+            .Skip((currentPageNumber - 1) * PageSize)
+            .Take(PageSize)
+            .ToList();
+
+            ViewBag.PageNumber = currentPageNumber;
+            ViewBag.PageSize = PageSize;
+            ViewBag.MaxPages = maxPages;
+            ViewBag.ImageUrl = imageUrl;
+            ViewBag.OverviewDesc = overviewDesc;
+            ViewBag.UniqueDays = uniqueDaysForPage;
 
             return View(model);
         }

@@ -6,7 +6,8 @@ namespace BumboApp.Controllers
 {
     public class UniqueDaysController : MainController
     {
-        public IActionResult Edit(int id )
+        private int maxFactor = 100;
+        public IActionResult Edit(int id)
         {
             UniqueDay? uniqueDay = Context.UniqueDays.Find(id);
             return uniqueDay == null ? NotifyErrorAndRedirect("De Speciale dag die je probeert te bewerken bestaat niet.", "Index", "OpeningHours") : View(uniqueDay);
@@ -29,6 +30,11 @@ namespace BumboApp.Controllers
 
             if (uniqueDay.StartDate <= DateOnly.FromDateTime(DateTime.Now))
                 return NotifyErrorAndRedirect("De data moet in de toekomst liggen.", "Index", "OpeningHours");
+
+            if (uniqueDay.Factor > maxFactor)
+            {
+                return NotifyErrorAndRedirect("De factor mag niet meer zijn dan " + maxFactor + ".", "Index", "OpeningHours");
+            }
 
             if (!(ModelState.IsValid))
                 return NotifyErrorAndRedirect("Er is iets mis gegaan. Mogelijk zijn niet alle velden ingevuld", "Index", "OpeningHours");
@@ -107,6 +113,9 @@ namespace BumboApp.Controllers
 
             if (uniqueDay.Factor <= 0)
                 return NotifyErrorAndRedirect("de Factor moet boven 0 liggen.", "Add");
+
+            if (uniqueDay.Factor > maxFactor)
+                return NotifyErrorAndRedirect("de Factor mag niet groter zijn dan " + maxFactor + ".", "Add");
 
             if (!ModelState.IsValid)
                 return NotifyErrorAndRedirect("Er is iets mis gegaan. Mogelijk zijn niet alle velden ingevuld", "Add");
