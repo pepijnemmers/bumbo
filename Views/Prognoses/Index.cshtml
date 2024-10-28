@@ -1,0 +1,67 @@
+﻿
+@model List<WeekPrognosis>
+@using System.Globalization
+@using BumboApp.Views.Components
+@using Microsoft.Data.SqlClient
+@{
+    ViewData["Title"] = "Prognoses";
+}
+
+<div class="row align-items-center mb-3">
+    <div class="col">
+        <h2>Overzicht</h2>
+    </div>
+    <div class="col-auto">
+        <a asp-controller="Prognoses" asp-action="Create" class="btn btn-primary d-inline-block">Nieuwe Prognose</a>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Week</th>
+            <th>
+                <a asp-controller="Prognoses" asp-action="Index" asp-route-OrderBy="@(ViewBag.OrderBy == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending)" class="text-dark">
+                    Begin datum
+                    <img width="20px" src="~/img/chevron-@(ViewBag.OrderBy == SortOrder.Ascending ? "down" : "up").svg" alt="Arrow" />
+                </a>
+            </th>
+            <th>Eind datum</th>
+            <th>Acties</th>
+        </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="100" class="text-center">Er zijn geen Prognoses</td>
+                </tr>
+            }
+            else{
+                @foreach (var item in Model)
+                {
+                    DateTime startDateTime = item.StartDate.ToDateTime(TimeOnly.MinValue);
+                    int weekNumber = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(startDateTime,new CalendarWeekRule(),item.StartDate.DayOfWeek);
+                    <tr>
+                        <td>@weekNumber</td>
+                        <td>@item.StartDate</td> 
+                        <td>@item.StartDate.AddDays(6)</td> 
+                        <td>
+                            <a asp-controller="prognoses" asp-action="details" asp-route-id="@(item.StartDate.ToString("dd-MM-yyyy"))">
+                                <img width="20px" height="auto" src="~/img/details-icon.svg" alt="Alternate Text" />
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    @if (ViewBag.MaxPages > 1)
+    {
+        <Component type="typeof(Pagination)"
+               render-mode="ServerPrerendered"
+               param-PageNumber="ViewBag.PageNumber"
+               param-MaxPages="ViewBag.MaxPages" />
+    }
+</div>

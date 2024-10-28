@@ -1,0 +1,127 @@
+﻿@using BumboApp.Views.Components
+@model List<Expectation>
+@{
+    ViewData["Title"] = "Verwachtingen";
+}
+
+<div class="table-container p-3">
+    <form method="post" asp-action="Create">
+        <div class="row">
+            <div class="col-12 col-lg">
+                <label for="date">Datum</label>
+                <input type="date" id="date" name="Date" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+            </div>
+            <div class="col-12 col-lg">
+                <label for="customersExpected">Aantal klanten verwacht</label>
+                <input type="number" id="customersExpected" name="ExpectedCustomers" class="form-control" min="0" required />
+            </div>
+            <div class="col-12 col-lg">
+                <label for="cargoExpected">Aantal coli&#39;s verwacht</label>
+                <input type="number" id="cargoExpected" name="ExpectedCargo" class="form-control" min="0" required />
+            </div>
+        </div>
+        <div class="text-end mt-3">
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#bulk-input-modal">
+                <i class="fa-solid fa-upload"></i>
+                Bulk invoer
+            </button>
+            <button type="submit" class="btn btn-primary">Toevoegen</button>
+        </div>
+    </form>
+</div>
+
+<div class="modal fade" id="bulk-input-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" method="post" asp-action="BulkRead" enctype="multipart/form-data">
+            <div class="modal-header">
+                <h5 class="modal-title">Verwachtingen in Bulk toevoegen via CSV</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="csvFile">Upload een CSV-bestand</label>
+                    <input type="file" id="csvFile" name="csvFile" class="form-control" accept=".csv" required />
+                    <p class="form-text">
+                        <i class="fa-solid fa-info-circle"></i>
+                        Het bestand moet de volgende kolommen bevatten:
+                        <code>Date</code> <em>(yyyy-mm-dd)</em>, <code>ExpectedCustomers</code> en <code>ExpectedCargo</code>
+                    </p>
+                </div>
+                <div class="form-group">
+                    <label>Scheidingsteken</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="delimiter" id="delimiterSemicolon" value=";" checked>
+                        <label class="form-check-label fw-normal" for="delimiterSemicolon">
+                            Puntkomma
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="delimiter" id="delimiterComma" value=",">
+                        <label class="form-check-label fw-normal" for="delimiterComma">
+                            Komma
+                        </label>
+                    </div>
+                    <p class="form-text">
+                        <i class="fa-solid fa-info-circle"></i>
+                        Kies het scheidingsteken dat in het CSV-bestand wordt gebruikt. Standaard is dit een puntkomma
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuleren</button>
+                <button type="submit" class="btn btn-primary">Invoeren</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Datum</th>
+            <th>Aantal klanten verwacht</th>
+            <th>Aantal coli’s verwacht</th>
+            <th>Acties</th>
+        </tr>
+        </thead>
+        <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="100%" class="text-center py-4">Er zijn nog geen verwachtingen...</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var expectation in Model)
+            {
+                <tr>
+                    <td>@expectation.Date.ToShortDateString()</td>
+                    <td>@expectation.ExpectedCustomers</td>
+                    <td>@expectation.ExpectedCargo</td>
+                    <td>
+                        @if (expectation.Date > DateOnly.FromDateTime(DateTime.Now))
+                        {
+                            <a asp-action="Edit" asp-route-id="@expectation.Id">
+                                <img width="20px" src="~/img/update-icon.svg" alt="edit"/>
+                            </a>
+                        }
+                        else {
+                            <span>-</span>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+
+    @if (ViewBag.MaxPages > 1)
+    {
+        <Component type="typeof(Pagination)"
+               render-mode="ServerPrerendered"
+               param-PageNumber="ViewBag.PageNumber"
+               param-MaxPages="ViewBag.MaxPages" />
+    }
+</div>
