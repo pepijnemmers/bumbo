@@ -26,10 +26,8 @@ namespace BumboApp.Controllers
                     .ToList();
             }
 
-            string imageUrl = "~/img/DownArrow.png";
             if (orderBy == SortOrder.Descending)
             {
-                imageUrl = "~/img/UpArrow.png";
                 uniqueDays.Reverse();
             }
 
@@ -46,7 +44,6 @@ namespace BumboApp.Controllers
             ViewBag.PageNumber = currentPageNumber;
             ViewBag.PageSize = PageSize;
             ViewBag.MaxPages = maxPages;
-            ViewBag.ImageUrl = imageUrl;
             ViewBag.OrderBy = orderBy ?? SortOrder.Ascending;
             ViewBag.OldDays = oldDays;
 

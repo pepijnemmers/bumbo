@@ -17,10 +17,8 @@ namespace BumboApp.Controllers
                 .OrderBy(p => p.StartDate)
                 .ToList();
 
-            string imageUrl = "~/img/DownArrow.png";
             if (orderBy == SortOrder.Descending)
             {
-                imageUrl = "~/img/UpArrow.png";
                 prognoses.Reverse();
             }
 
@@ -38,13 +36,13 @@ namespace BumboApp.Controllers
             ViewBag.PageSize = PageSize;
             ViewBag.MaxPages = maxPages;
 
-            ViewBag.ImageUrl = imageUrl;
             ViewBag.OrderBy = orderBy ?? SortOrder.Ascending;
 
             return View(prognosesForPage);
         }
-        public IActionResult Details(string id, int? page, bool overviewDesc = false)
+        public IActionResult Details(string id, int? page, SortOrder? orderBy = SortOrder.Ascending)
         {
+            // prognosis details
             var dateParts = id.Split('-');
             if (dateParts.Length != 3)
             {
@@ -91,18 +89,20 @@ namespace BumboApp.Controllers
                 WeekPrognoseId = wp?.Id ?? -1
             };
 
+            // unique days
             int currentPageNumber = page ?? DefaultPage;
-            string imageUrl = "~/img/DownArrow.png";
-
             List<UniqueDay> uniqueDays;
-            uniqueDays = Context.UniqueDays.Where(u => (u.StartDate >= model.StartDate && u.StartDate <= model.StartDate.AddDays(6)) || 
-            (u.EndDate >= model.StartDate && u.EndDate <= model.StartDate.AddDays(6)) || 
-            (u.StartDate < model.StartDate && u.EndDate > model.StartDate.AddDays(6)))
-                .OrderBy(p => p.StartDate).ToList();
+            
+            uniqueDays = Context.UniqueDays
+                .Where(u => (
+                                u.StartDate >= model.StartDate && u.StartDate <= model.StartDate.AddDays(6)) || 
+                                (u.EndDate >= model.StartDate && u.EndDate <= model.StartDate.AddDays(6)) || 
+                                (u.StartDate < model.StartDate && u.EndDate > model.StartDate.AddDays(6)))
+                .OrderBy(p => p.StartDate)
+                .ToList();
 
-            if (overviewDesc)
+            if (orderBy == SortOrder.Descending)
             {
-                imageUrl = "~/img/UpArrow.png";
                 uniqueDays.Reverse();
             }
 
@@ -119,13 +119,11 @@ namespace BumboApp.Controllers
             ViewBag.PageNumber = currentPageNumber;
             ViewBag.PageSize = PageSize;
             ViewBag.MaxPages = maxPages;
-            ViewBag.ImageUrl = imageUrl;
-            ViewBag.OverviewDesc = overviewDesc;
+            ViewBag.OrderBy = orderBy ?? SortOrder.Ascending;
             ViewBag.UniqueDays = uniqueDaysForPage;
 
             return View(model);
         }
-
 
         [HttpPost]
         public IActionResult Update(List<Prognosis> prognoses)
@@ -179,7 +177,7 @@ namespace BumboApp.Controllers
             WeekPrognosis? wp = Context.WeekPrognoses.SingleOrDefault(wp => wp.Id == weekPrognoseId);
             if (wp == null)
             {
-                return RedirectToAction("Index");
+                return NotifyErrorAndRedirect("Prognose niet gevonden", "Index");
             }
             List<Prognosis> prognoses = Context.Prognoses.Where(p => p.WeekPrognosisId == weekPrognoseId).ToList();
             try
@@ -192,8 +190,7 @@ namespace BumboApp.Controllers
             {
                 return NotifyErrorAndRedirect("Er is iets misgegaan", "Index");
             }
-            NotifyService.Success("Prognose succesvol verwijderd");
-            return RedirectToAction("Index");
+            return NotifySuccessAndRedirect("Prognose succesvol verwijderd", "Index");
         }
 
         public IActionResult Create()

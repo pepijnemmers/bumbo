@@ -16,7 +16,7 @@ builder.Services.AddNotyf(config =>
 
 var app = builder.Build();
 
-var defaultCulture = new CultureInfo("en-US");
+var defaultCulture = new CultureInfo("en-GB");
 var localizationOptions = new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture(defaultCulture),
