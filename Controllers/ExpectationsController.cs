@@ -70,15 +70,13 @@ namespace BumboApp.Controllers
                 Context.Expectations.Update(expectation);
                 Context.SaveChanges();
                 transaction.Commit();
-                NotifyService.Success("De verwachting is bijgewerkt!");
+                return NotifySuccessAndRedirect("De verwachting is bijgewerkt.", "Index");
             }
             catch
             {
                 transaction.Rollback();
-                NotifyService.Error("Er is iets mis gegaan bij het bewerken van de verwachting.");
+                return NotifyErrorAndRedirect("Er is iets mis gegaan bij het bewerken van de verwachting.", "Index");
             }
-            
-            return RedirectToAction("Index");
         }
         
         [HttpPost]
@@ -104,15 +102,13 @@ namespace BumboApp.Controllers
                 Context.Expectations.Add(expectation);
                 Context.SaveChanges();
                 transaction.Commit();
-                NotifyService.Success("De verwachting is toegevoegd!");
+                return NotifySuccessAndRedirect("De verwachting is toegevoegd.", "Index");
             }
             catch
             {
                 transaction.Rollback();
-                NotifyService.Error("Er is iets mis gegaan bij het toevoegen van de verwachting.");
+                return NotifyErrorAndRedirect("Er is iets mis gegaan bij het toevoegen van de verwachting.", "Index");
             }
-            
-            return RedirectToAction("Index");
         }
         
         [HttpPost]
@@ -212,15 +208,13 @@ namespace BumboApp.Controllers
                 Context.Expectations.AddRange(expectations);
                 Context.SaveChanges();
                 transaction.Commit();
-                NotifyService.Success($"Er zijn {expectations.Count} verwachtingen toegevoegd!");
+                return NotifySuccessAndRedirect($"Er zijn {expectations.Count} verwachtingen toegevoegd!", "Index");
             }
             catch
             {
                 transaction.Rollback();
-                NotifyService.Error("Er is iets mis gegaan bij het toevoegen van de verwachtingen.");
+                return NotifyErrorAndRedirect("Er is iets mis gegaan bij het toevoegen van de verwachtingen.", "Index");
             }
-            
-            return RedirectToAction("Index");
         }
     }
 }

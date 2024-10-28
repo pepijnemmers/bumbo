@@ -22,27 +22,18 @@ namespace BumboApp.Controllers
                 if (dbPassword == password)
                 {
                     LoggedInUser = user;
-                    return RedirectToAction("index", "Dashboard");
+                    return NotifySuccessAndRedirect("Je bent ingelogd", "Index", "Dashboard");
                 }
             }
             
-            NotifyService.Error("Onjuiste gebruikersnaam of wachtwoord");
-            return RedirectToAction("index", "Login");
+            return NotifyErrorAndRedirect("Onjuiste gebruikersnaam of wachtwoord", "Index");
         }
 
         [HttpGet]
         public IActionResult Logout()
         {
             LoggedInUser = null;
-            NotifyService.Success("U bent uitgelogd");
-            
-            return RedirectToAction("index", "Login");
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return NotifySuccessAndRedirect("Je bent uitgelogd", "Index", "Login");
         }
     }
 }

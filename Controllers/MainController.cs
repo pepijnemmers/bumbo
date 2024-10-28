@@ -39,7 +39,19 @@ namespace BumboApp.Controllers
         protected IActionResult NotifyErrorAndRedirect(string message, string redirect, string redirectController)
         {
             NotifyService.Error(message);
-            return RedirectToAction(redirect,redirectController);
+            return RedirectToAction(redirect, redirectController);
+        }
+        
+        protected IActionResult NotifySuccessAndRedirect(string message, string redirect)
+        {
+            NotifyService.Success(message);
+            return RedirectToAction(redirect);
+        }
+        
+        protected IActionResult NotifySuccessAndRedirect(string message, string redirect, string redirectController)
+        {
+            NotifyService.Success(message);
+            return RedirectToAction(redirect, redirectController);
         }
 
         /// <summary>
@@ -60,6 +72,8 @@ namespace BumboApp.Controllers
             {
                 context.HttpContext.Response.Redirect("/Login");
             }
+            
+            ViewData["User"] = LoggedInUser;
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

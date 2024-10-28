@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var user = ViewData["User"] as User;
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -64,11 +68,14 @@
                             </button>
                             <h1 class="my-0 my-md-1">@ViewData["Title"]</h1>
                         </div>
-                        <nav class="d-flex align-items-center gap-3">
-                            <a class="new-prognosis d-none d-md-block" asp-area="" asp-controller="Prognoses" asp-action="Create">
-                                <i class="fa-solid fa-plus"></i>
-                            </a>
-                            <a class="profile" asp-area="" asp-controller="Profile" asp-action="Index">
+                        <nav>
+                            <a class="profile d-flex align-items-center gap-3">
+                                @if (user != null)
+                                {
+                                    <span class="text-secondary d-none d-sm-block">
+                                        Welkom, @user.FirstName!
+                                    </span>
+                                }
                                 <img class="profile-icon" src="/img/profile-icon.png" alt="profiel"/>
                             </a>
                         </nav>
