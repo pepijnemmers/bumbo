@@ -26,10 +26,10 @@ namespace BumboApp.Controllers
                     .ToList();
             }
 
-            string imageUrl = "~/img/UpArrow.png";
+            string imageUrl = "~/img/DownArrow.png";
             if (orderBy == SortOrder.Descending)
             {
-                imageUrl = "~/img/DownArrow.png";
+                imageUrl = "~/img/UpArrow.png";
                 uniqueDays.Reverse();
             }
 
