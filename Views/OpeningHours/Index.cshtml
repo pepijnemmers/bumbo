@@ -1,4 +1,6 @@
-﻿@using BumboApp.Views.Components
+@using BumboApp.Views.Components
+@using Microsoft.Data.SqlClient
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @using Microsoft.Data.SqlClient
 @model BumboApp.ViewModels.OpeningHoursViewModel
 @{
@@ -76,6 +78,23 @@
                     <th class=" col-3">Factor</th>
                     <th>Acties</th>
                 </tr>
+                    <tr>
+                        <th>Naam</th>
+                        <th class="col-5">
+                            <a asp-controller="OpeningHours"
+                               asp-action="Index"
+                               asp-route-OrderBy="@(ViewBag.OrderBy == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending)"
+                               asp-route-OldDays="@ViewBag.OldDays" aria-label="begin" class="text-decoration-none text-dark d-flex align-items-center">
+                                <div class="me-2">
+                                    Startdatum <br/>
+                                    Einddatum
+                                </div>
+                                <img width="20px" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow"/>
+                            </a>
+                        </th>
+                        <th class=" col-3">Factor</th>
+                        <th>Acties</th>
+                    </tr>
                 </thead>
                 <tbody>
                 @if (!Model.UniqueDays.Any())
@@ -115,6 +134,43 @@
                         </tr>
                     }
                 }
+                    @if (!Model.UniqueDays.Any())
+                    {
+                        <!-- Display this alert if there are unique days -->
+                        <tr>
+                            <td colspan="100%" class="text-center">Er zijn geen Speciale dagen</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model.UniqueDays)
+                        {
+                            <tr>
+                                <td>
+                                    @item.Name
+                                </td>
+                                <td class=" col-5">
+                                    @item.StartDate <br>
+                                    @item.EndDate
+                                </td>
+                                <td class=" col-3">
+                                    @item.Factor
+                                </td>
+                                <td>
+                                    @if (item.StartDate > DateOnly.FromDateTime(DateTime.Now))
+                                    {
+                                        <a asp-controller="UniqueDays" asp-action="Edit" asp-route-id="@item.Id">
+                                            <img style="width: 20px; height: auto" src="~/img/update-icon.svg" alt="Alternate Text" />
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
                 </tbody>
             </table>
                 

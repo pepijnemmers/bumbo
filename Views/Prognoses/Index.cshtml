@@ -24,7 +24,7 @@
             <th>
                 <a asp-controller="Prognoses" asp-action="Index" asp-route-OrderBy="@(ViewBag.OrderBy == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending)" class="text-dark">
                     Begin datum
-                        <img style="width: 20px; height: auto" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow" />
+                    <img width="20px" src="@Url.Content(ViewBag.ImageUrl)" alt="Arrow" />
                 </a>
             </th>
             <th>Eind datum</th>
