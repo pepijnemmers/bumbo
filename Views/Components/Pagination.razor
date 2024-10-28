@@ -1,4 +1,6 @@
-@using Microsoft.Data.SqlClient
+@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.WebUtilities
+
 @code {
     [Parameter]
     public int PageNumber { get; set; }
@@ -6,19 +8,16 @@
     [Parameter]
     public int MaxPages { get; set; }
 
-    [Parameter]
-    public SortOrder OrderBy { get; set; }
-
-    [Parameter]
-    public bool OldDays { get; set; }
-
     private string GenerateUrl(int page)
     {
-        var url = $"?page={page}";
-        url += $"&orderBy={OrderBy}";
-        if (OldDays) url += $"&OldDays={OldDays}";
-        
-        return url;
+        var uri = new Uri(Navigation.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        var queryParams = query.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToString());
+        queryParams["page"] = page.ToString();
+        var newQuery = string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+
+        return $"?{newQuery}";
     }
 }
 
@@ -34,12 +33,66 @@
                 <span aria-hidden="true">&lsaquo;</span>
             </a>
         </li>
-        @for (int i = 1; i <= MaxPages; i++)
+        
+        @if (MaxPages < 4)
         {
-            <li class="page-item @(PageNumber == i ? "active" : "")">
-                <a class="page-link" href="@GenerateUrl(i)">@i</a>
-            </li>
+            @for (int i = 1; i <= MaxPages; i++)
+            {
+                <li class="page-item @(PageNumber == i ? "active" : "")">
+                    <a class="page-link" href="@GenerateUrl(i)">@i</a>
+                </li>
+            }
         }
+        else
+        {
+            @for (int i = 1; i <= MaxPages; i++)
+            {
+                // always show first
+                if (i == 1)
+                {
+                    <li class="page-item @(PageNumber == 1 ? "active" : "")">
+                        <a class="page-link" href="@GenerateUrl(1)">1</a>
+                    </li>
+                }
+                // always show ...
+                else if (i == MaxPages - 1)
+                {
+                    <li class="page-item">
+                        <div>
+                            <select class="page-link" style="padding: .4rem .75rem" onchange="location.href=this.value">
+                                <option disabled selected>...</option>
+                                @for (int j = 1; j <= MaxPages; j++)
+                                {
+                                    <option value="@GenerateUrl(j)">@j</option>
+                                }
+                            </select>
+                        </div>
+                    </li>
+                    
+                    if (PageNumber == MaxPages - 1)
+                    {
+                        <li class="page-item active">
+                            <a class="page-link" href="@GenerateUrl(i)">@i</a>
+                        </li>
+                    }
+                }
+                // always show current
+                else if (i == PageNumber)
+                {
+                    <li class="page-item active">
+                        <a class="page-link" href="@GenerateUrl(i)">@i</a>
+                    </li>
+                }
+                // always show last
+                else if (i == MaxPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@GenerateUrl(MaxPages)">@MaxPages</a>
+                    </li>
+                }
+            }
+        }
+        
         <li class="page-item @(PageNumber == MaxPages ? "disabled" : "")">
             <a class="page-link" href="@GenerateUrl(PageNumber + 1)" aria-label="next">
                 <span aria-hidden="true">&rsaquo;</span>
