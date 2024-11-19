@@ -1,0 +1,24 @@
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace BumboApp.Controllers
+{
+    public class EmployeesController : MainController
+    {
+        public IActionResult Index()
+        {
+            return View();
+        }
+        public IActionResult Create()
+        {
+            return View();
+        }
+        public IActionResult Update()
+        {
+            return View();
+        }
+        public IActionResult Details()
+        {
+            return View();
+        }
+    }
+}
