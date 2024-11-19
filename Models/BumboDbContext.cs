@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.Emit;
 using System.Reflection.Metadata;
+using BumboApp.Migrations;
 using Microsoft.EntityFrameworkCore;
 
 namespace BumboApp.Models;
@@ -15,11 +17,11 @@ public partial class BumboDbContext : DbContext
         : base(options)
     {
     }
-    
+
     private IConfiguration Configuration => new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
         .AddJsonFile("appsettings.json")
         .Build();
-    
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer(Configuration.GetConnectionString("BumboDb"));
 
@@ -37,12 +39,57 @@ public partial class BumboDbContext : DbContext
 
     public virtual DbSet<WeekPrognosis> WeekPrognoses { get; set; }
 
+    public virtual DbSet<Availability> Availabilities { get; set; }
+    public virtual DbSet<Employee> Employees { get; set; }
+    public virtual DbSet<LeaveRequest> LeaveRequests { get; set; }
+    public virtual DbSet<Notification> Notifications { get; set; }
+    public virtual DbSet<SchoolSchedule> SchoolSchedules { get; set; }
+    public virtual DbSet<Shift> Shifts { get; set; }
+    public virtual DbSet<ShiftTakeOver> ShiftTakeOvers { get; set; }
+    public virtual DbSet<SickLeave> SickLeaves { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         OnModelCreatingPartial(modelBuilder);
         modelBuilder.Entity<User>()
             .Property<string>("Password").IsRequired();
 
+        modelBuilder.Entity<Availability>()
+            .HasKey(ss => new { ss.EmployeeNumber, ss.Date });
+
+        modelBuilder.Entity<Availability>()
+            .HasOne(ss => ss.Employee)
+            .WithMany(e => e.Availabilities)
+            .HasForeignKey(ss => ss.EmployeeNumber)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<SickLeave>()
+            .HasKey(ss => new { ss.EmployeeNumber, ss.Date });
+
+        modelBuilder.Entity<SickLeave>()
+            .HasOne(ss => ss.Employee)
+            .WithMany(e => e.sickLeaves)
+            .HasForeignKey(ss => ss.EmployeeNumber)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<SchoolSchedule>()
+            .HasKey(ss => new { ss.EmployeeNumber, ss.Date });
+
+        modelBuilder.Entity<SchoolSchedule>()
+            .HasOne(ss => ss.Employee)
+            .WithMany(e => e.SchoolSchedules)
+            .HasForeignKey(ss => ss.EmployeeNumber)
+            .OnDelete(DeleteBehavior.Cascade);
+
+
+
+        SeedData(modelBuilder);
+    }
+
+    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+    private void SeedData(ModelBuilder modelBuilder)
+    {
         modelBuilder.Entity<WeekPrognosis>().HasData(
     new WeekPrognosis { Id = 1, StartDate = new DateOnly(2024, 10, 7) }
 );
@@ -191,36 +238,34 @@ public partial class BumboDbContext : DbContext
             }
         );
 
-        modelBuilder.Entity<User>().HasData(
-            new
-            {
-                Id = 1,
-                Role = Role.Manager,
-                Email = "john.doe@example.com",
-                FirstName = "John",
-                LastName = "Doe",
-                Password = "qwer1234"
-            },
-            new
-            {
-                Id = 2,
-                Role = Role.Manager,
-                Email = "jane.smith@example.com",
-                FirstName = "Jane",
-                LastName = "Smith",
-                Password = "asdf1234"
-            },
-            new
-            {
-                Id = 3,
-                Role = Role.Manager,
-                Email = "emily.jones@example.com",
-                FirstName = "Emily",
-                LastName = "Jones",
-                Password = "zxcv1234"
-            }
-        );
+        //modelBuilder.Entity<User>().HasData(
+        //    new
+        //    {
+        //        Id = 1,
+        //        Role = Role.Manager,
+        //        Email = "john.doe@example.com",
+        //        FirstName = "John",
+        //        LastName = "Doe",
+        //        Password = "qwer1234"
+        //    },
+        //    new
+        //    {
+        //        Id = 2,
+        //        Role = Role.Manager,
+        //        Email = "jane.smith@example.com",
+        //        FirstName = "Jane",
+        //        LastName = "Smith",
+        //        Password = "asdf1234"
+        //    },
+        //    new
+        //    {
+        //        Id = 3,
+        //        Role = Role.Manager,
+        //        Email = "emily.jones@example.com",
+        //        FirstName = "Emily",
+        //        LastName = "Jones",
+        //        Password = "zxcv1234"
+        //    }
+        //);
     }
-
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

@@ -4,6 +4,7 @@ using BumboApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BumboApp.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    partial class BumboDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241119133715_Module2First")]
+    partial class Module2First
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,7 +47,7 @@ namespace BumboApp.Migrations
                     b.HasIndex("Date")
                         .IsUnique();
 
-                    b.ToTable("Expectations", (string)null);
+                    b.ToTable("Expectations");
 
                     b.HasData(
                         new
@@ -218,7 +221,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Norms", (string)null);
+                    b.ToTable("Norms");
 
                     b.HasData(
                         new
@@ -276,7 +279,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("WeekDay");
 
-                    b.ToTable("OpeningHours", (string)null);
+                    b.ToTable("OpeningHours");
 
                     b.HasData(
                         new
@@ -348,7 +351,7 @@ namespace BumboApp.Migrations
 
                     b.HasIndex("WeekPrognosisId");
 
-                    b.ToTable("Prognoses", (string)null);
+                    b.ToTable("Prognoses");
 
                     b.HasData(
                         new
@@ -566,7 +569,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UniqueDays", (string)null);
+                    b.ToTable("UniqueDays");
 
                     b.HasData(
                         new
@@ -617,7 +620,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("BumboApp.Models.WeekPrognosis", b =>
@@ -633,7 +636,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("WeekPrognoses", (string)null);
+                    b.ToTable("WeekPrognoses");
 
                     b.HasData(
                         new
