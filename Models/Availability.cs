@@ -6,8 +6,9 @@ namespace BumboApp.Models
     public class Availability
     {
         public DateOnly Date { get; set; }
-
+        [Required]
         public int EmployeeNumber { get; set; }
+        [Required]
         public Employee Employee { get; set; }
 
         [Required]

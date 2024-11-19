@@ -23,6 +23,7 @@ namespace BumboApp.Models
         [StringLength(10)]
         public string HouseNumber { get; set; }
         [Required]
+        [Range(0, 55)]
         public int ContractHours { get; set; }
         [Required]
         public DateOnly StartOfEmployment { get; set; }

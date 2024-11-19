@@ -9,6 +9,7 @@ namespace BumboApp.Models
         public Employee Employee { get; set; }
         public DateOnly Date { get; set; }
         [Required]
+        [Range(0, 24)]
         public float DurationInHours { get; set; }
     }
 }

@@ -25,6 +25,7 @@ public partial class BumboDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer(Configuration.GetConnectionString("BumboDb"));
 
+    //Module 1 classes
     public virtual DbSet<Expectation> Expectations { get; set; }
 
     public virtual DbSet<Norm> Norms { get; set; }
@@ -39,6 +40,7 @@ public partial class BumboDbContext : DbContext
 
     public virtual DbSet<WeekPrognosis> WeekPrognoses { get; set; }
 
+    //Module 2 classes
     public virtual DbSet<Availability> Availabilities { get; set; }
     public virtual DbSet<Employee> Employees { get; set; }
     public virtual DbSet<LeaveRequest> LeaveRequests { get; set; }
@@ -50,10 +52,60 @@ public partial class BumboDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        OnModelCreatingPartial(modelBuilder);
-        modelBuilder.Entity<User>()
-            .Property<string>("Password").IsRequired();
+        //Module 1 classes
+        modelBuilder.Entity<WeekPrognosis>()
+            .HasIndex(wp => wp.StartDate)
+            .IsUnique();
 
+        modelBuilder.Entity<Prognosis>()
+            .HasIndex(p => new { p.Date, p.Department })
+            .IsUnique();
+
+
+        modelBuilder.Entity<Prognosis>().ToTable(p =>
+            {
+                p.HasCheckConstraint("CK_Prognoses_NeededHours_NeededEmployees", "[NeededHours] = [NeededEmployees] * 8");
+            });
+
+        modelBuilder.Entity<UniqueDay>().ToTable(ud =>
+            {
+                ud.HasCheckConstraint("CK_UniqueDays_StartDate_EndDate", "[StartDate] <= [EndDate]");
+            });
+
+        modelBuilder.Entity<OpeningHour>().ToTable(oh =>
+            {
+                oh.HasCheckConstraint("CK_OpeningHours_OpeningTime_ClosingTime", "([OpeningTime] IS NULL AND [ClosingTime] IS NULL) OR ([OpeningTime] IS NOT NULL AND [ClosingTime] IS NOT NULL AND [OpeningTime] < [ClosingTime])");
+            });
+
+        //Module 2 classes
+        modelBuilder.Entity<Availability>().ToTable(t => t.
+            HasCheckConstraint("CK_Availability_StartTime_EndTime", "[StartTime] < [EndTime]"));
+
+        modelBuilder.Entity<Employee>().ToTable(t =>
+            {
+                t.HasCheckConstraint("CK_Employees_StartOfEmployment_EndOfEmployment", "[StartOfEmployment] <= [EndOfEmployment]");
+                t.HasCheckConstraint("CK_Employees_Zipcode", "[Zipcode] LIKE '[1-9][0-9][0-9][0-9][A-Z][A-Z]'");
+            });
+
+        modelBuilder.Entity<LeaveRequest>().ToTable(lr =>
+            {
+                lr.HasCheckConstraint("CK_LeaveRequests_StartDate_EndDate", "[StartDate] <= [EndDate]");
+            });
+
+        modelBuilder.Entity<Shift>().ToTable(lr =>
+            {
+                lr.HasCheckConstraint("CK_Shifts_Start_End", "[Start] < [End]");
+            });
+
+        OnModelCreatingPartial(modelBuilder);
+        modelBuilder.Entity<User>(u =>
+            {
+                u.HasIndex(u => u.Email)
+                 .IsUnique();
+                u.Property<string>("Password").IsRequired();
+            });
+
+        //Composite keys tables explicit relations (efcore doesnt interpret right)
         modelBuilder.Entity<Availability>()
             .HasKey(ss => new { ss.EmployeeNumber, ss.Date });
 
@@ -81,7 +133,11 @@ public partial class BumboDbContext : DbContext
             .HasForeignKey(ss => ss.EmployeeNumber)
             .OnDelete(DeleteBehavior.Cascade);
 
-
+        modelBuilder.Entity<Shift>()
+            .HasOne(s => s.ShiftTakeOver)
+            .WithOne(sto => sto.Shift)
+            .HasForeignKey<ShiftTakeOver>(sto => sto.ShiftId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         SeedData(modelBuilder);
     }

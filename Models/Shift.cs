@@ -14,5 +14,7 @@ namespace BumboApp.Models
         public Department Department { get; set; }
         [Required]
         public Employee Employee { get; set; }
+        //Navigation
+        public ShiftTakeOver ShiftTakeOver { get; set; }
     }
 }

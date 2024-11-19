@@ -9,11 +9,9 @@ namespace BumboApp.Models
         public int Id { get; set; }
         [Required]
         public Employee Employee { get; set; }
-        [Required]
-        [StringLength(60)]
+        [Required, StringLength(60)]
         public string Title { get; set; }
-        [Required]
-        [StringLength(60)]
+        [Required, StringLength(60)]
         public string Description { get; set; }
         [Required]
         public DateTime SentAt { get; set; }
