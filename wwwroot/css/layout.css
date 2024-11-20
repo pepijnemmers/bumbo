@@ -17,6 +17,11 @@ a {
     left: 0;
 }
 
+.aside-nav .scrollable {
+    overflow-y: auto;
+    max-height: calc(100vh - 2rem - 50px - 65px);
+}
+
 .aside-nav .logo {
     font-weight: bold;
     color: var(--bs-body-color);
@@ -33,12 +38,19 @@ a {
     margin-bottom: .5em;
     border-radius: .5em;
     font-weight: 500;
+    min-width: 240px;
 }
 .aside-nav .nav-link i[class^="fa-"] {
     font-size: 1.3em;
     text-align: center;
     width: 25px;
     margin-right: .6em;
+}
+.aside-nav .collapse-link i.fa-chevron-down {
+    font-size: 1em;
+    text-align: end;
+    width: 25px;
+    margin: 0;
 }
 
 .aside-nav .nav-link.active {
