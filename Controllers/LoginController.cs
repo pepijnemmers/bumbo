@@ -1,8 +1,5 @@
 ﻿using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging.Abstractions;
-using System.Diagnostics;
-using System.Runtime.Intrinsics.X86;
 
 namespace BumboApp.Controllers
 {
