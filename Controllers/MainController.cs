@@ -74,6 +74,7 @@ namespace BumboApp.Controllers
             }
             
             ViewData["User"] = LoggedInUser;
+            //TODO: UNCOMMENT AND TEST -> ViewData["NumberOfNotifications"] = Context.Notification.Count(n => n.Employee.User.Id == LoggedInUser?.Id && !n.HasBeenRead) ?? 0;
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
