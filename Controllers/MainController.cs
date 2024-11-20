@@ -30,6 +30,14 @@ namespace BumboApp.Controllers
             DefaultPage = 1;
         }
         
+        // No Access page
+        public IActionResult NoAccess()
+        {
+            ViewData["FromUrl"] = Request.Query["from"];
+            return View();
+        }
+        
+        // Redirects with a notification
         protected IActionResult NotifyErrorAndRedirect(string message, string redirect)
         {
             NotifyService.Error(message);
@@ -75,6 +83,15 @@ namespace BumboApp.Controllers
             
             ViewData["User"] = LoggedInUser;
             //TODO: UNCOMMENT AND TEST -> ViewData["NumberOfNotifications"] = Context.Notification.Count(n => n.Employee.User.Id == LoggedInUser?.Id && !n.HasBeenRead) ?? 0;
+        }
+        
+        // check if user has access to this page otherwise redirect to NoAccess page
+        protected void CheckPageAccess(Role role)
+        {
+            if (LoggedInUser?.Role != role)
+            {
+                Response.Redirect("/Main/NoAccess?from=" + Request.Path);
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
