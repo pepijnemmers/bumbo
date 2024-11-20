@@ -6,11 +6,101 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BumboApp.Migrations
 {
     /// <inheritdoc />
-    public partial class Module2ClassesWithCK : Migration
+    public partial class FirstMigrationModule2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Expectations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
+                    ExpectedCustomers = table.Column<int>(type: "int", nullable: false),
+                    ExpectedCargo = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Expectations", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Norms",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Activity = table.Column<int>(type: "int", nullable: false),
+                    Value = table.Column<int>(type: "int", nullable: false),
+                    NormType = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Norms", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OpeningHours",
+                columns: table => new
+                {
+                    WeekDay = table.Column<int>(type: "int", nullable: false),
+                    OpeningTime = table.Column<TimeOnly>(type: "time", nullable: true),
+                    ClosingTime = table.Column<TimeOnly>(type: "time", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OpeningHours", x => x.WeekDay);
+                    table.CheckConstraint("CK_OpeningHours_OpeningTime_ClosingTime", "([OpeningTime] IS NULL AND [ClosingTime] IS NULL) OR ([OpeningTime] IS NOT NULL AND [ClosingTime] IS NOT NULL AND [OpeningTime] < [ClosingTime])");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UniqueDays",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    StartDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    EndDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    Factor = table.Column<float>(type: "real", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UniqueDays", x => x.Id);
+                    table.CheckConstraint("CK_UniqueDays_StartDate_EndDate", "[StartDate] <= [EndDate]");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Role = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WeekPrognoses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StartDate = table.Column<DateOnly>(type: "date", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WeekPrognoses", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Employees",
                 columns: table => new
@@ -36,6 +126,30 @@ namespace BumboApp.Migrations
                         name: "FK_Employees_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Prognoses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    WeekPrognosisId = table.Column<int>(type: "int", nullable: false),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
+                    Department = table.Column<int>(type: "int", nullable: false),
+                    NeededHours = table.Column<float>(type: "real", nullable: false),
+                    NeededEmployees = table.Column<float>(type: "real", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Prognoses", x => x.Id);
+                    table.CheckConstraint("CK_Prognoses_NeededHours_NeededEmployees", "[NeededHours] = [NeededEmployees] * 8");
+                    table.ForeignKey(
+                        name: "FK_Prognoses_WeekPrognoses_WeekPrognosisId",
+                        column: x => x.WeekPrognosisId,
+                        principalTable: "WeekPrognoses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -193,42 +307,15 @@ namespace BumboApp.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_WeekPrognoses_StartDate",
-                table: "WeekPrognoses",
-                column: "StartDate",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_Email",
-                table: "Users",
-                column: "Email",
-                unique: true);
-
-            migrationBuilder.AddCheckConstraint(
-                name: "CK_UniqueDays_StartDate_EndDate",
-                table: "UniqueDays",
-                sql: "[StartDate] <= [EndDate]");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Prognoses_Date_Department",
-                table: "Prognoses",
-                columns: new[] { "Date", "Department" },
-                unique: true);
-
-            migrationBuilder.AddCheckConstraint(
-                name: "CK_Prognoses_NeededHours_NeededEmployees",
-                table: "Prognoses",
-                sql: "[NeededHours] = [NeededEmployees] * 8");
-
-            migrationBuilder.AddCheckConstraint(
-                name: "CK_OpeningHours_OpeningTime_ClosingTime",
-                table: "OpeningHours",
-                sql: "([OpeningTime] IS NULL AND [ClosingTime] IS NULL) OR ([OpeningTime] IS NOT NULL AND [ClosingTime] IS NOT NULL AND [OpeningTime] < [ClosingTime])");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Employees_UserId",
                 table: "Employees",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Expectations_Date",
+                table: "Expectations",
+                column: "Date",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_LeaveRequests_EmployeeNumber",
@@ -241,6 +328,17 @@ namespace BumboApp.Migrations
                 column: "EmployeeNumber");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Prognoses_Date_Department",
+                table: "Prognoses",
+                columns: new[] { "Date", "Department" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Prognoses_WeekPrognosisId",
+                table: "Prognoses",
+                column: "WeekPrognosisId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Shifts_EmployeeNumber",
                 table: "Shifts",
                 column: "EmployeeNumber");
@@ -249,6 +347,18 @@ namespace BumboApp.Migrations
                 name: "IX_ShiftTakeOvers_EmployeeTakingOverEmployeeNumber",
                 table: "ShiftTakeOvers",
                 column: "EmployeeTakingOverEmployeeNumber");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Email",
+                table: "Users",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WeekPrognoses_StartDate",
+                table: "WeekPrognoses",
+                column: "StartDate",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -258,10 +368,22 @@ namespace BumboApp.Migrations
                 name: "Availabilities");
 
             migrationBuilder.DropTable(
+                name: "Expectations");
+
+            migrationBuilder.DropTable(
                 name: "LeaveRequests");
 
             migrationBuilder.DropTable(
+                name: "Norms");
+
+            migrationBuilder.DropTable(
                 name: "Notifications");
+
+            migrationBuilder.DropTable(
+                name: "OpeningHours");
+
+            migrationBuilder.DropTable(
+                name: "Prognoses");
 
             migrationBuilder.DropTable(
                 name: "SchoolSchedules");
@@ -273,34 +395,19 @@ namespace BumboApp.Migrations
                 name: "SickLeaves");
 
             migrationBuilder.DropTable(
+                name: "UniqueDays");
+
+            migrationBuilder.DropTable(
+                name: "WeekPrognoses");
+
+            migrationBuilder.DropTable(
                 name: "Shifts");
 
             migrationBuilder.DropTable(
                 name: "Employees");
 
-            migrationBuilder.DropIndex(
-                name: "IX_WeekPrognoses_StartDate",
-                table: "WeekPrognoses");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Users_Email",
-                table: "Users");
-
-            migrationBuilder.DropCheckConstraint(
-                name: "CK_UniqueDays_StartDate_EndDate",
-                table: "UniqueDays");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Prognoses_Date_Department",
-                table: "Prognoses");
-
-            migrationBuilder.DropCheckConstraint(
-                name: "CK_Prognoses_NeededHours_NeededEmployees",
-                table: "Prognoses");
-
-            migrationBuilder.DropCheckConstraint(
-                name: "CK_OpeningHours_OpeningTime_ClosingTime",
-                table: "OpeningHours");
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }
