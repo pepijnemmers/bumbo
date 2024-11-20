@@ -4,7 +4,7 @@
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -36,53 +36,75 @@
                                 <i class="fa-solid fa-house"></i>
                                 Dashboard
                             </a>
-                            <a class="nav-link @(Context.Request.Path == "/schedule" ? "active" : "")" asp-controller="Schedule" asp-action="Index">
-                                <i class="fa-solid fa-calendar"></i>
-                                Rooster
-                            </a>
-                            <div>
-                                <a class="nav-link d-flex justify-content-between align-items-center collapse-link @(Context.Request.Path == "/schedule" ? "active" : "")" data-bs-toggle="collapse" href="#collapseNavLinkSchedule">
-                                    <div>
-                                        <i class="fa-solid fa-calendar"></i>
-                                        Rooster
-                                    </div>
-                                    <i class="fa-solid fa-chevron-down"></i>
+                            
+                            @if (user?.Role is Role.Employee)
+                            {
+                                <a class="nav-link @(Context.Request.Path == "/schedule" ? "active" : "")" asp-controller="Schedule" asp-action="Index">
+                                    <i class="fa-solid fa-calendar"></i>
+                                    Rooster
                                 </a>
-                                <div class="collapse ps-5" id="collapseNavLinkSchedule">
-                                    <div class="d-flex flex-column">
-                                        <a class="py-2" asp-controller="Schedule" asp-action="Index">Rooster bekijken</a>
-                                        <a class="py-2" asp-controller="Schedule" asp-action="Create">Nieuw rooster maken</a>
+                            }
+                            
+                            @if (user?.Role is Role.Manager)
+                            {
+                                <div>
+                                    <a class="nav-link d-flex justify-content-between align-items-center collapse-link @(Context.Request.Path == "/schedule" ? "active" : "")" data-bs-toggle="collapse" href="#collapseNavLinkSchedule">
+                                        <div>
+                                            <i class="fa-solid fa-calendar"></i>
+                                            Rooster
+                                        </div>
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                    </a>
+                                    <div class="collapse ps-5" id="collapseNavLinkSchedule">
+                                        <div class="d-flex flex-column">
+                                            <a class="py-2" asp-controller="Schedule" asp-action="Index">Rooster bekijken</a>
+                                            <a class="py-2" asp-controller="Schedule" asp-action="Create">Nieuw rooster maken</a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <a class="nav-link @(Context.Request.Path == "/norms" ? "active" : "")" asp-controller="Norms" asp-action="Index">
-                                <i class="fa-solid fa-square-pen"></i>
-                                Normeringen
-                            </a>
-                            <a class="nav-link @(Context.Request.Path == "/prognoses" ? "active" : "")" asp-controller="Prognoses" asp-action="Index">
-                                <i class="fa-solid fa-file-lines"></i>
-                                Prognoses
-                            </a>
-                            <a class="nav-link @(Context.Request.Path == "/expectations" ? "active" : "")" asp-controller="Expectations" asp-action="Index">
-                                <i class="fa-solid fa-layer-group"></i>
-                                Verwachtingen
-                            </a>
-                            <a class="nav-link @(Context.Request.Path == "/openinghours" ? "active" : "")" asp-controller="OpeningHours" asp-action="Index">
-                                <i class="fa-solid fa-clock"></i>
-                                Openingstijden
-                            </a>
-                            <a class="nav-link @(Context.Request.Path == "/employees" ? "active" : "")" asp-controller="Employees" asp-action="Index">
-                                <i class="fa-solid fa-users"></i>
-                                Werknemers
-                            </a>
-                            <a class="nav-link @(Context.Request.Path == "/leave" ? "active" : "")" asp-controller="Leave" asp-action="Index">
-                                <i class="fa-solid fa-bed"></i>
-                                Verlof & Ziek
-                            </a>
-                            <a class="nav-link @(Context.Request.Path == "/availability" ? "active" : "")" asp-controller="Availability" asp-action="Index">
-                                <i class="fa-solid fa-clock"></i>
-                                Beschikbaarheid
-                            </a>
+                                
+                                <a class="nav-link @(Context.Request.Path == "/norms" ? "active" : "")" asp-controller="Norms" asp-action="Index">
+                                    <i class="fa-solid fa-square-pen"></i>
+                                    Normeringen
+                                </a>
+                                
+                                <a class="nav-link @(Context.Request.Path == "/prognoses" ? "active" : "")" asp-controller="Prognoses" asp-action="Index">
+                                    <i class="fa-solid fa-file-lines"></i>
+                                    Prognoses
+                                </a>
+                                
+                                <a class="nav-link @(Context.Request.Path == "/expectations" ? "active" : "")" asp-controller="Expectations" asp-action="Index">
+                                    <i class="fa-solid fa-layer-group"></i>
+                                    Verwachtingen
+                                </a>
+                                
+                                <a class="nav-link @(Context.Request.Path == "/openinghours" ? "active" : "")" asp-controller="OpeningHours" asp-action="Index">
+                                    <i class="fa-solid fa-clock"></i>
+                                    Openingstijden
+                                </a>
+                                
+                                <a class="nav-link @(Context.Request.Path == "/employees" ? "active" : "")" asp-controller="Employees" asp-action="Index">
+                                    <i class="fa-solid fa-users"></i>
+                                    Werknemers
+                                </a>
+                            }
+                            
+                            @if (user?.Role is Role.Manager or Role.Employee)
+                            {
+                                <a class="nav-link @(Context.Request.Path == "/leave" ? "active" : "")" asp-controller="Leave" asp-action="Index">
+                                    <i class="fa-solid fa-bed"></i>
+                                    Verlof & Ziek
+                                </a>
+                            }
+                            
+                            @if (user?.Role is Role.Employee)
+                            {
+                                <a class="nav-link @(Context.Request.Path == "/availability" ? "active" : "")" asp-controller="Availability" asp-action="Index">
+                                    <i class="fa-solid fa-clock"></i>
+                                    Beschikbaarheid
+                                </a>
+                            }
+                            
                             <a class="nav-link d-flex justify-content-between align-items-center @(Context.Request.Path == "/notifications" ? "active" : "")" asp-controller="Notifications" asp-action="Index">
                                 <div>
                                     <i class="fa-solid fa-bell"></i>
