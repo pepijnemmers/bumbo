@@ -18,6 +18,10 @@
   --border-clr: #ddd;
 }
 
+.bg-primary {
+  background-color: var(--bs-primary) !important;
+}
+
 /* buttons */
 .btn {
   text-transform: capitalize;
