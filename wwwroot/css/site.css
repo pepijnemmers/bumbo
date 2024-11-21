@@ -172,3 +172,8 @@ label {
 .opening-hours-buttons-class button {
     display: none;
 }
+
+textarea {
+    resize: none;
+    height: 100px;
+}

@@ -2,3 +2,28 @@
 @{
     ViewData["Title"] = "Verlof aanvragen";
 }
+
+<form asp-action="CreateLeaveRequest" asp-controller="Leave" method="post">
+    <div class="card p-4 create-prognosis-card"> 
+        @*css card id later generaliseren voor alle create cards?*@
+        <div class="mb-3">
+            <label for="startDate" class="form-label fw-bold">Begin Datum</label>
+            <input type="date" class="form-control" id="startDate" name="startDate" placeholder="Begindatum" onchange="checkDate()" min="@DateTime.Now.ToString("yyyy-MM-dd")">
+        </div>
+
+        <div class="mb-2">
+            <label for="endDate" class="form-label fw-bold">Eind Datum</label>
+            <input type="date" class="form-control" id="endDate" name="endDate" placeholder="Einddatum" onchange="checkDate()" min="@DateTime.Now.ToString("yyyy-MM-dd")">
+        </div>
+
+        <div class="mb-3">
+            <label for="reason" class="form-label fw-bold">Reden</label>
+            <textarea class="form-control" placeholder="Reden"></textarea>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <a asp-controller="Leave" asp-action="Index" class="btn btn-outline-primary" type="button">Annuleer</a>
+            <button class="btn btn-primary me-md-2" id="leaveCreateButton" type="submit">Aanvragen</button>
+        </div>
+    </div>
+</form>

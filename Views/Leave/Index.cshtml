@@ -1,4 +1,35 @@
 ﻿
 @{
-    ViewData["Title"] = "Verlofaanvragen overzicht";
+    ViewData["Title"] = "Verlof en ziekmelden";
 }
+
+<div class="row align-items-center mb-3">
+    <div class="col">
+        <h3>Verlof</h3>
+    </div>
+    <div class="col-auto">
+        <a asp-controller="Leave" asp-action="LeaveRequest" class="btn btn-primary d-inline-block">Verlof aanvragen</a>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Begin datum
+                </th>
+                <th>Eind datum</th>
+                <th>Reden</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+                <tr>
+                    <td>21-11-2024</td>
+                    <td>21-11-2024</td>
+                    <td>Test</td>
+                    <td>Aangevraagd</td>
+                </tr>
+        </tbody>
+    </table>
+</div>
