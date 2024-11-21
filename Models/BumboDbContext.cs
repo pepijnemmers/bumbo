@@ -138,8 +138,9 @@ public partial class BumboDbContext : DbContext
             .HasForeignKey<ShiftTakeOver>(sto => sto.ShiftId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        //EssentialSeedData(modelBuilder);
-        //SeedData(modelBuilder);
+        //------------- SeedData ---------------------------
+        EssentialSeedData(modelBuilder);
+        SeedData(modelBuilder);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
@@ -236,7 +237,7 @@ public partial class BumboDbContext : DbContext
             new Prognosis { Id = 20, Date = new DateOnly(2024, 10, 13), Department = Department.Vakkenvullen, NeededHours = 24, NeededEmployees = 3, WeekPrognosisId = 1 },
             new Prognosis { Id = 21, Date = new DateOnly(2024, 10, 13), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2, WeekPrognosisId = 1 },
 
-
+            // Week 2, Day 1 (2024-12-09)
             new Prognosis { Id = 22, Date = new DateOnly(2024, 12, 9), Department = Department.Vers, NeededHours = 40, NeededEmployees = 5.0f, WeekPrognosisId = 2 },
             new Prognosis { Id = 23, Date = new DateOnly(2024, 12, 9), Department = Department.Vakkenvullen, NeededHours = 36, NeededEmployees = 4.5f, WeekPrognosisId = 2 },
             new Prognosis { Id = 24, Date = new DateOnly(2024, 12, 9), Department = Department.Kassa, NeededHours = 20, NeededEmployees = 2.5f, WeekPrognosisId = 2 },
@@ -351,16 +352,161 @@ public partial class BumboDbContext : DbContext
             new
             {
                 Id = 2,
-                Role = Role.Manager,
+                Role = Role.Employee,
                 Email = "jane.smith@example.com",
                 Password = "asdf1234"
             },
             new
             {
                 Id = 3,
-                Role = Role.Manager,
+                Role = Role.Employee,
                 Email = "emily.jones@example.com",
                 Password = "zxcv1234"
+            }
+        );
+
+
+        modelBuilder.Entity<Employee>().HasData(
+    new
+    {
+        EmployeeNumber = 1,
+        FirstName = "John",
+        LastName = "Doe",
+        DateOfBirth = new DateOnly(1990, 5, 20),
+        Zipcode = "1234AB",
+        HouseNumber = "1A",
+        ContractHours = 40,
+        StartOfEmployment = new DateOnly(2020, 1, 15),
+        UserId = 1
+    },
+    new
+    {
+        EmployeeNumber = 2,
+        FirstName = "Jane",
+        LastName = "Smith",
+        DateOfBirth = new DateOnly(1995, 8, 12),
+        Zipcode = "5684AC",
+        HouseNumber = "2B",
+        ContractHours = 20,
+        StartOfEmployment = new DateOnly(2021, 3, 1),
+        UserId = 2
+    },
+    new
+    {
+        EmployeeNumber = 3,
+        FirstName = "Emily",
+        LastName = "Jones",
+        DateOfBirth = new DateOnly(1998, 12, 5),
+        Zipcode = "5211DG",
+        HouseNumber = "3C",
+        ContractHours = 35,
+        StartOfEmployment = new DateOnly(2019, 7, 30),
+        UserId = 3
+    }
+);
+
+        modelBuilder.Entity<Availability>().HasData(
+            new
+            {
+                Date = new DateOnly(2024, 12, 9),
+                EmployeeNumber = 1,
+                StartTime = new TimeOnly(9, 0),
+                EndTime = new TimeOnly(17, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 10),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(13, 0),
+                EndTime = new TimeOnly(17, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 11),
+                EmployeeNumber = 3,
+                StartTime = new TimeOnly(8, 0),
+                EndTime = new TimeOnly(14, 0)
+            }
+        );
+
+        modelBuilder.Entity<SchoolSchedule>().HasData(
+            // Schedule for John (Employee 1)
+            new { EmployeeNumber = 1, Date = new DateOnly(2024, 12, 9), DurationInHours = 4.0f },
+            new { EmployeeNumber = 1, Date = new DateOnly(2024, 12, 10), DurationInHours = 4.0f },
+            // Schedule for Jane (Employee 2)
+            new { EmployeeNumber = 2, Date = new DateOnly(2024, 12, 9), DurationInHours = 3.0f },
+            new { EmployeeNumber = 2, Date = new DateOnly(2024, 12, 10), DurationInHours = 3.0f },
+            // Schedule for Emily (Employee 3)
+            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 9), DurationInHours = 6.0f },
+            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 10), DurationInHours = 6.0f }
+        );
+
+        modelBuilder.Entity<LeaveRequest>().HasData(
+            new
+            {
+                Id = 1,
+                Status = Status.Geaccepteerd,
+                StartDate = new DateTime(2024, 12, 13),
+                EndDate = new DateTime(2024, 12, 14),
+                Reason = "Family event",
+                EmployeeNumber = 1
+            },
+            new
+            {
+                Id = 2,
+                Status = Status.Aangevraagd,
+                StartDate = new DateTime(2024, 12, 15),
+                EndDate = new DateTime(2024, 12, 15),
+                Reason = "Medical appointment",
+                EmployeeNumber = 2
+            }
+        );
+
+        modelBuilder.Entity<Notification>().HasData(
+            new
+            {
+                Id = 1,
+                EmployeeNumber = 1,
+                Title = "Meeting Reminder",
+                Description = "Don't forget the department meeting on Dec 10.",
+                SentAt = new DateTime(2024, 12, 8, 9, 0, 0),
+                HasBeenRead = false
+            },
+            new
+            {
+                Id = 2,
+                EmployeeNumber = 3,
+                Title = "Holiday Hours",
+                Description = "Check your holiday hours for December.",
+                SentAt = new DateTime(2024, 12, 7, 15, 30, 0),
+                HasBeenRead = true
+            }
+        );
+
+        modelBuilder.Entity<Shift>().HasData(
+            new
+            {
+                Id = 1,
+                Start = new DateTime(2024, 12, 9, 9, 0, 0),
+                End = new DateTime(2024, 12, 9, 17, 0, 0),
+                Department = Department.Kassa,
+                EmployeeNumber = 1
+            },
+            new
+            {
+                Id = 2,
+                Start = new DateTime(2024, 12, 10, 13, 0, 0),
+                End = new DateTime(2024, 12, 10, 17, 0, 0),
+                Department = Department.Vakkenvullen,
+                EmployeeNumber = 2
+            }
+        );
+
+        modelBuilder.Entity<ShiftTakeOver>().HasData(
+            new
+            {
+                ShiftId = 2,
+                EmployeeTakingOverEmployeeNumber = 3
             }
         );
     }
