@@ -12,9 +12,10 @@ namespace BumboApp.Models
         public DateTime End { get; set; }
         [Required]
         public Department Department { get; set; }
-        [Required]
-        public Employee Employee { get; set; }
+        public Employee? Employee { get; set; }
         //Navigation
         public ShiftTakeOver ShiftTakeOver { get; set; }
+        [Required]
+        public bool IsFinal { get; set; }
     }
 }

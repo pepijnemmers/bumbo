@@ -18,6 +18,6 @@ namespace BumboApp.Models
         [Required]
         public bool HasBeenRead { get; set; }
         [Column(TypeName = "text")]
-        public string? Text { get; set; }
+        public string? ActionUrl { get; set; }
     }
 }

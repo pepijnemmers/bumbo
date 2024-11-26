@@ -11,7 +11,9 @@ namespace BumboApp.Models
         [ForeignKey(nameof(ShiftId))]
         public Shift Shift { get; set; }
         [ForeignKey(nameof(ShiftId))]
-        public int EmployeeTakingOverEmployeeNumber { get; set; }
-        public Employee EmployeeTakingOver { get; set; }
+        public int? EmployeeTakingOverEmployeeNumber { get; set; }
+        public Employee? EmployeeTakingOver { get; set; }
+        [Required]
+        public Status Status { get; set; }
     }
 }

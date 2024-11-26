@@ -376,6 +376,7 @@ public partial class BumboDbContext : DbContext
         Zipcode = "1234AB",
         HouseNumber = "1A",
         ContractHours = 40,
+        LeaveHours = 60,
         StartOfEmployment = new DateOnly(2020, 1, 15),
         UserId = 1
     },
@@ -388,6 +389,7 @@ public partial class BumboDbContext : DbContext
         Zipcode = "5684AC",
         HouseNumber = "2B",
         ContractHours = 20,
+        LeaveHours = 5,
         StartOfEmployment = new DateOnly(2021, 3, 1),
         UserId = 2
     },
@@ -400,6 +402,7 @@ public partial class BumboDbContext : DbContext
         Zipcode = "5211DG",
         HouseNumber = "3C",
         ContractHours = 35,
+        LeaveHours = 40,
         StartOfEmployment = new DateOnly(2019, 7, 30),
         UserId = 3
     }
@@ -490,7 +493,8 @@ public partial class BumboDbContext : DbContext
                 Start = new DateTime(2024, 12, 9, 9, 0, 0),
                 End = new DateTime(2024, 12, 9, 17, 0, 0),
                 Department = Department.Kassa,
-                EmployeeNumber = 1
+                EmployeeNumber = 1,
+                IsFinal = false
             },
             new
             {
@@ -498,7 +502,8 @@ public partial class BumboDbContext : DbContext
                 Start = new DateTime(2024, 12, 10, 13, 0, 0),
                 End = new DateTime(2024, 12, 10, 17, 0, 0),
                 Department = Department.Vakkenvullen,
-                EmployeeNumber = 2
+                EmployeeNumber = 2,
+                IsFinal = false
             }
         );
 
@@ -506,7 +511,14 @@ public partial class BumboDbContext : DbContext
             new
             {
                 ShiftId = 2,
-                EmployeeTakingOverEmployeeNumber = 3
+                EmployeeTakingOverEmployeeNumber = 3,
+                Status = Status.Aangevraagd
+            },
+            new
+            {
+                ShiftId = 1,
+                EmployeeTakingOverEmployeeNumber = 2,
+                Status = Status.Afgewezen
             }
         );
     }
