@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BumboApp.Migrations
 {
     /// <inheritdoc />
-    public partial class SeedDataOpeningHours : Migration
+    public partial class SeedDataEssential : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
