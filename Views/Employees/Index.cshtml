@@ -1,4 +1,4 @@
-﻿@* @model List<Employee> *@
+﻿@model List<Employee>
 @using System.Globalization
 @using BumboApp.Views.Components
 @using Microsoft.Data.SqlClient
@@ -37,10 +37,11 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td>@item.employee_number</td>
-                        <td>@(item.first_name + " " + item.last_name)</td>
+                        <td>@item.EmployeeNumber</td>
+                        <td>@(item.FirstName + " " + item.LastName)</td>
+                        <td>@item.User.Role</td>
                         <td>
-                            <a asp-controller="Employee" asp-action="details" asp-route-id="@item.employee_number)">
+                            <a asp-controller="Employee" asp-action="details" asp-route-id="@item.EmployeeNumber">
                                 <img width="20px" height="auto" src="~/img/details-icon.svg" alt="Alternate Text" />
                             </a>
                         </td>

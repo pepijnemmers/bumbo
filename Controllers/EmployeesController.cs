@@ -1,6 +1,7 @@
 ﻿using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace BumboApp.Controllers
 {
@@ -10,6 +11,7 @@ namespace BumboApp.Controllers
         {
             int currentPageNumber = page ?? DefaultPage;
             List<Employee> employees = Context.Employees
+                .Include(e => e.User)
                 .ToList();
 
             int maxPages = (int)(Math.Ceiling((decimal)employees.Count / PageSize));
