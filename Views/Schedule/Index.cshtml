@@ -14,7 +14,47 @@
     };
     DateOnly? selectedStartDay = new DateOnly(2024, 12, 2); // current day or monday of the week
     int weeknumber = ISOWeek.GetWeekOfYear(selectedStartDay.Value.ToDateTime(new TimeOnly(12, 00)));
-    bool isDayView = true;
+    bool isDayView = false;
+    
+    List<Shift> shifts = new List<Shift>()
+    {
+        new Shift()
+        {
+            Id = 1, 
+            Start = new DateTime(new DateOnly(2024, 12, 2), new TimeOnly(9, 00)), 
+            End = new DateTime(new DateOnly(2024, 12, 2), new TimeOnly(18, 00)), 
+            Department = Department.Kassa,
+            Employee = employees[0],
+            IsFinal = true
+        },
+        new Shift()
+        {
+            Id = 2, 
+            Start = new DateTime(new DateOnly(2024, 12, 3), new TimeOnly(6, 00)), 
+            End = new DateTime(new DateOnly(2024, 12, 3), new TimeOnly(10, 00)), 
+            Department = Department.Vers,
+            Employee = employees[1],
+            IsFinal = true
+        },
+        new Shift()
+        {
+            Id = 3, 
+            Start = new DateTime(new DateOnly(2024, 12, 7), new TimeOnly(12, 00)), 
+            End = new DateTime(new DateOnly(2024, 12, 7), new TimeOnly(15, 00)), 
+            Department = Department.Vakkenvullen,
+            Employee = employees[2],
+            IsFinal = true
+        },
+        new Shift()
+        {
+            Id = 3, 
+            Start = new DateTime(new DateOnly(2024, 12, 8), new TimeOnly(12, 00)), 
+            End = new DateTime(new DateOnly(2024, 12, 8), new TimeOnly(15, 00)), 
+            Department = Department.Vers,
+            Employee = null,
+            IsFinal = true
+        },
+    };
 
 }
 
@@ -96,8 +136,10 @@
             @if (role == Role.Manager)
             {
                 <select class="form-select w-auto" onchange="GoToEmployee(this)">
-                    <option value="all" selected="@(selectedEmployee == null)">Alle werknemers</option>
-                    <optgroup label="Filter op werknemer">
+                    <optgroup label="Toon alle werknemers">
+                        <option value="all" selected="@(selectedEmployee == null)">Alle werknemers</option>
+                    </optgroup>
+                    <optgroup label="Toon één werknemer">
                         @foreach (Employee employee in employees)
                         {
                             <option value="@employee.EmployeeNumber" selected="@(employee == selectedEmployee)">@employee.FirstName @employee.LastName</option>
@@ -107,6 +149,13 @@
             }
         </div>
     </div>
+    @if (role == Role.Manager)
+    {
+        <p class="text-secondary mt-2 fst-italic">
+            <i class="fas fa-info-circle"></i>
+            Tip! Dubbelklik op een uur om een dienst toe te voegen.
+        </p>
+    }
 </header>
 
 @* Calendar day view *@
@@ -115,32 +164,124 @@
 @* Calender week view *@
 @* base grid for calender TODO: move to component if possible and remove comments *@
 <div class="table-container">
-    <div class="calendar-container py-1">
+    <div class="calendar-container">
+        
         <!-- Layer 1: Base Grid -->
-        <div class="calendar-grid row">
-            <div class="col time-slots-col">
-                @for (int i = 0; i < 24; i++)
+        <div class="calendar-grid row g-0" style="@(role == Role.Employee ? "pointer-events: none" : "")">
+            <div class="time-slots-col">
+                <div class="time-slot time-slot-header"></div>
+                @for (int i = 6; i < 24; i++)
                 {
                     <div class="time-slot">
-                        <span>@i:00</span>
+                        <span>@i.ToString("D2"):00</span>
                     </div>
                 }
             </div>
             @for (int i = 0; i < 7; i++)
             {
-                <div class="col day-col">
+                <div class="col day-col @(selectedStartDay.Value.AddDays(i) == DateOnly.FromDateTime(DateTime.Today) ? "today" : "")">
                     <div class="day-header">
                         <span class="text-center d-block small lh-1">@selectedStartDay.Value.AddDays(i).ToString("ddd", CultureInfo.GetCultureInfo("nl-NL"))</span>
                         <strong class="text-center d-block fs-5 lh-1">@selectedStartDay.Value.AddDays(i).ToString("dd", CultureInfo.GetCultureInfo("nl-NL"))</strong>
+                    </div>
+                    <div class="day-hours-grid">
+                        @for (int j = 6; j < 24; j++)
+                        {
+                            if (role == Role.Manager)
+                            {
+                                <div class="hour" ondblclick="GoToCreateShift('@selectedStartDay.Value.AddDays(i).ToString()', @j)"><i class="fas fa-plus"></i></div>
+                            }
+                            else
+                            {
+                                <div class="hour"></div>
+                            }
+                        }
                     </div>
                 </div>
             }
         </div>
 
         <!-- Layer 2: Overlay -->
-        <div class="shift-overlay">
-            
+        <div class="shifts-overlay">
+            @foreach (Shift shift in shifts)
+            {
+                var dayGridPosition = shift.Start.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)shift.Start.DayOfWeek;
+                var startHour = shift.Start.Hour;
+                var endHour = shift.End.Hour;
+                var gridSpan = endHour - startHour;
+                
+                <button 
+                    class="unset-all shift-container 
+                        @shift.Department.ToString().ToLower() 
+                        @(shift.Employee == null ? "no-employee" : "")
+                        @(!shift.IsFinal ? "concept": "")"
+                    style="grid-area: @(startHour - 5) / @dayGridPosition / span @gridSpan"
+                    data-bs-toggle="popover"
+                    data-bs-trigger="focus"
+                    data-bs-placement="left"
+                    data-bs-html="true"
+                    data-bs-custom-class="popover-shift @shift.Department.ToString().ToLower()"
+                    data-bs-title="
+                        @if (!shift.IsFinal) { <span class='text-secondary small fst-italic'>Concept</span> }
+                        <div class='d-flex justify-content-between align-items-center gap-3'>
+                            <span class='fw-500' style='min-width: 3em'>@shift.Department</span>
+                            @if (selectedStartDay > DateOnly.FromDateTime(DateTime.Today)) { <a href='/shifts/update?id=@shift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
+                        </div>
+                        "
+                    data-bs-content="
+                        <div>
+                            <p class='text-secondary m-0'>@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                            @if (shift.Employee != null) { <p class='fw-500 m-0'>@shift.Employee?.FirstName @shift.Employee?.LastName</p> }
+                            else { <p class='fw-500 text-danger m-0'>Zoek intern vervanging en pas de dienst aan of zoek extern.</p> }
+                        </div>"
+                >
+                    <div class="shift">
+                        <p class="text-secondary m-0">@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                        @if (shift.Employee != null)
+                        {
+                            <p class="fw-500">@shift.Employee?.FirstName @shift.Employee?.LastName</p>
+                        }
+                        else
+                        {
+                            <p class="fw-500 text-danger">
+                                <i class="fas fa-user-slash"></i>
+                                Geen werknemer
+                            </p>
+                        }
+                    </div>
+                </button>
+            }
         </div>
+    </div>
+</div>
+
+@* Legenda *@
+<div class="legenda table-container p-3">
+    <h4>Legenda</h4>
+    <div class="d-flex align-items-center gap-4 flex-wrap">
+        <div class="legenda-item">
+            <div class="legenda-color kassa"></div>
+            <span>Kassa</span>
+        </div>
+        <div class="legenda-item">
+            <div class="legenda-color vers"></div>
+            <span>Vers</span>
+        </div>
+        <div class="legenda-item">
+            <div class="legenda-color vakkenvullen"></div>
+            <span>Vakkenvullen</span>
+        </div>
+        @if (role == Role.Manager)
+        {
+            <div class="legenda-item">
+                <div class="legenda-color no-employee"></div>
+                <span>Geen werknemer</span>
+            </div>
+            <div class="legenda-item">
+                <div class="legenda-color concept"></div>
+                <span>Concept</span>
+            </div>
+        }
     </div>
 </div>
 
@@ -170,8 +311,7 @@
 
 @section Scripts
 {
-    <script type="text/javascript">
-            
+    <script type="text/javascript">            
         function GoToDate(date) {
             console.log(date);
         }
@@ -180,5 +320,9 @@
             console.log(select.value);
         }    
         
+        function GoToCreateShift(date, startHour) {
+            console.log(date, startHour);
+        }
+    
     </script>
 }
