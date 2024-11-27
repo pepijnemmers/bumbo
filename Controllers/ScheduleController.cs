@@ -15,6 +15,11 @@ namespace BumboApp.Controllers
 
         public IActionResult Create(DateOnly startDate)
         {
+            Prognosis prognosis = Context.Prognoses.Where(e => e.Date == startDate).FirstOrDefault();
+            if (prognosis == null)
+            {
+                NotifyErrorAndRedirect("Geen prognose om het rooster te maken", "Index"); //route to prognose page?
+            }
             List<Department> departmentList = new List<Department> { Department.Kassa, Department.Vers, Department.Vakkenvullen };
             DateOnly endDate = startDate.AddDays(6);
             foreach (Department department in departmentList)
@@ -44,6 +49,11 @@ namespace BumboApp.Controllers
                     });
                 }
             }
+            try
+            {
+                Context.SaveChanges(); //more saves between edits or just in the end?
+            }
+            catch(Exception e) { return NotifyErrorAndRedirect("er is een probleem opgetreden", "Index"); }
             return RedirectToAction("Index",startDate);
         }
 
@@ -101,11 +111,9 @@ namespace BumboApp.Controllers
                 .ToList();
             if (prognosis == null)
             {
-                NotifyErrorAndRedirect("Geen prognose om het rooster te maken","Index"); //route to prognose page?
-                return false; //Visual studio was whining that it wanted this
+                NotifyErrorAndRedirect("Geen prognose om het rooster te maken", "Index"); //route to prognose page?
             }
-
-            if(prognosis.NeededHours >= GetWorkingHours(departmentDayShifts))
+            if (prognosis.NeededHours >= GetWorkingHours(departmentDayShifts))
             {
                 return true;
             }
@@ -114,8 +122,11 @@ namespace BumboApp.Controllers
 
         private bool OpeningInCashRegister(DateOnly scheduledate)
         {
-            TimeOnly time = (TimeOnly)Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).FirstOrDefault().OpeningTime;
-            int hour = time.Hour;
+            TimeOnly oTime = (TimeOnly)Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).FirstOrDefault().OpeningTime;
+            TimeOnly cTime = (TimeOnly)Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).FirstOrDefault().ClosingTime;
+            int openingHour = oTime.Hour;
+            int closingHour = cTime.Hour;
+            if (cTime.Minute > 0) { closingHour++; }
             List<Shift> shifts = Context.Shifts
                     .Where(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly())
                     && e.Department == Department.Kassa).OrderBy(e => e.Start.Hour).ToList();
@@ -124,19 +135,30 @@ namespace BumboApp.Controllers
             {
                 if (previous == null)
                 {
-                    if (shift.Start.Hour == hour)
+                    if (shift.Start.Hour == openingHour)
                     {
                         previous = shift;
                         continue;
                     }
+                    return true;
                 }
+                if (previous.End.Hour >= shift.Start.Hour)
+                {
+                    previous = shift;
+                    continue;
+                }
+                return true;
             }
-            return false;
+            if(shifts.Last().End.Hour == closingHour)
+            {
+                return false;
+            }
+            return true;
         }
 
         private void ScheduleShift(Department department, DateOnly scheduledate, Employee employee)
         {
-            throw new NotImplementedException();
+            Availability availability = employee.Availabilities.Where(e => e.Date == scheduledate).FirstOrDefault();
         }
 
         private bool ScheduleConcurrentShift(Department department, DateOnly scheduledate, Employee employee)
