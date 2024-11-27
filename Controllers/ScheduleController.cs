@@ -326,7 +326,31 @@ namespace BumboApp.Controllers
 
         private int getMaxTimeCAO(Employee employee, DateOnly scheduledate, int startinghour)
         {
-            throw new NotImplementedException();
+            int age = DateTime.Now.Year - employee.DateOfBirth.Year;
+            if( !(employee.DateOfBirth.Month <= DateTime.Now.Month && employee.DateOfBirth.Day <= DateTime.Now.Day))
+            {
+                age--;
+            }
+            if( age >= 18 )
+            {
+                // 4,5 uur = 30 min pauze
+                // 8 uur 30
+                // 12 uur per dienst
+                // 60 per week
+            }
+            else if(age < 16)
+            {
+                // 8 uur incl schooluren
+                // max 19:00
+                // max 5 dagen
+                // 12 in schoolweek
+                // max 40 uur gewone week
+            }
+            else
+            {
+                // 9 uur incl school
+                // 40 gemiddeld 4 weken
+            }
         }
     }
 }
