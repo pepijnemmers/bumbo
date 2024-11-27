@@ -1,4 +1,6 @@
-﻿@{
+﻿@using System.Globalization
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@{
     ViewData["Title"] = "Rooster";
     
     Role role = Role.Manager;
@@ -6,100 +8,177 @@
     Employee? selectedEmployee = null;
     List<Employee> employees = new List<Employee>()
     {
-        new Employee() { EmployeeNumber = 1, FirstName = "John", LastName = "Doe" },
-        new Employee() { EmployeeNumber = 2, FirstName = "Jane", LastName = "Doe" },
+        new Employee() { EmployeeNumber = 1, FirstName = "Jane", LastName = "Doe" },
+        new Employee() { EmployeeNumber = 2, FirstName = "John", LastName = "Doe" },
         new Employee() { EmployeeNumber = 3, FirstName = "Alice", LastName = "Doe" },
     };
-    DateOnly? selectedDay = null;
-    DateOnly? selectedWeek = null;
+    DateOnly? selectedStartDay = new DateOnly(2024, 12, 2); // current day or monday of the week
+    int weeknumber = ISOWeek.GetWeekOfYear(selectedStartDay.Value.ToDateTime(new TimeOnly(12, 00)));
+    bool isDayView = true;
+
 }
 
-@* Header Manager *@
-@*
-    - dag
-        - datum met pijltjes
-        - verwijder week
-        - dienst toevoegen
-        - dag/week overzicht dropdown (alleen bij 1 werknemer)
-        - werknemer dropdown
-    - week (alleen van 1 werknemer)
-        - week met pijltjes
-        - verwijder week
-        - dienst toevoegen
-        - dag/week overzicht dropdown (alleen bij 1 werknemer)
-        - werknemer dropdown
-    - concept (zelfde als bovenstaande, maar dan met rij erbij en zonder verwijder week knop)
-*@
-
-@if (role == Role.Manager)
-{
-    <header>
-        @* concept header *@
-        @if (!isFinal)
-        {
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <h3 class="fst-italic text-secondary">Concept rooster</h3>
-                <div class="buttons">
-                    <a class="btn btn-outline-danger">
-                        <i class="fas fa-trash-alt"></i>
-                        Concept week verwijderen
-                    </a>
-                    <a class="btn btn-success">
-                        <i class="fas fa-check"></i>
-                        Week publiceren
-                    </a>
-                </div>
+@* Header for manager and employee *@
+<header>
+    @* concept header *@
+    @if (role == Role.Manager && !isFinal)
+    {
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h3 class="fst-italic text-secondary">Concept rooster</h3>
+            <div class="buttons">
+                <a class="btn btn-outline-danger">
+                    <i class="fas fa-trash-alt"></i>
+                    Concept week verwijderen
+                </a>
+                <a class="btn btn-success">
+                    <i class="fas fa-check"></i>
+                    Week publiceren
+                </a>
             </div>
-        }
-        @* day & week header *@
-        <div class="d-flex align-items-center justify-content-between">
-            <div class="date-nav">
-                < date >
-            </div>
-            <div class="buttons d-flex align-items-center gap-2">
-                @if (isFinal && (selectedDay >= DateOnly.FromDateTime(DateTime.Today)) || selectedWeek >= DateOnly.FromDateTime(DateTime.Today))
-                {
-                    <a class="btn btn-outline-danger">
-                        <i class="fas fa-trash-alt"></i>
-                        Verwijder week
-                    </a>
-                }
-                <a class="btn btn-primary">
+        </div>
+    }
+    @* day & week header *@
+    <div class="d-flex align-items-center justify-content-between">
+        <div class="date-nav">
+            @if (!isDayView)
+            {
+                <button class="unset-all text-body" onclick="GoToDate('@selectedStartDay.Value.AddDays(-7).ToString()')">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <span class="fw-bold px-1 text-capitalize">
+                    Week @weeknumber
+                </span>
+                <button class="unset-all text-body" onclick="GoToDate('@selectedStartDay.Value.AddDays(7).ToString()')">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            }
+            else
+            {
+                <button class="unset-all text-body" onclick="GoToDate('@selectedStartDay.Value.AddDays(-1).ToString()')">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <span class="fw-bold px-1 text-capitalize">
+                    @selectedStartDay.Value.ToString("ddd dd-MM-yyyy", CultureInfo.GetCultureInfo("nl-NL"))
+                </span>
+                <button class="unset-all text-body" onclick="GoToDate('@selectedStartDay.Value.AddDays(1).ToString()')">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            }
+        </div>
+        <div class="buttons d-flex align-items-center gap-2">
+            @if (role == Role.Manager && isFinal && selectedStartDay > DateOnly.FromDateTime(DateTime.Today))
+            {
+                <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#delete-week-modal">
+                    <i class="fas fa-trash-alt"></i>
+                    Verwijder week
+                </button>
+            }
+            @if (role == Role.Manager)
+            {
+                <a class="btn btn-primary" asp-controller="Shifts" asp-action="Create" asp-route-date="@(isDayView ? selectedStartDay : null)">
                     <i class="fas fa-plus"></i>
                     Dienst toevoegen
                 </a>
-                @if (selectedEmployee == null)
-                {
-                    <select class="form-select w-auto">
-                        <option value="day" selected>Dag overzicht</option>
-                        <option value="week">Week overzicht</option>
-                    </select>
-                }
+            }
+            @if (role == Role.Employee)
+            {
+                <a class="btn btn-primary" asp-controller="Shifts" asp-action="MyShifts">
+                    Mijn diensten
+                </a>
+            }
+            @if (selectedEmployee != null)
+            {
                 <select class="form-select w-auto">
-                    <option value="all" selected>Alle werknemers</option>
-                    
+                    <option value="day" selected="@(isDayView)">Dag overzicht</option>
+                    <option value="week" selected="@(!isDayView)">Week overzicht</option>
+                </select>
+            }
+            @if (role == Role.Manager)
+            {
+                <select class="form-select w-auto" onchange="GoToEmployee(this)">
+                    <option value="all" selected="@(selectedEmployee == null)">Alle werknemers</option>
                     <optgroup label="Filter op werknemer">
                         @foreach (Employee employee in employees)
                         {
-                            <option value="@employee.EmployeeNumber">@employee.FirstName @employee.LastName</option>
+                            <option value="@employee.EmployeeNumber" selected="@(employee == selectedEmployee)">@employee.FirstName @employee.LastName</option>
                         }
                     </optgroup>
                 </select>
+            }
+        </div>
+    </div>
+</header>
+
+@* Calendar day view *@
+
+
+@* Calender week view *@
+@* base grid for calender TODO: move to component if possible and remove comments *@
+<div class="table-container">
+    <div class="calendar-container py-1">
+        <!-- Layer 1: Base Grid -->
+        <div class="calendar-grid row">
+            <div class="col time-slots-col">
+                @for (int i = 0; i < 24; i++)
+                {
+                    <div class="time-slot">
+                        <span>@i:00</span>
+                    </div>
+                }
+            </div>
+            @for (int i = 0; i < 7; i++)
+            {
+                <div class="col day-col">
+                    <div class="day-header">
+                        <span class="text-center d-block small lh-1">@selectedStartDay.Value.AddDays(i).ToString("ddd", CultureInfo.GetCultureInfo("nl-NL"))</span>
+                        <strong class="text-center d-block fs-5 lh-1">@selectedStartDay.Value.AddDays(i).ToString("dd", CultureInfo.GetCultureInfo("nl-NL"))</strong>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Layer 2: Overlay -->
+        <div class="shift-overlay">
+            
+        </div>
+    </div>
+</div>
+
+@* Modals *@
+@if (role == Role.Manager)
+{
+    <div class="modal fade" id="delete-week-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Weet je zeker dat je alle diensten deze week wilt verwijderen?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Door op "Verwijderen" te klikken worden alle diensten van deze week verwijderd. Dit kan niet ongedaan worden gemaakt.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuleren</button>
+                    <a class="btn btn-danger" asp-controller="Schedule" asp-action="DeleteWeek" asp-route-startDay="@selectedStartDay">
+                        Verwijderen
+                    </a>
+                </div>
             </div>
         </div>
-    </header>
+    </div>
 }
 
-
-
-@* Header Werknemer *@
-@*
-    - dag
-        - datum met pijltjes
-        - mijn diensten
-        - dag/week overzicht dropdown
-    - week
-        - week met pijltjes
-        - mijn diensten
-        - dag/week overzicht dropdown
-*@
+@section Scripts
+{
+    <script type="text/javascript">
+            
+        function GoToDate(date) {
+            console.log(date);
+        }
+        
+        function GoToEmployee(select) {
+            console.log(select.value);
+        }    
+        
+    </script>
+}
