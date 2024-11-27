@@ -13,5 +13,10 @@ namespace BumboApp.Controllers
         {
             return View();
         }
+
+        public IActionResult DeleteWeek(DateOnly startDay)
+        {
+            return RedirectToAction("Index");
+        }
     }
 }
