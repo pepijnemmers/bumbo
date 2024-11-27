@@ -1,4 +1,4 @@
-﻿@model BumboApp.Models.Employee
+﻿@model List<LeaveRequest>
 @{
     ViewData["Title"] = "Verlof en ziekmelden";
 }
@@ -25,7 +25,7 @@
         <tbody>
             @if (Model != null)
             {
-                foreach (var request in Model.leaveRequests)
+                foreach (var request in Model)
                 {
                     <tr>
                         <td>@request.StartDate</td>
