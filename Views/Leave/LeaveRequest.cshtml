@@ -1,11 +1,10 @@
-﻿@model BumboApp.Models.Employee
+﻿@model BumboApp.Models.User
 @{
     ViewData["Title"] = "Verlof aanvragen";
 }
 
 <form asp-action="CreateLeaveRequest" asp-controller="Leave" method="post">
-    <div class="card p-4 create-prognosis-card"> 
-        @*css card id later generaliseren voor alle create cards?*@
+    <div class="card p-4 create-card"> 
         <div class="mb-3">
             <label for="startDate" class="form-label fw-bold">Begin Datum</label>
             <input type="date" class="form-control" id="startDate" name="StartDate" placeholder="Begindatum" onchange="checkDate()" min="@DateTime.Now.ToString("yyyy-MM-dd")" required>
@@ -18,9 +17,9 @@
 
         <div class="mb-3">
             <label for="reason" class="form-label fw-bold">Reden</label>
-            <textarea class="form-control" name="Reason" placeholder="Reden" required></textarea>
+            <textarea class="form-control" name="Reason" placeholder="Reden" maxlength="255" required></textarea>
         </div>
-        <input type="hidden" name="Employee" value="@Model"/>
+        
         <input type="hidden" name="Status" value="@Status.Aangevraagd" />
 
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">

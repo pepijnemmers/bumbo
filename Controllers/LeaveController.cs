@@ -5,7 +5,7 @@ namespace BumboApp.Controllers
 {
     public class LeaveController : MainController
     {
-        Employee LoggedInEmployee; // de Employee die is ingelogd (afgeleid van LoggedInUser)
+        Employee LoggedInEmployee;
         public IActionResult Index()
         {
             LoggedInEmployee = Context.Employees.Find(LoggedInUser.Id);
@@ -13,7 +13,7 @@ namespace BumboApp.Controllers
             List<LeaveRequest> leaveRequests;
             if (LoggedInUser.Role == Role.Manager)
             {
-                leaveRequests = Context.LeaveRequests.ToList();
+                leaveRequests = Context.LeaveRequests.OrderBy(p => p.StartDate).ToList();
             }
             else
             {
@@ -26,23 +26,32 @@ namespace BumboApp.Controllers
 
         public IActionResult LeaveRequest()
         {
-            return View(LoggedInEmployee);
+            return View(LoggedInUser);
         }
 
         public IActionResult CreateLeaveRequest(LeaveRequest request)
         {
-            return NotifyErrorAndRedirect("Fail", "Index"); // test dingetje
+            LoggedInEmployee = Context.Employees.Find(LoggedInUser.Id);
+            request.Employee = LoggedInEmployee;
 
-            /* uncommenten als de LoggedInEmployee correct werkt
+            NotifyService.Information(request.StartDate.ToString());
+
+            // validation 
+            if (request.StartDate < DateTime.Now)
+                return NotifyErrorAndRedirect("Je kunt geen verlofaanvraag in het verleden doen.", "Index");
+
+            if (request.StartDate > request.EndDate)
+            {
+                return NotifyErrorAndRedirect("De startdatum moet voor of op de einddatum vallen.", "LeaveRequest");
+            }
+
             using var transaction = Context.Database.BeginTransaction();
 
             try
             {
                 Context.LeaveRequests.Add(request);
-
                 Context.SaveChanges();
                 transaction.Commit();
-                LoggedInEmployee.leaveRequests.Add(request);
                 return NotifySuccessAndRedirect("De verlofaanvraag is opgeslagen.", "Index");
             }
             catch
@@ -50,7 +59,6 @@ namespace BumboApp.Controllers
                 transaction.Rollback();
                 return NotifyErrorAndRedirect("Er is iets mis gegaan bij het toevoegen van de verlofaanvraag", "Index");
             }
-            */
         }
     }
 }
