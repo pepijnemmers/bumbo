@@ -142,8 +142,8 @@ public partial class BumboDbContext : IdentityDbContext<User>
     private void EssentialSeedData(ModelBuilder modelBuilder)
     {
         //Add roles
-        var managerRoleId = Guid.NewGuid().ToString();
-        var employeeRoleId = Guid.NewGuid().ToString();
+        var managerRoleId = "7y6w";
+        var employeeRoleId = "0f5t";
 
         modelBuilder.Entity<IdentityRole>().HasData(
             new IdentityRole
@@ -161,11 +161,9 @@ public partial class BumboDbContext : IdentityDbContext<User>
             );
 
         //Seed Users
-        var user1Id = Guid.NewGuid().ToString(); //Manager
-        var user2Id = Guid.NewGuid().ToString(); //Employee
-        var user3Id = Guid.NewGuid().ToString(); //Employee
-
-        var passwordHasher = new PasswordHasher<User>();
+        var user1Id = "a1"; //Manager
+        var user2Id = "b2"; //Employee
+        var user3Id = "c3"; //Employee
 
         modelBuilder.Entity<User>().HasData(
                 new User
@@ -176,8 +174,11 @@ public partial class BumboDbContext : IdentityDbContext<User>
                     Email = "john.doe@example.com",
                     NormalizedEmail = "JOHN.DOE@EXAMPLE.COM",
                     EmailConfirmed = true,
-                    PasswordHash = passwordHasher.HashPassword(null, "qwer1234")
-                        },
+                    LockoutEnabled = false,
+                    SecurityStamp = "static-security-stamp",
+                    ConcurrencyStamp = "static-concurrency-stamp",
+                    PasswordHash = "AQAAAAIAAYagAAAAEHElifiD+iCmgFS/WCucV8tMzAcHwDdy1B4kwXCYsxB7xOwvRsxjkQbdJ6YrI77xDA=="
+                },
                 new User
                 {
                     Id = user2Id,
@@ -186,7 +187,10 @@ public partial class BumboDbContext : IdentityDbContext<User>
                     Email = "jane.smith@example.com",
                     NormalizedEmail = "JANE.SMITH@EXAMPLE.COM",
                     EmailConfirmed = true,
-                    PasswordHash = passwordHasher.HashPassword(null, "asdf1234")
+                    LockoutEnabled = false,
+                    SecurityStamp = "static-security-stamp",
+                    ConcurrencyStamp = "static-concurrency-stamp",
+                    PasswordHash = "AQAAAAIAAYagAAAAEGk4lj3QRvRZzy4Oas9sTTW0A2nJ1X41eB0uiNnGNFQT7RdiOs/FLSjxWz/x4KDk+w=="
                 },
                 new User
                 {
@@ -196,7 +200,10 @@ public partial class BumboDbContext : IdentityDbContext<User>
                     Email = "emily.jones@example.com",
                     NormalizedEmail = "EMILY.JONES@EXAMPLE.COM",
                     EmailConfirmed = true,
-                    PasswordHash = passwordHasher.HashPassword(null, "zxcv1234")
+                    LockoutEnabled = false,
+                    SecurityStamp = "static-security-stamp",
+                    ConcurrencyStamp = "static-concurrency-stamp",
+                    PasswordHash = "AQAAAAIAAYagAAAAEHv/0P6Xoo7fFyIXoIwA78DUHxHCFNYGaR8vPnMjmnx+QoW0Khto6+ptFaVzpYAWFw=="
                 }
             );
 

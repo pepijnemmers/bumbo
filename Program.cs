@@ -4,6 +4,7 @@ using AspNetCoreHero.ToastNotification.Extensions;
 using BumboApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,12 +17,18 @@ builder.Services.AddNotyf(config =>
     config.Position = NotyfPosition.BottomRight;
 });
 
-builder.Services.AddAuthorization();
-builder.Services.AddAuthentication().AddCookie(IdentityConstants.ApplicationScheme);
+builder.Services.AddDbContext<BumboDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentityCore<User>()
-    .AddEntityFrameworkStores<BumboDbContext>()
-    .AddApiEndpoints();
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = true;
+})
+.AddEntityFrameworkStores<BumboDbContext>()
+.AddDefaultTokenProviders();
+
+builder.Services.AddAuthorization();
+
 
 var app = builder.Build();
 
@@ -54,7 +61,5 @@ app.UseNotyf();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboard}/{action=Index}");
-
-app.MapIdentityApi<User>();
 
 app.Run();

@@ -38,7 +38,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("EmployeeNumber", "Date");
 
-                    b.ToTable("Availabilities", null, t =>
+                    b.ToTable("Availabilities", t =>
                         {
                             t.HasCheckConstraint("CK_Availability_StartTime_EndTime", "[StartTime] < [EndTime]");
                         });
@@ -118,7 +118,7 @@ namespace BumboApp.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Employees", null, t =>
+                    b.ToTable("Employees", t =>
                         {
                             t.HasCheckConstraint("CK_Employees_StartOfEmployment_EndOfEmployment", "[StartOfEmployment] <= [EndOfEmployment]");
 
@@ -136,7 +136,7 @@ namespace BumboApp.Migrations
                             LastName = "Doe",
                             LeaveHours = 60,
                             StartOfEmployment = new DateOnly(2020, 1, 15),
-                            UserId = "1",
+                            UserId = "a1",
                             Zipcode = "1234AB"
                         },
                         new
@@ -149,7 +149,7 @@ namespace BumboApp.Migrations
                             LastName = "Smith",
                             LeaveHours = 5,
                             StartOfEmployment = new DateOnly(2021, 3, 1),
-                            UserId = "2",
+                            UserId = "b2",
                             Zipcode = "5684AC"
                         },
                         new
@@ -162,7 +162,7 @@ namespace BumboApp.Migrations
                             LastName = "Jones",
                             LeaveHours = 40,
                             StartOfEmployment = new DateOnly(2019, 7, 30),
-                            UserId = "3",
+                            UserId = "c3",
                             Zipcode = "5211DG"
                         });
                 });
@@ -189,7 +189,7 @@ namespace BumboApp.Migrations
                     b.HasIndex("Date")
                         .IsUnique();
 
-                    b.ToTable("Expectations", (string)null);
+                    b.ToTable("Expectations");
 
                     b.HasData(
                         new
@@ -419,7 +419,7 @@ namespace BumboApp.Migrations
 
                     b.HasIndex("EmployeeNumber");
 
-                    b.ToTable("LeaveRequests", null, t =>
+                    b.ToTable("LeaveRequests", t =>
                         {
                             t.HasCheckConstraint("CK_LeaveRequests_StartDate_EndDate", "[StartDate] <= [EndDate]");
                         });
@@ -467,7 +467,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Norms", (string)null);
+                    b.ToTable("Norms");
 
                     b.HasData(
                         new
@@ -546,7 +546,7 @@ namespace BumboApp.Migrations
 
                     b.HasIndex("EmployeeNumber");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
 
                     b.HasData(
                         new
@@ -582,7 +582,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("WeekDay");
 
-                    b.ToTable("OpeningHours", null, t =>
+                    b.ToTable("OpeningHours", t =>
                         {
                             t.HasCheckConstraint("CK_OpeningHours_OpeningTime_ClosingTime", "([OpeningTime] IS NULL AND [ClosingTime] IS NULL) OR ([OpeningTime] IS NOT NULL AND [ClosingTime] IS NOT NULL AND [OpeningTime] < [ClosingTime])");
                         });
@@ -660,7 +660,7 @@ namespace BumboApp.Migrations
                     b.HasIndex("Date", "Department")
                         .IsUnique();
 
-                    b.ToTable("Prognoses", null, t =>
+                    b.ToTable("Prognoses", t =>
                         {
                             t.HasCheckConstraint("CK_Prognoses_NeededHours_NeededEmployees", "[NeededHours] = [NeededEmployees] * 8");
                         });
@@ -1059,7 +1059,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("EmployeeNumber", "Date");
 
-                    b.ToTable("SchoolSchedules", (string)null);
+                    b.ToTable("SchoolSchedules");
 
                     b.HasData(
                         new
@@ -1127,7 +1127,7 @@ namespace BumboApp.Migrations
 
                     b.HasIndex("EmployeeNumber");
 
-                    b.ToTable("Shifts", null, t =>
+                    b.ToTable("Shifts", t =>
                         {
                             t.HasCheckConstraint("CK_Shifts_Start_End", "[Start] < [End]");
                         });
@@ -1168,7 +1168,7 @@ namespace BumboApp.Migrations
 
                     b.HasIndex("EmployeeTakingOverEmployeeNumber");
 
-                    b.ToTable("ShiftTakeOvers", (string)null);
+                    b.ToTable("ShiftTakeOvers");
 
                     b.HasData(
                         new
@@ -1195,7 +1195,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("EmployeeNumber", "Date");
 
-                    b.ToTable("SickLeaves", (string)null);
+                    b.ToTable("SickLeaves");
                 });
 
             modelBuilder.Entity("BumboApp.Models.UniqueDay", b =>
@@ -1222,7 +1222,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UniqueDays", null, t =>
+                    b.ToTable("UniqueDays", t =>
                         {
                             t.HasCheckConstraint("CK_UniqueDays_StartDate_EndDate", "[StartDate] <= [EndDate]");
                         });
@@ -1321,30 +1321,51 @@ namespace BumboApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "1",
+                            Id = "a1",
                             AccessFailedCount = 0,
+                            ConcurrencyStamp = "static-concurrency-stamp",
+                            Email = "john.doe@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
-                            PhoneNumberConfirmed = true,
-                            TwoFactorEnabled = false
+                            NormalizedEmail = "JOHN.DOE@EXAMPLE.COM",
+                            NormalizedUserName = "JOHN.DOE@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHElifiD+iCmgFS/WCucV8tMzAcHwDdy1B4kwXCYsxB7xOwvRsxjkQbdJ6YrI77xDA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "static-security-stamp",
+                            TwoFactorEnabled = false,
+                            UserName = "john.doe@example.com"
                         },
                         new
                         {
-                            Id = "2",
+                            Id = "b2",
                             AccessFailedCount = 0,
+                            ConcurrencyStamp = "static-concurrency-stamp",
+                            Email = "jane.smith@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
-                            PhoneNumberConfirmed = true,
-                            TwoFactorEnabled = false
+                            NormalizedEmail = "JANE.SMITH@EXAMPLE.COM",
+                            NormalizedUserName = "JANE.SMITH@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGk4lj3QRvRZzy4Oas9sTTW0A2nJ1X41eB0uiNnGNFQT7RdiOs/FLSjxWz/x4KDk+w==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "static-security-stamp",
+                            TwoFactorEnabled = false,
+                            UserName = "jane.smith@example.com"
                         },
                         new
                         {
-                            Id = "3",
+                            Id = "c3",
                             AccessFailedCount = 0,
+                            ConcurrencyStamp = "static-concurrency-stamp",
+                            Email = "emily.jones@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
-                            PhoneNumberConfirmed = true,
-                            TwoFactorEnabled = false
+                            NormalizedEmail = "EMILY.JONES@EXAMPLE.COM",
+                            NormalizedUserName = "EMILY.JONES@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHv/0P6Xoo7fFyIXoIwA78DUHxHCFNYGaR8vPnMjmnx+QoW0Khto6+ptFaVzpYAWFw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "static-security-stamp",
+                            TwoFactorEnabled = false,
+                            UserName = "emily.jones@example.com"
                         });
                 });
 
@@ -1364,7 +1385,7 @@ namespace BumboApp.Migrations
                     b.HasIndex("StartDate")
                         .IsUnique();
 
-                    b.ToTable("WeekPrognoses", (string)null);
+                    b.ToTable("WeekPrognoses");
 
                     b.HasData(
                         new
@@ -1404,6 +1425,20 @@ namespace BumboApp.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "7y6w",
+                            Name = "Manager",
+                            NormalizedName = "MANAGER"
+                        },
+                        new
+                        {
+                            Id = "0f5t",
+                            Name = "Employee",
+                            NormalizedName = "EMPLOYEE"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1491,6 +1526,23 @@ namespace BumboApp.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "a1",
+                            RoleId = "7y6w"
+                        },
+                        new
+                        {
+                            UserId = "b2",
+                            RoleId = "0f5t"
+                        },
+                        new
+                        {
+                            UserId = "c3",
+                            RoleId = "0f5t"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>

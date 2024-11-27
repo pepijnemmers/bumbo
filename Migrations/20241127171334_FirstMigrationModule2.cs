@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BumboApp.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialModule2 : Migration
+    public partial class FirstMigrationModule2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -440,13 +440,22 @@ namespace BumboApp.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "0f5t", null, "Employee", "EMPLOYEE" },
+                    { "7y6w", null, "Manager", "MANAGER" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { "1", 0, null, null, true, false, null, null, null, null, null, true, null, false, null },
-                    { "2", 0, null, null, true, false, null, null, null, null, null, true, null, false, null },
-                    { "3", 0, null, null, true, false, null, null, null, null, null, true, null, false, null }
+                    { "a1", 0, "static-concurrency-stamp", "john.doe@example.com", true, false, null, "JOHN.DOE@EXAMPLE.COM", "JOHN.DOE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEHElifiD+iCmgFS/WCucV8tMzAcHwDdy1B4kwXCYsxB7xOwvRsxjkQbdJ6YrI77xDA==", null, false, "static-security-stamp", false, "john.doe@example.com" },
+                    { "b2", 0, "static-concurrency-stamp", "jane.smith@example.com", true, false, null, "JANE.SMITH@EXAMPLE.COM", "JANE.SMITH@EXAMPLE.COM", "AQAAAAIAAYagAAAAEGk4lj3QRvRZzy4Oas9sTTW0A2nJ1X41eB0uiNnGNFQT7RdiOs/FLSjxWz/x4KDk+w==", null, false, "static-security-stamp", false, "jane.smith@example.com" },
+                    { "c3", 0, "static-concurrency-stamp", "emily.jones@example.com", true, false, null, "EMILY.JONES@EXAMPLE.COM", "EMILY.JONES@EXAMPLE.COM", "AQAAAAIAAYagAAAAEHv/0P6Xoo7fFyIXoIwA78DUHxHCFNYGaR8vPnMjmnx+QoW0Khto6+ptFaVzpYAWFw==", null, false, "static-security-stamp", false, "emily.jones@example.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -530,13 +539,23 @@ namespace BumboApp.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[,]
+                {
+                    { "7y6w", "a1" },
+                    { "0f5t", "b2" },
+                    { "0f5t", "c3" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Employees",
                 columns: new[] { "EmployeeNumber", "ContractHours", "DateOfBirth", "EndOfEmployment", "FirstName", "HouseNumber", "LastName", "LeaveHours", "StartOfEmployment", "UserId", "Zipcode" },
                 values: new object[,]
                 {
-                    { 1, 40, new DateOnly(1990, 5, 20), null, "John", "1A", "Doe", 60, new DateOnly(2020, 1, 15), "1", "1234AB" },
-                    { 2, 20, new DateOnly(1995, 8, 12), null, "Jane", "2B", "Smith", 5, new DateOnly(2021, 3, 1), "2", "5684AC" },
-                    { 3, 35, new DateOnly(1998, 12, 5), null, "Emily", "3C", "Jones", 40, new DateOnly(2019, 7, 30), "3", "5211DG" }
+                    { 1, 40, new DateOnly(1990, 5, 20), null, "John", "1A", "Doe", 60, new DateOnly(2020, 1, 15), "a1", "1234AB" },
+                    { 2, 20, new DateOnly(1995, 8, 12), null, "Jane", "2B", "Smith", 5, new DateOnly(2021, 3, 1), "b2", "5684AC" },
+                    { 3, 35, new DateOnly(1998, 12, 5), null, "Emily", "3C", "Jones", 40, new DateOnly(2019, 7, 30), "c3", "5211DG" }
                 });
 
             migrationBuilder.InsertData(

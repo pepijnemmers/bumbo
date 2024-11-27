@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BumboApp.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    [Migration("20241127124838_InitialModule2")]
-    partial class InitialModule2
+    [Migration("20241127171334_FirstMigrationModule2")]
+    partial class FirstMigrationModule2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -139,7 +139,7 @@ namespace BumboApp.Migrations
                             LastName = "Doe",
                             LeaveHours = 60,
                             StartOfEmployment = new DateOnly(2020, 1, 15),
-                            UserId = "1",
+                            UserId = "a1",
                             Zipcode = "1234AB"
                         },
                         new
@@ -152,7 +152,7 @@ namespace BumboApp.Migrations
                             LastName = "Smith",
                             LeaveHours = 5,
                             StartOfEmployment = new DateOnly(2021, 3, 1),
-                            UserId = "2",
+                            UserId = "b2",
                             Zipcode = "5684AC"
                         },
                         new
@@ -165,7 +165,7 @@ namespace BumboApp.Migrations
                             LastName = "Jones",
                             LeaveHours = 40,
                             StartOfEmployment = new DateOnly(2019, 7, 30),
-                            UserId = "3",
+                            UserId = "c3",
                             Zipcode = "5211DG"
                         });
                 });
@@ -1324,30 +1324,51 @@ namespace BumboApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "1",
+                            Id = "a1",
                             AccessFailedCount = 0,
+                            ConcurrencyStamp = "static-concurrency-stamp",
+                            Email = "john.doe@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
-                            PhoneNumberConfirmed = true,
-                            TwoFactorEnabled = false
+                            NormalizedEmail = "JOHN.DOE@EXAMPLE.COM",
+                            NormalizedUserName = "JOHN.DOE@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHElifiD+iCmgFS/WCucV8tMzAcHwDdy1B4kwXCYsxB7xOwvRsxjkQbdJ6YrI77xDA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "static-security-stamp",
+                            TwoFactorEnabled = false,
+                            UserName = "john.doe@example.com"
                         },
                         new
                         {
-                            Id = "2",
+                            Id = "b2",
                             AccessFailedCount = 0,
+                            ConcurrencyStamp = "static-concurrency-stamp",
+                            Email = "jane.smith@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
-                            PhoneNumberConfirmed = true,
-                            TwoFactorEnabled = false
+                            NormalizedEmail = "JANE.SMITH@EXAMPLE.COM",
+                            NormalizedUserName = "JANE.SMITH@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGk4lj3QRvRZzy4Oas9sTTW0A2nJ1X41eB0uiNnGNFQT7RdiOs/FLSjxWz/x4KDk+w==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "static-security-stamp",
+                            TwoFactorEnabled = false,
+                            UserName = "jane.smith@example.com"
                         },
                         new
                         {
-                            Id = "3",
+                            Id = "c3",
                             AccessFailedCount = 0,
+                            ConcurrencyStamp = "static-concurrency-stamp",
+                            Email = "emily.jones@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
-                            PhoneNumberConfirmed = true,
-                            TwoFactorEnabled = false
+                            NormalizedEmail = "EMILY.JONES@EXAMPLE.COM",
+                            NormalizedUserName = "EMILY.JONES@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHv/0P6Xoo7fFyIXoIwA78DUHxHCFNYGaR8vPnMjmnx+QoW0Khto6+ptFaVzpYAWFw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "static-security-stamp",
+                            TwoFactorEnabled = false,
+                            UserName = "emily.jones@example.com"
                         });
                 });
 
@@ -1407,6 +1428,20 @@ namespace BumboApp.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "7y6w",
+                            Name = "Manager",
+                            NormalizedName = "MANAGER"
+                        },
+                        new
+                        {
+                            Id = "0f5t",
+                            Name = "Employee",
+                            NormalizedName = "EMPLOYEE"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1494,6 +1529,23 @@ namespace BumboApp.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "a1",
+                            RoleId = "7y6w"
+                        },
+                        new
+                        {
+                            UserId = "b2",
+                            RoleId = "0f5t"
+                        },
+                        new
+                        {
+                            UserId = "c3",
+                            RoleId = "0f5t"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
