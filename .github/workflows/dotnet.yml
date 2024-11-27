@@ -9,7 +9,10 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    
+    env:
+      POSTCODE_API_KEY: ${{ secrets.POSTCODE_API_KEY }}
+      
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
