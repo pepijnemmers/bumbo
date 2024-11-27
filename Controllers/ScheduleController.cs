@@ -259,9 +259,9 @@ namespace BumboApp.Controllers
                         End = scheduledate.ToDateTime(new TimeOnly(startingHour + maxhours.First(), 00, 00)),
                         IsFinal = false
                     });
+                return true;
             }
-
-
+            return false;
         }
 
         private int getNextEmptySpot(Department department, DateOnly scheduledate)
