@@ -63,7 +63,9 @@ namespace BumboApp.Controllers
 
             // validation 
             if (request.StartDate < DateTime.Now)
+            { 
                 return NotifyErrorAndRedirect("Je kunt geen verlofaanvraag in het verleden doen.", "Index");
+            }
 
             if (request.StartDate > request.EndDate)
             {
@@ -72,6 +74,10 @@ namespace BumboApp.Controllers
             if (LoggedInEmployee.LeaveHours < amountOfLeaveHours)
             {
                 return NotifyErrorAndRedirect("Je hebt niet genoeg verlofuren om een verlofaanvraag te doen.", "Index");
+            }
+            if (LoggedInUser.Role != Role.Manager) 
+            {
+                return NotifyErrorAndRedirect("Je kan geen verlofaanvraag doen als manager", "Index");
             }
 
             using var transaction = Context.Database.BeginTransaction();
