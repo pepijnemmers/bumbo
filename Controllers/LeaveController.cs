@@ -57,6 +57,10 @@ namespace BumboApp.Controllers
             LoggedInEmployee = Context.Employees.Find(LoggedInUser.Id);
             request.Employee = LoggedInEmployee;
 
+            TimeSpan difference = request.EndDate - request.StartDate;
+            int totalDays = difference.Days + 1;
+            int amountOfLeaveHours = totalDays * 8;
+
             // validation 
             if (request.StartDate < DateTime.Now)
                 return NotifyErrorAndRedirect("Je kunt geen verlofaanvraag in het verleden doen.", "Index");
@@ -65,12 +69,17 @@ namespace BumboApp.Controllers
             {
                 return NotifyErrorAndRedirect("De startdatum moet voor of op de einddatum vallen.", "LeaveRequest");
             }
+            if (LoggedInEmployee.LeaveHours < amountOfLeaveHours)
+            {
+                return NotifyErrorAndRedirect("Je hebt niet genoeg verlofuren om een verlofaanvraag te doen.", "Index");
+            }
 
             using var transaction = Context.Database.BeginTransaction();
 
             try
             {
                 Context.LeaveRequests.Add(request);
+                LoggedInEmployee.LeaveHours = LoggedInEmployee.LeaveHours - amountOfLeaveHours;
                 Context.SaveChanges();
                 transaction.Commit();
                 return NotifySuccessAndRedirect("De verlofaanvraag is opgeslagen.", "Index");
