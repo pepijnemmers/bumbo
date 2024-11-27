@@ -33,12 +33,15 @@ a {
 }
 
 .aside-nav .nav-link {
+    display: flex;
+    align-items: center;
     color: var(--bs-body-sec-color);
     padding: .7rem 2rem;
     margin-bottom: .5em;
     border-radius: .5em;
     font-weight: 500;
     min-width: 240px;
+    transition: all 250ms;
 }
 .aside-nav .nav-link i[class^="fa-"] {
     font-size: 1.3em;
@@ -52,19 +55,43 @@ a {
     width: 25px;
     margin: 0;
 }
+.aside-nav .sub-nav {
+    padding-left: 2.5rem;
+}
+.aside-nav .sub-nav-link {
+    padding: .5rem;
+    color: var(--bs-body-sec-color);
+    border-radius: .5em;
+    font-weight: 500;
+    transition: all 250ms;
+}
+.aside-nav .sub-nav-link i[class^="fa-"] {
+    font-size: 1.1em;
+    text-align: center;
+    width: 25px;
+    margin-right: .6em;
+}
 
 .aside-nav .nav-link.active {
     color: var(--accent-color);
     background-color: var(--accent-color-sec);
     font-weight: 700;
 }
+.aside-nav .sub-nav-link.active {
+    color: var(--accent-color);
+    font-weight: 700;
+}
 .aside-nav .nav-link:not(.active):hover,
-.aside-nav .nav-link:not(.active):focus {
+.aside-nav .nav-link:not(.active):focus,
+.aside-nav .sub-nav-link:not(.active):hover,
+.aside-nav .sub-nav-link:not(.active):focus {
     color: var(--bs-body-color);
     background-color: var(--bs-gray-200);
 }
 .aside-nav .nav-link.active:hover,
-.aside-nav .nav-link.active:focus {
+.aside-nav .nav-link.active:focus,
+.aside-nav .sub-nav-link.active:hover,
+.aside-nav .sub-nav-link.active:focus {
     color: var(--bs-white);
     background-color: var(--accent-color);
 }
