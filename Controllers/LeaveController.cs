@@ -18,7 +18,7 @@ namespace BumboApp.Controllers
             }
             else
             {
-                leaveRequests = LoggedInEmployee.leaveRequests;
+                leaveRequests = Context.LeaveRequests.Where(e => e.Employee == LoggedInEmployee).OrderBy(P => P.StartDate).ToList();
             }
             if (orderBy == SortOrder.Descending)
             {
@@ -63,7 +63,7 @@ namespace BumboApp.Controllers
 
             // validation 
             if (request.StartDate < DateTime.Now)
-            { 
+            {
                 return NotifyErrorAndRedirect("Je kunt geen verlofaanvraag in het verleden doen.", "Index");
             }
 
@@ -75,7 +75,7 @@ namespace BumboApp.Controllers
             {
                 return NotifyErrorAndRedirect("Je hebt niet genoeg verlofuren om een verlofaanvraag te doen.", "Index");
             }
-            if (LoggedInUser.Role != Role.Manager) 
+            if (LoggedInUser.Role == Role.Manager)
             {
                 return NotifyErrorAndRedirect("Je kan geen verlofaanvraag doen als manager", "Index");
             }
@@ -84,8 +84,19 @@ namespace BumboApp.Controllers
 
             try
             {
+                // TODO fix notification
                 Context.LeaveRequests.Add(request);
                 LoggedInEmployee.LeaveHours = LoggedInEmployee.LeaveHours - amountOfLeaveHours;
+                var manager = Context.Employees.Find(1);
+                //var notification = new Notification
+                //{
+                //    Employee = manager,
+                //    Title = "Nieuwe verlofaanvraag",
+                //    Description = "Er staat een nieuwe verlofaanvraag klaar om beoordeeld te worden.",
+                //    SentAt = DateTime.Now,
+                //    HasBeenRead = false
+                //};
+                //Context.Notifications.Add(notification);
                 Context.SaveChanges();
                 transaction.Commit();
                 return NotifySuccessAndRedirect("De verlofaanvraag is opgeslagen.", "Index");
