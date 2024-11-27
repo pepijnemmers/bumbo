@@ -77,25 +77,9 @@ namespace BumboApp.Controllers
             using var transaction = Context.Database.BeginTransaction();
 
             try
-            { 
+            {
                 Context.LeaveRequests.Add(request);
                 LoggedInEmployee.LeaveHours = LoggedInEmployee.LeaveHours - amountOfLeaveHours;
-                foreach (var employee in Context.Employees.ToList())
-                {
-                    if (employee.User.Role == Role.Manager)
-                    {
-                        var notification = new Notification
-                        {
-                            Employee = employee,
-                            Title = "Nieuwe verlofaanvraag",
-                            Description = "Er staat een nieuwe verlofaanvraag klaar om beoordeeld te worden.",
-                            SentAt = DateTime.Now,
-                            HasBeenRead = false
-                        };
-                        Context.Notifications.Add(notification);
-                    }
-                }
-
                 Context.SaveChanges();
                 transaction.Commit();
                 return NotifySuccessAndRedirect("De verlofaanvraag is opgeslagen.", "Index");
