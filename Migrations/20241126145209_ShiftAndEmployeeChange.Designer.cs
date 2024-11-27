@@ -4,6 +4,7 @@ using BumboApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BumboApp.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    partial class BumboDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241126145209_ShiftAndEmployeeChange")]
+    partial class ShiftAndEmployeeChange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -519,9 +522,6 @@ namespace BumboApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ActionUrl")
-                        .HasColumnType("text");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(60)
@@ -535,6 +535,9 @@ namespace BumboApp.Migrations
 
                     b.Property<DateTime>("SentAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("text");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -1116,9 +1119,6 @@ namespace BumboApp.Migrations
                     b.Property<DateTime>("End")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsFinal")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime>("Start")
                         .HasColumnType("datetime2");
 
@@ -1138,7 +1138,6 @@ namespace BumboApp.Migrations
                             Department = 2,
                             EmployeeNumber = 1,
                             End = new DateTime(2024, 12, 9, 17, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsFinal = false,
                             Start = new DateTime(2024, 12, 9, 9, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -1147,7 +1146,6 @@ namespace BumboApp.Migrations
                             Department = 1,
                             EmployeeNumber = 2,
                             End = new DateTime(2024, 12, 10, 17, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsFinal = false,
                             Start = new DateTime(2024, 12, 10, 13, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
@@ -1157,10 +1155,7 @@ namespace BumboApp.Migrations
                     b.Property<int>("ShiftId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("EmployeeTakingOverEmployeeNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
+                    b.Property<int>("EmployeeTakingOverEmployeeNumber")
                         .HasColumnType("int");
 
                     b.HasKey("ShiftId");
@@ -1173,14 +1168,7 @@ namespace BumboApp.Migrations
                         new
                         {
                             ShiftId = 2,
-                            EmployeeTakingOverEmployeeNumber = 3,
-                            Status = 0
-                        },
-                        new
-                        {
-                            ShiftId = 1,
-                            EmployeeTakingOverEmployeeNumber = 2,
-                            Status = 2
+                            EmployeeTakingOverEmployeeNumber = 3
                         });
                 });
 
@@ -1412,7 +1400,9 @@ namespace BumboApp.Migrations
                 {
                     b.HasOne("BumboApp.Models.Employee", "EmployeeTakingOver")
                         .WithMany("shiftTakeOvers")
-                        .HasForeignKey("EmployeeTakingOverEmployeeNumber");
+                        .HasForeignKey("EmployeeTakingOverEmployeeNumber")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("BumboApp.Models.Shift", "Shift")
                         .WithOne("ShiftTakeOver")
