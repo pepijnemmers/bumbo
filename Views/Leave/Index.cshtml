@@ -1,15 +1,21 @@
 ﻿@model List<LeaveRequest>
 @{
     ViewData["Title"] = "Verlof en ziekmelden";
+    var loggedInUser = ViewData["LoggedInUser"] as User;
 }
 
 <div class="row align-items-center mb-3">
     <div class="col">
         <h3>Verlof</h3>
     </div>
-    <div class="col-auto">
-        <a asp-controller="Leave" asp-action="LeaveRequest" class="btn btn-primary d-inline-block">Verlof aanvragen</a>
-    </div>
+
+    @if (loggedInUser.Role == Role.Employee)
+    {
+        <div class="col-auto">
+            <a asp-controller="Leave" asp-action="LeaveRequest" class="btn btn-primary d-inline-block">Verlof aanvragen</a>
+        </div>
+    }  
+    
 </div>
 
 <div class="table-container">

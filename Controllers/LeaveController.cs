@@ -8,6 +8,8 @@ namespace BumboApp.Controllers
         Employee LoggedInEmployee; // de Employee die is ingelogd (afgeleid van LoggedInUser)
         public IActionResult Index()
         {
+            LoggedInEmployee = Context.Employees.Find(LoggedInUser.Id);
+
             List<LeaveRequest> leaveRequests;
             if (LoggedInUser.Role == Role.Manager)
             {
@@ -17,6 +19,8 @@ namespace BumboApp.Controllers
             {
                 leaveRequests = LoggedInEmployee.leaveRequests;
             }
+
+            ViewData["LoggedInUser"] = LoggedInUser;
             return View(leaveRequests);
         }
 
