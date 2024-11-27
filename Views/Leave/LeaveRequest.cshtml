@@ -8,18 +8,20 @@
         @*css card id later generaliseren voor alle create cards?*@
         <div class="mb-3">
             <label for="startDate" class="form-label fw-bold">Begin Datum</label>
-            <input type="date" class="form-control" id="startDate" name="startDate" placeholder="Begindatum" onchange="checkDate()" min="@DateTime.Now.ToString("yyyy-MM-dd")">
+            <input type="date" class="form-control" id="startDate" name="StartDate" placeholder="Begindatum" onchange="checkDate()" min="@DateTime.Now.ToString("yyyy-MM-dd")">
         </div>
 
         <div class="mb-2">
             <label for="endDate" class="form-label fw-bold">Eind Datum</label>
-            <input type="date" class="form-control" id="endDate" name="endDate" placeholder="Einddatum" onchange="checkDate()" min="@DateTime.Now.ToString("yyyy-MM-dd")">
+            <input type="date" class="form-control" id="endDate" name="EndDate" placeholder="Einddatum" onchange="checkDate()" min="@DateTime.Now.ToString("yyyy-MM-dd")">
         </div>
 
         <div class="mb-3">
             <label for="reason" class="form-label fw-bold">Reden</label>
-            <textarea class="form-control" placeholder="Reden"></textarea>
+            <textarea class="form-control" name="Reason" placeholder="Reden"></textarea>
         </div>
+        <input type="hidden" name="Employee" value="1" /> @*value aanpassen naar uiteindelijk meegegeven employee?*@
+        <input type="hidden" name="Status" value="@Status.Aangevraagd" />
 
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
             <a asp-controller="Leave" asp-action="Index" class="btn btn-outline-primary" type="button">Annuleer</a>
