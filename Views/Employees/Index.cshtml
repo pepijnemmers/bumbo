@@ -41,7 +41,7 @@
                         <td>@(item.FirstName + " " + item.LastName)</td>
                         <td>@item.User.Role</td>
                         <td>
-                            <a asp-controller="Employee" asp-action="details" asp-route-id="@item.EmployeeNumber">
+                            <a asp-controller="Employees" asp-action="details" asp-route-id="@item.EmployeeNumber">
                                 <img width="20px" height="auto" src="~/img/details-icon.svg" alt="Alternate Text" />
                             </a>
                         </td>

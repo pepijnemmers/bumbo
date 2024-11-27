@@ -9,7 +9,7 @@ namespace BumboApp.Controllers
     public class MainController : Controller
     {
         private static User? _loggedInUser;
-        
+
         [FromServices] protected INotyfService NotifyService { get; set; } = null!;
         protected readonly BumboDbContext Context;
         protected static IConfiguration Configuration = null!;
@@ -24,12 +24,12 @@ namespace BumboApp.Controllers
         public MainController()
         {
             Context = new BumboDbContext();
-            
+
             // fallback values for pagination
             PageSize = 5;
             DefaultPage = 1;
         }
-        
+
         protected IActionResult NotifyErrorAndRedirect(string message, string redirect)
         {
             NotifyService.Error(message);
@@ -41,13 +41,13 @@ namespace BumboApp.Controllers
             NotifyService.Error(message);
             return RedirectToAction(redirect, redirectController);
         }
-        
+
         protected IActionResult NotifySuccessAndRedirect(string message, string redirect)
         {
             NotifyService.Success(message);
             return RedirectToAction(redirect);
         }
-        
+
         protected IActionResult NotifySuccessAndRedirect(string message, string redirect, string redirectController)
         {
             NotifyService.Success(message);
@@ -60,19 +60,19 @@ namespace BumboApp.Controllers
         /// </summary>
         /// <param name="context">The context in which the action is executed.</param>
         public override void OnActionExecuting(ActionExecutingContext context)
-        {    
+        {
             base.OnActionExecuting(context);
             NotifyService = HttpContext.RequestServices.GetService<INotyfService>()!;
             Configuration = HttpContext.RequestServices.GetService<IConfiguration>()!;
-            
+
             PageSize = Configuration.GetValue<int>("Pagination:DefaultPageSize");
             DefaultPage = Configuration.GetValue<int>("Pagination:StartPage");
-            
+
             if (LoggedInUser == null && context.HttpContext.Request.Path != "/login")
             {
                 context.HttpContext.Response.Redirect("/Login");
             }
-            
+
             ViewData["User"] = LoggedInUser;
         }
 
