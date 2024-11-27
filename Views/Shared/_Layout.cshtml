@@ -1,9 +1,10 @@
 ﻿@{
     var user = ViewData["User"] as User;
+    int numberOfNotifications = ViewData["NumberOfNotifications"] as int? ?? 0;
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,88 +15,189 @@
     <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <aside id="aside-nav-primary" class="aside-nav col-auto py-3 overflow-y-scroll d-none d-md-flex bg-white">
-                <nav class="d-flex flex-column justify-content-between h-100">
-                    <div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <a class="logo align-items-center d-flex gap-3 mb-4 px-2" asp-area="" asp-controller="Dashboard" asp-action="Index">
-                                <img alt="Logo" src="/img/icon.png" />
-                                <span>
-                                Bumbo
-                            </span>
-                            </a>
-                            <button id="mobile-close-menu" class="mobile-menu-icon d-block d-md-none">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        </div>
-                        <a class="nav-link @(Context.Request.Path == "/dashboard" || Context.Request.Path == "/" ? "active" : "")" asp-area="" asp-controller="Dashboard" asp-action="Index">
+<div class="container-fluid">
+    <div class="row">
+        <aside id="aside-nav-primary" class="aside-nav col-auto py-3 overflow-y-scroll d-none d-md-flex bg-white">
+            <nav class="d-flex flex-column justify-content-between h-100">
+                <div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a class="logo align-items-center d-flex gap-3 mb-4 px-2" asp-area="" asp-controller="Dashboard" asp-action="Index">
+                            <img alt="Logo" src="/img/icon.png" />
+                            <span>
+                                    Bumbo
+                                </span>
+                        </a>
+                        <button id="mobile-close-menu" class="mobile-menu-icon d-block d-md-none">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <div class="scrollable">
+                        <a class="nav-link @(Context.Request.Path == "/dashboard" || Context.Request.Path == "/" ? "active" : "")" asp-controller="Dashboard" asp-action="Index">
                             <i class="fa-solid fa-house"></i>
                             Dashboard
                         </a>
-                        <a class="nav-link @(Context.Request.Path == "/norms" ? "active" : "")" asp-area="" asp-controller="Norms" asp-action="Index">
-                            <i class="fa-solid fa-square-pen"></i>
-                            Normeringen
-                        </a>
-                        <a class="nav-link @(Context.Request.Path == "/prognoses" ? "active" : "")" asp-area="" asp-controller="Prognoses" asp-action="Index">
-                            <i class="fa-solid fa-file-lines"></i>
-                            Prognoses
-                        </a>
-                        <a class="nav-link @(Context.Request.Path == "/expectations" ? "active" : "")" asp-area="" asp-controller="Expectations" asp-action="Index">
-                            <i class="fa-solid fa-layer-group"></i>
-                            Verwachtingen
-                        </a>
-                        <a class="nav-link @(Context.Request.Path == "/openinghours" ? "active" : "")" asp-area="" asp-controller="OpeningHours" asp-action="Index">
-                            <i class="fa-solid fa-clock"></i>
-                            Openingstijden
-                        </a>
-                    </div>
-                    <div>
-                        <a class="nav-link logout" asp-area="" asp-controller="Login" asp-action="Logout">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                            Uitloggen
-                        </a>
-                    </div>
-                </nav>
-            </aside>
-            <div class="col p-0">
-                <header class="topbar bg-white py-2">
-                    <div class="container d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center gap-3">
-                            <button id="mobile-hamburger-menu" class="mobile-menu-icon d-block d-md-none">
-                                <i class="fa-solid fa-bars"></i>
-                            </button>
-                            <h1 class="my-0 my-md-1">@ViewData["Title"]</h1>
-                        </div>
-                        <nav>
-                            <a class="profile d-flex align-items-center gap-3">
-                                @if (user != null)
-                                {
-                                    <span class="text-secondary d-none d-sm-block">
-                                        @* Welkom, @user.FirstName! *@
-                                    </span>
-                                }
-                                <img class="profile-icon" src="/img/profile-icon.png" alt="profiel"/>
+
+                        @if (user?.Role is Role.Employee)
+                        {
+                            <a class="nav-link @(Context.Request.Path == "/schedule" ? "active" : "")" asp-controller="Schedule" asp-action="Index">
+                                <i class="fa-solid fa-calendar"></i>
+                                Rooster
                             </a>
-                        </nav>
+                        }
+
+                        @if (user?.Role is Role.Manager)
+                        {
+                            <div>
+                                @{
+                                    bool roosterNavLinkActive = Context.Request.Path == "/schedule" ||
+                                                                    Context.Request.Path == "/schedule/create";
+                                }
+                                <a class="nav-link d-flex justify-content-between align-items-center collapse-link @(roosterNavLinkActive ? "active" : "")" data-bs-toggle="collapse" href="#collapseNavLinkSchedule">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa-solid fa-calendar-days"></i>
+                                        <span>Rooster</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </a>
+                                <div class="sub-nav collapse @(roosterNavLinkActive ? "show" : "")" id="collapseNavLinkSchedule">
+                                    <div class="d-flex flex-column">
+                                        <a class="sub-nav-link @(Context.Request.Path == "/schedule" ? "active" : "")" asp-controller="Schedule" asp-action="Index">
+                                            <i class="fa-solid fa-calendar-day"></i>
+                                            Rooster bekijken
+                                        </a>
+                                        <a class="sub-nav-link @(Context.Request.Path == "/schedule/create" ? "active" : "")" asp-controller="Schedule" asp-action="Create">
+                                            <i class="fa-solid fa-calendar-plus"></i>
+                                            Nieuw rooster maken
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                @{
+                                    bool beheerNavLinkActive = Context.Request.Path == "/norms" ||
+                                                                   Context.Request.Path == "/prognoses" ||
+                                                                   Context.Request.Path == "/expectations" ||
+                                                                   Context.Request.Path == "/openinghours";
+                                }
+                                <a class="nav-link d-flex justify-content-between align-items-center collapse-link @(beheerNavLinkActive ? "active" : "")"
+                                   data-bs-toggle="collapse" href="#collapseNavLinkAdmin">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa-solid fa-cog"></i>
+                                        <span>Beheer</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </a>
+                                <div class="sub-nav collapse @(beheerNavLinkActive ? "show" : "")" id="collapseNavLinkAdmin">
+                                    <div class="d-flex flex-column">
+                                        <a class="sub-nav-link @(Context.Request.Path == "/norms" ? "active" : "")" asp-controller="Norms" asp-action="Index">
+                                            <i class="fa-solid fa-square-pen"></i>
+                                            Normeringen
+                                        </a>
+
+                                        <a class="sub-nav-link @(Context.Request.Path == "/prognoses" ? "active" : "")" asp-controller="Prognoses" asp-action="Index">
+                                            <i class="fa-solid fa-file-lines"></i>
+                                            Prognoses
+                                        </a>
+
+                                        <a class="sub-nav-link @(Context.Request.Path == "/expectations" ? "active" : "")" asp-controller="Expectations" asp-action="Index">
+                                            <i class="fa-solid fa-layer-group"></i>
+                                            Verwachtingen
+                                        </a>
+
+                                        <a class="sub-nav-link @(Context.Request.Path == "/openinghours" ? "active" : "")" asp-controller="OpeningHours" asp-action="Index">
+                                            <i class="fa-solid fa-clock"></i>
+                                            Openingstijden
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a class="nav-link @(Context.Request.Path == "/employees" ? "active" : "")" asp-controller="Employees" asp-action="Index">
+                                <i class="fa-solid fa-users"></i>
+                                Werknemers
+                            </a>
+                        }
+
+                        @if (user?.Role is Role.Manager or Role.Employee)
+                        {
+                            <a class="nav-link @(Context.Request.Path == "/leave" ? "active" : "")" asp-controller="Leave" asp-action="Index">
+                                <i class="fa-solid fa-bed"></i>
+                                Verlof & Ziek
+                            </a>
+                        }
+
+                        @if (user?.Role is Role.Employee)
+                        {
+                            <a class="nav-link @(Context.Request.Path == "/availability" ? "active" : "")" asp-controller="Availability" asp-action="Index">
+                                <i class="fa-solid fa-clock"></i>
+                                Beschikbaarheid
+                            </a>
+                        }
+
+                        <a class="nav-link d-flex justify-content-between align-items-center @(Context.Request.Path == "/notifications" ? "active" : "")" asp-controller="Notifications" asp-action="Index">
+                            <div>
+                                <i class="fa-solid fa-bell"></i>
+                                Meldingen
+                            </div>
+                            <span class="badge bg-primary">
+                                    @numberOfNotifications
+                                </span>
+                        </a>
                     </div>
-                </header>
-                
-                <div class="container">
-                    <main role="main" class="py-4">
-                        @RenderBody()
-                    </main>
                 </div>
+                <div>
+                    <a class="nav-link logout" asp-controller="Login" asp-action="Logout">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        Uitloggen
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        <div class="col p-0">
+            <header class="topbar bg-white py-2">
+                <div class="container d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-3">
+                        <button id="mobile-hamburger-menu" class="mobile-menu-icon d-block d-md-none">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                        <h1 class="my-0 my-md-1">@ViewData["Title"]</h1>
+                    </div>
+                    <button
+                        type="button"
+                        class="unset-all profile d-flex align-items-center gap-3"
+                        data-bs-html="true"
+                        data-bs-toggle="popover"
+                        data-bs-trigger="focus"
+                        data-bs-placement="bottom"
+                        data-bs-custom-class="popover-profile"
+                        data-bs-content="<a class='btn btn-danger' href='/login/logout'>Uitloggen</a>">
+                        @if (user != null)
+                        {
+                            <div class="text-secondary d-none d-sm-flex flex-column">
+                                <span class="fw-bold">Welkom, Frank! @* TODO: @user.FirstName *@</span>
+                                <span class="small" style="margin-top: -5px">@user.Role @* TODO: ToFriendlyString() *@</span>
+                            </div>
+                        }
+                        <img class="profile-icon" src="/img/profile-icon.png" alt="profiel"/>
+                    </button>
+                </div>
+            </header>
+
+            <div class="container">
+                <main role="main" class="py-4">
+                    @RenderBody()
+                </main>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
 
-    @await Component.InvokeAsync("Notyf")
-    @await RenderSectionAsync("Scripts", required: false)
+@await Component.InvokeAsync("Notyf")
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
