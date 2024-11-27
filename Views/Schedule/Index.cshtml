@@ -1,3 +1,105 @@
 ﻿@{
     ViewData["Title"] = "Rooster";
+    
+    Role role = Role.Manager;
+    bool isFinal = true;
+    Employee? selectedEmployee = null;
+    List<Employee> employees = new List<Employee>()
+    {
+        new Employee() { EmployeeNumber = 1, FirstName = "John", LastName = "Doe" },
+        new Employee() { EmployeeNumber = 2, FirstName = "Jane", LastName = "Doe" },
+        new Employee() { EmployeeNumber = 3, FirstName = "Alice", LastName = "Doe" },
+    };
+    DateOnly? selectedDay = null;
+    DateOnly? selectedWeek = null;
 }
+
+@* Header Manager *@
+@*
+    - dag
+        - datum met pijltjes
+        - verwijder week
+        - dienst toevoegen
+        - dag/week overzicht dropdown (alleen bij 1 werknemer)
+        - werknemer dropdown
+    - week (alleen van 1 werknemer)
+        - week met pijltjes
+        - verwijder week
+        - dienst toevoegen
+        - dag/week overzicht dropdown (alleen bij 1 werknemer)
+        - werknemer dropdown
+    - concept (zelfde als bovenstaande, maar dan met rij erbij en zonder verwijder week knop)
+*@
+
+@if (role == Role.Manager)
+{
+    <header>
+        @* concept header *@
+        @if (!isFinal)
+        {
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h3 class="fst-italic text-secondary">Concept rooster</h3>
+                <div class="buttons">
+                    <a class="btn btn-outline-danger">
+                        <i class="fas fa-trash-alt"></i>
+                        Concept week verwijderen
+                    </a>
+                    <a class="btn btn-success">
+                        <i class="fas fa-check"></i>
+                        Week publiceren
+                    </a>
+                </div>
+            </div>
+        }
+        @* day & week header *@
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="date-nav">
+                < date >
+            </div>
+            <div class="buttons d-flex align-items-center gap-2">
+                @if (isFinal && (selectedDay >= DateOnly.FromDateTime(DateTime.Today)) || selectedWeek >= DateOnly.FromDateTime(DateTime.Today))
+                {
+                    <a class="btn btn-outline-danger">
+                        <i class="fas fa-trash-alt"></i>
+                        Verwijder week
+                    </a>
+                }
+                <a class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Dienst toevoegen
+                </a>
+                @if (selectedEmployee == null)
+                {
+                    <select class="form-select w-auto">
+                        <option value="day" selected>Dag overzicht</option>
+                        <option value="week">Week overzicht</option>
+                    </select>
+                }
+                <select class="form-select w-auto">
+                    <option value="all" selected>Alle werknemers</option>
+                    
+                    <optgroup label="Filter op werknemer">
+                        @foreach (Employee employee in employees)
+                        {
+                            <option value="@employee.EmployeeNumber">@employee.FirstName @employee.LastName</option>
+                        }
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+    </header>
+}
+
+
+
+@* Header Werknemer *@
+@*
+    - dag
+        - datum met pijltjes
+        - mijn diensten
+        - dag/week overzicht dropdown
+    - week
+        - week met pijltjes
+        - mijn diensten
+        - dag/week overzicht dropdown
+*@
