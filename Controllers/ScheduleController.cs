@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BumboApp.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BumboApp.Controllers
 {
@@ -11,6 +12,10 @@ namespace BumboApp.Controllers
 
         public IActionResult Create()
         {
+            foreach(Department department in depa)
+            {
+
+            }
             return View();
         }
     }
