@@ -1,12 +1,13 @@
 ﻿using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 
 namespace BumboApp.Controllers
 {
     public class LeaveController : MainController
     {
         Employee LoggedInEmployee;
-        public IActionResult Index()
+        public IActionResult Index(int? page, SortOrder? orderBy = SortOrder.Ascending)
         {
             LoggedInEmployee = Context.Employees.Find(LoggedInUser.Id);
 
@@ -19,9 +20,31 @@ namespace BumboApp.Controllers
             {
                 leaveRequests = LoggedInEmployee.leaveRequests;
             }
+            if (orderBy == SortOrder.Descending)
+            {
+                leaveRequests.Reverse();
+            }
+
+            int currentPageNumber = page ?? DefaultPage;
+            int maxPages = (int)(Math.Ceiling((decimal)leaveRequests.Count / PageSize));
+
+            if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
+            if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
+
+            List<LeaveRequest> leaveRequestsForPage =
+                    leaveRequests
+                    .Skip((currentPageNumber - 1) * PageSize)
+                    .Take(PageSize)
+                    .ToList();
+
+            ViewBag.PageNumber = currentPageNumber;
+            ViewBag.PageSize = PageSize;
+            ViewBag.MaxPages = maxPages;
+
+            ViewBag.OrderBy = orderBy ?? SortOrder.Ascending;
 
             ViewData["LoggedInUser"] = LoggedInUser;
-            return View(leaveRequests);
+            return View(leaveRequestsForPage);
         }
 
         public IActionResult LeaveRequest()

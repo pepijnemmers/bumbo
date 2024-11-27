@@ -1,4 +1,6 @@
 ﻿@model List<LeaveRequest>
+@using BumboApp.Views.Components
+@using Microsoft.Data.SqlClient
 @{
     ViewData["Title"] = "Verlof en ziekmelden";
     var loggedInUser = ViewData["LoggedInUser"] as User;
@@ -26,7 +28,11 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Begin datum</th>
+                <th><a asp-controller="Leave" asp-action="Index" asp-route-OrderBy="@(ViewBag.OrderBy == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending)" class="text-dark">
+                    Begin datum
+                    <img width="20px" src="~/img/chevron-@(ViewBag.OrderBy == SortOrder.Ascending ? "down" : "up").svg" alt="Arrow" />
+                </a>
+                </th>
                 <th>Eind datum</th>
                 <th>Reden</th>
                 <th>Status</th>
@@ -72,4 +78,11 @@
             }        
         </tbody>
     </table>
+    @if (ViewBag.MaxPages > 1)
+    {
+        <Component type="typeof(Pagination)"
+                   render-mode="ServerPrerendered"
+                   param-PageNumber="ViewBag.PageNumber"
+                   param-MaxPages="ViewBag.MaxPages" />
+    }
 </div>
