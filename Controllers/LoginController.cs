@@ -32,7 +32,6 @@ namespace BumboApp.Controllers
                 var result = await _signInManager.PasswordSignInAsync(user, password, isPersistent: false, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    LoggedInUser = user;
                     return NotifySuccessAndRedirect("Je bent ingelogd", "Index", "Dashboard");
                 }
             }

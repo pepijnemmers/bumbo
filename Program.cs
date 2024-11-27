@@ -22,7 +22,7 @@ builder.Services.AddDbContext<BumboDbContext>(options =>
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
-    options.SignIn.RequireConfirmedAccount = true;
+    options.SignIn.RequireConfirmedAccount = false;
 })
 .AddEntityFrameworkStores<BumboDbContext>()
 .AddDefaultTokenProviders();
