@@ -34,8 +34,6 @@ namespace BumboApp.Controllers
             LoggedInEmployee = Context.Employees.Find(LoggedInUser.Id);
             request.Employee = LoggedInEmployee;
 
-            NotifyService.Information(request.StartDate.ToString());
-
             // validation 
             if (request.StartDate < DateTime.Now)
                 return NotifyErrorAndRedirect("Je kunt geen verlofaanvraag in het verleden doen.", "Index");
