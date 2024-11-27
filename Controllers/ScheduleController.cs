@@ -84,13 +84,13 @@ namespace BumboApp.Controllers
                 Employee employee = employees.ElementAt(index);
                 if (department == Department.Kassa && OpeningInCashRegister(scheduledate))
                 {
-                    bool result = ScheduleConcurrentShift(department, scheduledate, employee);
+                    bool result = ScheduleConcurrentShift(department, scheduledate,startDate , employee);
                     index++;
                     if (result) index = 0;
                 }
                 else
                 {
-                    ScheduleShift(department, scheduledate, employee);
+                    ScheduleShift(department, scheduledate, startDate, employee);
                     index++;
                 }
                 if (index >= employees.Count || PrognoseHoursHit(department,scheduledate)) break;
@@ -165,7 +165,7 @@ namespace BumboApp.Controllers
         }
 
         //schedules shift if possible
-        private void ScheduleShift(Department department, DateOnly scheduledate, Employee employee)
+        private void ScheduleShift(Department department, DateOnly scheduledate, DateOnly startDate, Employee employee)
         {
             Availability availability = employee.Availabilities.Where(e => e.Date == scheduledate).FirstOrDefault();
             OpeningHour openingHour = Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).FirstOrDefault();
@@ -185,7 +185,7 @@ namespace BumboApp.Controllers
 
             int maxTimeCAO = getMaxTimeCAO(employee,scheduledate, startinghour);
             int maxTimePrognose = getMaxTimePrognose(department, scheduledate);
-            int maxTimeContract = getMaxTimeContract(employee);
+            int maxTimeContract = getMaxTimeContract(employee, startDate, scheduledate);
             int maxTimeAvailable = (availability.EndTime - availability.StartTime).Hours;
             List<int> maxhours = new List<int> { maxTimeCAO, maxTimePrognose, maxTimeContract,maxTimeAvailable };
             maxhours.Sort();
@@ -208,7 +208,7 @@ namespace BumboApp.Controllers
             return;
         }
 
-        private bool ScheduleConcurrentShift(Department department, DateOnly scheduledate, Employee employee)
+        private bool ScheduleConcurrentShift(Department department, DateOnly scheduledate, DateOnly startDate, Employee employee)
         {
             Availability availability = employee.Availabilities.Where(e => e.Date == scheduledate).FirstOrDefault();
             int availableFrom;
@@ -240,7 +240,7 @@ namespace BumboApp.Controllers
 
             int maxTimeCAO = getMaxTimeCAO(employee, scheduledate, startingHour);
             int maxTimePrognose = getMaxTimePrognose(department, scheduledate);
-            int maxTimeContract = getMaxTimeContract(employee);
+            int maxTimeContract = getMaxTimeContract(employee, startDate, scheduledate);
             int maxTimeAvailable = availableTill - availableFrom;
             int maxTimeTillClose = closingHour - startingHour;
 
@@ -299,14 +299,29 @@ namespace BumboApp.Controllers
             return previous.End.Hour;
         }
 
-        private int getMaxTimeContract(Employee employee)
+        private int getMaxTimeContract(Employee employee, DateOnly startDate, DateOnly scheduleDate)
         {
-            throw new NotImplementedException();
+            int hours = employee.ContractHours;
+            List<Shift> shifts = (List<Shift>)employee.Shifts.Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) && e.End.Date >= scheduleDate.ToDateTime(new TimeOnly()));
+            if (shifts.Count == 0) { return hours; }
+            else
+            {
+                return hours - GetWorkingHours(shifts);
+            }
         }
 
         private int getMaxTimePrognose(Department department, DateOnly scheduledate)
         {
-            throw new NotImplementedException();
+            Prognosis prognosis = Context.Prognoses.Where(e => e.Date == scheduledate && e.Department == department).FirstOrDefault();
+            List<Shift> departmentDayShifts = (List<Shift>)Context.Shifts
+                .Where(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly()))
+                .Where(e => e.Department == department)
+                .ToList();
+            if (prognosis == null)
+            {
+                NotifyErrorAndRedirect("Geen prognose om het rooster te maken", "Index"); //route to prognose page?
+            }
+            return (int)Math.Ceiling(prognosis.NeededHours - GetWorkingHours(departmentDayShifts));
         }
 
         private int getMaxTimeCAO(Employee employee, DateOnly scheduledate, int startinghour)
