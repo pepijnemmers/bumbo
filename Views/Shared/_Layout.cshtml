@@ -163,17 +163,24 @@
                             </button>
                             <h1 class="my-0 my-md-1">@ViewData["Title"]</h1>
                         </div>
-                        <nav>
-                            <a asp-controller="Profile" asp-action="Index" class="profile d-flex align-items-center gap-3">
-                                @if (user != null)
-                                {
-                                    <span class="text-secondary d-none d-sm-block">
-                                        @* Welkom, @user.FirstName! *@
-                                    </span>
-                                }
-                                <img class="profile-icon" src="/img/profile-icon.png" alt="profiel"/>
-                            </a>
-                        </nav>
+                        <button
+                            type="button"
+                            class="unset-all profile d-flex align-items-center gap-3"
+                            data-bs-html="true"
+                            data-bs-toggle="popover"
+                            data-bs-trigger="focus"
+                            data-bs-placement="bottom"
+                            data-bs-custom-class="popover-profile"
+                            data-bs-content="<a class='btn btn-danger' href='/login/logout'>Uitloggen</a>">
+                            @if (user != null)
+                            {
+                                <div class="text-secondary d-none d-sm-flex flex-column">
+                                    <span class="fw-bold">Welkom, Frank! @* TODO: @user.FirstName *@</span>
+                                    <span class="small" style="margin-top: -5px">@user.Role @* TODO: ToFriendlyString() *@</span>
+                                </div>
+                            }
+                            <img class="profile-icon" src="/img/profile-icon.png" alt="profiel"/>
+                        </button>
                     </div>
                 </header>
                 

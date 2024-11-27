@@ -127,9 +127,21 @@ html {
   background-color: var(--bs-body-bg);
 }
 
+.unset-all {
+  all: unset;
+}
+
 label {
   font-weight: bold;
   margin-bottom: .3em;
+}
+
+.popover {
+    z-index: 9999999;
+}
+.popover-p-small .popover-body,
+.popover-profile .popover-body {
+    padding: .4rem .5rem;
 }
 
 /* pagination */

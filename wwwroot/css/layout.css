@@ -133,6 +133,9 @@ a {
 .topbar .profile-icon {
     height: 45px;
 }
+.popover-profile a.btn {
+    min-width: 175px;
+}
 
 .mobile-menu-icon {
     all: unset;
