@@ -319,14 +319,11 @@ label {
     overflow-y: auto;
 }
 .shifts-overlay .shift::-webkit-scrollbar {
-    width: 5px;
+    width: 7px;
 }
 .shifts-overlay .shift::-webkit-scrollbar-thumb {
     background-color: var(--bs-secondary);
     border-radius: 5px;
-}
-.shifts-overlay .shift::-webkit-scrollbar-track {
-    background-color: var(--bs-white);
 }
 .shifts-overlay .no-employee .shift,
 .legenda .no-employee {

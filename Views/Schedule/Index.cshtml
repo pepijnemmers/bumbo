@@ -141,7 +141,7 @@
                     <div class="day-hours-grid">
                         @for (int j = 6; j < 24; j++)
                         {
-                            if (role == Role.Manager)
+                            if (role == Role.Manager && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
                             {
                                 <div class="hour" ondblclick="GoToCreateShift('@Model.SelectedStartDate.ToString()', @j, '@departmentName')"><i class="fas fa-plus"></i></div>
                             }
@@ -357,7 +357,7 @@ else
                     <div class="day-hours-grid">
                         @for (int j = 6; j < 24; j++)
                         {
-                            if (role == Role.Manager)
+                            if (role == Role.Manager && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
                             {
                                 <div class="hour" ondblclick="GoToCreateShift('@Model.SelectedStartDate.AddDays(i).ToString()', @j)"><i class="fas fa-plus"></i></div>
                             }
