@@ -23,6 +23,9 @@ namespace BumboApp.Controllers
         private int maxWorkingDaysUnderSixteen = 5;
         private TimeOnly maxWorkTimeForUnderSixteen = new TimeOnly(19,00,00);
 
+        private float breakTimeHours = (float)0.5;
+        private int[] breakTimes = { 4, 8 };
+
         public IActionResult Index(DateOnly date)
         {
             return View();
@@ -115,13 +118,20 @@ namespace BumboApp.Controllers
         //works if shifts start and end on a full hour
         private int GetWorkingHours(IEnumerable<Shift> shifts)
         {
-            int hours = 0;
+            float hours = 0;
             foreach (Shift shift in shifts)
             {
                 TimeSpan time = shift.End - shift.Start; 
                 hours += time.Hours;
+                foreach(int breakTime in breakTimes)
+                {
+                    if(time.Hours > breakTime)
+                    {
+                        hours -= breakTimeHours;
+                    }
+                }
             }
-            return hours;
+            return (int)Math.Ceiling(hours);
         }
 
         private bool PrognoseHoursHit(Department department, DateOnly scheduledate)
@@ -197,7 +207,7 @@ namespace BumboApp.Controllers
             }
             else return;
 
-            int maxTimeCAO = getMaxTimeCAO(employee,scheduledate, startinghour);
+            int maxTimeCAO = getMaxTimeCAO(employee, startDate, scheduledate, startinghour);
             int maxTimePrognose = getMaxTimePrognose(department, scheduledate);
             int maxTimeContract = getMaxTimeContract(employee, startDate, scheduledate);
             int maxTimeAvailable = (availability.EndTime - availability.StartTime).Hours;
@@ -252,7 +262,7 @@ namespace BumboApp.Controllers
                 availableTill = 24;
             }
 
-            int maxTimeCAO = getMaxTimeCAO(employee, scheduledate, startingHour);
+            int maxTimeCAO = getMaxTimeCAO(employee, startDate, scheduledate, startingHour);
             int maxTimePrognose = getMaxTimePrognose(department, scheduledate);
             int maxTimeContract = getMaxTimeContract(employee, startDate, scheduledate);
             int maxTimeAvailable = availableTill - availableFrom;
@@ -338,32 +348,100 @@ namespace BumboApp.Controllers
             return (int)Math.Ceiling(prognosis.NeededHours - GetWorkingHours(departmentDayShifts));
         }
 
-        private int getMaxTimeCAO(Employee employee, DateOnly scheduledate, int startinghour)
+        private int getMaxTimeCAO(Employee employee, DateOnly startDate, DateOnly scheduledate, int startinghour)
         {
+            List<int> hours = new List<int>();
             int age = DateTime.Now.Year - employee.DateOfBirth.Year;
             if( !(employee.DateOfBirth.Month <= DateTime.Now.Month && employee.DateOfBirth.Day <= DateTime.Now.Day))
             {
                 age--;
             }
-            if( age >= 18 )
+            List<Shift> workingShiftsThisWeek = employee.Shifts
+                .Where(e => e.Start.Date <= scheduledate.ToDateTime(new TimeOnly()))
+                .Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()))
+                .ToList();
+            int workingHours = GetWorkingHours(workingShiftsThisWeek);
+            if ( age >= 18 )
             {
-                // 4,5 uur = 30 min pauze
-                // 8 uur 30
-                // 12 uur per dienst
-                // 60 per week
+
+                int maxShiftLenght = maxShiftLengthAdult - GetWorkingHours(workingShiftsThisWeek.
+                    Where(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly())));
+                int maxWeekHoursLeft = maxWeeklyHoursAdult - GetWorkingHours(workingShiftsThisWeek);
+                hours.Add(maxWeekHoursLeft);
+                hours.Add(maxShiftLenght);
             }
             else if(age < 16)
             {
-                // 8 uur incl schooluren
-                // max 19:00
-                // max 5 dagen
-                // 12 in schoolweek
-                // max 40 uur gewone week
+
+                int maxWeekHours;
+                int maxTimeWithSchoolHours;
+                int maxHoursTillMaxTime;
+                if(!((scheduledate.ToDateTime(new TimeOnly()) - startDate.ToDateTime(new TimeOnly())).Days < maxWorkingDaysUnderSixteen))
+                {
+                    int workingDays = 0;
+                    for(DateTime day = startDate.ToDateTime(new TimeOnly()); startDate <= scheduledate; day.AddDays(1))
+                    {
+                        if(workingShiftsThisWeek.Where(e => e.Start.Date == day.Date).Any())
+                        {
+                            workingDays++;
+                        }
+                    }
+                    if(workingDays >= maxWorkingDaysUnderSixteen) { return 0; }
+                }
+                if (!employee.SchoolSchedules.Where(e => e.Date >= startDate && e.Date <= startDate.AddDays(6)).Any()) // magic number
+                {
+                    maxWeekHours = maxWeeklyHoursSchoolweekUnderSixteen - workingHours;
+                    maxTimeWithSchoolHours = maxHoursWithSchoolUnderSixteen;
+                }
+                else
+                {
+                    maxWeekHours = maxWeeklyHoursSchoolweekUnderSixteen - workingHours;
+                    maxTimeWithSchoolHours = maxHoursWithSchoolUnderSixteen - GetSchoolHours(scheduledate, employee) -GetWorkingHours(workingShiftsThisWeek.
+                    Where(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly())));
+                }
+
+                if(new TimeOnly(startinghour,00,00) >= maxWorkTimeForUnderSixteen) { return 0; }
+                else { maxHoursTillMaxTime = maxWorkTimeForUnderSixteen.Hour - startinghour; }
+
+                hours.Add(maxWeekHours);
+                hours.Add(maxTimeWithSchoolHours);
+                hours.Add(maxHoursTillMaxTime);
             }
             else
             {
-                // 9 uur incl school
-                // 40 gemiddeld 4 weken
+                int maxWeekHours;
+                int maxTimeWithSchoolHours;
+                int maxhoursWithAverage;
+                int maxAllowedHours = maxWeeklyHoursAlmostAdult * timeframeInWeeksMaxWeeklyHoursAlmostAdult;
+                int amountOfDaysLookedAtForMaxAllowedHours = timeframeInWeeksMaxWeeklyHoursAlmostAdult * 7;
+
+                int workedHoursInTimeframe = GetWorkingHours(Context.Shifts
+                .Where(e => e.Start.Date <= scheduledate.ToDateTime(new TimeOnly()))
+                .Where(e => e.Start.Date >= scheduledate.AddDays(amountOfDaysLookedAtForMaxAllowedHours - 1).ToDateTime(new TimeOnly()))
+                .ToList());
+
+                maxhoursWithAverage = maxAllowedHours + workedHoursInTimeframe;            
+                if (employee.SchoolSchedules.Where(e => e.Date >= startDate && e.Date <= startDate.AddDays(6)).Any()) // magic number
+                {
+                    maxTimeWithSchoolHours = maxHoursWithSchoolAlmostAdult;
+                }
+                else
+                {
+                    maxTimeWithSchoolHours = maxHoursWithSchoolAlmostAdult - GetSchoolHours(scheduledate, employee) - GetWorkingHours(workingShiftsThisWeek.
+                    Where(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly())));
+                }
+            }
+            hours.Sort();
+            return hours.First();
+        }
+
+        private int GetSchoolHours(DateOnly scheduledate, Employee employee)
+        {
+            SchoolSchedule schedule = employee.SchoolSchedules.Where(e => e.Date == scheduledate).First();
+            if (schedule == null) { return 0; }
+            else
+            {
+                return (int)Math.Ceiling(schedule.DurationInHours);
             }
         }
     }
