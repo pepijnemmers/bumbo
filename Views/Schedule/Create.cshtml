@@ -1,3 +1,25 @@
 ﻿@{
     ViewData["Title"] = "Rooster aanmaken";
 }
+
+<form asp-action="MakeSchedule" asp-controller="Schedule" method="post">
+    <div class="card p-4 create-prognosis-card">
+        <div class="mb-3">
+            <label for="startDate" class="form-label fw-bold">Begin Datum</label>
+            <input type="date" class="form-control" id="startDate" name="startDate" placeholder="Begindatum" onchange="checkDate()" min="@DateTime.Now.ToString("yyyy-MM-dd")">
+            <div id="mondayWarning" class="small text-danger d-none fst-italic fs-6">
+                De geselecteerde datum moet een maandag zijn.
+            </div>
+        </div>
+
+        <div class="mb-2">
+            <label class="form-label fw-bold">Eind Datum</label>
+            <p class="fst-italic">dd-mm-yyyy</p>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <a asp-controller="Schedule" asp-action="Index" class="btn btn-outline-primary" type="button">Annuleer</a>
+            <button class="btn btn-primary me-md-2" id="prognosisCreateButton" type="submit" disabled>Berekenen Rooster</button>
+        </div>
+    </div>
+</form>
