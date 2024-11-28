@@ -7,11 +7,11 @@ namespace BumboApp.Controllers
 {
     public class LeaveController : MainController
     {
-        Employee LoggedInEmployee;
+        private Employee _loggedInEmployee;
         public IActionResult Index(int? page, SortOrder? orderBy = SortOrder.Ascending)
         {
             var username = User?.Identity?.Name;
-            LoggedInEmployee = Context.Employees
+            _loggedInEmployee = Context.Employees
             .FirstOrDefault(e => e.FirstName.Equals(username));
 
             List<LeaveRequest> leaveRequests;
@@ -21,7 +21,7 @@ namespace BumboApp.Controllers
             }
             else
             {
-                leaveRequests = Context.LeaveRequests.Where(e => e.Employee == LoggedInEmployee).OrderBy(P => P.StartDate).ToList();
+                leaveRequests = Context.LeaveRequests.Where(e => e.Employee == _loggedInEmployee).OrderBy(P => P.StartDate).ToList();
             }
             if (orderBy == SortOrder.Descending)
             {
@@ -58,9 +58,9 @@ namespace BumboApp.Controllers
         public IActionResult CreateLeaveRequest(LeaveRequest request)
         {
             var username = User?.Identity?.Name;
-            LoggedInEmployee = Context.Employees
+            _loggedInEmployee = Context.Employees
             .FirstOrDefault(e => e.FirstName.Equals(username));
-            request.Employee = LoggedInEmployee;
+            request.Employee = _loggedInEmployee;
 
             TimeSpan difference = request.EndDate - request.StartDate;
             int totalDays = difference.Days + 1;
@@ -76,7 +76,7 @@ namespace BumboApp.Controllers
             {
                 return NotifyErrorAndRedirect("De startdatum moet voor of op de einddatum vallen.", "LeaveRequest");
             }
-            if (LoggedInEmployee.LeaveHours < amountOfLeaveHours)
+            if (_loggedInEmployee.LeaveHours < amountOfLeaveHours)
             {
                 return NotifyErrorAndRedirect("Je hebt niet genoeg verlofuren om een verlofaanvraag te doen.", "Index");
             }
@@ -87,7 +87,7 @@ namespace BumboApp.Controllers
 
             bool hasOverlappingLeaveRequest = Context.LeaveRequests
                 .Any(lr =>
-                    lr.Employee == LoggedInEmployee &&
+                    lr.Employee == _loggedInEmployee &&
                     lr.StartDate <= request.EndDate &&
                     lr.EndDate >= request.StartDate);
 
