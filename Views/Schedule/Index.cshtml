@@ -1,67 +1,16 @@
 ﻿@using System.Globalization
 @using Microsoft.AspNetCore.Mvc.TagHelpers
+
+@model BumboApp.ViewModels.ScheduleViewModel
 @{
     ViewData["Title"] = "Rooster";
-    
-    Role role = Role.Manager;
-    bool isFinal = true;
-    Employee? selectedEmployee = null;
-    List<Employee> employees = new List<Employee>()
-    {
-        new Employee() { EmployeeNumber = 1, FirstName = "Jane", LastName = "Doe" },
-        new Employee() { EmployeeNumber = 2, FirstName = "John", LastName = "Doe" },
-        new Employee() { EmployeeNumber = 3, FirstName = "Alice", LastName = "Doe" },
-    };
-    DateOnly? selectedStartDay = new DateOnly(2024, 12, 2); // current day or monday of the week
-    int weeknumber = ISOWeek.GetWeekOfYear(selectedStartDay.Value.ToDateTime(new TimeOnly(12, 00)));
-    bool isDayView = false;
-    
-    List<Shift> shifts = new List<Shift>()
-    {
-        new Shift()
-        {
-            Id = 1, 
-            Start = new DateTime(new DateOnly(2024, 12, 2), new TimeOnly(9, 00)), 
-            End = new DateTime(new DateOnly(2024, 12, 2), new TimeOnly(18, 00)), 
-            Department = Department.Kassa,
-            Employee = employees[0],
-            IsFinal = true
-        },
-        new Shift()
-        {
-            Id = 2, 
-            Start = new DateTime(new DateOnly(2024, 12, 3), new TimeOnly(6, 00)), 
-            End = new DateTime(new DateOnly(2024, 12, 3), new TimeOnly(10, 00)), 
-            Department = Department.Vers,
-            Employee = employees[1],
-            IsFinal = true
-        },
-        new Shift()
-        {
-            Id = 3, 
-            Start = new DateTime(new DateOnly(2024, 12, 7), new TimeOnly(12, 00)), 
-            End = new DateTime(new DateOnly(2024, 12, 7), new TimeOnly(15, 00)), 
-            Department = Department.Vakkenvullen,
-            Employee = employees[2],
-            IsFinal = true
-        },
-        new Shift()
-        {
-            Id = 3, 
-            Start = new DateTime(new DateOnly(2024, 12, 8), new TimeOnly(12, 00)), 
-            End = new DateTime(new DateOnly(2024, 12, 8), new TimeOnly(15, 00)), 
-            Department = Department.Vers,
-            Employee = null,
-            IsFinal = true
-        },
-    };
-
+    var role = Model.Role;
 }
 
 @* Header for manager and employee *@
 <header>
     @* concept header *@
-    @if (role == Role.Manager && !isFinal)
+    @if (role == Role.Manager && Model.ViewIsConcept)
     {
         <div class="d-flex align-items-center justify-content-between mb-3">
             <h3 class="fst-italic text-secondary">Concept rooster</h3>
@@ -80,33 +29,33 @@
     @* day & week header *@
     <div class="d-flex align-items-center justify-content-between">
         <div class="date-nav">
-            @if (!isDayView)
+            @if (!Model.IsDayView)
             {
-                <button class="unset-all text-body" onclick="GoToDate('@selectedStartDay.Value.AddDays(-7).ToString()')">
+                <button class="unset-all text-body" onclick="GoToDate('@Model.SelectedStartDate.AddDays(-7).ToString()')">
                     <i class="fas fa-chevron-left"></i>
                 </button>
                 <span class="fw-bold px-1 text-capitalize">
-                    Week @weeknumber
+                    Week @Model.WeekNumber
                 </span>
-                <button class="unset-all text-body" onclick="GoToDate('@selectedStartDay.Value.AddDays(7).ToString()')">
+                <button class="unset-all text-body" onclick="GoToDate('@Model.SelectedStartDate.AddDays(7).ToString()')">
                     <i class="fas fa-chevron-right"></i>
                 </button>
             }
             else
             {
-                <button class="unset-all text-body" onclick="GoToDate('@selectedStartDay.Value.AddDays(-1).ToString()')">
+                <button class="unset-all text-body" onclick="GoToDate('@Model.SelectedStartDate.AddDays(-1).ToString()')">
                     <i class="fas fa-chevron-left"></i>
                 </button>
                 <span class="fw-bold px-1 text-capitalize">
-                    @selectedStartDay.Value.ToString("ddd dd-MM-yyyy", CultureInfo.GetCultureInfo("nl-NL"))
+                    @Model.SelectedStartDate.ToString("ddd dd-MM-yyyy", CultureInfo.GetCultureInfo("nl-NL"))
                 </span>
-                <button class="unset-all text-body" onclick="GoToDate('@selectedStartDay.Value.AddDays(1).ToString()')">
+                <button class="unset-all text-body" onclick="GoToDate('@Model.SelectedStartDate.AddDays(1).ToString()')">
                     <i class="fas fa-chevron-right"></i>
                 </button>
             }
         </div>
         <div class="buttons d-flex align-items-center gap-2">
-            @if (role == Role.Manager && isFinal && selectedStartDay > DateOnly.FromDateTime(DateTime.Today))
+            @if (role == Role.Manager && !Model.ViewIsConcept && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
             {
                 <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#delete-week-modal">
                     <i class="fas fa-trash-alt"></i>
@@ -115,7 +64,7 @@
             }
             @if (role == Role.Manager)
             {
-                <a class="btn btn-primary" asp-controller="Shifts" asp-action="Create" asp-route-date="@(isDayView ? selectedStartDay : null)">
+                <a class="btn btn-primary" asp-controller="Shifts" asp-action="Create" asp-route-date="@(Model.IsDayView ? Model.SelectedStartDate : null)">
                     <i class="fas fa-plus"></i>
                     Dienst toevoegen
                 </a>
@@ -126,23 +75,23 @@
                     Mijn diensten
                 </a>
             }
-            @if (selectedEmployee != null)
+            @if (Model.SelectedEmployee != null)
             {
                 <select class="form-select w-auto">
-                    <option value="day" selected="@(isDayView)">Dag overzicht</option>
-                    <option value="week" selected="@(!isDayView)">Week overzicht</option>
+                    <option value="day" selected="@(Model.IsDayView)">Dag overzicht</option>
+                    <option value="week" selected="@(!Model.IsDayView)">Week overzicht</option>
                 </select>
             }
             @if (role == Role.Manager)
             {
                 <select class="form-select w-auto" onchange="GoToEmployee(this)">
                     <optgroup label="Toon alle werknemers">
-                        <option value="all" selected="@(selectedEmployee == null)">Alle werknemers</option>
+                        <option value="all" selected="@(Model.SelectedEmployee == null)">Alle werknemers</option>
                     </optgroup>
                     <optgroup label="Toon één werknemer">
-                        @foreach (Employee employee in employees)
+                        @foreach (Employee employee in Model.Employees)
                         {
-                            <option value="@employee.EmployeeNumber" selected="@(employee == selectedEmployee)">@employee.FirstName @employee.LastName</option>
+                            <option value="@employee.EmployeeNumber" selected="@(employee == Model.SelectedEmployee)">@employee.FirstName @employee.LastName</option>
                         }
                     </optgroup>
                 </select>
@@ -179,17 +128,17 @@
             </div>
             @for (int i = 0; i < 7; i++)
             {
-                <div class="col day-col @(selectedStartDay.Value.AddDays(i) == DateOnly.FromDateTime(DateTime.Today) ? "today" : "")">
+                <div class="col day-col @(Model.SelectedStartDate.AddDays(i) == DateOnly.FromDateTime(DateTime.Today) ? "today" : "")">
                     <div class="day-header">
-                        <span class="text-center d-block small lh-1">@selectedStartDay.Value.AddDays(i).ToString("ddd", CultureInfo.GetCultureInfo("nl-NL"))</span>
-                        <strong class="text-center d-block fs-5 lh-1">@selectedStartDay.Value.AddDays(i).ToString("dd", CultureInfo.GetCultureInfo("nl-NL"))</strong>
+                        <span class="text-center d-block small lh-1">@Model.SelectedStartDate.AddDays(i).ToString("ddd", CultureInfo.GetCultureInfo("nl-NL"))</span>
+                        <strong class="text-center d-block fs-5 lh-1">@Model.SelectedStartDate.AddDays(i).ToString("dd", CultureInfo.GetCultureInfo("nl-NL"))</strong>
                     </div>
                     <div class="day-hours-grid">
                         @for (int j = 6; j < 24; j++)
                         {
                             if (role == Role.Manager)
                             {
-                                <div class="hour" ondblclick="GoToCreateShift('@selectedStartDay.Value.AddDays(i).ToString()', @j)"><i class="fas fa-plus"></i></div>
+                                <div class="hour" ondblclick="GoToCreateShift('@Model.SelectedStartDate.AddDays(i).ToString()', @j)"><i class="fas fa-plus"></i></div>
                             }
                             else
                             {
@@ -203,7 +152,7 @@
 
         <!-- Layer 2: Overlay -->
         <div class="shifts-overlay">
-            @foreach (Shift shift in shifts)
+            @foreach (Shift shift in Model.Shifts)
             {
                 var dayGridPosition = shift.Start.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)shift.Start.DayOfWeek;
                 var startHour = shift.Start.Hour;
@@ -225,7 +174,7 @@
                         @if (!shift.IsFinal) { <span class='text-secondary small fst-italic'>Concept</span> }
                         <div class='d-flex justify-content-between align-items-center gap-3'>
                             <span class='fw-500' style='min-width: 3em'>@shift.Department</span>
-                            @if (selectedStartDay > DateOnly.FromDateTime(DateTime.Today) && role == Role.Manager) { <a href='/shifts/update?id=@shift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
+                            @if (Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today) && role == Role.Manager) { <a href='/shifts/update?id=@shift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
                         </div>
                         "
                     data-bs-content="
@@ -300,7 +249,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuleren</button>
-                    <a class="btn btn-danger" asp-controller="Schedule" asp-action="DeleteWeek" asp-route-startDay="@selectedStartDay">
+                    <a class="btn btn-danger" asp-controller="Schedule" asp-action="DeleteWeek" asp-route-startDay="@Model.SelectedStartDate">
                         Verwijderen
                     </a>
                 </div>
