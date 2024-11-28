@@ -1,6 +1,7 @@
 ﻿using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System.Security.Claims;
 
 namespace BumboApp.Controllers
 {
@@ -9,10 +10,12 @@ namespace BumboApp.Controllers
         Employee LoggedInEmployee;
         public IActionResult Index(int? page, SortOrder? orderBy = SortOrder.Ascending)
         {
-            LoggedInEmployee = Context.Employees.Find(LoggedInUser.Id);
+            var username = User?.Identity?.Name;
+            LoggedInEmployee = Context.Employees
+            .FirstOrDefault(e => e.FirstName.Equals(username));
 
             List<LeaveRequest> leaveRequests;
-            if (LoggedInUser.Role == Role.Manager)
+            if (User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value == "Manager")
             {
                 leaveRequests = Context.LeaveRequests.OrderBy(p => p.StartDate).ToList();
             }
@@ -43,18 +46,20 @@ namespace BumboApp.Controllers
 
             ViewBag.OrderBy = orderBy ?? SortOrder.Ascending;
 
-            ViewData["LoggedInUser"] = LoggedInUser;
+            ViewData["LoggedInUser"] = User;
             return View(leaveRequestsForPage);
         }
 
         public IActionResult LeaveRequest()
         {
-            return View(LoggedInUser);
+            return View();
         }
 
         public IActionResult CreateLeaveRequest(LeaveRequest request)
         {
-            LoggedInEmployee = Context.Employees.Find(LoggedInUser.Id);
+            var username = User?.Identity?.Name;
+            LoggedInEmployee = Context.Employees
+            .FirstOrDefault(e => e.FirstName.Equals(username));
             request.Employee = LoggedInEmployee;
 
             TimeSpan difference = request.EndDate - request.StartDate;
@@ -75,7 +80,7 @@ namespace BumboApp.Controllers
             {
                 return NotifyErrorAndRedirect("Je hebt niet genoeg verlofuren om een verlofaanvraag te doen.", "Index");
             }
-            if (LoggedInUser.Role == Role.Manager)
+            if (User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value == "Manager")
             {
                 return NotifyErrorAndRedirect("Je kan geen verlofaanvraag doen als manager", "Index");
             }
@@ -84,10 +89,9 @@ namespace BumboApp.Controllers
 
             try
             {
-                // TODO fix notification
                 Context.LeaveRequests.Add(request);
-                LoggedInEmployee.LeaveHours = LoggedInEmployee.LeaveHours - amountOfLeaveHours;
-                var manager = Context.Employees.Find(1);
+                // TODO fix notification
+                //var manager = Context.Employees.Find(1);
                 //var notification = new Notification
                 //{
                 //    Employee = manager,
