@@ -9,6 +9,20 @@ namespace BumboApp.Controllers
 {
     public class ScheduleController : MainController
     {
+        // will need to be in a json file   
+        private int maxShiftLengthAdult = 12;
+        private int maxWeeklyHoursAdult = 60;
+
+        private int maxWeeklyHoursAlmostAdult = 40;
+        private int timeframeInWeeksMaxWeeklyHoursAlmostAdult = 4;
+        private int maxHoursWithSchoolAlmostAdult = 9;
+
+        private int maxWeeklyHoursUnderSixteen = 40;
+        private int maxWeeklyHoursSchoolweekUnderSixteen = 12;
+        private int maxHoursWithSchoolUnderSixteen = 8;
+        private int maxWorkingDaysUnderSixteen = 5;
+        private TimeOnly maxWorkTimeForUnderSixteen = new TimeOnly(19,00,00);
+
         public IActionResult Index(DateOnly date)
         {
             return View();
