@@ -67,8 +67,6 @@ namespace BumboApp.Controllers
             {
                 context.HttpContext.Response.Redirect("/Login");
             }
-            
-            ViewData["User"] = User;
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

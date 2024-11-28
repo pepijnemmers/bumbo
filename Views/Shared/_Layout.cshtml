@@ -1,6 +1,6 @@
 ﻿@{
-    var user = ViewData["User"] as User;
     int numberOfNotifications = ViewData["NumberOfNotifications"] as int? ?? 0;
+    var firstRole = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
 }
 
 <!DOCTYPE html>
@@ -37,7 +37,7 @@
                             Dashboard
                         </a>
 
-                        @if (user?.Role is Role.Employee)
+                        @if (User.IsInRole("Employee"))
                         {
                             <a class="nav-link @(Context.Request.Path == "/schedule" ? "active" : "")" asp-controller="Schedule" asp-action="Index">
                                 <i class="fa-solid fa-calendar"></i>
@@ -45,7 +45,7 @@
                             </a>
                         }
 
-                        @if (user?.Role is Role.Manager)
+                        @if (User.IsInRole("Manager"))
                         {
                             <div>
                                 @{
@@ -119,7 +119,7 @@
                             </a>
                         }
 
-                        @if (user?.Role is Role.Manager or Role.Employee)
+                            @if (User.IsInRole("Manager") || User.IsInRole("Employee"))
                         {
                             <a class="nav-link @(Context.Request.Path == "/leave" ? "active" : "")" asp-controller="Leave" asp-action="Index">
                                 <i class="fa-solid fa-bed"></i>
@@ -127,7 +127,7 @@
                             </a>
                         }
 
-                        @if (user?.Role is Role.Employee)
+                            @if (User.IsInRole("Employee"))
                         {
                             <a class="nav-link @(Context.Request.Path == "/availability" ? "active" : "")" asp-controller="Availability" asp-action="Index">
                                 <i class="fa-solid fa-clock"></i>
@@ -172,11 +172,11 @@
                         data-bs-placement="bottom"
                         data-bs-custom-class="popover-profile"
                         data-bs-content="<a class='btn btn-danger' href='/login/logout'>Uitloggen</a>">
-                        @if (user != null)
+                        @if (User != null)
                         {
                             <div class="text-secondary d-none d-sm-flex flex-column">
                                 <span class="fw-bold">Welkom, Frank! @* TODO: @user.FirstName *@</span>
-                                <span class="small" style="margin-top: -5px">@user.Role @* TODO: ToFriendlyString() *@</span>
+                                    <span class="small" style="margin-top: -5px">@firstRole @* TODO: ToFriendlyString() *@</span>
                             </div>
                         }
                         <img class="profile-icon" src="/img/profile-icon.png" alt="profiel"/>
