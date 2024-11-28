@@ -1,4 +1,4 @@
-html, 
+html,
 body {
     height: 100%;
 }
@@ -102,8 +102,8 @@ a {
 }
 .aside-nav .nav-link.logout:hover,
 .aside-nav .nav-link.logout:focus {
-     color: var(--bs-white);
-     background-color: var(--bs-danger);
+    color: var(--bs-white);
+    background-color: var(--bs-danger);
 }
 
 @media screen and (max-width: 768px) {
