@@ -85,6 +85,17 @@ namespace BumboApp.Controllers
                 return NotifyErrorAndRedirect("Je kan geen verlofaanvraag doen als manager", "Index");
             }
 
+            bool hasOverlappingLeaveRequest = Context.LeaveRequests
+                .Any(lr =>
+                    lr.Employee == LoggedInEmployee &&
+                    lr.StartDate <= request.EndDate &&
+                    lr.EndDate >= request.StartDate);
+
+            if (hasOverlappingLeaveRequest)
+            {
+                return NotifyErrorAndRedirect("Je hebt al een overlappende verlofaanvraag", "Index");
+            }
+
             using var transaction = Context.Database.BeginTransaction();
 
             try
