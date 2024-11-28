@@ -298,11 +298,15 @@ label {
     inset: 0;
     left: var(--cdr-time-col-width);
     top: var(--cdr-header-height);
-    
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(18, var(--cdr-time-slot-height));
     pointer-events: none;
+    display: grid;
+    grid-template-rows: repeat(18, var(--cdr-time-slot-height));
+}
+.calendar-container .shifts-overlay--day {
+    grid-template-columns: repeat(12, 1fr);
+}
+.calendar-container .shifts-overlay--week {
+    grid-template-columns: repeat(7, 1fr);
 }
 .shifts-overlay .shift-container {
     padding: .4em;

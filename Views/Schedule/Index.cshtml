@@ -107,15 +107,120 @@
     }
 </header>
 
+@if (Model.IsDayView)
+{
 @* Calendar day view *@
+<div class="table-container">
+    <div class="calendar-container">
 
+        @* Layer 1: Base Grid *@
+        <div class="calendar-grid row g-0" style="@(role == Role.Employee ? "pointer-events: none" : "")">
+            <div class="time-slots-col">
+                <div class="time-slot time-slot-header"></div>
+                @for (int i = 6; i < 24; i++)
+                {
+                    <div class="time-slot">
+                        <span>@i.ToString("D2"):00</span>
+                    </div>
+                }
+            </div>
+            @for (int i = 0; i < 3; i++)
+            {
+                var departmentName = i switch
+                {
+                    0 => Department.Vers.ToFriendlyString(),
+                    1 => Department.Vakkenvullen.ToFriendlyString(),
+                    2 => Department.Kassa.ToFriendlyString(),
+                    _ => string.Empty
+                };
+                
+                <div class="col day-col">
+                    <div class="day-header">
+                        <strong class="text-center d-block fs-5">@departmentName</strong>
+                    </div>
+                    <div class="day-hours-grid">
+                        @for (int j = 6; j < 24; j++)
+                        {
+                            if (role == Role.Manager)
+                            {
+                                <div class="hour" ondblclick="GoToCreateShift('@Model.SelectedStartDate.ToString()', @j, '@departmentName')"><i class="fas fa-plus"></i></div>
+                            }
+                            else
+                            {
+                                <div class="hour"></div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        </div>
 
+        @* Layer 2: Overlay *@
+        <div class="shifts-overlay shifts-overlay--day">
+            @foreach (Shift shift in Model.Shifts)
+            {
+                var dayGridPosition = shift.Department switch
+                {
+                    Department.Vers => 1,
+                    Department.Vakkenvullen => 5,
+                    Department.Kassa => 9,
+                    _ => 0
+                };
+                var startHour = shift.Start.Hour;
+                var endHour = shift.End.Hour;
+                var gridSpanCol = endHour - startHour;
+
+                <button
+                    class="unset-all shift-container 
+                        @shift.Department.ToString().ToLower() 
+                        @(shift.Employee == null ? "no-employee" : "")
+                        @(!shift.IsFinal ? "concept" : "")"
+                    style="grid-area: @(startHour - 5) / @dayGridPosition  / span @gridSpanCol / span 4"
+                    data-bs-toggle="popover"
+                    data-bs-trigger="focus"
+                    data-bs-placement="left"
+                    data-bs-html="true"
+                    data-bs-custom-class="popover-shift @shift.Department.ToString().ToLower()"
+                    data-bs-title="
+                        @if (!shift.IsFinal) { <span class='text-secondary small fst-italic'>Concept</span> }
+                        <div class='d-flex justify-content-between align-items-center gap-3'>
+                            <span class='fw-500' style='min-width: 3em'>@shift.Department</span>
+                            @if (Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today) && role == Role.Manager) { <a href='/shifts/update?id=@shift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
+                        </div>
+                        "
+                    data-bs-content="
+                        <div>
+                            <p class='text-secondary m-0'>@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                            @if (shift.Employee != null) { <p class='fw-500 m-0'>@shift.Employee?.FirstName @shift.Employee?.LastName</p> }else { <p class='fw-500 text-danger m-0'>Zoek intern vervanging en pas de dienst aan of zoek extern.</p> }
+                        </div>">
+                    <div class="shift">
+                        <p class="text-secondary m-0">@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                        @if (shift.Employee != null)
+                        {
+                            <p class="fw-500">@shift.Employee?.FirstName @shift.Employee?.LastName</p>
+                        }
+                        else
+                        {
+                            <p class="fw-500 text-danger">
+                                <i class="fas fa-user-slash"></i>
+                                Geen werknemer
+                            </p>
+                        }
+                    </div>
+                </button>
+            }
+        </div>
+    </div>
+</div>
+}
+else
+{
 @* Calender week view *@
 @* base grid for calender TODO: move to component if possible and remove comments *@
 <div class="table-container">
     <div class="calendar-container">
         
-        <!-- Layer 1: Base Grid -->
+        @* Layer 1: Base Grid *@
         <div class="calendar-grid row g-0" style="@(role == Role.Employee ? "pointer-events: none" : "")">
             <div class="time-slots-col">
                 <div class="time-slot time-slot-header"></div>
@@ -150,8 +255,8 @@
             }
         </div>
 
-        <!-- Layer 2: Overlay -->
-        <div class="shifts-overlay">
+        @* Layer 2: Overlay *@
+        <div class="shifts-overlay shifts-overlay--week">
             @foreach (Shift shift in Model.Shifts)
             {
                 var dayGridPosition = shift.Start.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)shift.Start.DayOfWeek;
@@ -182,8 +287,7 @@
                             <p class='text-secondary m-0'>@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
                             @if (shift.Employee != null) { <p class='fw-500 m-0'>@shift.Employee?.FirstName @shift.Employee?.LastName</p> }
                             else { <p class='fw-500 text-danger m-0'>Zoek intern vervanging en pas de dienst aan of zoek extern.</p> }
-                        </div>"
-                >
+                        </div>">
                     <div class="shift">
                         <p class="text-secondary m-0">@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
                         @if (shift.Employee != null)
@@ -203,7 +307,7 @@
         </div>
     </div>
 </div>
-
+}
 @* Legenda *@
 <div class="legenda table-container p-3">
     <h4>Legenda</h4>
@@ -260,7 +364,8 @@
 
 @section Scripts
 {
-    <script type="text/javascript">            
+    <script type="text/javascript">
+    @*    TODO: gotodate doesn't work yet *@
         function GoToDate(date) {
             const url = new URL(window.location.href);
             url.searchParams.set("startDate", date);
@@ -274,16 +379,14 @@
                 url.searchParams.delete("dayView");
             } else {
                 url.searchParams.set("employeeNumber", select.value);
-                
-                if (!url.searchParams.has("dayView")) {
-                    url.searchParams.set("dayView", false);
-                }
             }
             location.href = url;
         }    
         
-        function GoToCreateShift(date, startHour) {
-            location.href = `/shifts/create?date=${date}&startHour=${startHour}`;
+        function GoToCreateShift(date, startHour, departmentName = null) {
+            location.href = departmentName === null
+                ? `/shifts/create?date=${date}&startHour=${startHour}`
+                : `/shifts/create?date=${date}&startHour=${startHour}&department=${departmentName}`;
         }
         
         function GoToView(select) {
@@ -291,6 +394,7 @@
             url.searchParams.set("dayView", select.value === "day");
             location.href = url;
         }
+    
     
     </script>
 }
