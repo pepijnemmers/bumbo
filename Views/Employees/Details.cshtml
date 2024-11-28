@@ -32,8 +32,8 @@ else
                 <div class="col-md-6">
                     <p><strong>Geboortedatum:</strong> @Model.DateOfBirth</p>
                     <p><strong>Rol:</strong> @Model.User.Role</p>
-                    <p><strong>Contracturen:</strong> TODO van de @Model.ContractHours uur per week gebruikt</p>
-                    <p><strong>Verlofuren:</strong> TODO van de @Model.LeaveHours uur gebruikt</p>
+                    <p><strong>Contracturen:</strong> @ViewData["ContractHourUsed"] van de @Model.ContractHours uur per week gebruikt</p>
+                    <p><strong>Verlofuren:</strong> @ViewData["LeaveHourUsed"] van de @Model.LeaveHours uur gebruikt</p>
                 </div>
             </div>
         </div>
@@ -45,11 +45,11 @@ else
             <div class="row">
                 <div class="col-md-6">
                     <p><strong>Postcode:</strong> @Model.Zipcode</p>
-                    <p><strong>Straat:</strong> TODO</p>
+                    <p><strong>Straat:</strong> @ViewData["StreetName"]</p>
                 </div>
                 <div class="col-md-6">
                     <p><strong>Huisnummer:</strong> @Model.HouseNumber</p>
-                    <p><strong>Plaats:</strong> TODO</p>
+                    <p><strong>Plaats:</strong> @ViewData["CityName"]</p>
                 </div>
             </div>
         </div>
