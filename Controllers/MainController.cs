@@ -13,9 +13,9 @@ namespace BumboApp.Controllers
         protected readonly BumboDbContext Context = new();
         protected int PageSize = 5;
         protected int DefaultPage = 1;
+        protected Role LoggedInUserRole;
         
         private IConfiguration _configuration = null!;
-        private Role _loggedInUserRole;
 
         // No Access page
         public IActionResult NoAccess()
@@ -71,7 +71,7 @@ namespace BumboApp.Controllers
             
             if (!string.IsNullOrEmpty(loggedInUserId))
             {
-                _loggedInUserRole = Enum.TryParse(User?.FindFirstValue(ClaimTypes.Role), out Role role) ? role : Role.Unknown;
+                LoggedInUserRole = Enum.TryParse(User?.FindFirstValue(ClaimTypes.Role), out Role role) ? role : Role.Unknown;
             }
 
             ViewData["NumberOfNotifications"] = Context.Notifications.Count(n => n.Employee.User.Id == loggedInUserId && !n.HasBeenRead);
@@ -80,7 +80,7 @@ namespace BumboApp.Controllers
         // check if user has access to this page otherwise redirect to NoAccess page
         protected void CheckPageAccess(Role role)
         {
-            if (_loggedInUserRole != role)
+            if (LoggedInUserRole != role)
             {
                 Response.Redirect("/Main/NoAccess?from=" + Request.Path);
             }
