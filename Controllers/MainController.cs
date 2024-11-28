@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Security.Claims;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -7,19 +8,12 @@ using Microsoft.AspNetCore.Mvc.Filters;
 namespace BumboApp.Controllers
 {
     public class MainController : Controller
-    {
-        private static User? _loggedInUser;
-        
+    {   
         [FromServices] protected INotyfService NotifyService { get; set; } = null!;
         protected readonly BumboDbContext Context;
         protected static IConfiguration Configuration = null!;
         protected static int PageSize;
         protected static int DefaultPage;
-        protected static User? LoggedInUser
-        {
-            get => _loggedInUser;
-            set => _loggedInUser = value;
-        }
 
         public MainController()
         {
@@ -68,12 +62,11 @@ namespace BumboApp.Controllers
             PageSize = Configuration.GetValue<int>("Pagination:DefaultPageSize");
             DefaultPage = Configuration.GetValue<int>("Pagination:StartPage");
             
-            if (LoggedInUser == null && context.HttpContext.Request.Path != "/login")
+            var loggedInUserId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(loggedInUserId) && context.HttpContext.Request.Path != "/login")
             {
                 context.HttpContext.Response.Redirect("/Login");
             }
-            
-            ViewData["User"] = LoggedInUser;
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

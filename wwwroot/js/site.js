@@ -1,4 +1,8 @@
-﻿// hamburger menu
+﻿// bootstrap popover
+const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+
+// hamburger menu
 document.getElementById('mobile-hamburger-menu').addEventListener('click', function () {
     document.getElementById('aside-nav-primary').classList.toggle('d-none');
 });
