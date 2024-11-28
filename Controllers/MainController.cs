@@ -10,22 +10,13 @@ namespace BumboApp.Controllers
     public class MainController : Controller
     {   
         [FromServices] protected INotyfService NotifyService { get; set; } = null!;
-        protected readonly BumboDbContext Context;
-        protected static int PageSize;
-        protected static int DefaultPage;
+        protected readonly BumboDbContext Context = new();
+        protected int PageSize = 5;
+        protected int DefaultPage = 1;
         
-        private static IConfiguration _configuration = null!;
+        private IConfiguration _configuration = null!;
         private Role _loggedInUserRole;
 
-        public MainController()
-        {
-            Context = new BumboDbContext();
-            
-            // fallback values for pagination
-            PageSize = 5;
-            DefaultPage = 1;
-        }
-        
         // No Access page
         public IActionResult NoAccess()
         {
@@ -78,7 +69,7 @@ namespace BumboApp.Controllers
                 context.HttpContext.Response.Redirect("/Login");
             }
             
-            if (!string.IsNullOrEmpty(loggedInUserId) && _loggedInUserRole == Role.Unknown)
+            if (!string.IsNullOrEmpty(loggedInUserId))
             {
                 _loggedInUserRole = Enum.TryParse(User?.FindFirstValue(ClaimTypes.Role), out Role role) ? role : Role.Unknown;
             }
