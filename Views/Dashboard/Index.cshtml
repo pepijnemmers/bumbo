@@ -2,31 +2,135 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="container dashboard">
-    <div class="row gap-3">
-        <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="Dashboard" asp-action="Index">
-            <i class="fa-solid fa-house fs-4 mb-2"></i>
-            Dashboard
-        </a>
-        <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="Norms" asp-action="Index">
-            <i class="fa-solid fa-square-pen fs-4 mb-2"></i>
-            Normeringen
-        </a>
-        <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="Prognoses" asp-action="Index">
-            <i class="fa-solid fa-file-lines fs-4 mb-2"></i>
-            Prognoses
-        </a>
-        <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="Expectations" asp-action="Index">
-            <i class="fa-solid fa-layer-group fs-4 mb-2"></i>
-            Verwachtingen
-        </a>
-        <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="OpeningHours" asp-action="Index">
-            <i class="fa-solid fa-clock fs-4 mb-2"></i>
-            Openingstijden
-        </a>
-        <a class="col d-flex flex-column align-items-center btn btn-outline-danger py-4" asp-area="" asp-controller="Login" asp-action="Logout">
-            <i class="fa-solid fa-right-from-bracket fs-4 mb-2"></i>
-            Uitloggen
-        </a>
+@if (User.IsInRole("Employee"))
+{
+    <div class="container dashboard">
+        <div class="row gap-3">
+            <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="Dashboard" asp-action="Index">
+                <i class="fa-solid fa-house fs-4 mb-2"></i>
+                Dashboard
+            </a>
+            <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="Norms" asp-action="Index">
+                <i class="fa-solid fa-square-pen fs-4 mb-2"></i>
+                Normeringen
+            </a>
+            <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="Prognoses" asp-action="Index">
+                <i class="fa-solid fa-file-lines fs-4 mb-2"></i>
+                Prognoses
+            </a>
+            <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="Expectations" asp-action="Index">
+                <i class="fa-solid fa-layer-group fs-4 mb-2"></i>
+                Verwachtingen
+            </a>
+            <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="OpeningHours" asp-action="Index">
+                <i class="fa-solid fa-clock fs-4 mb-2"></i>
+                Openingstijden
+            </a>
+            <a class="col d-flex flex-column align-items-center btn btn-outline-danger py-4" asp-area="" asp-controller="Login" asp-action="Logout">
+                <i class="fa-solid fa-right-from-bracket fs-4 mb-2"></i>
+                Uitloggen
+            </a>
+        </div>
     </div>
-</div>
+}
+
+@if (User.IsInRole("Manager"))
+{
+    <div class="container dashboard">
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-md-7">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5><strong>Overnames te beoordelen</strong></h5>
+                        <div class="row">
+                            @foreach (var shiftTakeOver in ViewBag.ShiftTakeOvers)
+                            {
+                                <div class="col-12 mb-3">
+                                    <div class="card w-100">
+                                        <div class="card-body d-flex justify-content-between">
+                                            <div>
+                                                <h6 class="card-title">
+                                                    <strong>Dienst @shiftTakeOver.Shift.Department</strong>
+                                                </h6>
+                                                <p class="card-text">
+                                                    @shiftTakeOver.Shift.Start.ToString("dd-MM-yyyy")
+                                                    @shiftTakeOver.Shift.Start.ToString("HH:mm") - 
+                                                    @shiftTakeOver.Shift.End.ToString("HH:mm")
+                                                </p>
+                                            </div>
+                                            <a asp-controller="Prognoses" asp-action="Index" class="btn btn-outline-dark align-self-center" type="button">Beoordelen</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5><strong>Verlof te beoordelen</strong></h5>
+                        <div class="row">
+                            @foreach (var leaveRequest in ViewBag.LeaveRequests)
+                            {
+                                <div class="col-12 mb-3">
+                                    <div class="card w-100">
+                                        <div class="card-body d-flex justify-content-between">
+                                            <div>
+                                                <h6 class="card-title">
+                                                    <strong>Verlof verzoek - @leaveRequest.Employee.FirstName @leaveRequest.Employee.LastName</strong>
+                                                </h6>
+                                                <p class="card-text">
+                                                    @leaveRequest.StartDate.ToString("dd-MM-yyyy") - @leaveRequest.EndDate.ToString("dd-MM-yyyy")
+                                                </p>
+                                            </div>
+                                            <a asp-controller="Prognoses" asp-action="Index" class="btn btn-outline-dark align-self-center" type="button">Beoordelen</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Snelle acties</h5>
+                        <div class="row">
+                            <!-- First Button -->
+                            <div class="col-6 mb-2">
+                                <button class="btn btn-outline-primary w-100 py-3">Button 1</button>
+                            </div>
+                            <!-- Second Button -->
+                            <div class="col-6 mb-2">
+                                <button class="btn btn-outline-primary w-100 py-3">Button 2</button>
+                            </div>
+                            <!-- Third Button -->
+                            <div class="col-6">
+                                <button class="btn btn-outline-primary w-100 py-3">Button 3</button>
+                            </div>
+                            <!-- Fourth Button -->
+                            <div class="col-6">
+                                <button class="btn btn-outline-primary w-100 py-3">Button 4</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Right Column -->
+            <div class="col-md-5">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Card 4</h5>
+                        <p class="card-text">Content for card 4.</p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Card 5</h5>
+                        <p class="card-text">Content for card 5.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
