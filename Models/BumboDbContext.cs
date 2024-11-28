@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection.Emit;
-using System.Reflection.Metadata;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BumboApp.Models;
 
-public partial class BumboDbContext : DbContext
+public partial class BumboDbContext : IdentityDbContext<User>
 {
     public BumboDbContext()
     {
@@ -35,7 +33,7 @@ public partial class BumboDbContext : DbContext
 
     public virtual DbSet<UniqueDay> UniqueDays { get; set; }
 
-    public virtual DbSet<User> Users { get; set; }
+    public override DbSet<User> Users { get; set; }
 
     public virtual DbSet<WeekPrognosis> WeekPrognoses { get; set; }
 
@@ -51,6 +49,8 @@ public partial class BumboDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        
         //Module 1 classes
         modelBuilder.Entity<WeekPrognosis>()
             .HasIndex(wp => wp.StartDate)
@@ -97,12 +97,6 @@ public partial class BumboDbContext : DbContext
             });
 
         OnModelCreatingPartial(modelBuilder);
-        modelBuilder.Entity<User>(u =>
-            {
-                u.HasIndex(u => u.Email)
-                 .IsUnique();
-                u.Property<string>("Password").IsRequired();
-            });
 
         //Composite keys tables explicit relations (efcore doesnt interpret right)
         modelBuilder.Entity<Availability>()
@@ -147,6 +141,134 @@ public partial class BumboDbContext : DbContext
 
     private void EssentialSeedData(ModelBuilder modelBuilder)
     {
+        //Add roles
+        var managerRoleId = "dc065cdc-e1d7-4202-936a-fbf03070c74d";
+        var employeeRoleId = "4cd8ce88-df2a-49fb-ac51-0610e1be0f0b";
+
+        modelBuilder.Entity<IdentityRole>().HasData(
+            new IdentityRole
+            {
+                Id = managerRoleId,
+                Name = Role.Manager.ToString(),
+                NormalizedName = Role.Manager.ToString().ToUpper()
+            },
+            new IdentityRole
+            {
+                Id=employeeRoleId,
+                Name = Role.Employee.ToString(),
+                NormalizedName = Role.Employee.ToString().ToUpper()
+            }
+            );
+
+        //Seed Users
+        var user1Id = "2ab03136-c316-4b70-a7fc-4c9cb044a6be"; //Manager
+        var user2Id = "12544476-38da-4113-9c40-4bc508f8c0f2"; //Employee
+        var user3Id = "2667ab01-7225-451b-adbb-c99eea968d02"; //Employee
+
+        modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = user1Id,
+                    UserName = "John",
+                    NormalizedUserName = "JOHN",
+                    Email = "john.doe@example.com",
+                    NormalizedEmail = "JOHN.DOE@EXAMPLE.COM",
+                    EmailConfirmed = true,
+                    LockoutEnabled = false,
+                    SecurityStamp = "static-security-stamp",
+                    ConcurrencyStamp = "static-concurrency-stamp",
+                    PasswordHash = "AQAAAAIAAYagAAAAEHElifiD+iCmgFS/WCucV8tMzAcHwDdy1B4kwXCYsxB7xOwvRsxjkQbdJ6YrI77xDA=="
+                },
+                new User
+                {
+                    Id = user2Id,
+                    UserName = "Jane",
+                    NormalizedUserName = "JANE",
+                    Email = "jane.smith@example.com",
+                    NormalizedEmail = "JANE.SMITH@EXAMPLE.COM",
+                    EmailConfirmed = true,
+                    LockoutEnabled = false,
+                    SecurityStamp = "static-security-stamp",
+                    ConcurrencyStamp = "static-concurrency-stamp",
+                    PasswordHash = "AQAAAAIAAYagAAAAEGk4lj3QRvRZzy4Oas9sTTW0A2nJ1X41eB0uiNnGNFQT7RdiOs/FLSjxWz/x4KDk+w=="
+                },
+                new User
+                {
+                    Id = user3Id,
+                    UserName = "Emily",
+                    NormalizedUserName = "EMILY",
+                    Email = "emily.jones@example.com",
+                    NormalizedEmail = "EMILY.JONES@EXAMPLE.COM",
+                    EmailConfirmed = true,
+                    LockoutEnabled = false,
+                    SecurityStamp = "static-security-stamp",
+                    ConcurrencyStamp = "static-concurrency-stamp",
+                    PasswordHash = "AQAAAAIAAYagAAAAEHv/0P6Xoo7fFyIXoIwA78DUHxHCFNYGaR8vPnMjmnx+QoW0Khto6+ptFaVzpYAWFw=="
+                }
+            );
+
+        // Assign Roles to Users
+        modelBuilder.Entity<IdentityUserRole<string>>().HasData(
+            new IdentityUserRole<string>
+            {
+                UserId = user1Id,
+                RoleId = managerRoleId
+            },
+            new IdentityUserRole<string>
+            {
+                UserId = user2Id,
+                RoleId = employeeRoleId
+            },
+            new IdentityUserRole<string>
+            {
+                UserId = user3Id,
+                RoleId = employeeRoleId
+            }
+        );
+
+        //seed Employees
+        modelBuilder.Entity<Employee>().HasData(
+            new
+            {
+                EmployeeNumber = 1,
+                FirstName = "John",
+                LastName = "Doe",
+                DateOfBirth = new DateOnly(1990, 5, 20),
+                Zipcode = "1234AB",
+                HouseNumber = "1A",
+                ContractHours = 40,
+                LeaveHours = 60,
+                StartOfEmployment = new DateOnly(2020, 1, 15),
+                UserId = user1Id
+            },
+            new
+            {
+                EmployeeNumber = 2,
+                FirstName = "Jane",
+                LastName = "Smith",
+                DateOfBirth = new DateOnly(1995, 8, 12),
+                Zipcode = "5684AC",
+                HouseNumber = "2B",
+                ContractHours = 20,
+                LeaveHours = 5,
+                StartOfEmployment = new DateOnly(2021, 3, 1),
+                UserId = user2Id
+            },
+            new
+            {
+                EmployeeNumber = 3,
+                FirstName = "Emily",
+                LastName = "Jones",
+                DateOfBirth = new DateOnly(1998, 12, 5),
+                Zipcode = "5211DG",
+                HouseNumber = "3C",
+                ContractHours = 35,
+                LeaveHours = 40,
+                StartOfEmployment = new DateOnly(2019, 7, 30),
+                UserId = user3Id
+            }
+        );
+
         // Seed data for OpeningHours
         modelBuilder.Entity<OpeningHour>().HasData(
             new OpeningHour
@@ -339,74 +461,6 @@ public partial class BumboDbContext : DbContext
                 Factor = 1.8f
             }
         );
-
-
-        modelBuilder.Entity<User>().HasData(
-            new
-            {
-                Id = 1,
-                Role = Role.Manager,
-                Email = "john.doe@example.com",
-                Password = "qwer1234"
-            },
-            new
-            {
-                Id = 2,
-                Role = Role.Employee,
-                Email = "jane.smith@example.com",
-                Password = "asdf1234"
-            },
-            new
-            {
-                Id = 3,
-                Role = Role.Employee,
-                Email = "emily.jones@example.com",
-                Password = "zxcv1234"
-            }
-        );
-
-
-        modelBuilder.Entity<Employee>().HasData(
-    new
-    {
-        EmployeeNumber = 1,
-        FirstName = "John",
-        LastName = "Doe",
-        DateOfBirth = new DateOnly(1990, 5, 20),
-        Zipcode = "1234AB",
-        HouseNumber = "1A",
-        ContractHours = 40,
-        LeaveHours = 60,
-        StartOfEmployment = new DateOnly(2020, 1, 15),
-        UserId = 1
-    },
-    new
-    {
-        EmployeeNumber = 2,
-        FirstName = "Jane",
-        LastName = "Smith",
-        DateOfBirth = new DateOnly(1995, 8, 12),
-        Zipcode = "5684AC",
-        HouseNumber = "2B",
-        ContractHours = 20,
-        LeaveHours = 5,
-        StartOfEmployment = new DateOnly(2021, 3, 1),
-        UserId = 2
-    },
-    new
-    {
-        EmployeeNumber = 3,
-        FirstName = "Emily",
-        LastName = "Jones",
-        DateOfBirth = new DateOnly(1998, 12, 5),
-        Zipcode = "5211DG",
-        HouseNumber = "3C",
-        ContractHours = 35,
-        LeaveHours = 40,
-        StartOfEmployment = new DateOnly(2019, 7, 30),
-        UserId = 3
-    }
-);
 
         modelBuilder.Entity<Availability>().HasData(
             new
