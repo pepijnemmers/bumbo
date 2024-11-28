@@ -7,12 +7,12 @@ namespace BumboApp.Controllers
 {
     public class ScheduleController : MainController
     {
-        public IActionResult Index(Employee? employee, DateOnly? startDate, bool? dayView)
+        public IActionResult Index(string? employeeNumber, DateOnly? startDate, bool? dayView)
         {
             var role = Role.Manager; // TODO: Get role from user
             
-            var selectedEmployee = employee;
-            var isDayView = selectedEmployee == null ? false : dayView ?? true;
+            var selectedEmployee = employeeNumber != null && int.TryParse(employeeNumber, out _) ? Context.Employees.Find(Int32.Parse(employeeNumber)) : null;
+            var isDayView = selectedEmployee != null && (dayView ?? true);
             
             var selectedStartDate = isDayView ? startDate ?? DateOnly.FromDateTime(DateTime.Today) : GetMondayOfWeek(startDate ?? DateOnly.FromDateTime(DateTime.Today));
             var weekNumber = ISOWeek.GetWeekOfYear(selectedStartDate.ToDateTime(new TimeOnly(12, 00)));
@@ -33,7 +33,7 @@ namespace BumboApp.Controllers
                 SelectedEmployee = selectedEmployee,
                 IsDayView = isDayView
             };
-            return View();
+            return View(viewModel);
         }
         
         private DateOnly GetMondayOfWeek(DateOnly date)

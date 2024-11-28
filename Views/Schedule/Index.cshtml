@@ -77,7 +77,7 @@
             }
             @if (Model.SelectedEmployee != null)
             {
-                <select class="form-select w-auto">
+                <select class="form-select w-auto" onchange="GoToView(this)">
                     <option value="day" selected="@(Model.IsDayView)">Dag overzicht</option>
                     <option value="week" selected="@(!Model.IsDayView)">Week overzicht</option>
                 </select>
@@ -262,15 +262,34 @@
 {
     <script type="text/javascript">            
         function GoToDate(date) {
-            console.log(date);
+            const url = new URL(window.location.href);
+            url.searchParams.set("startDate", date);
+            location.href = url;
         }
         
         function GoToEmployee(select) {
-            console.log(select.value);
+            const url = new URL(window.location.href);
+            if (select.value.toLowerCase() === "all") {
+                url.searchParams.delete("employeeNumber");
+                url.searchParams.delete("dayView");
+            } else {
+                url.searchParams.set("employeeNumber", select.value);
+                
+                if (!url.searchParams.has("dayView")) {
+                    url.searchParams.set("dayView", false);
+                }
+            }
+            location.href = url;
         }    
         
         function GoToCreateShift(date, startHour) {
-            console.log(date, startHour);
+            location.href = `/shifts/create?date=${date}&startHour=${startHour}`;
+        }
+        
+        function GoToView(select) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("dayView", select.value === "day");
+            location.href = url;
         }
     
     </script>
