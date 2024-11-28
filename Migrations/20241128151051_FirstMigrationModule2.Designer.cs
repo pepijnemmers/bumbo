@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BumboApp.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    [Migration("20241128150201_FirstMigrationModule2")]
+    [Migration("20241128151051_FirstMigrationModule2")]
     partial class FirstMigrationModule2
     {
         /// <inheritdoc />

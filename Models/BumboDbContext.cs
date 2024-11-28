@@ -149,14 +149,14 @@ public partial class BumboDbContext : IdentityDbContext<User>
             new IdentityRole
             {
                 Id = managerRoleId,
-                Name = "Manager",
-                NormalizedName = "MANAGER"
+                Name = Role.Manager.ToString(),
+                NormalizedName = Role.Manager.ToString().ToUpper()
             },
             new IdentityRole
             {
                 Id=employeeRoleId,
-                Name = "Employee",
-                NormalizedName = "EMPLOYEE"
+                Name = Role.Employee.ToString(),
+                NormalizedName = Role.Employee.ToString().ToUpper()
             }
             );
 
