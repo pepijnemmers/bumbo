@@ -11,9 +11,11 @@ namespace BumboApp.Controllers
     {   
         [FromServices] protected INotyfService NotifyService { get; set; } = null!;
         protected readonly BumboDbContext Context;
-        protected static IConfiguration Configuration = null!;
         protected static int PageSize;
         protected static int DefaultPage;
+        
+        private static IConfiguration _configuration = null!;
+        private Role _loggedInUserRole;
 
         public MainController()
         {
@@ -65,10 +67,10 @@ namespace BumboApp.Controllers
         {    
             base.OnActionExecuting(context);
             NotifyService = HttpContext.RequestServices.GetService<INotyfService>()!;
-            Configuration = HttpContext.RequestServices.GetService<IConfiguration>()!;
+            _configuration = HttpContext.RequestServices.GetService<IConfiguration>()!;
             
-            PageSize = Configuration.GetValue<int>("Pagination:DefaultPageSize");
-            DefaultPage = Configuration.GetValue<int>("Pagination:StartPage");
+            PageSize = _configuration.GetValue<int>("Pagination:DefaultPageSize");
+            DefaultPage = _configuration.GetValue<int>("Pagination:StartPage");
             
             var loggedInUserId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(loggedInUserId) && context.HttpContext.Request.Path != "/login")
@@ -76,14 +78,18 @@ namespace BumboApp.Controllers
                 context.HttpContext.Response.Redirect("/Login");
             }
             
-            ViewData["User"] = LoggedInUser;
-            //TODO: UNCOMMENT AND TEST -> ViewData["NumberOfNotifications"] = Context.Notification.Count(n => n.Employee.User.Id == LoggedInUser?.Id && !n.HasBeenRead) ?? 0;
+            if (!string.IsNullOrEmpty(loggedInUserId) && _loggedInUserRole == Role.Unknown)
+            {
+                _loggedInUserRole = Enum.TryParse(User?.FindFirstValue(ClaimTypes.Role), out Role role) ? role : Role.Unknown;
+            }
+
+            ViewData["NumberOfNotifications"] = Context.Notifications.Count(n => n.Employee.User.Id == loggedInUserId && !n.HasBeenRead);
         }
         
         // check if user has access to this page otherwise redirect to NoAccess page
         protected void CheckPageAccess(Role role)
         {
-            if (LoggedInUser?.Role != role)
+            if (_loggedInUserRole != role)
             {
                 Response.Redirect("/Main/NoAccess?from=" + Request.Path);
             }
