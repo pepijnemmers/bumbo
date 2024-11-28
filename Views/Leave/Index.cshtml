@@ -30,7 +30,7 @@
                 </a>
                 </th>
                 <th>Eind datum</th>
-                <th>Reden</th>
+                <th class="leaveRequestReason">Reden</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -42,7 +42,7 @@
                     <tr>
                         <td>@request.StartDate.ToShortDateString()</td>
                         <td>@request.EndDate.ToShortDateString()</td>
-                        <td>@request.Reason</td>
+                        <td class="leaveRequestReason">@request.Reason</td>
                         <td>
                             @switch (request.Status)
                             {
@@ -65,20 +65,14 @@
                         </td>
                     </tr>
                 }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="100%" class="text-center">Er zijn geen verlofverzoeken</td>
-                </tr>
             }        
         </tbody>
     </table>
     @if (ViewBag.MaxPages > 1)
     {
         <Component type="typeof(Pagination)"
-                   render-mode="ServerPrerendered"
-                   param-PageNumber="ViewBag.PageNumber"
-                   param-MaxPages="ViewBag.MaxPages" />
+            render-mode="ServerPrerendered"
+            param-PageNumber="ViewBag.PageNumber"
+            param-MaxPages="ViewBag.MaxPages" />
     }
 </div>

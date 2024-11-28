@@ -183,9 +183,19 @@ label {
     text-align: left;
 }
 
-/*Create prognosis*/
+/*Create prognosis and leave request*/
 .create-card {
     width: 30rem;
+}
+
+@media (max-width: 768px) {
+    .create-card {
+        width: 100%;
+    }
+
+    .leaveRequestReason {
+        display: none;
+    }
 }
 
 /* Opening hours view*/
