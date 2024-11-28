@@ -156,58 +156,174 @@
         </div>
 
         @* Layer 2: Overlay *@
-        <div class="shifts-overlay shifts-overlay--day">
-            @foreach (Shift shift in Model.Shifts)
+        @{
+            List<List<Shift>> GetShiftGroups(List<Shift> shifts)
             {
-                var dayGridPosition = shift.Department switch
-                {
-                    Department.Vers => 1,
-                    Department.Vakkenvullen => 5,
-                    Department.Kassa => 9,
-                    _ => 0
-                };
-                var startHour = shift.Start.Hour;
-                var endHour = shift.End.Hour;
-                var gridSpanCol = endHour - startHour;
+                shifts = shifts.OrderBy(shift => shift.Start).ToList();
+                var groups = new List<List<Shift>>();
 
-                <button
-                    class="unset-all shift-container 
-                        @shift.Department.ToString().ToLower() 
-                        @(shift.Employee == null ? "no-employee" : "")
-                        @(!shift.IsFinal ? "concept" : "")"
-                    style="grid-area: @(startHour - 5) / @dayGridPosition  / span @gridSpanCol / span 4"
-                    data-bs-toggle="popover"
-                    data-bs-trigger="focus"
-                    data-bs-placement="left"
-                    data-bs-html="true"
-                    data-bs-custom-class="popover-shift @shift.Department.ToString().ToLower()"
-                    data-bs-title="
-                        @if (!shift.IsFinal) { <span class='text-secondary small fst-italic'>Concept</span> }
-                        <div class='d-flex justify-content-between align-items-center gap-3'>
-                            <span class='fw-500' style='min-width: 3em'>@shift.Department</span>
-                            @if (Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today) && role == Role.Manager) { <a href='/shifts/update?id=@shift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
+                foreach (var shift in shifts)
+                {
+                    var overlappingGroup = groups.FirstOrDefault(group =>
+                        group.Any(g => g.End > shift.Start && g.Start < shift.End));
+        
+                    if (overlappingGroup == null)
+                    {
+                        groups.Add(new List<Shift> { shift });
+                    }
+                    else
+                    {
+                        overlappingGroup.Add(shift);
+                    }
+                }
+                return groups;
+            }
+            var shiftGroups = GetShiftGroups(Model.Shifts);
+        }
+        
+        <div class="shifts-overlay shifts-overlay--day">
+            @foreach (var group in shiftGroups)
+            {
+                // show single shifts
+                if (group.Count == 1)
+                {
+                    var shift = group.First();
+                    var departmentGridPosition = shift.Department switch
+                    {
+                        Department.Vers => 1,
+                        Department.Vakkenvullen => 5,
+                        Department.Kassa => 9,
+                        _ => 0
+                    };
+                    var startHour = shift.Start.Hour;
+                    var endHour = shift.End.Hour;
+                    var gridSpanCol = endHour - startHour;
+
+                    <button
+                        class="unset-all shift-container 
+                            @shift.Department.ToString().ToLower() 
+                            @(shift.Employee == null ? "no-employee" : "")
+                            @(!shift.IsFinal ? "concept" : "")"
+                        style="grid-area: @(startHour - 5) / @departmentGridPosition  / span @gridSpanCol / span 4"
+                        data-bs-toggle="popover"
+                        data-bs-trigger="focus"
+                        data-bs-placement="left"
+                        data-bs-html="true"
+                        data-bs-custom-class="popover-shift @shift.Department.ToString().ToLower()"
+                        data-bs-title="
+                            @if (!shift.IsFinal) { <span class='text-secondary small fst-italic'>Concept</span> }
+                            <div class='d-flex justify-content-between align-items-center gap-3'>
+                                <span class='fw-500' style='min-width: 3em'>@shift.Department</span>
+                                @if (Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today) && role == Role.Manager) { <a href='/shifts/update?id=@shift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
+                            </div>
+                            "
+                        data-bs-content="
+                            <div>
+                                <p class='text-secondary m-0'>@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                                @if (shift.Employee != null) {
+                                    <p class='fw-500 mb-1'><i class='fas fa-user me-1'></i>@shift.Employee?.FirstName @shift.Employee?.LastName</p> 
+                                } else {
+                                    <p class='fw-500 text-danger mb-1'><i class='fas fa-user-slash me-1'></i>Zoek intern vervanging en pas de dienst aan of zoek extern.</p> 
+                                }
+                            </div>">
+                        <div class="shift">
+                            <p class="text-secondary m-0">@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                            @if (shift.Employee != null)
+                            {
+                                <p class="fw-500">@shift.Employee?.FirstName @shift.Employee?.LastName</p>
+                            }
+                            else
+                            {
+                                <p class="fw-500 text-danger">
+                                    <i class="fas fa-user-slash"></i>
+                                    Geen werknemer
+                                </p>
+                            }
                         </div>
-                        "
-                    data-bs-content="
-                        <div>
-                            <p class='text-secondary m-0'>@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
-                            @if (shift.Employee != null) { <p class='fw-500 m-0'>@shift.Employee?.FirstName @shift.Employee?.LastName</p> }else { <p class='fw-500 text-danger m-0'>Zoek intern vervanging en pas de dienst aan of zoek extern.</p> }
-                        </div>">
-                    <div class="shift">
-                        <p class="text-secondary m-0">@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
-                        @if (shift.Employee != null)
-                        {
-                            <p class="fw-500">@shift.Employee?.FirstName @shift.Employee?.LastName</p>
-                        }
-                        else
-                        {
-                            <p class="fw-500 text-danger">
-                                <i class="fas fa-user-slash"></i>
-                                Geen werknemer
-                            </p>
-                        }
-                    </div>
-                </button>
+                    </button>
+                }
+                // Show shift groups
+                else
+                {
+                    var departmentGridPosition = group.First().Department switch
+                    {
+                        Department.Vers => 1,
+                        Department.Vakkenvullen => 5,
+                        Department.Kassa => 9,
+                        _ => 0
+                    };
+
+                    var startHour = group.Min(shift => shift.Start.Hour);
+                    var endHour = group.Max(shift => shift.End.Hour);
+                    var gridSpanCol = endHour - startHour;
+                    
+                    var firstShift = group.Find(shift => shift.Start.Hour == startHour) ?? group.First();
+                    bool groupHasEmptyShift = group.Any(shift => shift.Employee == null);
+                    
+                    <button
+                        class="unset-all shift-container 
+                            @firstShift.Department.ToString().ToLower() 
+                            @(groupHasEmptyShift ? "no-employee" : "")
+                            @(!firstShift.IsFinal ? "concept" : "")"
+                        style="grid-area: @(startHour - 5) / @departmentGridPosition  / span @gridSpanCol / span 4"
+                        data-bs-toggle="popover"
+                        data-bs-trigger="focus"
+                        data-bs-placement="left"
+                        data-bs-html="true"
+                        data-bs-custom-class="popover-shift @firstShift.Department.ToString().ToLower()"
+                        data-bs-title="
+                            @if (!firstShift.IsFinal) { <span class='text-secondary small fst-italic'>Concept</span> }
+                            <div class='d-flex justify-content-between align-items-center gap-3'>
+                                <span class='fw-500' style='min-width: 3em'>@firstShift.Department</span>
+                                @if (Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today) && role == Role.Manager) { <a href='/shifts/update?id=@firstShift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
+                            </div>
+                            "
+                        data-bs-content="
+                            @foreach (var timeGroup in group.GroupBy(shift => new { shift.Start, shift.End }))
+                            {
+                                <div class='mb-2'>
+                                    <p class='text-secondary m-0'>@timeGroup.Key.Start.ToShortTimeString() - @timeGroup.Key.End.ToShortTimeString()</p>
+
+                                    @foreach (var shiftContent in timeGroup)
+                                    {
+                                        if (shiftContent.Employee != null)
+                                        {
+                                            <p class='fw-500 mb-1'><i class='fas fa-user me-1'></i>@shiftContent.Employee?.FirstName @shiftContent.Employee?.LastName</p>
+                                        }
+                                        else
+                                        {
+                                            <p class='fw-500 text-danger mb-1'><i class='fas fa-user-slash me-1'></i>Zoek intern vervanging en pas de dienst aan of zoek extern.</p>
+                                        }
+                                    }
+                                </div>
+                            }">
+                        
+                        <div class="shift">
+                            @foreach (var timeGroup in group.GroupBy(shift => new { shift.Start, shift.End }))
+                            {
+                                <div class="mb-2">
+                                    <p class="text-secondary m-0">@timeGroup.Key.Start.ToShortTimeString() - @timeGroup.Key.End.ToShortTimeString()</p>
+
+                                    @foreach (var shiftContent in timeGroup)
+                                    {
+                                        if (shiftContent.Employee != null)
+                                        {
+                                            <p class="fw-500 mb-1">@shiftContent.Employee?.FirstName @shiftContent.Employee?.LastName</p>
+                                        }
+                                        else
+                                        {
+                                            <p class="fw-500 mb-1 text-danger">
+                                                <i class="fas fa-user-slash"></i>
+                                                Geen werknemer
+                                            </p>
+                                        }
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                    </button>
+                }
             }
         </div>
     </div>
@@ -285,8 +401,8 @@ else
                     data-bs-content="
                         <div>
                             <p class='text-secondary m-0'>@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
-                            @if (shift.Employee != null) { <p class='fw-500 m-0'>@shift.Employee?.FirstName @shift.Employee?.LastName</p> }
-                            else { <p class='fw-500 text-danger m-0'>Zoek intern vervanging en pas de dienst aan of zoek extern.</p> }
+                            @if (shift.Employee != null) { <p class='fw-500 mb-1'><i class='fas fa-user me-1'></i>@shift.Employee?.FirstName @shift.Employee?.LastName</p> }
+                            else { <p class='fw-500 text-danger mb-1'><i class='fas fa-user-slash me-1'></i>Zoek intern vervanging en pas de dienst aan of zoek extern.</p> }
                         </div>">
                     <div class="shift">
                         <p class="text-secondary m-0">@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>

@@ -18,7 +18,7 @@ namespace BumboApp.Controllers
             var weekNumber = ISOWeek.GetWeekOfYear(selectedStartDate.ToDateTime(new TimeOnly(12, 00)));
             
             var employees = Context.Employees.ToList();
-            // var shifts = new List<Shift>(); // TODO: Get shifts from database
+            // var shifts = new List<Shift>(); // TODO: Get shifts from database > for day view of all employees, order by department
             var shifts = new List<Shift>
             {
                 new Shift()
@@ -55,12 +55,32 @@ namespace BumboApp.Controllers
                 {
                     Id = 4,
                     Department = Department.Kassa,
-                    Employee = employees[2],
-                    Start = new DateTime(new DateOnly(2024, 11, 29), new TimeOnly(8, 0)),
-                    End = new DateTime(new DateOnly(2024, 11, 29), new TimeOnly(16, 0)),
+                    Employee = employees[1],
+                    Start = new DateTime(new DateOnly(2024, 11, 29), new TimeOnly(9, 0)),
+                    End = new DateTime(new DateOnly(2024, 11, 29), new TimeOnly(10, 0)),
                     IsFinal = true,
                     ShiftTakeOver = new ShiftTakeOver()
                 },
+                new Shift()
+                {
+                    Id = 5,
+                    Department = Department.Kassa,
+                    Employee = employees[0],
+                    Start = new DateTime(new DateOnly(2024, 11, 29), new TimeOnly(8, 0)),
+                    End = new DateTime(new DateOnly(2024, 11, 29), new TimeOnly(10, 0)),
+                    IsFinal = true,
+                    ShiftTakeOver = new ShiftTakeOver()
+                },
+                new Shift()
+                {
+                    Id = 6,
+                    Department = Department.Kassa,
+                    Employee = null,
+                    Start = new DateTime(new DateOnly(2024, 11, 29), new TimeOnly(17, 0)),
+                    End = new DateTime(new DateOnly(2024, 11, 29), new TimeOnly(20, 0)),
+                    IsFinal = true,
+                    ShiftTakeOver = new ShiftTakeOver()
+                }
             };
                 
             var viewIsConcept = shifts.Any(shift => !shift.IsFinal);
