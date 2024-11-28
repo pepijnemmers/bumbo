@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BumboApp.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    [Migration("20241128151051_FirstMigrationModule2")]
+    [Migration("20241128154133_FirstMigrationModule2")]
     partial class FirstMigrationModule2
     {
         /// <inheritdoc />
@@ -1331,12 +1331,12 @@ namespace BumboApp.Migrations
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "JOHN.DOE@EXAMPLE.COM",
-                            NormalizedUserName = "JOHN.DOE@EXAMPLE.COM",
+                            NormalizedUserName = "JOHN",
                             PasswordHash = "AQAAAAIAAYagAAAAEHElifiD+iCmgFS/WCucV8tMzAcHwDdy1B4kwXCYsxB7xOwvRsxjkQbdJ6YrI77xDA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "static-security-stamp",
                             TwoFactorEnabled = false,
-                            UserName = "john.doe@example.com"
+                            UserName = "John"
                         },
                         new
                         {
@@ -1347,12 +1347,12 @@ namespace BumboApp.Migrations
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "JANE.SMITH@EXAMPLE.COM",
-                            NormalizedUserName = "JANE.SMITH@EXAMPLE.COM",
+                            NormalizedUserName = "JANE",
                             PasswordHash = "AQAAAAIAAYagAAAAEGk4lj3QRvRZzy4Oas9sTTW0A2nJ1X41eB0uiNnGNFQT7RdiOs/FLSjxWz/x4KDk+w==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "static-security-stamp",
                             TwoFactorEnabled = false,
-                            UserName = "jane.smith@example.com"
+                            UserName = "Jane"
                         },
                         new
                         {
@@ -1363,12 +1363,12 @@ namespace BumboApp.Migrations
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "EMILY.JONES@EXAMPLE.COM",
-                            NormalizedUserName = "EMILY.JONES@EXAMPLE.COM",
+                            NormalizedUserName = "EMILY",
                             PasswordHash = "AQAAAAIAAYagAAAAEHv/0P6Xoo7fFyIXoIwA78DUHxHCFNYGaR8vPnMjmnx+QoW0Khto6+ptFaVzpYAWFw==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "static-security-stamp",
                             TwoFactorEnabled = false,
-                            UserName = "emily.jones@example.com"
+                            UserName = "Emily"
                         });
                 });
 

@@ -26,7 +26,7 @@ namespace BumboApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string email, string password)
         {
-            var user = await _userManager.FindByNameAsync(email);
+            var user = await _userManager.FindByEmailAsync(email);
             if (user != null)
             {
                 var result = await _signInManager.PasswordSignInAsync(user, password, isPersistent: false, lockoutOnFailure: false);

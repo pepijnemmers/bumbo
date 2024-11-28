@@ -1,6 +1,7 @@
 ﻿@{
     int numberOfNotifications = ViewData["NumberOfNotifications"] as int? ?? 0;
     var firstRole = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
+    var username = User?.Identity?.Name;
 }
 
 <!DOCTYPE html>
@@ -175,7 +176,7 @@
                         @if (User != null)
                         {
                             <div class="text-secondary d-none d-sm-flex flex-column">
-                                <span class="fw-bold">Welkom, Frank! @* TODO: @user.FirstName *@</span>
+                                <span class="fw-bold">Welkom, @username! @* TODO: @user.FirstName *@</span>
                                     <span class="small" style="margin-top: -5px">@firstRole @* TODO: ToFriendlyString() *@</span>
                             </div>
                         }

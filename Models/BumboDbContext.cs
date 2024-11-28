@@ -169,8 +169,8 @@ public partial class BumboDbContext : IdentityDbContext<User>
                 new User
                 {
                     Id = user1Id,
-                    UserName = "john.doe@example.com",
-                    NormalizedUserName = "JOHN.DOE@EXAMPLE.COM",
+                    UserName = "John",
+                    NormalizedUserName = "JOHN",
                     Email = "john.doe@example.com",
                     NormalizedEmail = "JOHN.DOE@EXAMPLE.COM",
                     EmailConfirmed = true,
@@ -182,8 +182,8 @@ public partial class BumboDbContext : IdentityDbContext<User>
                 new User
                 {
                     Id = user2Id,
-                    UserName = "jane.smith@example.com",
-                    NormalizedUserName = "JANE.SMITH@EXAMPLE.COM",
+                    UserName = "Jane",
+                    NormalizedUserName = "JANE",
                     Email = "jane.smith@example.com",
                     NormalizedEmail = "JANE.SMITH@EXAMPLE.COM",
                     EmailConfirmed = true,
@@ -195,8 +195,8 @@ public partial class BumboDbContext : IdentityDbContext<User>
                 new User
                 {
                     Id = user3Id,
-                    UserName = "emily.jones@example.com",
-                    NormalizedUserName = "EMILY.JONES@EXAMPLE.COM",
+                    UserName = "Emily",
+                    NormalizedUserName = "EMILY",
                     Email = "emily.jones@example.com",
                     NormalizedEmail = "EMILY.JONES@EXAMPLE.COM",
                     EmailConfirmed = true,
