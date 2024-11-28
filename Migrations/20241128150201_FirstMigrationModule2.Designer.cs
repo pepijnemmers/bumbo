@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BumboApp.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    [Migration("20241127171334_FirstMigrationModule2")]
+    [Migration("20241128150201_FirstMigrationModule2")]
     partial class FirstMigrationModule2
     {
         /// <inheritdoc />
@@ -139,7 +139,7 @@ namespace BumboApp.Migrations
                             LastName = "Doe",
                             LeaveHours = 60,
                             StartOfEmployment = new DateOnly(2020, 1, 15),
-                            UserId = "a1",
+                            UserId = "2ab03136-c316-4b70-a7fc-4c9cb044a6be",
                             Zipcode = "1234AB"
                         },
                         new
@@ -152,7 +152,7 @@ namespace BumboApp.Migrations
                             LastName = "Smith",
                             LeaveHours = 5,
                             StartOfEmployment = new DateOnly(2021, 3, 1),
-                            UserId = "b2",
+                            UserId = "12544476-38da-4113-9c40-4bc508f8c0f2",
                             Zipcode = "5684AC"
                         },
                         new
@@ -165,7 +165,7 @@ namespace BumboApp.Migrations
                             LastName = "Jones",
                             LeaveHours = 40,
                             StartOfEmployment = new DateOnly(2019, 7, 30),
-                            UserId = "c3",
+                            UserId = "2667ab01-7225-451b-adbb-c99eea968d02",
                             Zipcode = "5211DG"
                         });
                 });
@@ -1324,7 +1324,7 @@ namespace BumboApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "a1",
+                            Id = "2ab03136-c316-4b70-a7fc-4c9cb044a6be",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "static-concurrency-stamp",
                             Email = "john.doe@example.com",
@@ -1340,7 +1340,7 @@ namespace BumboApp.Migrations
                         },
                         new
                         {
-                            Id = "b2",
+                            Id = "12544476-38da-4113-9c40-4bc508f8c0f2",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "static-concurrency-stamp",
                             Email = "jane.smith@example.com",
@@ -1356,7 +1356,7 @@ namespace BumboApp.Migrations
                         },
                         new
                         {
-                            Id = "c3",
+                            Id = "2667ab01-7225-451b-adbb-c99eea968d02",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "static-concurrency-stamp",
                             Email = "emily.jones@example.com",
@@ -1432,13 +1432,13 @@ namespace BumboApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "7y6w",
+                            Id = "dc065cdc-e1d7-4202-936a-fbf03070c74d",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
-                            Id = "0f5t",
+                            Id = "4cd8ce88-df2a-49fb-ac51-0610e1be0f0b",
                             Name = "Employee",
                             NormalizedName = "EMPLOYEE"
                         });
@@ -1533,18 +1533,18 @@ namespace BumboApp.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = "a1",
-                            RoleId = "7y6w"
+                            UserId = "2ab03136-c316-4b70-a7fc-4c9cb044a6be",
+                            RoleId = "dc065cdc-e1d7-4202-936a-fbf03070c74d"
                         },
                         new
                         {
-                            UserId = "b2",
-                            RoleId = "0f5t"
+                            UserId = "12544476-38da-4113-9c40-4bc508f8c0f2",
+                            RoleId = "4cd8ce88-df2a-49fb-ac51-0610e1be0f0b"
                         },
                         new
                         {
-                            UserId = "c3",
-                            RoleId = "0f5t"
+                            UserId = "2667ab01-7225-451b-adbb-c99eea968d02",
+                            RoleId = "4cd8ce88-df2a-49fb-ac51-0610e1be0f0b"
                         });
                 });
 

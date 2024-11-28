@@ -444,8 +444,8 @@ namespace BumboApp.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "0f5t", null, "Employee", "EMPLOYEE" },
-                    { "7y6w", null, "Manager", "MANAGER" }
+                    { "4cd8ce88-df2a-49fb-ac51-0610e1be0f0b", null, "Employee", "EMPLOYEE" },
+                    { "dc065cdc-e1d7-4202-936a-fbf03070c74d", null, "Manager", "MANAGER" }
                 });
 
             migrationBuilder.InsertData(
@@ -453,9 +453,9 @@ namespace BumboApp.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { "a1", 0, "static-concurrency-stamp", "john.doe@example.com", true, false, null, "JOHN.DOE@EXAMPLE.COM", "JOHN.DOE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEHElifiD+iCmgFS/WCucV8tMzAcHwDdy1B4kwXCYsxB7xOwvRsxjkQbdJ6YrI77xDA==", null, false, "static-security-stamp", false, "john.doe@example.com" },
-                    { "b2", 0, "static-concurrency-stamp", "jane.smith@example.com", true, false, null, "JANE.SMITH@EXAMPLE.COM", "JANE.SMITH@EXAMPLE.COM", "AQAAAAIAAYagAAAAEGk4lj3QRvRZzy4Oas9sTTW0A2nJ1X41eB0uiNnGNFQT7RdiOs/FLSjxWz/x4KDk+w==", null, false, "static-security-stamp", false, "jane.smith@example.com" },
-                    { "c3", 0, "static-concurrency-stamp", "emily.jones@example.com", true, false, null, "EMILY.JONES@EXAMPLE.COM", "EMILY.JONES@EXAMPLE.COM", "AQAAAAIAAYagAAAAEHv/0P6Xoo7fFyIXoIwA78DUHxHCFNYGaR8vPnMjmnx+QoW0Khto6+ptFaVzpYAWFw==", null, false, "static-security-stamp", false, "emily.jones@example.com" }
+                    { "12544476-38da-4113-9c40-4bc508f8c0f2", 0, "static-concurrency-stamp", "jane.smith@example.com", true, false, null, "JANE.SMITH@EXAMPLE.COM", "JANE.SMITH@EXAMPLE.COM", "AQAAAAIAAYagAAAAEGk4lj3QRvRZzy4Oas9sTTW0A2nJ1X41eB0uiNnGNFQT7RdiOs/FLSjxWz/x4KDk+w==", null, false, "static-security-stamp", false, "jane.smith@example.com" },
+                    { "2667ab01-7225-451b-adbb-c99eea968d02", 0, "static-concurrency-stamp", "emily.jones@example.com", true, false, null, "EMILY.JONES@EXAMPLE.COM", "EMILY.JONES@EXAMPLE.COM", "AQAAAAIAAYagAAAAEHv/0P6Xoo7fFyIXoIwA78DUHxHCFNYGaR8vPnMjmnx+QoW0Khto6+ptFaVzpYAWFw==", null, false, "static-security-stamp", false, "emily.jones@example.com" },
+                    { "2ab03136-c316-4b70-a7fc-4c9cb044a6be", 0, "static-concurrency-stamp", "john.doe@example.com", true, false, null, "JOHN.DOE@EXAMPLE.COM", "JOHN.DOE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEHElifiD+iCmgFS/WCucV8tMzAcHwDdy1B4kwXCYsxB7xOwvRsxjkQbdJ6YrI77xDA==", null, false, "static-security-stamp", false, "john.doe@example.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -543,9 +543,9 @@ namespace BumboApp.Migrations
                 columns: new[] { "RoleId", "UserId" },
                 values: new object[,]
                 {
-                    { "7y6w", "a1" },
-                    { "0f5t", "b2" },
-                    { "0f5t", "c3" }
+                    { "4cd8ce88-df2a-49fb-ac51-0610e1be0f0b", "12544476-38da-4113-9c40-4bc508f8c0f2" },
+                    { "4cd8ce88-df2a-49fb-ac51-0610e1be0f0b", "2667ab01-7225-451b-adbb-c99eea968d02" },
+                    { "dc065cdc-e1d7-4202-936a-fbf03070c74d", "2ab03136-c316-4b70-a7fc-4c9cb044a6be" }
                 });
 
             migrationBuilder.InsertData(
@@ -553,9 +553,9 @@ namespace BumboApp.Migrations
                 columns: new[] { "EmployeeNumber", "ContractHours", "DateOfBirth", "EndOfEmployment", "FirstName", "HouseNumber", "LastName", "LeaveHours", "StartOfEmployment", "UserId", "Zipcode" },
                 values: new object[,]
                 {
-                    { 1, 40, new DateOnly(1990, 5, 20), null, "John", "1A", "Doe", 60, new DateOnly(2020, 1, 15), "a1", "1234AB" },
-                    { 2, 20, new DateOnly(1995, 8, 12), null, "Jane", "2B", "Smith", 5, new DateOnly(2021, 3, 1), "b2", "5684AC" },
-                    { 3, 35, new DateOnly(1998, 12, 5), null, "Emily", "3C", "Jones", 40, new DateOnly(2019, 7, 30), "c3", "5211DG" }
+                    { 1, 40, new DateOnly(1990, 5, 20), null, "John", "1A", "Doe", 60, new DateOnly(2020, 1, 15), "2ab03136-c316-4b70-a7fc-4c9cb044a6be", "1234AB" },
+                    { 2, 20, new DateOnly(1995, 8, 12), null, "Jane", "2B", "Smith", 5, new DateOnly(2021, 3, 1), "12544476-38da-4113-9c40-4bc508f8c0f2", "5684AC" },
+                    { 3, 35, new DateOnly(1998, 12, 5), null, "Emily", "3C", "Jones", 40, new DateOnly(2019, 7, 30), "2667ab01-7225-451b-adbb-c99eea968d02", "5211DG" }
                 });
 
             migrationBuilder.InsertData(

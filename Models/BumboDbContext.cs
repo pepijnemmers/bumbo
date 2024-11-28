@@ -142,8 +142,8 @@ public partial class BumboDbContext : IdentityDbContext<User>
     private void EssentialSeedData(ModelBuilder modelBuilder)
     {
         //Add roles
-        var managerRoleId = "7y6w";
-        var employeeRoleId = "0f5t";
+        var managerRoleId = "dc065cdc-e1d7-4202-936a-fbf03070c74d";
+        var employeeRoleId = "4cd8ce88-df2a-49fb-ac51-0610e1be0f0b";
 
         modelBuilder.Entity<IdentityRole>().HasData(
             new IdentityRole
@@ -161,9 +161,9 @@ public partial class BumboDbContext : IdentityDbContext<User>
             );
 
         //Seed Users
-        var user1Id = "a1"; //Manager
-        var user2Id = "b2"; //Employee
-        var user3Id = "c3"; //Employee
+        var user1Id = "2ab03136-c316-4b70-a7fc-4c9cb044a6be"; //Manager
+        var user2Id = "12544476-38da-4113-9c40-4bc508f8c0f2"; //Employee
+        var user3Id = "2667ab01-7225-451b-adbb-c99eea968d02"; //Employee
 
         modelBuilder.Entity<User>().HasData(
                 new User
