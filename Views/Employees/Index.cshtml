@@ -1,4 +1,4 @@
-﻿@model List<Employee>
+﻿@model List<BumboApp.ViewModels.EmployeeIndexViewModel>
 @using System.Globalization
 @using BumboApp.Views.Components
 @using Microsoft.Data.SqlClient
@@ -34,14 +34,14 @@
             }
             else
             {
-                @foreach (var item in Model)
+                @foreach (var employee in Model)
                 {
                     <tr>
-                        <td>@item.EmployeeNumber</td>
-                        <td>@(item.FirstName + " " + item.LastName)</td>
-                        <td>@item.User.Role</td>
+                        <td>@employee.Id</td>
+                        <td>@employee.Name</td>
+                        <td>@employee.Role</td>
                         <td>
-                            <a asp-controller="Employees" asp-action="details" asp-route-id="@item.EmployeeNumber">
+                            <a asp-controller="Employees" asp-action="details" asp-route-id="@employee.Id">
                                 <img width="20px" height="auto" src="~/img/details-icon.svg" alt="Alternate Text" />
                             </a>
                         </td>

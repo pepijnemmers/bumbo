@@ -10,8 +10,8 @@
 }
 else
 {
-    <div class="card">
-        <div class="d-flex justify-content-between align-items-center card-body">
+    <div class="table-container p-3">
+        <div class="d-flex justify-content-between align-items-center">
             <div>
                 <h4>@Model.FirstName @Model.LastName</h4>
                 <p class="text-muted">In dienst sinds: @Model.StartOfEmployment</p>
@@ -20,38 +20,36 @@ else
         </div>
     </div>
 
-    <div class="card my-3">
-        <div class="card-body">
-            <h5>Gegevens</h5>
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>Voornaam:</strong> @Model.FirstName</p>
-                    <p><strong>Achternaam:</strong> @Model.LastName</p>
-                    <p><strong>Emailadres:</strong> @Model.User.Email</p>
-                </div>
-                <div class="col-md-6">
-                    <p><strong>Geboortedatum:</strong> @Model.DateOfBirth</p>
-                    <p><strong>Rol:</strong> @Model.User.Role</p>
-                    <p><strong>Contracturen:</strong> @ViewData["ContractHourUsed"] van de @Model.ContractHours uur per week gebruikt</p>
-                    <p><strong>Verlofuren:</strong> @ViewData["LeaveHourUsed"] van de @Model.LeaveHours uur gebruikt</p>
-                </div>
+    <div class="table-container p-3 my-3">
+        <h5>Gegevens</h5>
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Voornaam:</strong> @Model.FirstName</p>
+                <p><strong>Achternaam:</strong> @Model.LastName</p>
+                <p><strong>Emailadres:</strong> @Model.User.Email</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Geboortedatum:</strong> @Model.DateOfBirth</p>
+                <p><strong>Rol:</strong> @ViewData["EmployeeRole"]</p>
+                <p><strong>Contracturen:</strong> @Model.ContractHours uur per week</p>
+                <p><strong>Verlofuren:</strong> @ViewData["LeaveHourUsed"] van de @Model.LeaveHours uur gebruikt</p>
             </div>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-body">
-            <h5>Adres</h5>
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>Postcode:</strong> @Model.Zipcode</p>
-                    <p><strong>Straat:</strong> @ViewData["StreetName"]</p>
-                </div>
-                <div class="col-md-6">
-                    <p><strong>Huisnummer:</strong> @Model.HouseNumber</p>
-                    <p><strong>Plaats:</strong> @ViewData["CityName"]</p>
-                </div>
+    <div class="table-container p-3">
+        @* <div class="card-body"> *@
+        <h5>Adres</h5>
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Postcode:</strong> @Model.Zipcode</p>
+                <p><strong>Straat:</strong> @ViewData["StreetName"]</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Huisnummer:</strong> @Model.HouseNumber</p>
+                <p><strong>Plaats:</strong> @ViewData["CityName"]</p>
             </div>
         </div>
+        @* </div> *@
     </div>
 }

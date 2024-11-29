@@ -5,18 +5,39 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Identity;
+using BumboApp.ViewModels;
 
 namespace BumboApp.Controllers
 {
     public class EmployeesController : MainController
     {
+        private readonly UserManager<User> _userManager;
+        private HttpClient client = new HttpClient();
+
+        public EmployeesController(UserManager<User> userManager)
+        {
+            _userManager = userManager;
+        }
+
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             base.OnActionExecuting(context);
             CheckPageAccess(Role.Manager);
         }
-        
-        public IActionResult Index(int? page)
+
+        public async Task<Role> GetUserRoleAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                return (Role)Enum.Parse(typeof(Role), roles[0]);
+            }
+            return Role.Unknown;
+        }
+
+        public async Task<IActionResult> Index(int? page)
         {
             int currentPageNumber = page ?? DefaultPage;
             List<Employee> employees = Context.Employees
@@ -33,11 +54,24 @@ namespace BumboApp.Controllers
                 .Take(PageSize)
                 .ToList();
 
+            List<EmployeeIndexViewModel> viewModels = new List<EmployeeIndexViewModel>();
+            foreach (var employee in employeesForPage)
+            {
+                var employeeRole = await GetUserRoleAsync(employee.User.Id);
+                var viewModel = new EmployeeIndexViewModel
+                {
+                    Id = employee.EmployeeNumber,
+                    Name = employee.FirstName + " " + employee.LastName,
+                    Role = employeeRole.ToFriendlyString()
+                };
+                viewModels.Add(viewModel);
+            }
+
             ViewBag.PageNumber = currentPageNumber;
             ViewBag.PageSize = PageSize;
             ViewBag.MaxPages = maxPages;
 
-            return View(employeesForPage);
+            return View(viewModels);
         }
         public IActionResult Create()
         {
@@ -59,18 +93,23 @@ namespace BumboApp.Controllers
                 return NotifyErrorAndRedirect("Werknemer niet gevonden", nameof(Index));
             }
 
+            var acceptedLeaves = employee.leaveRequests
+                .Where(lr => lr.Status == Status.Geaccepteerd
+                && lr.StartDate.Year.Equals(DateTime.Now.Year));
 
-            ViewData["ContractHourUsed"] = "";
-            ViewData["LeaveHourUsed"] = employee.leaveRequests.Where(lr => lr.Status == Status.Geaccepteerd && lr.StartDate.Year.Equals(DateTime.Now.Year));
+            double leaveHoursUsed = 0;
+            foreach (var leaveRequest in acceptedLeaves)
+            {
+                Console.WriteLine("leave: " + leaveRequest.StartDate + " " + leaveRequest.EndDate + "||" + (leaveRequest.EndDate - leaveRequest.StartDate));
+                leaveHoursUsed += (leaveRequest.EndDate - leaveRequest.StartDate).TotalHours;
+            }
+
+            var employeeRole = await GetUserRoleAsync(employee.User.Id);
+            ViewData["EmployeeRole"] = employeeRole.ToFriendlyString();
+            ViewData["LeaveHourUsed"] = leaveHoursUsed;
 
             //var apiKey = Environment.GetEnvironmentVariable("POSTCODE_API_KEY");
-            var apiKey = "669869e4-b372-430b-9b87-d41c72fcfc91";
-
-            //if (string.IsNullOrEmpty(apiKey))
-            //{
-            //    return BadRequest("API key not configured.");
-            //}
-
+            var apiKey = "669869e4-b372-430b-9b87-d41c72fcfc91"; //TODO deze uit github secrets eigenlijk
             var apiURL = $"https://json.api-postcode.nl?postcode={employee.Zipcode}&number={employee.HouseNumber}";
 
             client.DefaultRequestHeaders.Clear();
