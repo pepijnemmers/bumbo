@@ -3,6 +3,7 @@ using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Data.SqlClient;
 
 
@@ -10,6 +11,12 @@ namespace BumboApp.Controllers
 {
     public class PrognosesController : MainController
     {
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+            CheckPageAccess(Role.Manager);
+        }
+        
         public IActionResult Index(int? page, SortOrder? orderBy = SortOrder.Ascending)
         {
             int currentPageNumber = page ?? DefaultPage;
