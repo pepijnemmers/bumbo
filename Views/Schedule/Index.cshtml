@@ -332,7 +332,6 @@
 else
 {
 @* Calender week view *@
-@* base grid for calender TODO: move to component if possible and remove comments *@
 <div class="table-container">
     <div class="calendar-container">
         
@@ -481,7 +480,6 @@ else
 @section Scripts
 {
     <script type="text/javascript">
-    @*    TODO: gotodate doesn't work yet *@
         function GoToDate(date) {
             const url = new URL(window.location.href);
             url.searchParams.set("startDate", date);
