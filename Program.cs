@@ -1,7 +1,10 @@
 using System.Globalization;
 using AspNetCoreHero.ToastNotification;
 using AspNetCoreHero.ToastNotification.Extensions;
+using BumboApp.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +18,19 @@ builder.Services.AddNotyf(config =>
     config.IsDismissable = true;
     config.Position = NotyfPosition.BottomRight;
 });
+
+builder.Services.AddDbContext<BumboDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+})
+.AddEntityFrameworkStores<BumboDbContext>()
+.AddDefaultTokenProviders();
+
+builder.Services.AddAuthorization();
+
 
 var app = builder.Build();
 
@@ -39,6 +55,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseNotyf();

@@ -4,14 +4,18 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System.Text.Json;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace BumboApp.Controllers
 {
     public class EmployeesController : MainController
     {
-        static readonly HttpClient client = new HttpClient(); //TODO DIT MOET HIER WEG
-
-
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+            CheckPageAccess(Role.Manager);
+        }
+        
         public IActionResult Index(int? page)
         {
             int currentPageNumber = page ?? DefaultPage;
