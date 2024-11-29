@@ -1,0 +1,12 @@
+@{
+    ViewData["Title"] = "Geen Toegang";
+    Layout = "_Layout";
+}
+
+<div class="table-container p-4">
+    <h2 class="text-danger">Je hebt geen toegang tot deze pagina</h2>
+    <p>
+        Je hebt niet de juiste rechten om de pagina <code>@ViewData["FromUrl"]</code> te bekijken.
+    </p>
+    <a href="/" class="btn btn-primary">Terug naar dashboard</a>
+</div>
