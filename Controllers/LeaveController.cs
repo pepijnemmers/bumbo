@@ -63,7 +63,10 @@ namespace BumboApp.Controllers
 
         public IActionResult LeaveRequest()
         {
-            return View();
+            var username = User?.Identity?.Name;
+            _loggedInEmployee = Context.Employees
+            .FirstOrDefault(e => e.FirstName.Equals(username));
+            return View(_loggedInEmployee);
         }
 
         public IActionResult CreateLeaveRequest(LeaveRequest request)
@@ -128,6 +131,7 @@ namespace BumboApp.Controllers
             try
             {
                 Context.LeaveRequests.Add(request);
+                _loggedInEmployee.LeaveHours = _loggedInEmployee.LeaveHours - amountOfLeaveHours;
                 // TODO fix notification
                 //var manager = Context.Employees.Find(1);
                 //var notification = new Notification
