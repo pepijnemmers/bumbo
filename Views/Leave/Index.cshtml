@@ -82,6 +82,74 @@
     }
 </div>
 
+<div class="row align-items-center mb-3">
+    <div class="col">
+        <h4>Ziekmeldingen</h4>
+    </div>
+
+    <div class="col-auto">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sickLeaveModal">Nieuwe ziekmelding</button>
+    </div>
+
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Werknemer</th>
+                <th>Datum</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null)
+            {
+                foreach (var sickLeave in Model.SickLeaves)
+                {
+                    <tr>
+                        <td>@sickLeave.Employee.FirstName + @sickLeave.Employee.LastName</td> @*later testen als er DB entries zijn*@
+                        <td>@sickLeave.Date</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade align-content-center" id="sickLeaveModal" tabindex="-1" aria-labelledby="sickLeave" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="newSickLeave">Nieuwe ziekmelding</h1>
+            </div>
+            <div class="modal-body">
+                <form asp-action="CreateSickLeave" asp-controller="Leave" method="post">
+                    <div class="mb-3">
+                        <label for="date" class="col-form-label">Datum</label>
+                        <input type="date" class="form-control" id="date" name="date" placeholder="Datum" onchange="checkDate()" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" required>
+                    </div>
+                    @if (User.IsInRole(Role.Manager.ToString()))
+                    {
+                        <div class="mb-3">
+                            <label for="Employee" class="col-form-label">Werknemer:</label>
+                            <input type="text" class="form-control" id="EmployeeName">
+                        </div>
+                    }
+                    else
+                    {
+                        <input type="hidden" name="Employee" value="loggedInEmployee" />
+                    }
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="sickLeaveCreateButton" class="btn btn-primary">Ziekmelden</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
     function GoToStatus(select) {
         const url = new URL(window.location.href);

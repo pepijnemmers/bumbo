@@ -6,5 +6,7 @@ namespace BumboApp.ViewModels
     {
         public required List<LeaveRequest> LeaveRequestsForPage { get; set; }
         public required Status? SelectedStatus { get; set; }
+
+        public required List<SickLeave> SickLeaves { get; set; }
     }
 }

@@ -16,12 +16,14 @@ namespace BumboApp.Controllers
             .FirstOrDefault(e => e.FirstName.Equals(username));
 
             List<LeaveRequest> leaveRequests;
+            List<SickLeave> sickLeaves;
             if (LoggedInUserRole == Role.Manager)
             {
                 leaveRequests = Context.LeaveRequests
                     .Where(p => selectedStatus == null || p.Status == selectedStatus)
                     .OrderBy(p => p.StartDate)
                     .ToList();
+                sickLeaves = Context.SickLeaves.OrderByDescending(p => p.Date).ToList();
             }
             else
             {
@@ -30,6 +32,7 @@ namespace BumboApp.Controllers
                     .Where(p => selectedStatus == null || p.Status == selectedStatus)
                     .OrderBy(p => p.StartDate)
                     .ToList();
+                sickLeaves = Context.SickLeaves.Where(e => e.Employee == _loggedInEmployee).OrderByDescending(p => p.Date).ToList();
             }
 
             if (orderBy == SortOrder.Descending)
@@ -55,7 +58,8 @@ namespace BumboApp.Controllers
                     .Skip((currentPageNumber - 1) * PageSize)
                     .Take(PageSize)
                     .ToList(),
-                SelectedStatus = selectedStatus
+                SelectedStatus = selectedStatus,
+                SickLeaves = sickLeaves
             };
 
             return View(viewModel);
