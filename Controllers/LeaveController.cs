@@ -62,15 +62,31 @@ namespace BumboApp.Controllers
             request.Employee = _loggedInEmployee;
 
             TimeSpan difference = request.EndDate - request.StartDate;
-            int totalDays = difference.Days + 1;
-            int amountOfLeaveHours = totalDays * 8;
+            int totalDays = difference.Days;
 
+            // calculate amount of leavehours
+            int amountOfLeaveHours = 0;
+            if (totalDays > 0)
+            {
+                amountOfLeaveHours = totalDays * 8;
+            }
+            else
+            {
+                if (difference.Hours > 8)
+                {
+                    amountOfLeaveHours = 8;
+                }
+                else
+                {
+                    amountOfLeaveHours = difference.Hours;
+                }
+            }
+            
             // validation 
             if (request.StartDate < DateTime.Now)
             {
                 return NotifyErrorAndRedirect("Je kunt geen verlofaanvraag in het verleden doen.", "Index");
             }
-
             if (request.StartDate > request.EndDate)
             {
                 return NotifyErrorAndRedirect("De startdatum moet voor of op de einddatum vallen.", "LeaveRequest");

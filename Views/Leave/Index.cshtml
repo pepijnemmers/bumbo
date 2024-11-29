@@ -38,8 +38,8 @@
                 foreach (var request in Model)
                 {
                     <tr>
-                        <td>@request.StartDate.ToShortDateString()</td>
-                        <td>@request.EndDate.ToShortDateString()</td>
+                        <td>@request.StartDate</td>
+                        <td>@request.EndDate</td>
                         <td class="leaveRequestReason">@request.Reason</td>
                         <td>
                             @switch (request.Status)

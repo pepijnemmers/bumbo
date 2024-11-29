@@ -219,7 +219,7 @@ label {
     display: none;
 }
 
-textarea {
+.textAreaLeaveRequestReason {
     resize: none;
     height: 100px;
 }
