@@ -98,7 +98,7 @@
             }
         </div>
     </div>
-    @if (role == Role.Manager)
+    @if (role == Role.Manager && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
     {
         <p class="text-secondary mt-2 fst-italic">
             <i class="fas fa-info-circle"></i>
@@ -165,7 +165,7 @@
                 foreach (var shift in shifts)
                 {
                     var overlappingGroup = groups.FirstOrDefault(group =>
-                        group.Any(g => g.End > shift.Start && g.Start < shift.End));
+                        group.Any(g => g.End > shift.Start && g.Start < shift.End && g.Department == shift.Department));
         
                     if (overlappingGroup == null)
                     {
