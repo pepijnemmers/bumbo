@@ -8,5 +8,7 @@ namespace BumboApp.ViewModels
         public required Status? SelectedStatus { get; set; }
 
         public required List<SickLeave> SickLeaves { get; set; }
+
+        public required Employee LoggedInEmployee { get; set; }
     }
 }

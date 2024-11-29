@@ -59,7 +59,8 @@ namespace BumboApp.Controllers
                     .Take(PageSize)
                     .ToList(),
                 SelectedStatus = selectedStatus,
-                SickLeaves = sickLeaves
+                SickLeaves = sickLeaves,
+                LoggedInEmployee = _loggedInEmployee
             };
 
             return View(viewModel);
@@ -70,6 +71,7 @@ namespace BumboApp.Controllers
             return View();
         }
 
+        [HttpPost]
         public IActionResult CreateLeaveRequest(LeaveRequest request)
         {
             var username = User?.Identity?.Name;
@@ -152,6 +154,12 @@ namespace BumboApp.Controllers
                 transaction.Rollback();
                 return NotifyErrorAndRedirect("Er is iets mis gegaan bij het toevoegen van de verlofaanvraag", "Index");
             }
+        }
+
+        [HttpPost]
+        public IActionResult CreateSickLeave(SickLeave sickLeave)
+        {
+            return NotifySuccessAndRedirect("De ziekmelding is opgeslagen.", "Index");
         }
     }
 }
