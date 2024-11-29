@@ -1,12 +1,19 @@
 ﻿using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace BumboApp.Controllers
 {
     public class UniqueDaysController : MainController
     {
-        private int maxFactor = 100;
+        private const int MaxFactor = 100;
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+            CheckPageAccess(Role.Manager);
+        }
+        
         public IActionResult Edit(int id)
         {
             UniqueDay? uniqueDay = Context.UniqueDays.Find(id);
@@ -31,9 +38,9 @@ namespace BumboApp.Controllers
             if (uniqueDay.StartDate <= DateOnly.FromDateTime(DateTime.Now))
                 return NotifyErrorAndRedirect("De data moet in de toekomst liggen.", "Index", "OpeningHours");
 
-            if (uniqueDay.Factor > maxFactor)
+            if (uniqueDay.Factor > MaxFactor)
             {
-                return NotifyErrorAndRedirect("De factor mag niet meer zijn dan " + maxFactor + ".", "Index", "OpeningHours");
+                return NotifyErrorAndRedirect("De factor mag niet meer zijn dan " + MaxFactor + ".", "Index", "OpeningHours");
             }
 
             if (!(ModelState.IsValid))
@@ -110,8 +117,8 @@ namespace BumboApp.Controllers
             if (uniqueDay.Factor <= 0)
                 return NotifyErrorAndRedirect("de Factor moet boven 0 liggen.", "Add");
 
-            if (uniqueDay.Factor > maxFactor)
-                return NotifyErrorAndRedirect("de Factor mag niet groter zijn dan " + maxFactor + ".", "Add");
+            if (uniqueDay.Factor > MaxFactor)
+                return NotifyErrorAndRedirect("de Factor mag niet groter zijn dan " + MaxFactor + ".", "Add");
 
             if (!ModelState.IsValid)
                 return NotifyErrorAndRedirect("Er is iets mis gegaan. Mogelijk zijn niet alle velden ingevuld", "Add");
