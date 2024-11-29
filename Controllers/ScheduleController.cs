@@ -50,10 +50,13 @@ namespace BumboApp.Controllers
             Console.WriteLine("wow1");
             foreach (Department department in departmentList)
             {
-                for (DateOnly scheduledate = startDate; scheduledate <= endDate; scheduledate.AddDays(1))
+                for (DateOnly scheduledate = startDate; scheduledate <= endDate; scheduledate = scheduledate.AddDays(1))
                 {
+                    Console.WriteLine(scheduledate.ToString());
+                    Console.WriteLine(endDate.ToString());
+                    Console.WriteLine("dep");
                     ScheduleDepartmentDay(department, scheduledate, startDate);
-                    if(!PrognoseHoursHit(department, scheduledate)) {InsertEmptyShifts(department, scheduledate); }
+                    if (!PrognoseHoursHit(department, scheduledate)) { InsertEmptyShifts(department, scheduledate); }
                 }
             }
             Console.WriteLine("wow2");
@@ -94,18 +97,22 @@ namespace BumboApp.Controllers
         private void ScheduleDepartmentDay(Department department, DateOnly scheduledate, DateOnly startDate)
         {
             List<Employee> employees = Context.Employees.Include(e => e.Shifts.Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) && e.End.Date >= scheduledate.ToDateTime(new TimeOnly())))
-                .Include(e => e.SchoolSchedules.Where(e => e.Date == scheduledate))
-                //.Include(e => e.leaveRequests.Where(e => e.StartDate <= scheduledate.ToDateTime(new TimeOnly()) && e.EndDate >= scheduledate.ToDateTime(new TimeOnly()))
-                //.Where(e => e.Status == Status.Geaccepteerd))
-                //.Include(e => e.Availabilities.Where(e => e.Date == scheduledate)).
-                //OrderBy(e => e.ContractHours/GetWorkingHours(
-                //e.Shifts.Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) && e.End.Date >= scheduledate.ToDateTime(new TimeOnly())))).
-                //ThenByDescending(e => e.ContractHours).
+                .Include(e => e.SchoolSchedules)
+                .Include(e => e.leaveRequests)
+                .Include(e => e.Availabilities)
+                //.OrderBy(e => e.ContractHours / GetWorkingHours(
+                //e.Shifts.Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) && e.End.Date >= scheduledate.ToDateTime(new TimeOnly()))))
+                //.ThenByDescending(e => e.ContractHours)
                 .ToList();
             int index = 0;
-            while (true) //look out that it is not infinite
+            while (index < employees.Count) //look out that it is not infinite
             { 
                 Employee employee = employees.ElementAt(index);
+                if (employee.leaveRequests.Where(e => e.Status == Status.Geaccepteerd && e.StartDate <= scheduledate.ToDateTime(new TimeOnly()) && e.EndDate >= scheduledate.ToDateTime(new TimeOnly())).Any())
+                {
+                    index++;
+                    continue;
+                }
                 if (department == Department.Kassa && OpeningInCashRegister(scheduledate))
                 {
                     bool result = ScheduleConcurrentShift(department, scheduledate,startDate , employee);
@@ -161,7 +168,7 @@ namespace BumboApp.Controllers
 
         private bool OpeningInCashRegister(DateOnly scheduledate)
         {
-            TimeOnly oTime = (TimeOnly)Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).FirstOrDefault().OpeningTime;
+            TimeOnly oTime = (TimeOnly)Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).First().OpeningTime;
             TimeOnly cTime = (TimeOnly)Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).FirstOrDefault().ClosingTime;
             int openingHour = oTime.Hour;
             int closingHour = cTime.Hour;
@@ -346,7 +353,7 @@ namespace BumboApp.Controllers
         private int getMaxTimeContract(Employee employee, DateOnly startDate, DateOnly scheduleDate)
         {
             int hours = employee.ContractHours;
-            List<Shift> shifts = (List<Shift>)employee.Shifts.Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) && e.End.Date >= scheduleDate.ToDateTime(new TimeOnly()));
+            List<Shift> shifts = (List<Shift>)employee.Shifts.Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) && e.End.Date >= scheduleDate.ToDateTime(new TimeOnly())).ToList();
             if (shifts.Count == 0) { return hours; }
             else
             {
