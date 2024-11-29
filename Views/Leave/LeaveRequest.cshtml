@@ -7,12 +7,12 @@
     <div class="card p-4 create-card"> 
         <div class="mb-3">
             <label for="startDate" class="form-label fw-bold">Begin Datum</label>
-            <input type="date" class="form-control" id="startDate" name="StartDate" placeholder="Begindatum" onchange="checkDate()" min="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" required>
+            <input type="datetime-local" class="form-control" id="startDate" name="StartDate" placeholder="Begindatum" onchange="checkDate()" required>
         </div>
 
         <div class="mb-2">
             <label for="endDate" class="form-label fw-bold">Eind Datum</label>
-            <input type="date" class="form-control" id="endDate" name="EndDate" placeholder="Einddatum" onchange="checkDate()" min="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" required>
+            <input type="datetime-local" class="form-control" id="endDate" name="EndDate" placeholder="Einddatum" onchange="checkDate()" required>
         </div>
 
         <div class="mb-3">
@@ -28,3 +28,34 @@
         </div>
     </div>
 </form>
+
+<script>
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+
+    // Function to format date to YYYY-MM-DDTHH:mm in local timezone
+    function getLocalDateTime() {
+        const now = new Date();
+
+        // Get components of the local date and time
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+
+        // Combine them into the required format
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    // Set the min startDate
+    startDateInput.min = getLocalDateTime();
+
+    // Function to set the minimum value of endDate based on startDate
+    function setEndDateMin() {
+        const startDateValue = startDateInput.value;
+        if (startDateValue) {
+            endDateInput.min = startDateValue;
+        }
+    }
+</script>

@@ -15,7 +15,7 @@ namespace BumboApp.Controllers
             .FirstOrDefault(e => e.FirstName.Equals(username));
 
             List<LeaveRequest> leaveRequests;
-            if (User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value == "Manager")
+            if (LoggedInUserRole == Role.Manager)
             {
                 leaveRequests = Context.LeaveRequests.OrderBy(p => p.StartDate).ToList();
             }
@@ -46,7 +46,6 @@ namespace BumboApp.Controllers
 
             ViewBag.OrderBy = orderBy ?? SortOrder.Ascending;
 
-            ViewData["LoggedInUser"] = User;
             return View(leaveRequestsForPage);
         }
 
@@ -80,7 +79,7 @@ namespace BumboApp.Controllers
             {
                 return NotifyErrorAndRedirect("Je hebt niet genoeg verlofuren om een verlofaanvraag te doen.", "Index");
             }
-            if (User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value == "Manager")
+            if (LoggedInUserRole == Role.Manager)
             {
                 return NotifyErrorAndRedirect("Je kan geen verlofaanvraag doen als manager", "Index");
             }

@@ -3,7 +3,6 @@
 @using Microsoft.Data.SqlClient
 @{
     ViewData["Title"] = "Verlof en ziekmelden";
-    var loggedInUser = ViewData["LoggedInUser"] as User;
 }
 
 <div class="row align-items-center mb-3">
@@ -11,13 +10,12 @@
         <h3>Verlof</h3>
     </div>
 
-    @if (User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value == "Employee")
+    @if (User.IsInRole(Role.Employee.ToString()))
     {
         <div class="col-auto">
             <a asp-controller="Leave" asp-action="LeaveRequest" class="btn btn-primary d-inline-block">Verlof aanvragen</a>
         </div>
-    }
-    
+    }   
 </div>
 
 <div class="table-container">
