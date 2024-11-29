@@ -1,4 +1,5 @@
 ﻿using BumboApp.Models;
+using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Security.Claims;
@@ -8,7 +9,7 @@ namespace BumboApp.Controllers
     public class LeaveController : MainController
     {
         private Employee _loggedInEmployee;
-        public IActionResult Index(int? page, SortOrder? orderBy = SortOrder.Ascending)
+        public IActionResult Index(int? page, SortOrder? orderBy = SortOrder.Ascending, Status? selectedStatus = null)
         {
             var username = User?.Identity?.Name;
             _loggedInEmployee = Context.Employees
@@ -17,12 +18,20 @@ namespace BumboApp.Controllers
             List<LeaveRequest> leaveRequests;
             if (LoggedInUserRole == Role.Manager)
             {
-                leaveRequests = Context.LeaveRequests.OrderBy(p => p.StartDate).ToList();
+                leaveRequests = Context.LeaveRequests
+                    .Where(p => selectedStatus == null || p.Status == selectedStatus)
+                    .OrderBy(p => p.StartDate)
+                    .ToList();
             }
             else
             {
-                leaveRequests = Context.LeaveRequests.Where(e => e.Employee == _loggedInEmployee).OrderBy(P => P.StartDate).ToList();
+                leaveRequests = Context.LeaveRequests
+                    .Where(e => e.Employee == _loggedInEmployee)
+                    .Where(p => selectedStatus == null || p.Status == selectedStatus)
+                    .OrderBy(p => p.StartDate)
+                    .ToList();
             }
+
             if (orderBy == SortOrder.Descending)
             {
                 leaveRequests.Reverse();
@@ -34,19 +43,22 @@ namespace BumboApp.Controllers
             if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
             if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
 
-            List<LeaveRequest> leaveRequestsForPage =
-                    leaveRequests
-                    .Skip((currentPageNumber - 1) * PageSize)
-                    .Take(PageSize)
-                    .ToList();
-
             ViewBag.PageNumber = currentPageNumber;
             ViewBag.PageSize = PageSize;
             ViewBag.MaxPages = maxPages;
 
             ViewBag.OrderBy = orderBy ?? SortOrder.Ascending;
 
-            return View(leaveRequestsForPage);
+            var viewModel = new LeaveRequestViewModel
+            {
+                LeaveRequestsForPage = leaveRequests
+                    .Skip((currentPageNumber - 1) * PageSize)
+                    .Take(PageSize)
+                    .ToList(),
+                SelectedStatus = selectedStatus
+            };
+
+            return View(viewModel);
         }
 
         public IActionResult LeaveRequest()

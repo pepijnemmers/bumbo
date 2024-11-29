@@ -1,4 +1,4 @@
-﻿@model List<LeaveRequest>
+﻿@model BumboApp.ViewModels.LeaveRequestViewModel
 @using BumboApp.Views.Components
 @using Microsoft.Data.SqlClient
 @{
@@ -10,12 +10,19 @@
         <h3>Verlof</h3>
     </div>
 
-    @if (User.IsInRole(Role.Employee.ToString()))
-    {
-        <div class="col-auto">
-            <a asp-controller="Leave" asp-action="LeaveRequest" class="btn btn-primary d-inline-block">Verlof aanvragen</a>
-        </div>
-    }   
+    <div class="col-auto d-flex ms-auto">
+        @if (User.IsInRole(Role.Employee.ToString()))
+        {
+            <a asp-controller="Leave" asp-action="LeaveRequest" class="btn btn-primary d-inline-block me-2">Verlof aanvragen</a>
+        }
+        <select class="form-select w-auto" onchange="GoToStatus(this)">
+            <option value="all" selected="@(Model.SelectedStatus == null)">Alles</option>
+            <option value="@Status.Geaccepteerd" selected="@(Model.SelectedStatus == Status.Geaccepteerd)">Geaccepteerd</option>
+            <option value="@Status.Afgewezen" selected="@(Model.SelectedStatus == Status.Afgewezen)">Afgewezen</option>
+            <option value="@Status.Aangevraagd" selected="@(Model.SelectedStatus == Status.Aangevraagd)">Aangevraagd</option>
+        </select>
+    </div>
+     
 </div>
 
 <div class="table-container">
@@ -35,7 +42,7 @@
         <tbody>
             @if (Model != null)
             {
-                foreach (var request in Model)
+                foreach (var request in Model.LeaveRequestsForPage)
                 {
                     <tr>
                         <td>@request.StartDate</td>
@@ -74,3 +81,15 @@
             param-MaxPages="ViewBag.MaxPages" />
     }
 </div>
+
+<script>
+    function GoToStatus(select) {
+        const url = new URL(window.location.href);
+        if (select.value.toLowerCase() === "all") {
+            url.searchParams.delete("selectedStatus");
+        } else {
+            url.searchParams.set("selectedStatus", select.value);
+        }
+        location.href = url;
+    }
+</script>
