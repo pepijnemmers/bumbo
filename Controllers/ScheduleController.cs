@@ -40,7 +40,6 @@ namespace BumboApp.Controllers
         [HttpPost]
         public IActionResult MakeSchedule(DateOnly startDate)
         {
-            Console.WriteLine("wow1");
             Prognosis prognosis = Context.Prognoses.Where(e => e.Date == startDate).FirstOrDefault();
             if (prognosis == null)
             {
@@ -48,43 +47,43 @@ namespace BumboApp.Controllers
             }
             List<Department> departmentList = new List<Department> { Department.Kassa, Department.Vers, Department.Vakkenvullen };
             DateOnly endDate = startDate.AddDays(6);
-            Console.WriteLine("wow1");
             foreach (Department department in departmentList)
             {
                 for (DateOnly scheduledate = startDate; scheduledate <= endDate; scheduledate = scheduledate.AddDays(1))
                 {
                     Console.WriteLine(scheduledate.ToString());
                     Console.WriteLine(endDate.ToString());
-                    Console.WriteLine("dep");
                     ScheduleDepartmentDay(department, scheduledate, startDate);
                     if (!PrognoseHoursHit(department, scheduledate)) { InsertEmptyShifts(department, scheduledate); }
                 }
             }
-            Console.WriteLine("wow2");
-            List<Employee> employees = (List<Employee>)Context.Employees
-                .Where(e => e.ContractHours > GetWorkingHours( 
-                e.Shifts.Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) && e.End.Date >= endDate.ToDateTime(new TimeOnly()))));
+            List<Employee> employees = Context.Employees
+                .Include(e => e.Shifts).ToList();
 
             List<Employee> managers = Context.Employees.Where(e => e.User.UserName == Role.Manager.ToString()).ToList();
             int weekNumber = new GregorianCalendar(GregorianCalendarTypes.Localized).GetWeekOfYear(startDate.ToDateTime(new TimeOnly()), CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
-            Console.WriteLine("wow3");
             foreach (Employee e in employees)
             {
-                string name = e.FirstName + " " + e.LastName + " ";
-                foreach (Employee m in managers)
+                if (e.ContractHours >
+                    GetWorkingHours(e.Shifts.Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly())
+                    && e.End.Date <= endDate.ToDateTime(new TimeOnly())).ToList()))
                 {
-                    Context.Notifications.Add(new Notification()
+                    string name = e.FirstName + " " + e.LastName + " ";
+                    foreach (Employee m in managers)
                     {
-                        Title = name + "heeft te weinig uren in week " + weekNumber,
-                        Description = name + "heeft minder dan " + e.ContractHours + " uren in week " + weekNumber,
-                        Employee = m
-                    });
+                        Context.Notifications.Add(new Notification()
+                        {
+                            Title = name + "heeft te weinig uren in week " + weekNumber,
+                            Description = name + "heeft minder dan " + e.ContractHours + " uren in week " + weekNumber,
+                            Employee = m
+                        });
+                    }
                 }
             }
             Console.WriteLine("wow4");
             try
             {
-                Context.SaveChanges(); //more saves between edits or just in the end?
+                Context.SaveChanges();
             }
             catch(Exception e) { return NotifyErrorAndRedirect("er is een probleem opgetreden", "Index"); }
             return RedirectToAction("Index",startDate);
@@ -97,14 +96,15 @@ namespace BumboApp.Controllers
 
         private void ScheduleDepartmentDay(Department department, DateOnly scheduledate, DateOnly startDate)
         {
-            List<Employee> employees = Context.Employees.Include(e => e.Shifts.Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) && e.End.Date >= scheduledate.ToDateTime(new TimeOnly())))
+            List<Employee> employees = Context.Employees.Include(e => e.Shifts)
                 .Include(e => e.SchoolSchedules)
                 .Include(e => e.leaveRequests)
                 .Include(e => e.Availabilities)
-                //.OrderBy(e => e.ContractHours / GetWorkingHours(
-                //e.Shifts.Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) && e.End.Date >= scheduledate.ToDateTime(new TimeOnly()))))
-                //.ThenByDescending(e => e.ContractHours)
                 .ToList();
+
+            employees = employees.OrderBy(e => e.ContractHours / GetWorkingHoursNoZero(e.Shifts.Where(e => e.Start.Date <= startDate.ToDateTime(new TimeOnly()) && e.End.Date >= scheduledate.ToDateTime(new TimeOnly()))))
+            .ThenByDescending(e => e.ContractHours).ToList();
+
             int index = 0;
             while (index < employees.Count) //look out that it is not infinite
             { 
@@ -148,6 +148,27 @@ namespace BumboApp.Controllers
             }
             return (int)Math.Ceiling(hours);
         }
+        private float GetWorkingHoursNoZero(IEnumerable<Shift> shifts)
+        {
+            float hours = 0;
+            foreach (Shift shift in shifts)
+            {
+                TimeSpan time = shift.End - shift.Start;
+                hours += time.Hours;
+                foreach (int breakTime in breakTimes)
+                {
+                    if (time.Hours > breakTime)
+                    {
+                        hours -= breakTimeHours;
+                    }
+                }
+            }
+            if(hours == 0)
+            {
+                return 0.1F;
+            }
+            return hours;
+        }
 
         private bool PrognoseHoursHit(Department department, DateOnly scheduledate)
         {
@@ -169,8 +190,17 @@ namespace BumboApp.Controllers
 
         private bool OpeningInCashRegister(DateOnly scheduledate)
         {
-            TimeOnly oTime = (TimeOnly)Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).First().OpeningTime;
-            TimeOnly cTime = (TimeOnly)Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).FirstOrDefault().ClosingTime;
+            OpeningHour times = null;
+            times = (OpeningHour)Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).First();
+
+            TimeOnly oTime;
+            TimeOnly cTime;
+            try
+            {
+                oTime = (TimeOnly)times.OpeningTime;
+                cTime = (TimeOnly)times.ClosingTime;
+            } catch (Exception ex) { return false; }
+
             int openingHour = oTime.Hour;
             int closingHour = cTime.Hour;
             if (cTime.Minute > 0) { closingHour++; }
@@ -213,23 +243,37 @@ namespace BumboApp.Controllers
             Availability availability = employee.Availabilities.Where(e => e.Date == scheduledate).FirstOrDefault();
             OpeningHour openingHour = Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).FirstOrDefault();
             int startinghour;
+            int maxTimeAvailable;
 
             //checks if employee is available and sets starting time
+            try
+            {
+                TimeOnly oTime = (TimeOnly)openingHour.OpeningTime;
+                TimeOnly cTime = (TimeOnly)openingHour.ClosingTime;
+                if (oTime.Hour == cTime.Hour) return;
+            }
+            catch (Exception ex) { return; }
             if (availability == null)
             {
-                startinghour = openingHour.OpeningTime.Value.Hour;
+                try
+                {
+                    startinghour = openingHour.OpeningTime.Value.Hour;
+                    maxTimeAvailable = maxShiftLengthAdult;
+                } catch (Exception ex) { return; }
             }
-            else if ((availability.EndTime - availability.StartTime).Hours == 0)
-            {
+            else {
+                maxTimeAvailable = (availability.EndTime - availability.StartTime).Hours;
+                if (maxTimeAvailable == 0)
+                {
                 startinghour = availability.StartTime.Hour;
                 if (availability.StartTime.Minute > 0) { startinghour++; }
-            }
-            else return;
+                }
+                else return;
+                }
 
             int maxTimeCAO = getMaxTimeCAO(employee, startDate, scheduledate, startinghour);
             int maxTimePrognose = getMaxTimePrognose(department, scheduledate);
             int maxTimeContract = getMaxTimeContract(employee, startDate, scheduledate);
-            int maxTimeAvailable = (availability.EndTime - availability.StartTime).Hours;
             List<int> maxhours = new List<int> { maxTimeCAO, maxTimePrognose, maxTimeContract,maxTimeAvailable };
             maxhours.Sort();
 
