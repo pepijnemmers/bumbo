@@ -21,6 +21,7 @@ namespace BumboApp.Controllers
 
             ViewBag.ShiftTakeOvers = shiftTakeOvers;
             ViewBag.LeaveRequests = leaveRequests;
+            ViewBag.LoggedInUserRole = LoggedInUserRole;
 
             return View();
         }

@@ -2,7 +2,7 @@
     ViewData["Title"] = "Dashboard";
 }
 
-@if (User.IsInRole("Employee"))
+@if (ViewBag.LoggedInUserRole == Role.Employee)
 {
     <div class="container dashboard">
         <div class="row gap-3">
@@ -34,7 +34,7 @@
     </div>
 }
 
-@if (User.IsInRole("Manager"))
+@if (ViewBag.LoggedInUserRole == Role.Manager)
 {
     <div class="container dashboard">
         <div class="row">
@@ -44,25 +44,32 @@
                     <div class="card-body">
                         <h5><strong>Overnames te beoordelen</strong></h5>
                         <div class="row">
-                            @foreach (var shiftTakeOver in ViewBag.ShiftTakeOvers)
+                            @if (ViewBag.ShiftTakeOvers == null || ViewBag.ShiftTakeOvers.Count == 0)
                             {
-                                <div class="col-12 mb-3">
-                                    <div class="card w-100">
-                                        <div class="card-body d-flex justify-content-between">
-                                            <div>
-                                                <h6 class="card-title">
-                                                    <strong>Dienst @shiftTakeOver.Shift.Department</strong>
-                                                </h6>
-                                                <p class="card-text">
-                                                    @shiftTakeOver.Shift.Start.ToString("dd-MM-yyyy")
-                                                    @shiftTakeOver.Shift.Start.ToString("HH:mm") - 
-                                                    @shiftTakeOver.Shift.End.ToString("HH:mm")
-                                                </p>
+                                <p class="card-text">Er zijn geen overnames om te beoordelen.</p>
+                            }
+                            else
+                            {
+                                @foreach (var shiftTakeOver in ViewBag.ShiftTakeOvers)
+                                {
+                                    <div class="col-12 mb-3">
+                                        <div class="card w-100">
+                                            <div class="card-body d-flex justify-content-between">
+                                                <div>
+                                                    <h6 class="card-title">
+                                                        <strong>Dienst @shiftTakeOver.Shift.Department</strong>
+                                                    </h6>
+                                                    <p class="card-text">
+                                                        @shiftTakeOver.Shift.Start.ToString("dd-MM-yyyy")
+                                                        @shiftTakeOver.Shift.Start.ToString("HH:mm") -
+                                                        @shiftTakeOver.Shift.End.ToString("HH:mm")
+                                                    </p>
+                                                </div>
+                                                <a asp-controller="Prognoses" asp-action="Index" class="btn btn-outline-dark align-self-center" type="button">Beoordelen</a>
                                             </div>
-                                            <a asp-controller="Prognoses" asp-action="Index" class="btn btn-outline-dark align-self-center" type="button">Beoordelen</a>
                                         </div>
                                     </div>
-                                </div>
+                                }
                             }
                         </div>
                     </div>
@@ -71,47 +78,31 @@
                     <div class="card-body">
                         <h5><strong>Verlof te beoordelen</strong></h5>
                         <div class="row">
-                            @foreach (var leaveRequest in ViewBag.LeaveRequests)
+                            @if (ViewBag.LeaveRequests == null || ViewBag.LeaveRequests.Count == 0)
                             {
-                                <div class="col-12 mb-3">
-                                    <div class="card w-100">
-                                        <div class="card-body d-flex justify-content-between">
-                                            <div>
-                                                <h6 class="card-title">
-                                                    <strong>Verlof verzoek - @leaveRequest.Employee.FirstName @leaveRequest.Employee.LastName</strong>
-                                                </h6>
-                                                <p class="card-text">
-                                                    @leaveRequest.StartDate.ToString("dd-MM-yyyy") - @leaveRequest.EndDate.ToString("dd-MM-yyyy")
-                                                </p>
+                                <p class="card-text">Er zijn geen verlof aanvragen om te beoordelen.</p>
+                            }
+                            else
+                            {
+                                @foreach (var leaveRequest in ViewBag.LeaveRequests)
+                                {
+                                    <div class="col-12 mb-3">
+                                        <div class="card w-100">
+                                            <div class="card-body d-flex justify-content-between">
+                                                <div>
+                                                    <h6 class="card-title">
+                                                        <strong>Verlof verzoek - @leaveRequest.Employee.FirstName @leaveRequest.Employee.LastName</strong>
+                                                    </h6>
+                                                    <p class="card-text">
+                                                        @leaveRequest.StartDate.ToString("dd-MM-yyyy") - @leaveRequest.EndDate.ToString("dd-MM-yyyy")
+                                                    </p>
+                                                </div>
+                                                <a asp-controller="Prognoses" asp-action="Index" class="btn btn-outline-dark align-self-center" type="button">Beoordelen</a>
                                             </div>
-                                            <a asp-controller="Prognoses" asp-action="Index" class="btn btn-outline-dark align-self-center" type="button">Beoordelen</a>
                                         </div>
                                     </div>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Snelle acties</h5>
-                        <div class="row">
-                            <!-- First Button -->
-                            <div class="col-6 mb-2">
-                                <button class="btn btn-outline-primary w-100 py-3">Button 1</button>
-                            </div>
-                            <!-- Second Button -->
-                            <div class="col-6 mb-2">
-                                <button class="btn btn-outline-primary w-100 py-3">Button 2</button>
-                            </div>
-                            <!-- Third Button -->
-                            <div class="col-6">
-                                <button class="btn btn-outline-primary w-100 py-3">Button 3</button>
-                            </div>
-                            <!-- Fourth Button -->
-                            <div class="col-6">
-                                <button class="btn btn-outline-primary w-100 py-3">Button 4</button>
-                            </div>
+                                }
+                            }   
                         </div>
                     </div>
                 </div>
@@ -126,8 +117,8 @@
                 </div>
                 <div class="card mb-3">
                     <div class="card-body">
-                        <h5 class="card-title">Card 5</h5>
-                        <p class="card-text">Content for card 5.</p>
+                        <h5><strong>Verjaardagen</strong></h5>
+                        <p class="card-text">Vandaag</p>
                     </div>
                 </div>
             </div>
