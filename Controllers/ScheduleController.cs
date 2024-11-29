@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using BumboApp.Models;
+using System.Globalization;
 using BumboApp.Models;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -108,6 +109,7 @@ namespace BumboApp.Controllers
 
         public IActionResult Create()
         {
+            CheckPageAccess(Role.Manager);
             return View();
         }
 

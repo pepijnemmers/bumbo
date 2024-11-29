@@ -1,7 +1,16 @@
 ﻿@{
     int numberOfNotifications = ViewData["NumberOfNotifications"] as int? ?? 0;
+    
+    // User
     var firstRole = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
-    var username = User?.Identity?.Name;
+    var role = firstRole != null ? Enum.Parse<Role>(firstRole) : Role.Unknown; // default role so it doesn't crash. Will be redirected to login page.
+    var username = User?.Identity?.Name ?? "Gebruiker";
+    
+    if (User == null) 
+    {
+        Context.Response.Redirect("/login");
+        return;
+    }
 }
 
 <!DOCTYPE html>
@@ -24,9 +33,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <a class="logo align-items-center d-flex gap-3 mb-4 px-2" asp-area="" asp-controller="Dashboard" asp-action="Index">
                             <img alt="Logo" src="/img/icon.png" />
-                            <span>
-                                    Bumbo
-                                </span>
+                            <span>Bumbo</span>
                         </a>
                         <button id="mobile-close-menu" class="mobile-menu-icon d-block d-md-none">
                             <i class="fa-solid fa-xmark"></i>
@@ -38,7 +45,7 @@
                             Dashboard
                         </a>
 
-                        @if (User.IsInRole("Employee"))
+                        @if (User.IsInRole(Role.Employee.ToString()))
                         {
                             <a class="nav-link @(Context.Request.Path == "/schedule" ? "active" : "")" asp-controller="Schedule" asp-action="Index">
                                 <i class="fa-solid fa-calendar"></i>
@@ -46,7 +53,7 @@
                             </a>
                         }
 
-                        @if (User.IsInRole("Manager"))
+                        @if (User.IsInRole(Role.Manager.ToString()))
                         {
                             <div>
                                 @{
@@ -68,7 +75,7 @@
                                         </a>
                                         <a class="sub-nav-link @(Context.Request.Path == "/schedule/create" ? "active" : "")" asp-controller="Schedule" asp-action="Create">
                                             <i class="fa-solid fa-calendar-plus"></i>
-                                            Nieuw rooster maken
+                                            Nieuw rooster
                                         </a>
                                     </div>
                                 </div>
@@ -120,7 +127,7 @@
                             </a>
                         }
 
-                            @if (User.IsInRole("Manager") || User.IsInRole("Employee"))
+                            @if (User.IsInRole(Role.Manager.ToString()) || User.IsInRole(Role.Employee.ToString()))
                         {
                             <a class="nav-link @(Context.Request.Path == "/leave" ? "active" : "")" asp-controller="Leave" asp-action="Index">
                                 <i class="fa-solid fa-bed"></i>
@@ -128,7 +135,7 @@
                             </a>
                         }
 
-                            @if (User.IsInRole("Employee"))
+                            @if (User.IsInRole(Role.Employee.ToString()))
                         {
                             <a class="nav-link @(Context.Request.Path == "/availability" ? "active" : "")" asp-controller="Availability" asp-action="Index">
                                 <i class="fa-solid fa-clock"></i>
@@ -138,12 +145,18 @@
 
                         <a class="nav-link d-flex justify-content-between align-items-center @(Context.Request.Path == "/notifications" ? "active" : "")" asp-controller="Notifications" asp-action="Index">
                             <div>
-                                <i class="fa-solid fa-bell"></i>
+                                <i class="fa-solid fa-bell position-relative">
+                                    @if (numberOfNotifications > 0)
+                                    {
+                                        <span class="bg-danger border border-light position-absolute rounded-circle start-100 top-0 translate-middle"
+                                              style="padding: .35rem;"></span>
+                                    }
+                                </i>
                                 Meldingen
                             </div>
-                            <span class="badge bg-primary">
-                                    @numberOfNotifications
-                                </span>
+                            <div class="badge bg-primary position-relative">
+                                @numberOfNotifications
+                            </div>
                         </a>
                     </div>
                 </div>
@@ -176,8 +189,8 @@
                         @if (User != null)
                         {
                             <div class="text-secondary d-none d-sm-flex flex-column">
-                                <span class="fw-bold">Welkom, @username! @* TODO: @user.FirstName *@</span>
-                                    <span class="small" style="margin-top: -5px">@firstRole @* TODO: ToFriendlyString() *@</span>
+                                <span class="fw-bold">Welkom, @username!</span>
+                                <span class="small" style="margin-top: -5px">@role.ToFriendlyString()</span>
                             </div>
                         }
                         <img class="profile-icon" src="/img/profile-icon.png" alt="profiel"/>
