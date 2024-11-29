@@ -154,6 +154,10 @@ label {
     font-weight: 500;
 }
 
+.pointer-event-none {
+    pointer-events: none;
+}
+
 .popover {
     z-index: 9999999;
 }

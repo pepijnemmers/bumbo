@@ -114,7 +114,7 @@
     <div class="calendar-container">
 
         @* Layer 1: Base Grid *@
-        <div class="calendar-grid row g-0" style="@(role == Role.Employee ? "pointer-events: none" : "")">
+        <div class="calendar-grid row g-0 @(role == Role.Employee ? "pointer-events-none" : "")">
             <div class="time-slots-col">
                 <div class="time-slot time-slot-header"></div>
                 @for (int i = 6; i < 24; i++)
@@ -147,7 +147,8 @@
                             }
                             else
                             {
-                                <div class="hour"></div>
+                                // TODO: check if pointevents if fixt correct
+                                <div class="hour pointer-events-none"></div>
                             }
                         }
                     </div>
@@ -230,7 +231,7 @@
                             <p class="text-secondary m-0">@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
                             @if (shift.Employee != null)
                             {
-                                <p class="fw-500">@shift.Employee?.FirstName @shift.Employee?.LastName</p>
+                                <p class="fw-500">@shift.Employee.FirstName @shift.Employee.LastName</p>
                             }
                             else
                             {
@@ -337,7 +338,7 @@ else
     <div class="calendar-container">
         
         @* Layer 1: Base Grid *@
-        <div class="calendar-grid row g-0" style="@(role == Role.Employee ? "pointer-events: none" : "")">
+        <div class="calendar-grid row g-0 @(role == Role.Employee ? "pointer-events-none" : "")">
             <div class="time-slots-col">
                 <div class="time-slot time-slot-header"></div>
                 @for (int i = 6; i < 24; i++)
@@ -363,7 +364,7 @@ else
                             }
                             else
                             {
-                                <div class="hour"></div>
+                                <div class="hour pointer-events-none"></div>
                             }
                         }
                     </div>
