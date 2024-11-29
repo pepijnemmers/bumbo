@@ -111,14 +111,33 @@
             <div class="col-md-5">
                 <div class="card mb-3">
                     <div class="card-body">
-                        <h5 class="card-title">Card 4</h5>
-                        <p class="card-text">Content for card 4.</p>
-                    </div>
-                </div>
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5><strong>Verjaardagen</strong></h5>
-                        <p class="card-text">Vandaag</p>
+                        <div class="d-flex justify-content-between">
+                            <h5><strong>Ongelezen meldingen</strong></h5>
+                            <a asp-controller="Notifications" asp-action="Index" class="text-black text-decoration-underline ms-2">Bekijk alle</a>
+                        </div>
+                        @if (ViewBag.UnreadNotifications == null || ViewBag.UnreadNotifications.Count == 0)
+                        {
+                            <p class="card-text">Je hebt geen ongelezen meldingen.</p>
+                        }
+                        else
+                        {
+                            <div class="row">
+                                @foreach (var notification in ViewBag.UnreadNotifications)
+                                {
+                                    <div class="col-12 mb-3">
+                                        <div class="card w-100">
+                                            <div class="card-body">
+                                                <small class="text-muted">@notification.SentAt.ToString("dd-MM-yyyy HH:mm")</small>
+                                                <h6 class="card-title">
+                                                    <strong>@notification.Title</strong>
+                                                </h6>
+                                                <small class="card-text">@notification.Description</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
             </div>

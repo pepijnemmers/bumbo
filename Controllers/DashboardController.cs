@@ -1,6 +1,7 @@
 ﻿using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BumboApp.Controllers
 {
@@ -19,9 +20,23 @@ namespace BumboApp.Controllers
                 .Where(lr => lr.Status == Status.Aangevraagd)
                 .ToList();
 
+            // Get the current logged-in user's ID
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Fetch the employee associated with the logged-in user
+            var employee = Context.Employees
+                .Include(e => e.notifications) // Include notifications
+                .FirstOrDefault(e => e.User.Id == userId);
+
+            var unreadNotifications = employee.notifications
+                .Where(n => !n.HasBeenRead)
+                .OrderByDescending(n => n.SentAt)
+                .ToList();
+
             ViewBag.ShiftTakeOvers = shiftTakeOvers;
             ViewBag.LeaveRequests = leaveRequests;
             ViewBag.LoggedInUserRole = LoggedInUserRole;
+            ViewBag.UnreadNotifications = unreadNotifications;
 
             return View();
         }
