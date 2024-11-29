@@ -33,6 +33,7 @@ namespace BumboApp.Controllers
 
         public IActionResult Create()
         {
+            CheckPageAccess(Role.Manager);
             return View();
         }
 
