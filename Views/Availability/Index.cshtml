@@ -1,4 +1,62 @@
-﻿
+﻿@model BumboApp.ViewModels.AvailabilityViewModel
+
 @{
     ViewData["Title"] = "Beschikbaarheid";
 }
+
+<div class="row justify-content-between align-items-center">
+    <h2 class="col d-none d-lg-block">Week @Model.WeekNr</h2>
+    <div class="col-12 mb-2 mb-lg-0 col-lg text-center text-lg-end">
+        <a asp-controller="Availability" asp-action="Index" asp-route-id="@Model.StartDate.AddDays(-7).ToString("dd-MM-yyyy")">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 18L9 12L15 6" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </a>
+        <strong>
+            Week @Model.WeekNr
+        </strong>
+        (@Model.StartDate.ToString("dd/MM/yyyy") - @Model.StartDate.AddDays(6).ToString("dd/MM/yyyy"))
+        <a asp-controller="Availability" asp-action="Index" asp-route-id="@Model.StartDate.AddDays(7).ToString("dd-MM-yyyy")">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 18L15 12L9 6" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-xl-7">
+        @if (Model.availabilityList.Count == 0)
+        {
+            <p>Er is nog geen beschikbaarheid voor deze week opgegeven</p>
+            <button class="btn btn-secondary">Standaard gebruiken</button>
+            <button class="btn btn-primary">Toevoegen</button>
+        }
+        else
+        {
+            <form class="table-container" id="availability-form" asp-action="Update" method="post">
+                <table class="table">
+                    <tbody>
+                        @for (int i = 0; i < 7; i++)
+                        {
+                            DayOfWeek day = (DayOfWeek)((i + 1) % 7); // Start with Monday
+                            Availability? availability = Model.availabilityList.SingleOrDefault(a => a.Date.DayOfWeek == day);
+                            <tr>
+                                <td>@day</td>
+                                <td>vanaf</td>
+                                <td>@availability.StartTime</td>
+                                <td>tot</td>
+                                <td>@availability.EndTime</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </form>
+        }
+    </div>
+
+    <div class="col-12 col-xl-5 table-container">
+        <h3>Schooluren</h3>
+        <p>Laat leeg als je geen schooluren hebt</p>
+    </div>
+</div>
