@@ -9,6 +9,11 @@ namespace BumboApp.Controllers
     {
         public IActionResult Index()
         {
+            // Get the current logged-in user's ID
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null) {  return View(); }
+
             // Retrieve ShiftTakeOvers where the status indicates they need assessment
             var shiftTakeOvers = Context.ShiftTakeOvers
                 .Include(sto => sto.Shift)           // Include related shift data
@@ -19,9 +24,6 @@ namespace BumboApp.Controllers
                 .Include(lr => lr.Employee)
                 .Where(lr => lr.Status == Status.Aangevraagd)
                 .ToList();
-
-            // Get the current logged-in user's ID
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // Fetch the employee associated with the logged-in user
             var employee = Context.Employees

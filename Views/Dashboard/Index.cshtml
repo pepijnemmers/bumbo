@@ -128,9 +128,13 @@
                                         <div class="card w-100">
                                             <div class="card-body">
                                                 <small class="text-muted">@notification.SentAt.ToString("dd-MM-yyyy HH:mm")</small>
-                                                <h6 class="card-title">
-                                                    <strong>@notification.Title</strong>
-                                                </h6>
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <span class="bg-danger border border-light rounded-circle me-2"
+                                                          style="width: 10px; height: 10px; display: inline-block;"></span>
+                                                    <h6 class="card-title mb-0">
+                                                        <strong>@notification.Title</strong>
+                                                    </h6>
+                                                </div>
                                                 <small class="card-text">@notification.Description</small>
                                             </div>
                                         </div>
