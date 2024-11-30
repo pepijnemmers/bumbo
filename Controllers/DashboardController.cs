@@ -14,10 +14,21 @@ namespace BumboApp.Controllers
 
             if (userId == null) {  return View(); }
 
+            // Fetch the employee associated with the logged-in user
+            var employee = Context.Employees
+                .Include(e => e.notifications)
+                .Include(e => e.Shifts)
+                .FirstOrDefault(e => e.User.Id == userId);
+
             // Retrieve ShiftTakeOvers where the status indicates they need assessment
             var shiftTakeOvers = Context.ShiftTakeOvers
                 .Include(sto => sto.Shift)           // Include related shift data
-                .Where(sto => sto.Status == Status.Aangevraagd) // Filter by status
+                .Where(sto => sto.Status == Status.Aangevraagd && sto.EmployeeTakingOver != null) // Filter by status
+                .ToList();
+
+            var shiftTakeOversEmployee = Context.ShiftTakeOvers
+                .Include(sto => sto.Shift)           // Include related shift data
+                .Where(sto => sto.Status == Status.Aangevraagd && sto.EmployeeTakingOver == null && sto.Shift.Employee != employee) // Filter by status
                 .ToList();
 
             var leaveRequests = Context.LeaveRequests
@@ -25,20 +36,27 @@ namespace BumboApp.Controllers
                 .Where(lr => lr.Status == Status.Aangevraagd)
                 .ToList();
 
-            // Fetch the employee associated with the logged-in user
-            var employee = Context.Employees
-                .Include(e => e.notifications) // Include notifications
-                .FirstOrDefault(e => e.User.Id == userId);
-
             var unreadNotifications = employee.notifications
                 .Where(n => !n.HasBeenRead)
                 .OrderByDescending(n => n.SentAt)
                 .ToList();
 
+            var today = DateTime.Today;
+            var startOfWeek = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Monday); // Start of the week
+            var endOfWeek = startOfWeek.AddDays(6); // End of the week
+
+            // Filter shifts for the current week
+            var shiftsThisWeek = employee.Shifts
+                .Where(s => s.Start.Date >= startOfWeek && s.Start.Date <= endOfWeek && s.IsFinal)
+                .OrderBy(s => s.Start)
+                .ToList();
+
             ViewBag.ShiftTakeOvers = shiftTakeOvers;
+            ViewBag.ShiftTakeOversEmployee = shiftTakeOversEmployee;
             ViewBag.LeaveRequests = leaveRequests;
             ViewBag.LoggedInUserRole = LoggedInUserRole;
             ViewBag.UnreadNotifications = unreadNotifications;
+            ViewBag.ShiftsThisWeek = shiftsThisWeek;
 
             return View();
         }
