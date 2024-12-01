@@ -44,7 +44,11 @@ namespace BumboApp.Controllers
                 .ToList();
 
             var today = DateTime.Today;
-            var startOfWeek = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Monday); // Start of the week
+            var startOfWeek = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Monday); // Start of the week                                                                               // If today is Sunday, we want the week to start from the previous Monday
+            if (today.DayOfWeek == DayOfWeek.Sunday)
+            {
+                startOfWeek = startOfWeek.AddDays(-7); // Move back to the previous Monday
+            }
             var endOfWeek = startOfWeek.AddDays(6); // End of the week
 
             // Filter shifts for the current week
@@ -52,6 +56,14 @@ namespace BumboApp.Controllers
                 .Where(s => s.Start.Date >= startOfWeek && s.Start.Date <= endOfWeek && s.IsFinal)
                 .OrderBy(s => s.Start)
                 .ToList();
+
+            Console.WriteLine($"Start of week: {startOfWeek}");
+            Console.WriteLine($"End of week: {endOfWeek}");
+
+            foreach (var shift in employee.Shifts)
+            {
+                Console.WriteLine($"Shift Start: {shift.Start}");
+            }
 
             ViewBag.ShiftTakeOvers = shiftTakeOvers;
             ViewBag.ShiftTakeOversEmployee = shiftTakeOversEmployee;
