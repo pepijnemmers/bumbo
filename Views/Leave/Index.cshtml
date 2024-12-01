@@ -133,6 +133,8 @@
                         <div class="mb-3">
                             <label for="Employee" class="col-form-label">Werknemer:</label>
                             <select class="form-select" id="employeeSelect" aria-label="Employee" onchange="updateEmployeeNumber()">
+                                <option value="" disabled selected>Selecteer werknemer</option>
+
                                 @foreach (var employee in Model.AllEmployees)
                                 {
                                     <option value="@employee.EmployeeNumber">@employee.FirstName @employee.LastName</option>
@@ -140,7 +142,7 @@
                             </select>
                         </div>
 
-                        <input type="hidden" id="employeeNumber" name="EmployeeNumber" value="">
+                        <input type="hidden" id="EmployeeNumber" name="EmployeeNumber" value="">
 
                     }
                     else
@@ -172,6 +174,6 @@
 
     function updateEmployeeNumber() {
         const selectedEmployeeNumber = document.getElementById('employeeSelect').value;
-        document.getElementById('employeeNumber').value = selectedEmployeeNumber;
+        document.getElementById('EmployeeNumber').value = selectedEmployeeNumber;
     }
 </script>

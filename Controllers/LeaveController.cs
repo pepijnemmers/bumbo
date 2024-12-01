@@ -1,7 +1,9 @@
-﻿using BumboApp.Models;
+﻿using Azure.Core;
+using BumboApp.Models;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
 namespace BumboApp.Controllers
@@ -160,8 +162,44 @@ namespace BumboApp.Controllers
         [HttpPost]
         public IActionResult CreateSickLeave(SickLeave sickLeave)
         {
-            NotifyService.Information(sickLeave.EmployeeNumber.ToString());
-            return NotifySuccessAndRedirect("De ziekmelding is opgeslagen.", "Index");
+            if (sickLeave.EmployeeNumber == 0)
+            {
+                return NotifyErrorAndRedirect("Er was geen werknemer geselecteerd", "Index");
+            }
+            
+            Employee employee = Context.Employees.FirstOrDefault(e => e.EmployeeNumber == sickLeave.EmployeeNumber);
+            sickLeave.Employee = employee;
+
+            List<Shift> EmployeeShifts = Context.Shifts
+                                    .Where(s => s.Employee != null &&
+                                                s.Employee.EmployeeNumber == sickLeave.EmployeeNumber &&
+                                                s.Start.Date == sickLeave.Date.ToDateTime(TimeOnly.MinValue).Date) // checks if the shift starts on the sick leave date
+                                    .ToList();
+
+            using var transaction = Context.Database.BeginTransaction();
+
+            try
+            {
+                Context.SickLeaves.Add(sickLeave);
+                foreach (Shift shift in EmployeeShifts)
+                {
+                    shift.ShiftTakeOver = new ShiftTakeOver
+                    {
+                        ShiftId = shift.Id,
+                        Shift = shift,
+                        Status = Status.Aangevraagd
+                    };
+                    shift.Employee = null;
+                }
+                Context.SaveChanges();
+                transaction.Commit();
+                return NotifySuccessAndRedirect("De ziekmelding is opgeslagen.", "Index");
+            }
+            catch
+            {
+                transaction.Rollback();
+                return NotifyErrorAndRedirect("Er is iets mis gegaan bij het toevoegen van de ziekmelding", "Index");
+            }
         }
     }
 }
