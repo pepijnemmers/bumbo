@@ -57,14 +57,6 @@ namespace BumboApp.Controllers
                 .OrderBy(s => s.Start)
                 .ToList();
 
-            Console.WriteLine($"Start of week: {startOfWeek}");
-            Console.WriteLine($"End of week: {endOfWeek}");
-
-            foreach (var shift in employee.Shifts)
-            {
-                Console.WriteLine($"Shift Start: {shift.Start}");
-            }
-
             ViewBag.ShiftTakeOvers = shiftTakeOvers;
             ViewBag.ShiftTakeOversEmployee = shiftTakeOversEmployee;
             ViewBag.LeaveRequests = leaveRequests;
