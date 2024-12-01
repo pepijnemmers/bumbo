@@ -36,10 +36,18 @@ namespace BumboApp.Controllers
                                          .FirstOrDefault(st => st.ShiftId == shiftId);
             if (shiftTakeOver == null) { return NotifyErrorAndRedirect("Kon de shift niet vinden", "Index", "Dashboard"); }
 
+            //TODO: Checken CAO regels.
+
             shiftTakeOver.EmployeeTakingOverEmployeeNumber = employee.EmployeeNumber;
             Context.SaveChanges();
 
             return NotifySuccessAndRedirect("De overname is doorgegeven.", "Index", "Dashboard");
+        }
+
+        public IActionResult EmployeeTakeOverRequest() 
+        {
+            Console.WriteLine("I am here");
+            return RedirectToAction("MyShifts", "Shifts");
         }
     }
 }

@@ -1,3 +1,103 @@
 ﻿@{
     ViewData["Title"] = "Mijn diensten";
 }
+
+<h5><strong>Deze week (@ViewBag.StartOfWeek.ToString("dd-MM-yyyy") - @ViewBag.EndOfWeek.ToString("dd-MM-yyyy"))</strong></h5>
+@if (ViewBag.ShiftsThisWeek != null && ViewBag.ShiftsThisWeek.Count != 0)
+{
+    @foreach (var shift in ViewBag.ShiftsThisWeek)
+    {
+        <div class="col-12 mb-3">
+            <div class="card w-100">
+                <div class="card-body d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">
+                            <strong>Dienst @shift.Department</strong>
+                        </h6>
+                        <p class="card-text">
+                            @shift.Start.ToString("dd-MM-yyyy")
+                            @shift.Start.ToString("HH:mm") -
+                            @shift.End.ToString("HH:mm")
+                        </p>
+                    </div>
+                    @if (ViewBag.TakenOverShiftsThisWeek.Contains(shift))
+                    {
+
+                    }
+                    else
+                    {
+                    <a asp-controller="TakeOver" asp-action="EmployeeTakeOverRequest" class="btn btn-outline-dark align-self-center">Overname vragen</a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<h5><strong>Deze maand (@ViewBag.EndOfWeek.AddDays(1).ToString("dd-MM-yyyy") - @ViewBag.EndOfMonth.ToString("dd-MM-yyyy"))</strong></h5>
+@if (ViewBag.ShiftsThisMonth != null && ViewBag.ShiftsThisMonth.Count != 0)
+{
+    @foreach (var shift in ViewBag.ShiftsThisMonth)
+    {
+        <div class="col-12 mb-3">
+            <div class="card w-100">
+                <div class="card-body d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">
+                            <strong>Dienst @shift.Department</strong>
+                        </h6>
+                        <p class="card-text">
+                            @shift.Start.ToString("dd-MM-yyyy")
+                            @shift.Start.ToString("HH:mm") -
+                            @shift.End.ToString("HH:mm")
+                        </p>
+                    </div>
+                    @if (ViewBag.TakenOverShiftsThisMonth.Contains(shift))
+                    {
+                        <div class="card bg-secondary text-white border-0 rounded-pill">
+                            <div class="card-body">
+                                Overname aangevraagd
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <a asp-controller="TakeOver" asp-action="EmployeeTakeOverRequest" class="btn btn-outline-dark align-self-center">Overname vragen</a>
+                    }
+                 </div>
+            </div>
+        </div>
+    }
+}
+
+<h5><strong>Vanaf @ViewBag.EndOfMonth.AddDays(1).ToString("dd-MM-yyyy")</strong></h5>
+@if (ViewBag.ShiftsLater != null && ViewBag.ShiftsLater.Count != 0)
+{
+    @foreach (var shift in ViewBag.ShiftsLater)
+    {
+        <div class="col-12 mb-3">
+            <div class="card w-100">
+                <div class="card-body d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">
+                            <strong>Dienst @shift.Department</strong>
+                        </h6>
+                        <p class="card-text">
+                            @shift.Start.ToString("dd-MM-yyyy")
+                            @shift.Start.ToString("HH:mm") -
+                            @shift.End.ToString("HH:mm")
+                        </p>
+                    </div>
+                    @if (ViewBag.TakenOverShiftsLater.Contains(shift))
+                    {
+
+                    }
+                    else
+                    {
+                        <a asp-controller="TakeOver" asp-action="EmployeeTakeOverRequest" class="btn btn-outline-dark align-self-center">Overname vragen</a>
+                    }
+                 </div>
+            </div>
+        </div>
+    }
+}
