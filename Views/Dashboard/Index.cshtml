@@ -12,7 +12,7 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between">
                             <h5><strong>Jouw diensten deze week</strong></h5>
-                            <a asp-controller="Schedule" asp-action="Index" class="text-black text-decoration-underline ms-2">Bekijk alle</a>
+                            <a asp-controller="Shifts" asp-action="MyShifts" class="text-black text-decoration-underline ms-2">Bekijk alle</a>
                         </div>
                         <div class="row">
                             @if (ViewBag.ShiftsThisWeek == null || ViewBag.ShiftsThisWeek.Count == 0)
