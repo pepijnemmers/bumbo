@@ -1,6 +1,7 @@
 ﻿using BumboApp.Models;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using System.Globalization;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -8,6 +9,12 @@ namespace BumboApp.Controllers
 {
     public class AvailabilityController : MainController
     {
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+            CheckPageAccess(Role.Employee);
+        }
+
         public IActionResult Index(string? id)
         {
             if (id == null)

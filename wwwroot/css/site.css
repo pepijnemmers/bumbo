@@ -22,6 +22,10 @@
     background-color: var(--bs-primary) !important;
 }
 
+.bg-primary {
+  background-color: var(--bs-primary) !important;
+}
+
 /* buttons */
 .btn {
     text-transform: capitalize;
@@ -134,6 +138,10 @@ html {
     all: unset;
 }
 
+.unset-all {
+  all: unset;
+}
+
 label {
     font-weight: bold;
     margin-bottom: .3em;
@@ -143,6 +151,14 @@ label {
     z-index: 9999999;
 }
 
+.popover-p-small .popover-body,
+.popover-profile .popover-body {
+    padding: .4rem .5rem;
+}
+
+.popover {
+    z-index: 9999999;
+}
 .popover-p-small .popover-body,
 .popover-profile .popover-body {
     padding: .4rem .5rem;
