@@ -20,6 +20,8 @@ namespace BumboApp.Controllers
                 .Include(e => e.Shifts)
                 .FirstOrDefault(e => e.User.Id == userId);
 
+            if (employee == null) { return View(); }
+
             // Retrieve ShiftTakeOvers where the status indicates they need assessment
             var shiftTakeOvers = Context.ShiftTakeOvers
                 .Include(sto => sto.Shift)           // Include related shift data
