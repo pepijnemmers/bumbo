@@ -10,5 +10,7 @@ namespace BumboApp.ViewModels
         public required List<SickLeave> SickLeaves { get; set; }
 
         public required Employee LoggedInEmployee { get; set; }
+
+        public required List<Employee> AllEmployees { get; set; }
     }
 }

@@ -60,7 +60,8 @@ namespace BumboApp.Controllers
                     .ToList(),
                 SelectedStatus = selectedStatus,
                 SickLeaves = sickLeaves,
-                LoggedInEmployee = _loggedInEmployee
+                LoggedInEmployee = _loggedInEmployee,
+                AllEmployees = Context.Employees.Skip(1).ToList()
             };
 
             return View(viewModel);
@@ -159,6 +160,7 @@ namespace BumboApp.Controllers
         [HttpPost]
         public IActionResult CreateSickLeave(SickLeave sickLeave)
         {
+            NotifyService.Information(sickLeave.EmployeeNumber.ToString());
             return NotifySuccessAndRedirect("De ziekmelding is opgeslagen.", "Index");
         }
     }

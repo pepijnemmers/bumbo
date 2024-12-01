@@ -107,7 +107,7 @@
                 foreach (var sickLeave in Model.SickLeaves)
                 {
                     <tr>
-                        <td>@sickLeave.Employee.FirstName + @sickLeave.Employee.LastName</td> @*later testen als er DB entries zijn*@
+                        <td>@sickLeave.Employee.FirstName @sickLeave.Employee.LastName</td>
                         <td>@sickLeave.Date</td>
                     </tr>
                 }
@@ -132,8 +132,16 @@
                     {
                         <div class="mb-3">
                             <label for="Employee" class="col-form-label">Werknemer:</label>
-                            <input type="text" class="form-control" id="EmployeeName">
+                            <select class="form-select" id="employeeSelect" aria-label="Employee" onchange="updateEmployeeNumber()">
+                                @foreach (var employee in Model.AllEmployees)
+                                {
+                                    <option value="@employee.EmployeeNumber">@employee.FirstName @employee.LastName</option>
+                                }
+                            </select>
                         </div>
+
+                        <input type="hidden" id="employeeNumber" name="EmployeeNumber" value="">
+
                     }
                     else
                     {
@@ -160,5 +168,10 @@
             url.searchParams.set("selectedStatus", select.value);
         }
         location.href = url;
+    }
+
+    function updateEmployeeNumber() {
+        const selectedEmployeeNumber = document.getElementById('employeeSelect').value;
+        document.getElementById('employeeNumber').value = selectedEmployeeNumber;
     }
 </script>
