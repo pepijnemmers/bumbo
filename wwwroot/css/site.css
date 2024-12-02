@@ -330,7 +330,7 @@ label {
     grid-template-rows: repeat(18, var(--cdr-time-slot-height));
 }
 .calendar-container .shifts-overlay--day {
-    grid-template-columns: repeat(12, 1fr);
+    grid-template-columns: repeat(3, 1fr);
 }
 .calendar-container .shifts-overlay--week {
     grid-template-columns: repeat(7, 1fr);
@@ -397,9 +397,13 @@ label {
     .table-container.cdr-weekview .calendar-container .shifts-overlay--week {
         grid-template-columns: repeat(7, var(--cdr-day-col-min-width));
     }
+    .table-container.cdr-dayview .calendar-container .shifts-overlay--day {
+        grid-template-columns: repeat(3, calc(var(--cdr-day-col-min-width) * 7 / 3));
+    }
 }
 @media (max-width: 576px) {
-    .table-container.cdr-weekview {
+    .table-container.cdr-weekview,
+    .table-container.cdr-dayview {
         width: 100vw;
         margin-left: calc(var(--bs-gutter-x,.75rem) * -1);
         border-radius: 0;
@@ -408,10 +412,12 @@ label {
         --cdr-time-col-width: 45px;
         --cdr-day-col-min-width: min(calc(100vw - var(--cdr-time-col-width)), 200px);
     }
-    .table-container.cdr-weekview .time-slot {
+    .table-container.cdr-weekview .time-slot,
+    .table-container.cdr-dayview .time-slot {
         padding: .2em;
     }
-    .table-container.cdr-weekview .time-slot span {
+    .table-container.cdr-weekview .time-slot span,
+    .table-container.cdr-dayview .time-slot span {
         translate: 0 calc(-100% - 5px);
     }
 }

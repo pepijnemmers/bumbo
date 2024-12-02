@@ -7,7 +7,7 @@
     var role = Model.Role;
 }
 
-@* Header for manager and employee *@
+@* Header for manager and employee TODO: responsive *@
 <header>
     @* concept header *@
     @if (role == Role.Manager && Model.ViewIsConcept)
@@ -120,6 +120,20 @@
 {
 @* Calendar day view *@
 <div class="table-container cdr-dayview">
+    <div class="border-bottom d-block d-md-block d-xl-none py-1 small text-center text-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" xml:space="preserve"
+             style="height: 1.5em;fill: var(--bs-secondary);" viewBox="10.04 59.98 131.86 59.8">  
+            <g>
+                <g>
+                    <g>
+                        <path fill="inherit" d="M120.3,62.5c-0.8,1.4-0.8,3.8,0,5.5c1.1,1.9-15.8,2.7-49.2,2.7c-47,0-50.8,0.3-50,4.6c0.8,4.4,6,5.2,50,6.3c39.9,1.1,49.2,2.2,49.2,5.2c0,7.1,5.5,6,13.7-2.5l7.9-8.2l-7.9-8.2C125.5,59.2,123,58.1,120.3,62.5z"></path>
+                        <path fill="inherit" d="M15.7,96.1c-7.6,7.9-7.6,10.4,0.3,17.8c7.9,7.6,13.9,7.9,12,0.5c-1.4-5.2,0.3-5.5,49.4-6c67.5-1.1,67.7-6,0.5-7.1c-47-0.5-49.2-0.8-49.2-6C28.8,87.9,22.8,88.4,15.7,96.1z"></path>
+                    </g>
+                </g>
+            </g>
+        </svg>
+        <span>Horizontale scroll</span>
+    </div>
     <div class="calendar-container">
 
         @* Layer 1: Base Grid *@
@@ -200,8 +214,8 @@
                     var departmentGridPosition = shift.Department switch
                     {
                         Department.Vers => 1,
-                        Department.Vakkenvullen => 5,
-                        Department.Kassa => 9,
+                        Department.Vakkenvullen => 2,
+                        Department.Kassa => 3,
                         _ => 0
                     };
                     var startHour = shift.Start.Hour;
@@ -213,7 +227,7 @@
                             @shift.Department.ToString().ToLower() 
                             @(shift.Employee == null ? "no-employee" : "")
                             @(!shift.IsFinal ? "concept" : "")"
-                        style="grid-area: @(startHour - 5) / @departmentGridPosition  / span @gridSpanCol / span 4"
+                        style="grid-area: @(startHour - 5) / @departmentGridPosition  / span @gridSpanCol / span 1"
                         data-bs-toggle="popover"
                         data-bs-trigger="focus"
                         data-bs-placement="left"
@@ -257,8 +271,8 @@
                     var departmentGridPosition = group.First().Department switch
                     {
                         Department.Vers => 1,
-                        Department.Vakkenvullen => 5,
-                        Department.Kassa => 9,
+                        Department.Vakkenvullen => 2,
+                        Department.Kassa => 3,
                         _ => 0
                     };
 
@@ -274,7 +288,7 @@
                             @firstShift.Department.ToString().ToLower() 
                             @(groupHasEmptyShift ? "no-employee" : "")
                             @(!firstShift.IsFinal ? "concept" : "")"
-                        style="grid-area: @(startHour - 5) / @departmentGridPosition  / span @gridSpanCol / span 4"
+                        style="grid-area: @(startHour - 5) / @departmentGridPosition  / span @gridSpanCol / span 1"
                         data-bs-toggle="popover"
                         data-bs-trigger="focus"
                         data-bs-placement="left"
@@ -342,8 +356,22 @@ else
 {
 @* Calender week view *@
 <div class="table-container cdr-weekview">
+    <div class="border-bottom d-block d-md-block d-xl-none py-1 small text-center text-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" xml:space="preserve" 
+             style="height: 1.5em;fill: var(--bs-secondary);" viewBox="10.04 59.98 131.86 59.8">  
+            <g>
+                <g>
+                    <g>
+                        <path fill="inherit" d="M120.3,62.5c-0.8,1.4-0.8,3.8,0,5.5c1.1,1.9-15.8,2.7-49.2,2.7c-47,0-50.8,0.3-50,4.6c0.8,4.4,6,5.2,50,6.3c39.9,1.1,49.2,2.2,49.2,5.2c0,7.1,5.5,6,13.7-2.5l7.9-8.2l-7.9-8.2C125.5,59.2,123,58.1,120.3,62.5z"></path>
+                        <path fill="inherit" d="M15.7,96.1c-7.6,7.9-7.6,10.4,0.3,17.8c7.9,7.6,13.9,7.9,12,0.5c-1.4-5.2,0.3-5.5,49.4-6c67.5-1.1,67.7-6,0.5-7.1c-47-0.5-49.2-0.8-49.2-6C28.8,87.9,22.8,88.4,15.7,96.1z"></path>
+                    </g>
+                </g>
+            </g>
+        </svg>
+        <span>Horizontale scroll</span>
+    </div>
     <div class="calendar-container">
-        
+
         @* Layer 1: Base Grid *@
         <div class="calendar-grid row g-0 @(role == Role.Employee ? "pointer-events-none" : "")">
             <div class="time-slots-col">
