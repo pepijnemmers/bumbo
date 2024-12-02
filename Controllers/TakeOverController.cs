@@ -44,9 +44,29 @@ namespace BumboApp.Controllers
             return NotifySuccessAndRedirect("De overname is doorgegeven.", "Index", "Dashboard");
         }
 
-        public IActionResult EmployeeTakeOverRequest() 
+        public IActionResult EmployeeTakeOverRequest(int shiftId) 
         {
-            Console.WriteLine("I am here");
+            var shift = Context.Shifts.FirstOrDefault(s => s.Id == shiftId);
+            if (shift == null)
+            {
+                return NotifyErrorAndRedirect("Shift kon niet gevonden worden", "MyShifts", "Shifts");
+            }
+
+            // Check for existing takeovers for the same shift
+            var existingTakeOver = Context.ShiftTakeOvers.FirstOrDefault(st => st.ShiftId == shiftId);
+            if (existingTakeOver != null)
+            {
+                return NotifyErrorAndRedirect("De overname aanvraag bestaat al", "MyShifts", "Shifts");
+            }
+
+            var shiftTakeOver = new ShiftTakeOver
+            {
+                ShiftId = shiftId,
+                Status = Status.Aangevraagd
+            };
+
+            Context.ShiftTakeOvers.Add(shiftTakeOver);
+            Context.SaveChanges();
             return RedirectToAction("MyShifts", "Shifts");
         }
     }

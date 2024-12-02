@@ -35,6 +35,10 @@
         </div>
     }
 }
+else
+{
+    <p>Er zijn geen diensten in de rest van de week.</p>
+}
 
 <h5><strong>Deze maand (@ViewBag.EndOfWeek.AddDays(1).ToString("dd-MM-yyyy") - @ViewBag.EndOfMonth.ToString("dd-MM-yyyy"))</strong></h5>
 @if (ViewBag.ShiftsThisMonth != null && ViewBag.ShiftsThisMonth.Count != 0)
@@ -69,6 +73,10 @@
         </div>
     }
 }
+else
+{
+    <p>Er zijn geen diensten in de rest van de maand.</p>
+}
 
 <h5><strong>Vanaf @ViewBag.EndOfMonth.AddDays(1).ToString("dd-MM-yyyy")</strong></h5>
 @if (ViewBag.ShiftsLater != null && ViewBag.ShiftsLater.Count != 0)
@@ -96,10 +104,14 @@
                     }
                     else
                     {
-                        <a asp-controller="TakeOver" asp-action="EmployeeTakeOverRequest" class="btn btn-outline-dark mt-3 mt-sm-0">Overname vragen</a>
+                        <a asp-controller="TakeOver" asp-action="EmployeeTakeOverRequest" asp-route-shiftId="@shift.Id" class="btn btn-outline-dark mt-3 mt-sm-0">Overname vragen</a>
                     }
                  </div>
             </div>
         </div>
     }
+}
+else
+{
+    <p>Er zijn nog geen latere diensten.</p>
 }
