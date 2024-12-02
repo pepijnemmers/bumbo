@@ -166,7 +166,25 @@ namespace BumboApp.Controllers
             {
                 return NotifyErrorAndRedirect("Er was geen werknemer geselecteerd", "Index");
             }
-            
+            if (sickLeave.Date.ToDateTime(TimeOnly.MinValue) < DateTime.Now.Date)
+            {
+                return NotifyErrorAndRedirect("Je kunt geen ziekmelding in het verleden doen.", "Index");
+            }
+            if (sickLeave.Date.ToDateTime(TimeOnly.MinValue) > DateTime.Now.Date.AddDays(1))
+            {
+                return NotifyErrorAndRedirect("Je kunt je niet verder dan 1 dag in de toekomst ziekmelden.", "Index");
+            }
+
+            bool hasOverlappingSickLeave = Context.SickLeaves
+                .Any(sl =>
+                    sl.EmployeeNumber == sickLeave.EmployeeNumber &&
+                    sl.Date == sickLeave.Date);
+
+            if (hasOverlappingSickLeave)
+            {
+                return NotifyErrorAndRedirect("Werknemer is al ziekgemeld op deze dag", "Index");
+            }
+
             Employee employee = Context.Employees.FirstOrDefault(e => e.EmployeeNumber == sickLeave.EmployeeNumber);
             sickLeave.Employee = employee;
 
@@ -181,16 +199,18 @@ namespace BumboApp.Controllers
             try
             {
                 Context.SickLeaves.Add(sickLeave);
-                foreach (Shift shift in EmployeeShifts)
-                {
-                    shift.ShiftTakeOver = new ShiftTakeOver
-                    {
-                        ShiftId = shift.Id,
-                        Shift = shift,
-                        Status = Status.Aangevraagd
-                    };
-                    shift.Employee = null;
-                }
+                //foreach (Shift shift in EmployeeShifts)
+                //{
+                //    var shiftTakeOver = new ShiftTakeOver
+                //    {
+                //        ShiftId = shift.Id,
+                //        Shift = shift,
+                //        Status = Status.Aangevraagd
+                //    };
+                //    shift.Employee = null;
+                //    shift.ShiftTakeOver = shiftTakeOver;
+                //    Context.ShiftTakeOvers.Add(shiftTakeOver);
+                //}
                 Context.SaveChanges();
                 transaction.Commit();
                 return NotifySuccessAndRedirect("De ziekmelding is opgeslagen.", "Index");

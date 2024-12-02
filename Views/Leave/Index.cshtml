@@ -114,6 +114,13 @@
             }
         </tbody>
     </table>
+    @if (ViewBag.MaxPages > 1)
+    {
+        <Component type="typeof(Pagination)"
+                   render-mode="ServerPrerendered"
+                   param-PageNumber="ViewBag.PageNumber"
+                   param-MaxPages="ViewBag.MaxPages" />
+    }
 </div>
 
 <div class="modal fade align-content-center" id="sickLeaveModal" tabindex="-1" aria-labelledby="sickLeave" aria-hidden="true">
@@ -131,8 +138,8 @@
                     @if (User.IsInRole(Role.Manager.ToString()))
                     {
                         <div class="mb-3">
-                            <label for="Employee" class="col-form-label">Werknemer:</label>
-                            <select class="form-select" id="employeeSelect" aria-label="Employee" onchange="updateEmployeeNumber()">
+                            <label for="Employee" class="col-form-label">Werknemer</label>
+                            <select class="form-select" id="employeeSelect" aria-label="Employee" onchange="updateEmployeeNumber()" required>
                                 <option value="" disabled selected>Selecteer werknemer</option>
 
                                 @foreach (var employee in Model.AllEmployees)
@@ -153,7 +160,7 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
                 <button type="submit" id="sickLeaveCreateButton" class="btn btn-primary">Ziekmelden</button>
             </div>
         </div>
