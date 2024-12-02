@@ -119,7 +119,7 @@
 @if (Model.IsDayView)
 {
 @* Calendar day view *@
-<div class="table-container">
+<div class="table-container cdr-dayview">
     <div class="calendar-container">
 
         @* Layer 1: Base Grid *@
@@ -341,7 +341,7 @@
 else
 {
 @* Calender week view *@
-<div class="table-container">
+<div class="table-container cdr-weekview">
     <div class="calendar-container">
         
         @* Layer 1: Base Grid *@
@@ -387,12 +387,12 @@ else
                 var startHour = shift.Start.Hour;
                 var endHour = shift.End.Hour;
                 var gridSpan = endHour - startHour;
-                
-                <button 
+
+                <button
                     class="unset-all shift-container 
                         @shift.Department.ToString().ToLower() 
                         @(shift.Employee == null ? "no-employee" : "")
-                        @(!shift.IsFinal ? "concept": "")"
+                        @(!shift.IsFinal ? "concept" : "")"
                     style="grid-area: @(startHour - 5) / @dayGridPosition / span @gridSpan"
                     data-bs-toggle="popover"
                     data-bs-trigger="focus"
@@ -409,8 +409,7 @@ else
                     data-bs-content="
                         <div>
                             <p class='text-secondary m-0'>@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
-                            @if (shift.Employee != null) { <p class='fw-500 mb-1'><i class='fas fa-user me-1'></i>@shift.Employee?.FirstName @shift.Employee?.LastName</p> }
-                            else { <p class='fw-500 text-danger mb-1'><i class='fas fa-user-slash me-1'></i>Zoek intern vervanging en pas de dienst aan of zoek extern.</p> }
+                            @if (shift.Employee != null) { <p class='fw-500 mb-1'><i class='fas fa-user me-1'></i>@shift.Employee?.FirstName @shift.Employee?.LastName</p> }else { <p class='fw-500 text-danger mb-1'><i class='fas fa-user-slash me-1'></i>Zoek intern vervanging en pas de dienst aan of zoek extern.</p> }
                         </div>">
                     <div class="shift">
                         <p class="text-secondary m-0">@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>

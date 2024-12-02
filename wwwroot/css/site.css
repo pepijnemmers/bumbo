@@ -25,8 +25,16 @@
     --department-kassa-border: #97bf93;
 }
 
-.bg-primary {
-    background-color: var(--bs-primary) !important;
+:not(body, html)::-webkit-scrollbar {
+    width: .5em;
+    height: .5em;
+}
+:not(body, html)::-webkit-scrollbar-thumb {
+    background-color: var(--bs-secondary);
+    border-radius: 1em;
+}
+:not(body, html)::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
 }
 
 .bg-primary {
@@ -229,13 +237,23 @@ label {
     --cdr-header-height: calc(35px + 1em);
     --cdr-time-slot-height: 50px;
     --cdr-time-col-width: 55px;
+    --cdr-day-col-min-width: 115px;
     
     position: relative;
     border-radius: inherit;
-    overflow: hidden;
+    overflow-x: auto;
 }
 
+.calendar-grid {
+    min-width: calc(var(--cdr-time-col-width) + (var(--cdr-day-col-min-width) * 7));
+}
 .calendar-grid .time-slots-col {
+    position: sticky;
+    left: 0;
+    top: 0;
+    z-index: 2;
+    border-right: 1px solid var(--border-clr);
+    background-color: var(--bs-white);
     width: var(--cdr-time-col-width);
 }
 .calendar-grid .time-slots-col .time-slot {
@@ -270,6 +288,7 @@ label {
 
 .calendar-grid .day-col {
     border-left: 1px solid var(--border-clr);
+    min-width: var(--cdr-day-col-min-width);
 }
 .calendar-grid .day-col.today {
     color: var(--accent-color);
@@ -326,13 +345,6 @@ label {
     padding: .5em .8em;
     overflow-y: auto;
 }
-.shifts-overlay .shift::-webkit-scrollbar {
-    width: 7px;
-}
-.shifts-overlay .shift::-webkit-scrollbar-thumb {
-    background-color: var(--bs-secondary);
-    border-radius: 5px;
-}
 .shifts-overlay .no-employee .shift,
 .legenda .no-employee {
     border: 4px solid var(--bs-danger) !important;
@@ -378,6 +390,30 @@ label {
 .shifts-overlay .concept .shift * {
     position: relative;
     z-index: 2;
+}
+
+/* Schedule responsive */
+@media (max-width: 1200px) {
+    .table-container.cdr-weekview .calendar-container .shifts-overlay--week {
+        grid-template-columns: repeat(7, var(--cdr-day-col-min-width));
+    }
+}
+@media (max-width: 576px) {
+    .table-container.cdr-weekview {
+        width: 100vw;
+        margin-left: calc(var(--bs-gutter-x,.75rem) * -1);
+        border-radius: 0;
+    }
+    .table-container.cdr-weekview .calendar-container {
+        --cdr-time-col-width: 45px;
+        --cdr-day-col-min-width: min(calc(100vw - var(--cdr-time-col-width)), 200px);
+    }
+    .table-container.cdr-weekview .time-slot {
+        padding: .2em;
+    }
+    .table-container.cdr-weekview .time-slot span {
+        translate: 0 calc(-100% - 5px);
+    }
 }
 
 /* Schedule legend */
