@@ -7,19 +7,19 @@
     var role = Model.Role;
 }
 
-@* Header for manager and employee TODO: responsive *@
+@* Header for manager and employee *@
 <header>
     @* concept header *@
     @if (role == Role.Manager && Model.ViewIsConcept)
     {
-        <div class="d-flex align-items-center justify-content-between mb-3">
+        <div class="d-flex align-items-lg-center justify-content-between flex-column flex-lg-row mb-3">
             <h3 class="fst-italic text-secondary">Concept rooster</h3>
             <div class="buttons">
-                <a class="btn btn-outline-danger">
+                <a class="btn btn-outline-danger d-block d-lg-inline-block mt-2 mt-lg-0">
                     <i class="fas fa-trash-alt"></i>
                     Concept week verwijderen
                 </a>
-                <a class="btn btn-success">
+                <a class="btn btn-success d-block d-lg-inline-block mt-2 mb-3 my-lg-0">
                     <i class="fas fa-check"></i>
                     Week publiceren
                 </a>
@@ -27,8 +27,8 @@
         </div>
     }
     @* day & week header *@
-    <div class="d-flex align-items-center justify-content-between">
-        <div class="date-nav">
+    <div class="d-flex align-items-center justify-content-between flex-column flex-lg-row gap-2 flex-wrap">
+        <div class="d-flex align-items-center w-100 w-lg-auto">
             @if (!Model.IsDayView)
             {
                 <button class="unset-all text-body" onclick="GoToDate('@Model.SelectedStartDate.AddDays(-7).ToString()')">
@@ -53,38 +53,49 @@
                     <i class="fas fa-chevron-right"></i>
                 </button>
             }
+            @if (Model.SelectedStartDate != DateOnly.FromDateTime(DateTime.Today))
+            {
+                <a class="btn btn-outline-secondary btn-sm d-lg-none ms-auto" onclick="GoToDate('@DateOnly.FromDateTime(DateTime.Today).ToString()')">
+                    <i class="fas fa-calendar-day me-1"></i>
+                    @(Model.IsDayView ? "Vandaag" : "Deze week")
+                </a>
+            }
         </div>
-        <div class="buttons d-flex align-items-center gap-2">
+        <button onclick="toggleFilterBtns()" class="btn btn-dark d-block d-lg-none mt-2 w-100">
+            <i class="fas fa-filter"></i>
+            Filters & acties
+        </button>
+        <div class="buttons d-none d-flex d-lg-flex align-items-center gap-2 flex-column-reverse flex-lg-row w-100 w-lg-auto" id="filterButtons">
             @if (role == Role.Manager && !Model.ViewIsConcept && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
             {
-                <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#delete-week-modal">
+                <button class="btn btn-outline-danger w-100 w-lg-auto" data-bs-toggle="modal" data-bs-target="#delete-week-modal">
                     <i class="fas fa-trash-alt"></i>
                     Verwijder week
                 </button>
             }
             @if (role == Role.Manager)
             {
-                <a class="btn btn-primary" asp-controller="Shifts" asp-action="Create" asp-route-date="@(Model.IsDayView ? Model.SelectedStartDate : null)">
+                <a class="btn btn-primary w-100 w-lg-auto" asp-controller="Shifts" asp-action="Create" asp-route-date="@(Model.IsDayView ? Model.SelectedStartDate : null)">
                     <i class="fas fa-plus"></i>
                     Dienst toevoegen
                 </a>
             }
             @if (role == Role.Employee)
             {
-                <a class="btn btn-primary" asp-controller="Shifts" asp-action="MyShifts">
+                <a class="btn btn-primary w-100 w-lg-auto" asp-controller="Shifts" asp-action="MyShifts">
                     Mijn diensten
                 </a>
             }
             @if (Model.SelectedEmployee != null)
             {
-                <select class="form-select w-auto" onchange="GoToView(this)">
+                <select class="form-select w-100 w-lg-auto" onchange="GoToView(this)">
                     <option value="day" selected="@(Model.IsDayView)">Dag overzicht</option>
                     <option value="week" selected="@(!Model.IsDayView)">Week overzicht</option>
                 </select>
             }
             @if (role == Role.Manager)
             {
-                <select class="form-select w-auto" onchange="GoToEmployee(this)">
+                <select class="form-select w-100 w-lg-auto" onchange="GoToEmployee(this)">
                     <optgroup label="Toon alle werknemers">
                         <option value="all" selected="@(Model.SelectedEmployee == null)">Alle werknemers</option>
                     </optgroup>
@@ -101,7 +112,7 @@
     <div class="mt-2 d-flex align-items-center justify-content-between">
         @if (Model.SelectedStartDate != DateOnly.FromDateTime(DateTime.Today))
         {
-            <a class="btn btn-outline-secondary btn-sm" onclick="GoToDate('@DateOnly.FromDateTime(DateTime.Today).ToString()')">
+            <a class="btn btn-outline-secondary btn-sm d-none d-lg-inline-block" onclick="GoToDate('@DateOnly.FromDateTime(DateTime.Today).ToString()')">
                 <i class="fas fa-calendar-day me-1"></i>
                 @(Model.IsDayView ? "Vandaag" : "Deze week")
             </a>
@@ -544,7 +555,10 @@ else
             url.searchParams.set("dayView", select.value === "day");
             location.href = url;
         }
-    
-    
+
+        function toggleFilterBtns() {
+            const filterButtons = document.getElementById("filterButtons");
+            filterButtons.classList.toggle("d-none");
+        }
     </script>
 }
