@@ -6,7 +6,7 @@ namespace BumboApp.Models
     public class SchoolSchedule
     {
         public int EmployeeNumber { get; set; }
-        public Employee Employee { get; set; }
+        public Employee? Employee { get; set; }
         public DateOnly Date { get; set; }
         [Required]
         [Range(0, 24)]

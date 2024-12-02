@@ -1,0 +1,37 @@
+﻿@model List<BumboApp.Models.SchoolSchedule>
+
+@{
+}
+
+<form class="col-12 col-xl-4 table-container" asp-action="UpdateSchoolSchedule" method="post">
+    <h3>Schooluren</h3>
+    <p>Laat leeg als je geen schooluren hebt</p>
+
+    @if (Model.Count < 7)
+    {
+
+    }
+
+    @for (int i = 0; i < 7; i++)
+    {
+        DayOfWeek day = (DayOfWeek)((i + 1) % 7); // Start with Monday
+        SchoolSchedule? schoolSchedule = Model.SingleOrDefault(ss => ss.Date.DayOfWeek == day);
+        var currentDate = ((DateOnly)ViewData["StartDate"]).AddDays(i);
+        var employeeNumber = ViewData["EmployeeNumber"];
+        <label>@day: @currentDate.ToString("dd-MM")</label>
+
+        <input type="hidden" name="Schedules[@i].Date" value="@currentDate" />
+        <input type="hidden" name="Schedules[@i].EmployeeNumber" value="@employeeNumber" />
+        <input type="number"
+               step="0.1"
+               min="0"
+               max="24"
+               class="form-control"
+               name="Schedules[@i].DurationInHours"
+               value="@(schoolSchedule?.DurationInHours ?? 0)"
+               placeholder="Bijvoorbeeld: 6.5" />
+    }
+    <div class="d-flex justify-content-end m-3">
+        <button type="submit" class="btn btn-primary">Opslaan</button>
+    </div>
+</form>

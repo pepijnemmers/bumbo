@@ -6,7 +6,7 @@ namespace BumboApp.ViewModels
     {
         public int WeekNr { get; set; }
         public DateOnly StartDate { get; set; }
-        public List<Availability> availabilityList { get; set; } = new List<Availability>();
-        public List<SchoolSchedule> schoolScheduleList { get; set; } = new List<SchoolSchedule>();
+        public List<Availability> AvailabilityList { get; set; } = new List<Availability>();
+        public List<SchoolSchedule> SchoolScheduleList { get; set; } = new List<SchoolSchedule>();
     }
 }

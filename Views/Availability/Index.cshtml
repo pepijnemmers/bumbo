@@ -26,16 +26,16 @@
 </div>
 
 <div class="row">
-    <div class="col-12 col-xl-7">
-        @if (Model.availabilityList.Count == 0)
+    <div class="col-12 col-xl-8">
+        @if (Model.AvailabilityList.Count == 0)
         {
             <p>Er is nog geen beschikbaarheid voor deze week opgegeven</p>
-            <form asp-action="Add" method="post">
+            <form asp-action="AddAvailability" method="post">
                 <input type="hidden" name="id" value="@Model.StartDate.ToString("dd-MM-yyyy")" />
                 <input type="hidden" name="useStandard" value="true" />
                 <button type="submit" class="btn btn-secondary">Standaard gebruiken</button>
             </form>
-            <form asp-action="Add" method="post">
+            <form asp-action="AddAvailability" method="post">
                 <input type="hidden" name="id" value="@Model.StartDate.ToString("dd-MM-yyyy")" />
                 <input type="hidden" name="useStandard" value="false" />
                 <button type="submit" class="btn btn-primary">Toevoegen</button>
@@ -43,15 +43,15 @@
         }
         else
         {
-            <form class="table-container" id="availability-form" asp-action="Update" method="post">
+            <div class="table-container">
                 <table class="table">
                     <tbody>
                         @for (int i = 0; i < 7; i++)
                         {
                             DayOfWeek day = (DayOfWeek)((i + 1) % 7); // Start with Monday
-                            Availability? availability = Model.availabilityList.SingleOrDefault(a => a.Date.DayOfWeek == day);
+                            Availability? availability = Model.AvailabilityList.SingleOrDefault(a => a.Date.DayOfWeek == day);
                             <tr>
-                                <td>@day</td>
+                                <td>@day @Model.StartDate.AddDays(i).ToString("dd-MM")</td>
                                 @if (availability != null)
                                 {
                                     <td>vanaf</td>
@@ -68,14 +68,36 @@
                     </tbody>
                 </table>
                 <div class="d-flex justify-content-end m-3">
-                    <a class="btn btn-primary" asp-action="Update" asp-route-id="@Model.StartDate.ToString("dd-MM-yyyy")">Bewerken</a>
+                    <a class="btn btn-primary" asp-action="UpdateAvailability" asp-route-id="@Model.StartDate.ToString("dd-MM-yyyy")">Bewerken</a>
                 </div>
-            </form>
+            </div>
         }
     </div>
 
-    <div class="col-12 col-xl-5 table-container">
+    <div class="col-12 col-xl-4 table-container">
         <h3>Schooluren</h3>
         <p>Laat leeg als je geen schooluren hebt</p>
+
+        @if (Model.SchoolScheduleList.Count < 7)
+        {
+            <form class="d-flex justify-content-end" asp-action="AddSchoolSchedule" asp-route-id="@Model.StartDate.ToString("dd-MM-yyyy")">
+                <button type="submit" class="btn btn-primary">Toevoegen</button>
+            </form>
+        }
+        else
+        {
+            @for (int i = 0; i < 7; i++)
+            {
+                DayOfWeek day = (DayOfWeek)((i + 1) % 7); // Start with Monday
+                SchoolSchedule? schoolSchedule = Model.SchoolScheduleList.SingleOrDefault(ss => ss.Date.DayOfWeek == day);
+                <label>@day: @Model.StartDate.AddDays(i).ToString("dd-MM")</label>
+                <p>
+                    @(schoolSchedule != null ? schoolSchedule.DurationInHours + " uur" : "-")
+                </p>
+            }
+            <div class="d-flex justify-content-end m-3">
+                <a class="btn btn-primary" asp-action="UpdateSchoolSchedule" asp-route-id="@Model.StartDate.ToString("dd-MM-yyyy")">bewerken</a>
+            </div>
+        }
     </div>
 </div>

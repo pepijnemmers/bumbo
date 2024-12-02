@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Globalization;
+using System.Security.Claims;
 
 namespace BumboApp.Controllers
 {
@@ -22,7 +23,7 @@ namespace BumboApp.Controllers
             {
                 DayOfWeek dayOfWeek = CultureInfo.InvariantCulture.Calendar.GetDayOfWeek(DateTime.Now);
                 string newId = DateTime.Now.AddDays(-(int)dayOfWeek + 1).ToString("dd-MM-yyyy");
-                return RedirectToAction("Index", new { id = newId });
+                return RedirectToAction(nameof(Index), new { id = newId });
             }
 
             DateOnly startDate;
@@ -41,42 +42,26 @@ namespace BumboApp.Controllers
                 return RedirectToAction("Index", new { id = newId });
             }
 
-            List<Availability> availabilityList = Context.Availabilities.Where(a => a.EmployeeNumber == 2 && a.Date >= startDate && a.Date < startDate.AddDays(7)).ToList(); //Hardcoded employeeNumber
+            var employee = getLoggedinEmployee();
+            if (employee == null) { return View(); }
+            var employeeNumber = employee.EmployeeNumber;
 
-            List<SchoolSchedule> schoolScheduleList = Context.SchoolSchedules.Where(a => a.EmployeeNumber == 2 && a.Date >= startDate && a.Date < startDate.AddDays(7)).ToList(); //Hardcoded employeeNumber
+            List<Availability> availabilityList = Context.Availabilities.Where(a => a.EmployeeNumber == employeeNumber && a.Date >= startDate && a.Date < startDate.AddDays(7)).ToList();
+
+            List<SchoolSchedule> schoolScheduleList = Context.SchoolSchedules.Where(a => a.EmployeeNumber == employeeNumber && a.Date >= startDate && a.Date < startDate.AddDays(7)).ToList();
 
             var viewModel = new AvailabilityViewModel
             {
                 WeekNr = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(startDate.AddDays(3).ToDateTime(new TimeOnly(0, 0)), CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday),
                 StartDate = startDate,
-                availabilityList = availabilityList,
-                schoolScheduleList = schoolScheduleList
+                AvailabilityList = availabilityList,
+                SchoolScheduleList = schoolScheduleList
             };
             return View(viewModel);
         }
 
-        public IActionResult Update(string id)
-        {
-            DateOnly startDate;
-            try
-            {
-                startDate = StringToDate(id);
-            }
-            catch
-            {
-                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", "Index", "Dashboard");
-            }
-
-            ViewData["StartDate"] = startDate.ToString("dd-MM-yyyy");
-            List<Availability> availabilityList = Context.Availabilities
-                .Include(a => a.Employee)
-                .Where(a => a.EmployeeNumber == 2 && a.Date >= startDate && a.Date < startDate.AddDays(7)).ToList(); //Hardcoded employeeNumber
-
-            return View(availabilityList);
-        }
-
         [HttpPost]
-        public async Task<IActionResult> Add(string id, bool useStandard)
+        public async Task<IActionResult> AddAvailability(string id, bool useStandard)
         {
             DateOnly startDate;
             try
@@ -85,18 +70,23 @@ namespace BumboApp.Controllers
             }
             catch
             {
-                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", "Index", "Dashboard");
+                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", nameof(Index), "Dashboard");
             }
+
+
+            var employee = getLoggedinEmployee();
+            if (employee == null) { return RedirectToAction(nameof(Index), new { id }); }
+            var employeeNumber = employee.EmployeeNumber;
 
             List<Availability> availabilities = [];
-            if (useStandard)
+            if (!useStandard)
             {
                 for (int i = 0; i < 7; i++)
                 {
                     var a = new Availability
                     {
                         Date = startDate,
-                        EmployeeNumber = 2,
+                        EmployeeNumber = employeeNumber,
                         StartTime = new TimeOnly(9, 0),
                         EndTime = new TimeOnly(21, 0)
                     };
@@ -110,8 +100,31 @@ namespace BumboApp.Controllers
             return RedirectToAction(nameof(Index), new { id });
         }
 
+        public IActionResult UpdateAvailability(string id)
+        {
+            DateOnly startDate;
+            try
+            {
+                startDate = StringToDate(id);
+            }
+            catch
+            {
+                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", nameof(Index), "Dashboard");
+            }
+
+            var employee = getLoggedinEmployee();
+            if (employee == null) { return View(); }
+            var employeeNumber = employee.EmployeeNumber;
+
+            ViewData["StartDate"] = startDate.ToString("dd-MM-yyyy");
+            List<Availability> availabilityList = Context.Availabilities
+                .Where(a => a.EmployeeNumber == employeeNumber && a.Date >= startDate && a.Date < startDate.AddDays(7)).ToList();
+
+            return View(availabilityList);
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Update(List<Availability> availabilities)
+        public async Task<IActionResult> UpdateAvailability(List<Availability> availabilities)
         {
             if (!ModelState.IsValid)
             {
@@ -124,11 +137,84 @@ namespace BumboApp.Controllers
                 {
                     return View(availabilities);
                 }
-                //Console.WriteLine(a.Date + "|" + a.StartTime + " " + a.EndTime);
             }
             Context.Availabilities.UpdateRange(availabilities);
             await Context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return NotifySuccessAndRedirect("Wijzigingen succesvol opgeslagen", "Index");
+        }
+
+        public async Task<IActionResult> AddSchoolSchedule(string id)
+        {
+            DateOnly startDate;
+            try
+            {
+                startDate = StringToDate(id);
+            }
+            catch
+            {
+                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", nameof(Index), "Dashboard");
+            }
+
+            var employee = getLoggedinEmployee();
+            if (employee == null) { return View(); }
+            var employeeNumber = employee.EmployeeNumber;
+
+            List<SchoolSchedule> schoolSchedules = [];
+            for (int i = 0; i < 7; i++)
+            {
+                var ss = new SchoolSchedule
+                {
+                    Date = startDate,
+                    EmployeeNumber = employeeNumber,
+                    DurationInHours = 0,
+                };
+                startDate = startDate.AddDays(1);
+                schoolSchedules.Add(ss);
+            }
+
+            Context.SchoolSchedules.AddRange(schoolSchedules);
+            await Context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(UpdateSchoolSchedule), new { id });
+        }
+
+        public IActionResult UpdateSchoolSchedule(string id)
+        {
+            DateOnly startDate;
+            try
+            {
+                startDate = StringToDate(id);
+            }
+            catch
+            {
+                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", nameof(Index), "Dashboard");
+            }
+
+            var employee = getLoggedinEmployee();
+            if (employee == null) { return View(); }
+            var employeeNumber = employee.EmployeeNumber;
+            ViewData["EmployeeNumber"] = employeeNumber;
+            ViewData["StartDate"] = startDate;
+
+            List<SchoolSchedule> schoolSchedules = Context.SchoolSchedules
+                .Where(a => a.EmployeeNumber == employeeNumber && a.Date >= startDate && a.Date < startDate.AddDays(7)).ToList();
+
+            return View(schoolSchedules);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateSchoolSchedule(List<SchoolSchedule> schedules)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(schedules);
+            }
+
+            Context.SchoolSchedules.UpdateRange(schedules);
+            await Context.SaveChangesAsync();
+
+            return NotifySuccessAndRedirect("Wijzigingen succesvol opgeslagen", "Index");
         }
 
         public IActionResult UpdateDefault()
@@ -136,13 +222,13 @@ namespace BumboApp.Controllers
             return View();
         }
 
+        //Help methods--------------------------------
         private DateOnly StringToDate(string id)
         {
             var dateParts = id.Split('-');
             if (dateParts.Length != 3)
             {
                 throw new Exception();
-                //return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", "Index", "Dashboard");
             }
 
             if (!int.TryParse(dateParts[0], out int day) ||
@@ -150,7 +236,6 @@ namespace BumboApp.Controllers
                 !int.TryParse(dateParts[2], out int year))
             {
                 throw new Exception();
-                //return NotifyErrorAndRedirect("Ongeldige link: de datum bevat niet numerieke waarden", "Index", "Dashboard");
             }
 
             DateOnly startDate;
@@ -161,9 +246,18 @@ namespace BumboApp.Controllers
             catch (ArgumentOutOfRangeException e)
             {
                 throw new Exception();
-                //return NotifyErrorAndRedirect("Ongeldige link: de datum bestaat niet", "Index", "Dashboard");
             }
             return startDate;
+        }
+
+        public Employee? getLoggedinEmployee()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) { return null; }
+            var employee = Context.Employees
+                .Include(e => e.Shifts)
+                .FirstOrDefault(e => e.User.Id == userId);
+            return employee;
         }
     }
 }
