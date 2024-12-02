@@ -9,8 +9,14 @@ using Microsoft.AspNetCore.Identity;
 
 namespace BumboApp.Controllers
 {
+
     public class ScheduleController : MainController
     {
+        private UserManager<User> _userManager;
+        public ScheduleController(UserManager<User> userManager)
+        {
+            _userManager = userManager;
+        }
         // will need to be in a json file eventually 
         private int maxShiftLengthAdult = 12;
         private int maxWeeklyHoursAdult = 60;
@@ -27,6 +33,17 @@ namespace BumboApp.Controllers
 
         private float breakTimeHours = (float)0.5;
         private int[] breakTimes = { 4, 8 };
+
+        public async Task<Role> GetUserRoleAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                return (Role)Enum.Parse(typeof(Role), roles[0]);
+            }
+            return Role.Unknown;
+        }
 
         public IActionResult Index(DateOnly date)
         {
@@ -53,17 +70,13 @@ namespace BumboApp.Controllers
             {
                 for (DateOnly scheduledate = startDate; scheduledate <= endDate; scheduledate = scheduledate.AddDays(1))
                 {
-                    Console.WriteLine(scheduledate.ToString());
-                    Console.WriteLine(endDate.ToString());
                     ScheduleDepartmentDay(department, scheduledate, startDate);
                     if (!PrognoseHoursHit(department, scheduledate)) { InsertEmptyShifts(department, scheduledate); }
                 }
             }
             List<Employee> employees = Context.Employees
                 .Include(e => e.Shifts).ToList();
-
-            //idk how to only get the managers
-            List<Employee> managers = new List<Employee>();
+            List<Employee> managers = employees.Where(e => GetUserRoleAsync(e.User.Id).Result == Role.Manager).ToList();
 
             foreach (Employee employee in managers) { Console.WriteLine(employee.FirstName); }
 
@@ -90,7 +103,7 @@ namespace BumboApp.Controllers
             {
                 Context.SaveChanges();
             }
-            catch(Exception e) { Console.WriteLine(e); return NotifyErrorAndRedirect("er is een probleem opgetreden", "Index"); }
+            catch(Exception e) { return NotifyErrorAndRedirect("er is een probleem opgetreden", "Index"); }
             return RedirectToAction("Index",startDate);
         }
 
@@ -121,13 +134,14 @@ namespace BumboApp.Controllers
                     Context.SaveChanges(); //for some reason this is an infinite loop without the savechanges
                 }
             }
-            catch (Exception ex) { }
+            catch (Exception ex) { return; }
             return;
         }
 
         private void ScheduleDepartmentDay(Department department, DateOnly scheduledate, DateOnly startDate)
         {
             List<Employee> employees = Context.Employees.Include(e => e.Shifts)
+                .Include(e => e.User)
                 .Include(e => e.SchoolSchedules)
                 .Include(e => e.leaveRequests)
                 .Include(e => e.Availabilities)
@@ -140,6 +154,11 @@ namespace BumboApp.Controllers
             while (index < employees.Count)
             { 
                 Employee employee = employees.ElementAt(index);
+                if (GetUserRoleAsync(employee.User.Id).Result == Role.Manager)
+                {
+                    index++;
+                    continue;
+                }
                 if (employee.leaveRequests.Where(e => e.Status == Status.Geaccepteerd && e.StartDate <= scheduledate.ToDateTime(new TimeOnly()) && e.EndDate >= scheduledate.ToDateTime(new TimeOnly())).Any())
                 {
                     index++;
