@@ -345,7 +345,7 @@ namespace BumboApp.Controllers
             if (maxhours.First() > 0)
             {
                 int endTime = maxhours.First() + startinghour;
-                if (endTime > 24) { endTime = 24; } //closing maken of gwn houden
+                if (endTime > 24) { endTime = 24; } //till closing or keep it like this
                 if (department == Department.Kassa && endTime > openingHour.ClosingTime.Value.Hour + 1) { return; }
                 Context.Add(
                     new Shift()
