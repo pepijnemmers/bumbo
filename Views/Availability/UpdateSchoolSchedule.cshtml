@@ -7,27 +7,21 @@
     <h3>Schooluren</h3>
     <p>Laat leeg als je geen schooluren hebt</p>
 
-    @if (Model.Count < 7)
+    @for (int dayNr = 0; dayNr < 5; dayNr++)
     {
-
-    }
-
-    @for (int i = 0; i < 7; i++)
-    {
-        DayOfWeek day = (DayOfWeek)((i + 1) % 7); // Start with Monday
+        DayOfWeek day = (DayOfWeek) dayNr + 1;
         SchoolSchedule? schoolSchedule = Model.SingleOrDefault(ss => ss.Date.DayOfWeek == day);
-        var currentDate = ((DateOnly)ViewData["StartDate"]).AddDays(i);
+        var currentDate = ((DateOnly)ViewData["StartDate"]).AddDays(dayNr);
         var employeeNumber = ViewData["EmployeeNumber"];
         <label>@day: @currentDate.ToString("dd-MM")</label>
 
-        <input type="hidden" name="Schedules[@i].Date" value="@currentDate" />
-        <input type="hidden" name="Schedules[@i].EmployeeNumber" value="@employeeNumber" />
+        <input type="hidden" name="Schedules[@dayNr].Date" value="@currentDate" />
+        <input type="hidden" name="Schedules[@dayNr].EmployeeNumber" value="@employeeNumber" />
         <input type="number"
-               step="0.1"
                min="0"
                max="24"
                class="form-control"
-               name="Schedules[@i].DurationInHours"
+               name="Schedules[@dayNr].DurationInHours"
                value="@(schoolSchedule?.DurationInHours ?? 0)"
                placeholder="Bijvoorbeeld: 6.5" />
     }

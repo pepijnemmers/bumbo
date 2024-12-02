@@ -155,13 +155,17 @@ namespace BumboApp.Controllers
             {
                 return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", nameof(Index), "Dashboard");
             }
+            if (startDate.DayOfWeek != DayOfWeek.Monday)
+            {
+                return BadRequest();
+            }
 
             var employee = getLoggedinEmployee();
             if (employee == null) { return View(); }
             var employeeNumber = employee.EmployeeNumber;
 
             List<SchoolSchedule> schoolSchedules = [];
-            for (int i = 0; i < 7; i++)
+            for (int i = 0; i < 5; i++)
             {
                 var ss = new SchoolSchedule
                 {

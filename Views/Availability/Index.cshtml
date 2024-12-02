@@ -78,7 +78,7 @@
         <h3>Schooluren</h3>
         <p>Laat leeg als je geen schooluren hebt</p>
 
-        @if (Model.SchoolScheduleList.Count < 7)
+        @if (Model.SchoolScheduleList.Count == 0)
         {
             <form class="d-flex justify-content-end" asp-action="AddSchoolSchedule" asp-route-id="@Model.StartDate.ToString("dd-MM-yyyy")">
                 <button type="submit" class="btn btn-primary">Toevoegen</button>
@@ -86,11 +86,11 @@
         }
         else
         {
-            @for (int i = 0; i < 7; i++)
+            @for (int dayNr = 1; dayNr <= 5; dayNr++)
             {
-                DayOfWeek day = (DayOfWeek)((i + 1) % 7); // Start with Monday
+                DayOfWeek day = (DayOfWeek) dayNr;
                 SchoolSchedule? schoolSchedule = Model.SchoolScheduleList.SingleOrDefault(ss => ss.Date.DayOfWeek == day);
-                <label>@day: @Model.StartDate.AddDays(i).ToString("dd-MM")</label>
+                <label>@day: @Model.StartDate.AddDays(dayNr).ToString("dd-MM")</label>
                 <p>
                     @(schoolSchedule != null ? schoolSchedule.DurationInHours + " uur" : "-")
                 </p>

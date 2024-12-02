@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BumboApp.Migrations
 {
     /// <inheritdoc />
-    public partial class ImprovedAvailabilitySeedData : Migration
+    public partial class AvailabilitySeedDataFix : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,6 +22,16 @@ namespace BumboApp.Migrations
                 table: "Availabilities",
                 keyColumns: new[] { "Date", "EmployeeNumber" },
                 keyValues: new object[] { new DateOnly(2024, 12, 11), 3 });
+
+            migrationBuilder.DeleteData(
+                table: "SchoolSchedules",
+                keyColumns: new[] { "Date", "EmployeeNumber" },
+                keyValues: new object[] { new DateOnly(2024, 12, 9), 1 });
+
+            migrationBuilder.DeleteData(
+                table: "SchoolSchedules",
+                keyColumns: new[] { "Date", "EmployeeNumber" },
+                keyValues: new object[] { new DateOnly(2024, 12, 10), 1 });
 
             migrationBuilder.InsertData(
                 table: "Availabilities",
@@ -41,6 +51,33 @@ namespace BumboApp.Migrations
                     { new DateOnly(2024, 12, 13), 2, new TimeOnly(18, 0, 0), new TimeOnly(10, 0, 0) },
                     { new DateOnly(2024, 12, 14), 2, new TimeOnly(13, 0, 0), new TimeOnly(9, 0, 0) },
                     { new DateOnly(2024, 12, 15), 2, new TimeOnly(17, 0, 0), new TimeOnly(11, 0, 0) }
+                });
+
+            migrationBuilder.UpdateData(
+                table: "SchoolSchedules",
+                keyColumns: new[] { "Date", "EmployeeNumber" },
+                keyValues: new object[] { new DateOnly(2024, 12, 9), 3 },
+                column: "DurationInHours",
+                value: 3f);
+
+            migrationBuilder.UpdateData(
+                table: "SchoolSchedules",
+                keyColumns: new[] { "Date", "EmployeeNumber" },
+                keyValues: new object[] { new DateOnly(2024, 12, 10), 3 },
+                column: "DurationInHours",
+                value: 3f);
+
+            migrationBuilder.InsertData(
+                table: "SchoolSchedules",
+                columns: new[] { "Date", "EmployeeNumber", "DurationInHours" },
+                values: new object[,]
+                {
+                    { new DateOnly(2024, 12, 11), 2, 3f },
+                    { new DateOnly(2024, 12, 12), 2, 3f },
+                    { new DateOnly(2024, 12, 13), 2, 3f },
+                    { new DateOnly(2024, 12, 11), 3, 3f },
+                    { new DateOnly(2024, 12, 12), 3, 3f },
+                    { new DateOnly(2024, 12, 13), 3, 3f }
                 });
         }
 
@@ -112,6 +149,36 @@ namespace BumboApp.Migrations
                 keyColumns: new[] { "Date", "EmployeeNumber" },
                 keyValues: new object[] { new DateOnly(2024, 12, 15), 2 });
 
+            migrationBuilder.DeleteData(
+                table: "SchoolSchedules",
+                keyColumns: new[] { "Date", "EmployeeNumber" },
+                keyValues: new object[] { new DateOnly(2024, 12, 11), 2 });
+
+            migrationBuilder.DeleteData(
+                table: "SchoolSchedules",
+                keyColumns: new[] { "Date", "EmployeeNumber" },
+                keyValues: new object[] { new DateOnly(2024, 12, 12), 2 });
+
+            migrationBuilder.DeleteData(
+                table: "SchoolSchedules",
+                keyColumns: new[] { "Date", "EmployeeNumber" },
+                keyValues: new object[] { new DateOnly(2024, 12, 13), 2 });
+
+            migrationBuilder.DeleteData(
+                table: "SchoolSchedules",
+                keyColumns: new[] { "Date", "EmployeeNumber" },
+                keyValues: new object[] { new DateOnly(2024, 12, 11), 3 });
+
+            migrationBuilder.DeleteData(
+                table: "SchoolSchedules",
+                keyColumns: new[] { "Date", "EmployeeNumber" },
+                keyValues: new object[] { new DateOnly(2024, 12, 12), 3 });
+
+            migrationBuilder.DeleteData(
+                table: "SchoolSchedules",
+                keyColumns: new[] { "Date", "EmployeeNumber" },
+                keyValues: new object[] { new DateOnly(2024, 12, 13), 3 });
+
             migrationBuilder.InsertData(
                 table: "Availabilities",
                 columns: new[] { "Date", "EmployeeNumber", "EndTime", "StartTime" },
@@ -119,6 +186,29 @@ namespace BumboApp.Migrations
                 {
                     { new DateOnly(2024, 12, 9), 1, new TimeOnly(17, 0, 0), new TimeOnly(9, 0, 0) },
                     { new DateOnly(2024, 12, 11), 3, new TimeOnly(14, 0, 0), new TimeOnly(8, 0, 0) }
+                });
+
+            migrationBuilder.UpdateData(
+                table: "SchoolSchedules",
+                keyColumns: new[] { "Date", "EmployeeNumber" },
+                keyValues: new object[] { new DateOnly(2024, 12, 9), 3 },
+                column: "DurationInHours",
+                value: 6f);
+
+            migrationBuilder.UpdateData(
+                table: "SchoolSchedules",
+                keyColumns: new[] { "Date", "EmployeeNumber" },
+                keyValues: new object[] { new DateOnly(2024, 12, 10), 3 },
+                column: "DurationInHours",
+                value: 6f);
+
+            migrationBuilder.InsertData(
+                table: "SchoolSchedules",
+                columns: new[] { "Date", "EmployeeNumber", "DurationInHours" },
+                values: new object[,]
+                {
+                    { new DateOnly(2024, 12, 9), 1, 4f },
+                    { new DateOnly(2024, 12, 10), 1, 4f }
                 });
         }
     }

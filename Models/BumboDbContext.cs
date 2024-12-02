@@ -564,15 +564,18 @@ public partial class BumboDbContext : IdentityDbContext<User>
         );
 
         modelBuilder.Entity<SchoolSchedule>().HasData(
-            // Schedule for John (Employee 1)
-            new { EmployeeNumber = 1, Date = new DateOnly(2024, 12, 9), DurationInHours = 4.0f },
-            new { EmployeeNumber = 1, Date = new DateOnly(2024, 12, 10), DurationInHours = 4.0f },
             // Schedule for Jane (Employee 2)
             new { EmployeeNumber = 2, Date = new DateOnly(2024, 12, 9), DurationInHours = 3.0f },
             new { EmployeeNumber = 2, Date = new DateOnly(2024, 12, 10), DurationInHours = 3.0f },
+            new { EmployeeNumber = 2, Date = new DateOnly(2024, 12, 11), DurationInHours = 3.0f },
+            new { EmployeeNumber = 2, Date = new DateOnly(2024, 12, 12), DurationInHours = 3.0f },
+            new { EmployeeNumber = 2, Date = new DateOnly(2024, 12, 13), DurationInHours = 3.0f },            
             // Schedule for Emily (Employee 3)
-            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 9), DurationInHours = 6.0f },
-            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 10), DurationInHours = 6.0f }
+            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 9), DurationInHours = 3.0f },
+            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 10), DurationInHours = 3.0f },
+            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 11), DurationInHours = 3.0f },
+            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 12), DurationInHours = 3.0f },
+            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 13), DurationInHours = 3.0f }
         );
 
         modelBuilder.Entity<LeaveRequest>().HasData(

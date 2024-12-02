@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BumboApp.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    [Migration("20241201153825_ImprovedAvailabilitySeedData")]
-    partial class ImprovedAvailabilitySeedData
+    [Migration("20241202230959_AvailabilitySeedDataFix")]
+    partial class AvailabilitySeedDataFix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1144,18 +1144,6 @@ namespace BumboApp.Migrations
                     b.HasData(
                         new
                         {
-                            EmployeeNumber = 1,
-                            Date = new DateOnly(2024, 12, 9),
-                            DurationInHours = 4f
-                        },
-                        new
-                        {
-                            EmployeeNumber = 1,
-                            Date = new DateOnly(2024, 12, 10),
-                            DurationInHours = 4f
-                        },
-                        new
-                        {
                             EmployeeNumber = 2,
                             Date = new DateOnly(2024, 12, 9),
                             DurationInHours = 3f
@@ -1168,15 +1156,51 @@ namespace BumboApp.Migrations
                         },
                         new
                         {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 11),
+                            DurationInHours = 3f
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 12),
+                            DurationInHours = 3f
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 13),
+                            DurationInHours = 3f
+                        },
+                        new
+                        {
                             EmployeeNumber = 3,
                             Date = new DateOnly(2024, 12, 9),
-                            DurationInHours = 6f
+                            DurationInHours = 3f
                         },
                         new
                         {
                             EmployeeNumber = 3,
                             Date = new DateOnly(2024, 12, 10),
-                            DurationInHours = 6f
+                            DurationInHours = 3f
+                        },
+                        new
+                        {
+                            EmployeeNumber = 3,
+                            Date = new DateOnly(2024, 12, 11),
+                            DurationInHours = 3f
+                        },
+                        new
+                        {
+                            EmployeeNumber = 3,
+                            Date = new DateOnly(2024, 12, 12),
+                            DurationInHours = 3f
+                        },
+                        new
+                        {
+                            EmployeeNumber = 3,
+                            Date = new DateOnly(2024, 12, 13),
+                            DurationInHours = 3f
                         });
                 });
 
