@@ -86,7 +86,6 @@ namespace BumboApp.Controllers
                     }
                 }
             }
-            Console.WriteLine("wow4");
             try
             {
                 Context.SaveChanges();
@@ -97,7 +96,6 @@ namespace BumboApp.Controllers
 
         private void InsertEmptyShifts(Department department, DateOnly scheduledate)
         {
-            Console.WriteLine("empty");
             OpeningHour openingHour = Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).First();
             try
             {
@@ -108,7 +106,6 @@ namespace BumboApp.Controllers
                 if (cTime.Minute > 0) { closingHour++; }
                 while (!PrognoseHoursHit(department, scheduledate))
                 {
-                    Console.WriteLine(!PrognoseHoursHit(department, scheduledate));
                     int MissedTime = getMaxTimePrognose(department, scheduledate);
                     int maxTime = startingHour + MissedTime;
                     if (maxTime > closingHour) { maxTime = closingHour; }
