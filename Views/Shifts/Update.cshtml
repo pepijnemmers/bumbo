@@ -1,3 +1,94 @@
 ﻿@{
     ViewData["Title"] = "Dienst bewerken";
 }
+
+<div class="table-container p-3">
+    <form>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group mb-2">
+                    <label for="date" class="form-label fw-bold">Datum</label>
+                    <input type="date" class="form-control" id="date" name="date" required>
+                </div>
+                <div class="row">
+                    <div class="form-group mb-2 col">
+                        <label for="start" class="form-label fw-bold">Starttijd</label>
+                        <input type="time" class="form-control" id="start" name="start" required>
+                    </div>
+                    <div class="form-group mb-2 col">
+                        <label for="end" class="form-label fw-bold">Eindtijd</label>
+                        <input type="time" class="form-control" id="end" name="end" required>
+                    </div>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="department" class="form-label fw-bold">Afdeling</label>
+                    <select class="form-select" id="department" name="department" required>
+                        <option value="" selected>Selecteer een afdeling</option>
+                        @* TODO: get departments *@
+                    </select>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="employee" class="form-label fw-bold">Medewerker</label>
+                    <div class="d-flex gap-2">
+                        <select class="form-select" id="employee" name="employee" required>
+                            <option value="" selected>Selecteer een medewerker</option>
+                            @* TODO: get employees *@
+                        </select>
+                        <button class="btn btn-primary" type="button"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <p class="small text-secondary">
+                        <i class="fas fa-info-circle"></i>
+                        Selecteer een medewerker en klik op de plus om deze toe te voegen. Je kunt meerdere medewerkers toevoegen.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="vr h-100 float-start"></div>
+                <div class="ms-3">
+                    <p class="form-label fw-bold">Geselecteerde medewerkers</p>
+                    @* TODO: get selected employees --> Check with rules if allowed to set on shift, only show the allowed employees *@
+                    @if (false)
+                    {
+                        <p class="fst-italic text-secondary">Er zijn nog geen medewerkers geselecteerd.</p>
+                    }
+                    else
+                    {
+                        <ul class="list-group list-group-flush">
+                            @* TODO: *@
+                            <li class="list-group-item d-flex align-items-center gap-2">
+                                <span>Naam</span>
+                                <button class="btn text-danger" type="button"><i class="fas fa-trash"></i></button>
+                            </li>
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between">
+            <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#confirmDelete">Verwijderen</button>
+            <div>
+                <a class="btn btn-outline-primary px-3 me-1" asp-controller="Schedule" asp-action="Index">Annuleren</a>
+                <button class="btn btn-primary px-3" type="submit">Opslaan</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal fade" id="confirmDelete" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" method="post" asp-controller="Shifts" asp-action="Delete" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="0" /> @* TODO *@
+            <div class="modal-header">
+                <h5 class="modal-title">Dienst verwijderen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Weet je zeker dat je deze dienst wilt verwijderen? Dit kan niet ongedaan worden gemaakt.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuleren</button>
+                <button type="submit" class="btn btn-danger">Verwijderen</button>
+            </div>
+        </form>
+    </div>
+</div>
