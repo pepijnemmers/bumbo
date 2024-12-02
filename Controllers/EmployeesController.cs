@@ -75,12 +75,104 @@ namespace BumboApp.Controllers
         }
         public IActionResult Create()
         {
-            return View();
+
+            var viewModel = new UserEmployeeViewModel
+            {
+                Employee = new Employee()
+            };
+            return View(viewModel);
         }
-        public IActionResult Update()
+
+        [HttpPost]
+        public async Task<IActionResult> Create(UserEmployeeViewModel viewModel)
         {
-            return View();
+            if (!ModelState.IsValid)
+            {
+                //foreach (var state in ModelState)
+                //{
+                //    foreach (var error in state.Value.Errors)
+                //    {
+                //        Console.WriteLine($"Field: {state.Key}, Error: {error.ErrorMessage}");
+                //    }
+                //}
+                return View(viewModel);
+            }
+
+            var user = new User()
+            {
+                Email = viewModel.Email
+            };
+
+            var passwordHasher = new PasswordHasher<User>();
+            user.PasswordHash = passwordHasher.HashPassword(user, viewModel.Password);
+
+            viewModel.Employee.User = user;
+            Context.Employees.Add(viewModel.Employee);
+
+            await Context.SaveChangesAsync();
+            return RedirectToAction(nameof(Details), new { id = viewModel.Employee.EmployeeNumber });
         }
+
+        public IActionResult Update(int id)
+        {
+
+            var employee = Context.Employees
+                .Include(e => e.User)
+                .Include(e => e.leaveRequests)
+                .SingleOrDefault(e => e.EmployeeNumber == id);
+
+            var model = new EmployeeUpdateViewModel
+            {
+                EmployeeNumber = employee.EmployeeNumber,
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                DateOfBirth = employee.DateOfBirth,
+                Zipcode = employee.Zipcode,
+                HouseNumber = employee.HouseNumber,
+                ContractHours = employee.ContractHours,
+                LeaveHours = employee.LeaveHours,
+                StartOfEmployment = employee.StartOfEmployment,
+                Email = employee.User.Email
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update(int id, EmployeeUpdateViewModel model)
+        {
+            Console.WriteLine("----------------UpdatePOST------------");
+            if (!ModelState.IsValid)
+            {
+                NotifyService.Error("Er is iets misgegaan");
+                return View(model);
+            }
+
+            var employee = Context.Employees
+                .Include(e => e.User)
+                .FirstOrDefault(e => e.EmployeeNumber == model.EmployeeNumber);
+
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            employee.FirstName = model.FirstName;
+            employee.LastName = model.LastName;
+            employee.DateOfBirth = model.DateOfBirth;
+            employee.Zipcode = model.Zipcode;
+            employee.HouseNumber = model.HouseNumber;
+            employee.ContractHours = model.ContractHours;
+            employee.LeaveHours = model.LeaveHours;
+            employee.StartOfEmployment = model.StartOfEmployment;
+            employee.EndOfEmployment = model.EndOfEmployment;
+            employee.User.Email = model.Email;
+
+            await Context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
         public async Task<IActionResult> Details(int id)
         {
             var employee = Context.Employees
@@ -100,7 +192,6 @@ namespace BumboApp.Controllers
             double leaveHoursUsed = 0;
             foreach (var leaveRequest in acceptedLeaves)
             {
-                Console.WriteLine("leave: " + leaveRequest.StartDate + " " + leaveRequest.EndDate + "||" + (leaveRequest.EndDate - leaveRequest.StartDate));
                 leaveHoursUsed += (leaveRequest.EndDate - leaveRequest.StartDate).TotalHours;
             }
 

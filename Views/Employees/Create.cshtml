@@ -1,4 +1,79 @@
-﻿
+﻿@model BumboApp.ViewModels.UserEmployeeViewModel
+
 @{
     ViewData["Title"] = "Nieuwe werknemer aanmaken";
 }
+
+<h1>Create User and Employee</h1>
+
+<form method="post">
+    <div class="table-container">
+        <h3>Accountgegevens</h3>
+        <div class="form-group">
+            <label asp-for="@Model.Email" class="control-label">Email</label>
+            <input asp-for="@Model.Email" class="form-control" />
+            <span asp-validation-for="@Model.Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="@Model.Password" class="control-label">Wachtwoord</label>
+            <input asp-for="@Model.Password" type="password" class="form-control"/>
+            <span asp-validation-for="@Model.Password" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <h3>Persoonsgegevens</h3>
+        <div class="form-group">
+            <label asp-for="@Model.Employee.FirstName" class="control-label">Voornaam</label>
+            <input asp-for="@Model.Employee.FirstName" class="form-control" />
+            <span asp-validation-for="@Model.Employee.FirstName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="@Model.Employee.LastName" class="control-label">Achternaam</label>
+            <input asp-for="@Model.Employee.LastName" class="form-control" placeholder="van den Bos" />
+            <span asp-validation-for="@Model.Employee.LastName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="@Model.Employee.DateOfBirth" class="control-label">Geboortedatum</label>
+            <input asp-for="@Model.Employee.DateOfBirth" type="date" class="form-control" />
+            <span asp-validation-for="@Model.Employee.DateOfBirth" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <h3>Addresgegevens</h3>
+        <div class="form-group">
+            <label asp-for="@Model.Employee.Zipcode" class="control-label">Postcode</label>
+            <input asp-for="@Model.Employee.Zipcode" class="form-control" placeholder="Formaat: 1234AB" />
+            <span asp-validation-for="@Model.Employee.Zipcode" class="text-danger" placeholder="1a"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="@Model.Employee.HouseNumber" class="control-label">Huisnummer + toevoeging</label>
+            <input asp-for="@Model.Employee.HouseNumber" class="form-control" />
+            <span asp-validation-for="@Model.Employee.HouseNumber" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <h3>Contractgegevens</h3>
+        <div class="form-group">
+            <label asp-for="@Model.Employee.ContractHours" class="control-label">Contracturen</label>
+            <input asp-for="@Model.Employee.ContractHours" type="number" class="form-control" />
+            <span asp-validation-for="@Model.Employee.ContractHours" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="@Model.Employee.LeaveHours" class="control-label">Verlofuren</label>
+            <input asp-for="@Model.Employee.LeaveHours" type="number" class="form-control" />
+            <span asp-validation-for="@Model.Employee.LeaveHours" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary">Aanmaken</button>
+    </div>
+</form>

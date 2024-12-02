@@ -1,13 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BumboApp.Models
+namespace BumboApp.ViewModels
 {
-    public class Employee
+    public class EmployeeUpdateViewModel
     {
-        [Key]
         public int EmployeeNumber { get; set; }
-        [Required]
-        public string UserId { get; set; }
         [Required]
         [StringLength(255)]
         public string FirstName { get; set; }
@@ -24,20 +21,11 @@ namespace BumboApp.Models
         public string HouseNumber { get; set; }
         [Required, Range(0, 55)]
         public int ContractHours { get; set; }
+        [Required, Range(0, 255)]
         public int LeaveHours { get; set; }
         [Required]
         public DateOnly StartOfEmployment { get; set; }
         public DateOnly? EndOfEmployment { get; set; }
-
-        // Navigation properties
-        public User? User { get; set; }
-
-        public List<Notification>? notifications { get; set; }
-        public List<SchoolSchedule>? SchoolSchedules { get; set; }
-        public List<LeaveRequest>? leaveRequests { get; set; }
-        public List<SickLeave>? sickLeaves { get; set; }
-        public List<Availability>? Availabilities { get; set; }
-        public List<Shift>? Shifts { get; set; }
-        public List<ShiftTakeOver>? shiftTakeOvers { get; set; }
+        public string Email { get; set; }
     }
 }
