@@ -67,6 +67,12 @@
                                     </span>
                                     break;
                             }
+                            @if (User.IsInRole(Role.Manager.ToString()))
+                            {
+                                <a asp-controller="Leave" asp-action="LeaveRequest" asp-route-id="@(request.Id)">
+                                    <img width="20px" height="auto" src="~/img/details-icon.svg" alt="Alternate Text" />
+                                </a>
+                            }
                         </td>
                     </tr>
                 }

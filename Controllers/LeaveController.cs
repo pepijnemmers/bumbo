@@ -61,12 +61,28 @@ namespace BumboApp.Controllers
             return View(viewModel);
         }
 
-        public IActionResult LeaveRequest()
+        public IActionResult LeaveRequest(int? id)
         {
             var username = User?.Identity?.Name;
             _loggedInEmployee = Context.Employees
             .FirstOrDefault(e => e.FirstName.Equals(username));
-            return View(_loggedInEmployee);
+
+            LeaveRequest leaveRequest;
+            if (id == null)
+            {
+                leaveRequest = null;
+            }
+            else
+            {
+                leaveRequest = Context.LeaveRequests.FirstOrDefault(lr => lr.Id == id);
+            }
+
+            var viewModel = new LeaveRequestDetailViewModel
+            {
+                LoggedInEmployee = _loggedInEmployee,
+                LeaveRequest = leaveRequest
+            };
+            return View(viewModel);
         }
 
         public IActionResult CreateLeaveRequest(LeaveRequest request)
@@ -151,6 +167,35 @@ namespace BumboApp.Controllers
             {
                 transaction.Rollback();
                 return NotifyErrorAndRedirect("Er is iets mis gegaan bij het toevoegen van de verlofaanvraag", "Index");
+            }
+        }
+
+        public IActionResult AssessLeaveRequest(Status status, LeaveRequest leaveRequest)
+        {
+            if (status != null && leaveRequest != null)
+            {
+                leaveRequest.Status = status;
+                using var transaction = Context.Database.BeginTransaction();
+                try
+                {
+                    var existingLeaveRequest = Context.LeaveRequests.Find(leaveRequest.Id);
+                    if (existingLeaveRequest != null)
+                    {
+                        Context.Entry(existingLeaveRequest).CurrentValues.SetValues(leaveRequest);
+                    }
+                    Context.SaveChanges();
+                    transaction.Commit();
+                    return NotifySuccessAndRedirect("De nieuwe verlofaanvraag status is opgeslagen.", "Index");
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    return NotifyErrorAndRedirect("Er is iets misgegaan", "Index");
+                }
+            }
+            else
+            {
+                return NotifyErrorAndRedirect("Er is iets misgegaan", "Index");
             }
         }
     }
