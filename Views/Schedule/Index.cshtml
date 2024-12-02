@@ -98,13 +98,22 @@
             }
         </div>
     </div>
-    @if (role == Role.Manager && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
-    {
-        <p class="text-secondary mt-2 fst-italic">
-            <i class="fas fa-info-circle"></i>
-            Tip! Dubbelklik op een uur om een dienst toe te voegen.
-        </p>
-    }
+    <div class="mt-2 d-flex align-items-center justify-content-between">
+        @if (Model.SelectedStartDate != DateOnly.FromDateTime(DateTime.Today))
+        {
+            <a class="btn btn-outline-secondary btn-sm" onclick="GoToDate('@DateOnly.FromDateTime(DateTime.Today).ToString()')">
+                <i class="fas fa-calendar-day me-1"></i>
+                @(Model.IsDayView ? "Vandaag" : "Deze week")
+            </a>
+        }
+        @if (role == Role.Manager && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
+        {
+            <p class="text-secondary m-0 fst-italic">
+                <i class="fas fa-info-circle"></i>
+                Tip! Dubbelklik op een uur om een dienst toe te voegen.
+            </p>
+        }
+    </div>
 </header>
 
 @if (Model.IsDayView)
@@ -214,7 +223,7 @@
                             @if (!shift.IsFinal) { <span class='text-secondary small fst-italic'>Concept</span> }
                             <div class='d-flex justify-content-between align-items-center gap-3'>
                                 <span class='fw-500' style='min-width: 3em'>@shift.Department</span>
-                                @if (Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today) && role == Role.Manager) { <a href='/shifts/update?id=@shift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
+                                @if (shift.Start.Date > DateTime.Today.Date && role == Role.Manager) { <a href='/shifts/update?id=@shift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
                             </div>
                             "
                         data-bs-content="
@@ -275,7 +284,7 @@
                             @if (!firstShift.IsFinal) { <span class='text-secondary small fst-italic'>Concept</span> }
                             <div class='d-flex justify-content-between align-items-center gap-3'>
                                 <span class='fw-500' style='min-width: 3em'>@firstShift.Department</span>
-                                @if (Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today) && role == Role.Manager) { <a href='/shifts/update?id=@firstShift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
+                                @if (firstShift.Start.Date > DateTime.Today.Date && role == Role.Manager) { <a href='/shifts/update?id=@firstShift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
                             </div>
                             "
                         data-bs-content="
@@ -356,7 +365,7 @@ else
                     <div class="day-hours-grid">
                         @for (int j = 6; j < 24; j++)
                         {
-                            if (role == Role.Manager && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
+                            if (role == Role.Manager && Model.SelectedStartDate.AddDays(i) > DateOnly.FromDateTime(DateTime.Today))
                             {
                                 <div class="hour" ondblclick="GoToCreateShift('@Model.SelectedStartDate.AddDays(i).ToString()', @j)"><i class="fas fa-plus"></i></div>
                             }
@@ -394,7 +403,7 @@ else
                         @if (!shift.IsFinal) { <span class='text-secondary small fst-italic'>Concept</span> }
                         <div class='d-flex justify-content-between align-items-center gap-3'>
                             <span class='fw-500' style='min-width: 3em'>@shift.Department</span>
-                            @if (Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today) && role == Role.Manager) { <a href='/shifts/update?id=@shift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
+                            @if (shift.Start.Date > DateTime.Today.Date && role == Role.Manager) { <a href='/shifts/update?id=@shift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
                         </div>
                         "
                     data-bs-content="
