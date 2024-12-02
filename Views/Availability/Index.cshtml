@@ -15,12 +15,13 @@
         <strong>
             Week @Model.WeekNr
         </strong>
-        (@Model.StartDate.ToString("dd/MM/yyyy") - @Model.StartDate.AddDays(6).ToString("dd/MM/yyyy"))
+        (@Model.StartDate.ToString("dd-MM-yyyy") / @Model.StartDate.AddDays(6).ToString("dd-MM-yyyy"))
         <a asp-controller="Availability" asp-action="Index" asp-route-id="@Model.StartDate.AddDays(7).ToString("dd-MM-yyyy")">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9 18L15 12L9 6" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
         </a>
+        <a class="btn btn-primary">Standaard aanpassen</a>
     </div>
 </div>
 
@@ -29,8 +30,16 @@
         @if (Model.availabilityList.Count == 0)
         {
             <p>Er is nog geen beschikbaarheid voor deze week opgegeven</p>
-            <button class="btn btn-secondary">Standaard gebruiken</button>
-            <button class="btn btn-primary">Toevoegen</button>
+            <form asp-action="Add" method="post">
+                <input type="hidden" name="id" value="@Model.StartDate.ToString("dd-MM-yyyy")" />
+                <input type="hidden" name="useStandard" value="true" />
+                <button type="submit" class="btn btn-secondary">Standaard gebruiken</button>
+            </form>
+            <form asp-action="Add" method="post">
+                <input type="hidden" name="id" value="@Model.StartDate.ToString("dd-MM-yyyy")" />
+                <input type="hidden" name="useStandard" value="false" />
+                <button type="submit" class="btn btn-primary">Toevoegen</button>
+            </form>
         }
         else
         {
@@ -43,14 +52,24 @@
                             Availability? availability = Model.availabilityList.SingleOrDefault(a => a.Date.DayOfWeek == day);
                             <tr>
                                 <td>@day</td>
-                                <td>vanaf</td>
-                                <td>@availability.StartTime</td>
-                                <td>tot</td>
-                                <td>@availability.EndTime</td>
+                                @if (availability != null)
+                                {
+                                    <td>vanaf</td>
+                                    <td>@availability.StartTime</td>
+                                    <td>tot</td>
+                                    <td>@availability.EndTime</td>
+                                }
+                                else
+                                {
+                                    <td colspan="4">Niet beschikbaar</td>
+                                }
                             </tr>
                         }
                     </tbody>
                 </table>
+                <div class="d-flex justify-content-end m-3">
+                    <a class="btn btn-primary" asp-action="Update" asp-route-id="@Model.StartDate.ToString("dd-MM-yyyy")">Bewerken</a>
+                </div>
             </form>
         }
     </div>

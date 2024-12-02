@@ -2,8 +2,9 @@
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Globalization;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BumboApp.Controllers
 {
@@ -24,33 +25,25 @@ namespace BumboApp.Controllers
                 return RedirectToAction("Index", new { id = newId });
             }
 
-
-            var dateParts = id.Split('-');
-            if (dateParts.Length != 3)
+            DateOnly startDate;
+            try
+            {
+                startDate = StringToDate(id);
+            }
+            catch
             {
                 return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", "Index", "Dashboard");
             }
 
-            if (!int.TryParse(dateParts[0], out int day) ||
-                !int.TryParse(dateParts[1], out int month) ||
-                !int.TryParse(dateParts[2], out int year))
+            if (startDate.DayOfWeek != DayOfWeek.Monday)
             {
-                return NotifyErrorAndRedirect("Ongeldige link: de datum bevat niet numerieke waarden", "Index", "Dashboard");
+                string newId = startDate.AddDays(-(int)startDate.DayOfWeek + 1).ToString("dd-MM-yyyy");
+                return RedirectToAction("Index", new { id = newId });
             }
 
-            DateOnly startDate;
-            try
-            {
-                startDate = new DateOnly(year, month, day);
-            }
-            catch (ArgumentOutOfRangeException e)
-            {
-                return NotifyErrorAndRedirect("Ongeldige link: de datum bestaat niet", "Index", "Dashboard");
-            }
+            List<Availability> availabilityList = Context.Availabilities.Where(a => a.EmployeeNumber == 2 && a.Date >= startDate && a.Date < startDate.AddDays(7)).ToList(); //Hardcoded employeeNumber
 
-            List<Availability> availabilityList = Context.Availabilities.Where(a => a.EmployeeNumber == 1 && a.Date >= startDate && a.Date < startDate.AddDays(7)).ToList(); //Hardcoded employeeNumber
-
-            List<SchoolSchedule> schoolScheduleList = Context.SchoolSchedules.Where(a => a.EmployeeNumber == 1 && a.Date >= startDate && a.Date < startDate.AddDays(7)).ToList(); //Hardcoded employeeNumber
+            List<SchoolSchedule> schoolScheduleList = Context.SchoolSchedules.Where(a => a.EmployeeNumber == 2 && a.Date >= startDate && a.Date < startDate.AddDays(7)).ToList(); //Hardcoded employeeNumber
 
             var viewModel = new AvailabilityViewModel
             {
@@ -62,14 +55,115 @@ namespace BumboApp.Controllers
             return View(viewModel);
         }
 
-        public IActionResult Update()
+        public IActionResult Update(string id)
         {
-            return View();
+            DateOnly startDate;
+            try
+            {
+                startDate = StringToDate(id);
+            }
+            catch
+            {
+                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", "Index", "Dashboard");
+            }
+
+            ViewData["StartDate"] = startDate.ToString("dd-MM-yyyy");
+            List<Availability> availabilityList = Context.Availabilities
+                .Include(a => a.Employee)
+                .Where(a => a.EmployeeNumber == 2 && a.Date >= startDate && a.Date < startDate.AddDays(7)).ToList(); //Hardcoded employeeNumber
+
+            return View(availabilityList);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Add(string id, bool useStandard)
+        {
+            DateOnly startDate;
+            try
+            {
+                startDate = StringToDate(id);
+            }
+            catch
+            {
+                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", "Index", "Dashboard");
+            }
+
+            List<Availability> availabilities = [];
+            if (useStandard)
+            {
+                for (int i = 0; i < 7; i++)
+                {
+                    var a = new Availability
+                    {
+                        Date = startDate,
+                        EmployeeNumber = 2,
+                        StartTime = new TimeOnly(9, 0),
+                        EndTime = new TimeOnly(21, 0)
+                    };
+                    startDate = startDate.AddDays(1);
+                    availabilities.Add(a);
+                }
+            }
+
+            Context.Availabilities.AddRange(availabilities);
+            await Context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index), new { id });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update(List<Availability> availabilities)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(availabilities);
+            }
+
+            foreach (var a in availabilities)
+            {
+                if (a.StartTime > a.EndTime)
+                {
+                    return View(availabilities);
+                }
+                //Console.WriteLine(a.Date + "|" + a.StartTime + " " + a.EndTime);
+            }
+            Context.Availabilities.UpdateRange(availabilities);
+            await Context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         public IActionResult UpdateDefault()
         {
             return View();
+        }
+
+        private DateOnly StringToDate(string id)
+        {
+            var dateParts = id.Split('-');
+            if (dateParts.Length != 3)
+            {
+                throw new Exception();
+                //return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", "Index", "Dashboard");
+            }
+
+            if (!int.TryParse(dateParts[0], out int day) ||
+                !int.TryParse(dateParts[1], out int month) ||
+                !int.TryParse(dateParts[2], out int year))
+            {
+                throw new Exception();
+                //return NotifyErrorAndRedirect("Ongeldige link: de datum bevat niet numerieke waarden", "Index", "Dashboard");
+            }
+
+            DateOnly startDate;
+            try
+            {
+                startDate = new DateOnly(year, month, day);
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                throw new Exception();
+                //return NotifyErrorAndRedirect("Ongeldige link: de datum bestaat niet", "Index", "Dashboard");
+            }
+            return startDate;
         }
     }
 }

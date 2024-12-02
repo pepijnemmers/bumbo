@@ -8,8 +8,7 @@ namespace BumboApp.Models
         public DateOnly Date { get; set; }
         [Required]
         public int EmployeeNumber { get; set; }
-        [Required]
-        public Employee Employee { get; set; }
+        public Employee? Employee { get; set; }
 
         [Required]
         public TimeOnly StartTime { get; set; }

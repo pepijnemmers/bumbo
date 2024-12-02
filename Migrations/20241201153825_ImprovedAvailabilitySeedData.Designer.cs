@@ -4,6 +4,7 @@ using BumboApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BumboApp.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    partial class BumboDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241201153825_ImprovedAvailabilitySeedData")]
+    partial class ImprovedAvailabilitySeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,7 +41,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("EmployeeNumber", "Date");
 
-                    b.ToTable("Availabilities", null, t =>
+                    b.ToTable("Availabilities", t =>
                         {
                             t.HasCheckConstraint("CK_Availability_StartTime_EndTime", "[StartTime] < [EndTime]");
                         });
@@ -195,7 +198,7 @@ namespace BumboApp.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Employees", null, t =>
+                    b.ToTable("Employees", t =>
                         {
                             t.HasCheckConstraint("CK_Employees_StartOfEmployment_EndOfEmployment", "[StartOfEmployment] <= [EndOfEmployment]");
 
@@ -266,7 +269,7 @@ namespace BumboApp.Migrations
                     b.HasIndex("Date")
                         .IsUnique();
 
-                    b.ToTable("Expectations", (string)null);
+                    b.ToTable("Expectations");
 
                     b.HasData(
                         new
@@ -496,7 +499,7 @@ namespace BumboApp.Migrations
 
                     b.HasIndex("EmployeeNumber");
 
-                    b.ToTable("LeaveRequests", null, t =>
+                    b.ToTable("LeaveRequests", t =>
                         {
                             t.HasCheckConstraint("CK_LeaveRequests_StartDate_EndDate", "[StartDate] <= [EndDate]");
                         });
@@ -544,7 +547,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Norms", (string)null);
+                    b.ToTable("Norms");
 
                     b.HasData(
                         new
@@ -623,7 +626,7 @@ namespace BumboApp.Migrations
 
                     b.HasIndex("EmployeeNumber");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
 
                     b.HasData(
                         new
@@ -659,7 +662,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("WeekDay");
 
-                    b.ToTable("OpeningHours", null, t =>
+                    b.ToTable("OpeningHours", t =>
                         {
                             t.HasCheckConstraint("CK_OpeningHours_OpeningTime_ClosingTime", "([OpeningTime] IS NULL AND [ClosingTime] IS NULL) OR ([OpeningTime] IS NOT NULL AND [ClosingTime] IS NOT NULL AND [OpeningTime] < [ClosingTime])");
                         });
@@ -737,7 +740,7 @@ namespace BumboApp.Migrations
                     b.HasIndex("Date", "Department")
                         .IsUnique();
 
-                    b.ToTable("Prognoses", null, t =>
+                    b.ToTable("Prognoses", t =>
                         {
                             t.HasCheckConstraint("CK_Prognoses_NeededHours_NeededEmployees", "[NeededHours] = [NeededEmployees] * 8");
                         });
@@ -1136,7 +1139,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("EmployeeNumber", "Date");
 
-                    b.ToTable("SchoolSchedules", (string)null);
+                    b.ToTable("SchoolSchedules");
 
                     b.HasData(
                         new
@@ -1204,7 +1207,7 @@ namespace BumboApp.Migrations
 
                     b.HasIndex("EmployeeNumber");
 
-                    b.ToTable("Shifts", null, t =>
+                    b.ToTable("Shifts", t =>
                         {
                             t.HasCheckConstraint("CK_Shifts_Start_End", "[Start] < [End]");
                         });
@@ -1245,7 +1248,7 @@ namespace BumboApp.Migrations
 
                     b.HasIndex("EmployeeTakingOverEmployeeNumber");
 
-                    b.ToTable("ShiftTakeOvers", (string)null);
+                    b.ToTable("ShiftTakeOvers");
 
                     b.HasData(
                         new
@@ -1272,7 +1275,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("EmployeeNumber", "Date");
 
-                    b.ToTable("SickLeaves", (string)null);
+                    b.ToTable("SickLeaves");
                 });
 
             modelBuilder.Entity("BumboApp.Models.UniqueDay", b =>
@@ -1299,7 +1302,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UniqueDays", null, t =>
+                    b.ToTable("UniqueDays", t =>
                         {
                             t.HasCheckConstraint("CK_UniqueDays_StartDate_EndDate", "[StartDate] <= [EndDate]");
                         });
@@ -1462,7 +1465,7 @@ namespace BumboApp.Migrations
                     b.HasIndex("StartDate")
                         .IsUnique();
 
-                    b.ToTable("WeekPrognoses", (string)null);
+                    b.ToTable("WeekPrognoses");
 
                     b.HasData(
                         new

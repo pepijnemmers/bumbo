@@ -50,7 +50,7 @@ public partial class BumboDbContext : IdentityDbContext<User>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
         //Module 1 classes
         modelBuilder.Entity<WeekPrognosis>()
             .HasIndex(wp => wp.StartDate)
@@ -154,7 +154,7 @@ public partial class BumboDbContext : IdentityDbContext<User>
             },
             new IdentityRole
             {
-                Id=employeeRoleId,
+                Id = employeeRoleId,
                 Name = Role.Employee.ToString(),
                 NormalizedName = Role.Employee.ToString().ToUpper()
             }
@@ -465,10 +465,59 @@ public partial class BumboDbContext : IdentityDbContext<User>
         modelBuilder.Entity<Availability>().HasData(
             new
             {
-                Date = new DateOnly(2024, 12, 9),
-                EmployeeNumber = 1,
+                Date = new DateOnly(2024, 12, 2),
+                EmployeeNumber = 2,
                 StartTime = new TimeOnly(9, 0),
                 EndTime = new TimeOnly(17, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 3),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(10, 0),
+                EndTime = new TimeOnly(18, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 4),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(11, 0),
+                EndTime = new TimeOnly(15, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 5),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(8, 0),
+                EndTime = new TimeOnly(16, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 6),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(12, 0),
+                EndTime = new TimeOnly(20, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 7),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(9, 0),
+                EndTime = new TimeOnly(14, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 8),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(10, 0),
+                EndTime = new TimeOnly(16, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 9),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(11, 0),
+                EndTime = new TimeOnly(19, 0)
             },
             new
             {
@@ -480,9 +529,37 @@ public partial class BumboDbContext : IdentityDbContext<User>
             new
             {
                 Date = new DateOnly(2024, 12, 11),
-                EmployeeNumber = 3,
-                StartTime = new TimeOnly(8, 0),
-                EndTime = new TimeOnly(14, 0)
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(9, 0),
+                EndTime = new TimeOnly(15, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 12),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(12, 0),
+                EndTime = new TimeOnly(20, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 13),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(10, 0),
+                EndTime = new TimeOnly(18, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 14),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(9, 0),
+                EndTime = new TimeOnly(13, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 15),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(11, 0),
+                EndTime = new TimeOnly(17, 0)
             }
         );
 
