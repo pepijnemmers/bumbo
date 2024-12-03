@@ -14,6 +14,7 @@ namespace BumboApp.Controllers
         protected int PageSize = 5;
         protected int DefaultPage = 1;
         protected Role LoggedInUserRole;
+        protected string? LoggedInUserId;
         
         private IConfiguration _configuration = null!;
 
@@ -63,18 +64,18 @@ namespace BumboApp.Controllers
             PageSize = _configuration.GetValue<int>("Pagination:DefaultPageSize");
             DefaultPage = _configuration.GetValue<int>("Pagination:StartPage");
             
-            var loggedInUserId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(loggedInUserId) && context.HttpContext.Request.Path != "/login")
+            LoggedInUserId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(LoggedInUserId) && context.HttpContext.Request.Path != "/login")
             {
                 context.HttpContext.Response.Redirect("/Login");
             }
             
-            if (!string.IsNullOrEmpty(loggedInUserId))
+            if (!string.IsNullOrEmpty(LoggedInUserId))
             {
                 LoggedInUserRole = Enum.TryParse(User?.FindFirstValue(ClaimTypes.Role), out Role role) ? role : Role.Unknown;
             }
 
-            ViewData["NumberOfNotifications"] = Context.Notifications.Count(n => n.Employee.User.Id == loggedInUserId && !n.HasBeenRead);
+            ViewData["NumberOfNotifications"] = Context.Notifications.Count(n => n.Employee.User.Id == LoggedInUserId && !n.HasBeenRead);
         }
         
         // check if user has access to this page otherwise redirect to NoAccess page
