@@ -48,11 +48,6 @@ namespace BumboApp.Controllers
 
             //TODO: Checken CAO regels.
 
-            //shiftTakeOver.EmployeeTakingOverEmployeeNumber = employee.EmployeeNumber;
-            //Context.SaveChanges();
-
-            //return NotifySuccessAndRedirect("De overname is doorgegeven.", "Index", "Dashboard");
-
             using var transaction = Context.Database.BeginTransaction();
             try
             {
