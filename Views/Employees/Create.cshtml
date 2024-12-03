@@ -4,10 +4,10 @@
     ViewData["Title"] = "Nieuwe werknemer aanmaken";
 }
 
-<h1>Create User and Employee</h1>
+<a asp-action="Index" class="btn btn-secondary">Terug</a>
 
 <form method="post">
-    <div class="table-container">
+    <div class="table-container p-3">
         <h3>Accountgegevens</h3>
         <div class="form-group">
             <label asp-for="@Model.Email" class="control-label">Email</label>
@@ -22,7 +22,7 @@
         </div>
 
         <div>
-            <label asp-for="Role" class="control-label"></label>
+            <label asp-for="Role" class="control-label">Functie</label>
             <select asp-for="Role" class="form-control">
                 @foreach (var role in Enum.GetValues(typeof(Role)))
                 {
@@ -33,7 +33,7 @@
         </div>
     </div>
 
-    <div class="table-container">
+    <div class="table-container p-3">
         <h3>Persoonsgegevens</h3>
         <div class="form-group">
             <label asp-for="@Model.FirstName" class="control-label">Voornaam</label>
@@ -54,7 +54,7 @@
         </div>
     </div>
 
-    <div class="table-container">
+    <div class="table-container p-3">
         <h3>Addresgegevens</h3>
         <div class="form-group">
             <label asp-for="@Model.Zipcode" class="control-label">Postcode</label>
@@ -69,7 +69,7 @@
         </div>
     </div>
 
-    <div class="table-container">
+    <div class="table-container p-3">
         <h3>Contractgegevens</h3>
         <div class="form-group">
             <label asp-for="@Model.ContractHours" class="control-label">Contracturen</label>
