@@ -85,9 +85,8 @@ namespace BumboApp.Controllers
                     return NotifyErrorAndRedirect("De overname kon niet worden gevonden", "Index", "Dashboard");
                 }
 
-                // Set the EmployeeTakingOverEmployeeNumber to null
-                shiftTakeOver.Status = Status.Geaccepteerd;
                 shiftTakeOver.Shift.Employee = shiftTakeOver.EmployeeTakingOver;
+                Context.ShiftTakeOvers.Remove(shiftTakeOver);
 
                 // Save the changes to the database
                 Context.SaveChanges();
