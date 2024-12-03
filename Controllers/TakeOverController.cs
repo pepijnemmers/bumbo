@@ -115,6 +115,7 @@ namespace BumboApp.Controllers
                 // Find the ShiftTakeOver record based on the shiftId
                 var shiftTakeOver = Context.ShiftTakeOvers
                     .Include(sto => sto.Shift)
+                    .ThenInclude(sto => sto.Employee)
                     .Include(sto => sto.EmployeeTakingOver)
                     .FirstOrDefault(sto => sto.ShiftId == shiftId);
 
@@ -123,15 +124,53 @@ namespace BumboApp.Controllers
                     return NotifyErrorAndRedirect("De overname kon niet worden gevonden", "Index", "Dashboard");
                 }
 
+                // Create notifications
+                var shiftOwner = shiftTakeOver.Shift.Employee;
+                var employeeTakingOver = shiftTakeOver.EmployeeTakingOver;
+
                 shiftTakeOver.Shift.Employee = shiftTakeOver.EmployeeTakingOver;
+
+                if (shiftOwner != null)
+                {
+                    var ownerNotification = new Notification
+                    {
+                        Employee = shiftOwner,
+                        Title = "Dienst overgenomen",
+                        Description = $"Je dienst op {shiftTakeOver.Shift.Start:dd-MM-yyyy} is succesvol overgenomen",
+                        SentAt = DateTime.Now,
+                        HasBeenRead = false,
+                    };
+                    Console.WriteLine("Adding notification for owner: " + ownerNotification.Description);
+                    Context.Notifications.Add(ownerNotification);
+                }
+
+                if (employeeTakingOver != null)
+                {
+                    var takingOverNotification = new Notification
+                    {
+                        Employee = employeeTakingOver,
+                        Title = "Dienst overgenomen",
+                        Description = $"Je hebt met succes de dienst overgenomen op {shiftTakeOver.Shift.Start:dd-MM-yyyy}.",
+                        SentAt = DateTime.Now,
+                        HasBeenRead = false
+                    };
+                    Console.WriteLine("Adding notification for employee taking over: " + takingOverNotification.Description);
+                    Context.Notifications.Add(takingOverNotification);
+                }
+
                 Context.ShiftTakeOvers.Remove(shiftTakeOver);
 
                 // Save the changes to the database
                 Context.SaveChanges();
                 return NotifySuccessAndRedirect("De overname is goedgekeurd", "Index", "Dashboard");
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine("Error occurred: " + ex.Message);
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine("Inner exception: " + ex.InnerException.Message);
+                }
                 return NotifyErrorAndRedirect("Er is een fout opgetreden bij het accepteren van de overname.", "Index", "Dashboard");
             }
         }
