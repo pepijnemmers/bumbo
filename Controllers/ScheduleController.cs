@@ -14,7 +14,7 @@ namespace BumboApp.Controllers
 {
 
     public class ScheduleController : MainController
-    { Rooster-C
+    {
         private UserManager<User> _userManager;
         public ScheduleController(UserManager<User> userManager)
         {
@@ -129,12 +129,12 @@ namespace BumboApp.Controllers
             DateOnly endDate = startDate.AddDays(6);
 
             //for testing comment out the code between the comments (because there are already 2 shifts in the Db)
-            if (Context.Shifts
-                .Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) &&
-                e.End.Date <= endDate.ToDateTime(new TimeOnly())).Any())
-            {
-                return NotifyErrorAndRedirect("er is al een rooster voor deze week", "Index");
-            }
+            //if (Context.Shifts
+            //    .Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) &&
+            //    e.End.Date <= endDate.ToDateTime(new TimeOnly())).Any())
+            //{
+            //    return NotifyErrorAndRedirect("er is al een rooster voor deze week", "Index");
+            //}
             //so till this point
 
             foreach (Department department in departmentList)
@@ -191,7 +191,8 @@ namespace BumboApp.Controllers
                 while (!PrognoseHoursHit(department, scheduledate))
                 {
                     int MissedTime = getMaxTimePrognose(department, scheduledate);
-                    int maxTime = startingHour + MissedTime;
+                    int maxTime = startingHour + (int)MissedTime;
+
                     if (maxTime > closingHour) { maxTime = closingHour; }
                     if (startingHour >= maxTime) { return; }
                     Context.Add(
@@ -229,8 +230,18 @@ namespace BumboApp.Controllers
                 cantFindConcurrentForRegister = false;
             }
             else { cantFindConcurrentForRegister= true; }
-            while (index < employees.Count)
-            { 
+            while (true)
+            {
+                if (PrognoseHoursHit(department, scheduledate)) break;
+                if (index >= employees.Count)
+                {
+                    if (cantFindConcurrentForRegister) break;
+                    else
+                    {
+                        cantFindConcurrentForRegister = true;
+                        index = 0;
+                    }
+                }
                 Employee employee = employees.ElementAt(index);
                 if (GetUserRoleAsync(employee.User.Id).Result == Role.Manager)
                 {
@@ -258,12 +269,6 @@ namespace BumboApp.Controllers
                     ScheduleShift(department, scheduledate, startDate, employee);
                     index++;
                 }
-                if(index >= employees.Count && !cantFindConcurrentForRegister) 
-                { 
-                    cantFindConcurrentForRegister = true;
-                    index = 0;
-                }
-                if ((index >= employees.Count && cantFindConcurrentForRegister) || PrognoseHoursHit(department,scheduledate)) break;
             }
             return;
         }
@@ -310,6 +315,14 @@ namespace BumboApp.Controllers
 
         private bool PrognoseHoursHit(Department department, DateOnly scheduledate)
         {
+            try
+            {
+                Context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                return true;
+            }
             Prognosis prognosis= Context.Prognoses.Where(e => e.Date == scheduledate && e.Department == department).FirstOrDefault();
             List<Shift> departmentDayShifts = Context.Shifts
                 .Where(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly()))
@@ -319,7 +332,7 @@ namespace BumboApp.Controllers
             {
                 return true;
             }
-            if ((int)Math.Ceiling(prognosis.NeededHours) >= GetWorkingHours(departmentDayShifts))
+            if ((int)Math.Round(prognosis.NeededHours) >= GetWorkingHours(departmentDayShifts))
             {
                 return false;
             }
@@ -464,7 +477,7 @@ namespace BumboApp.Controllers
             else
             {
                 availableFrom = 0;
-                availableTill = 24;
+                availableTill = 23;
             }
 
             int maxTimeCAO = getMaxTimeCAO(employee, department, startDate, scheduledate, startingHour);
@@ -560,7 +573,13 @@ namespace BumboApp.Controllers
             {
                 return 0;
             }
-            return (int)Math.Ceiling(prognosis.NeededHours - GetWorkingHours(departmentDayShifts));
+            float MissingHours = prognosis.NeededHours - GetWorkingHours(departmentDayShifts);
+            foreach (int time in breakTimes)
+            {
+                MissingHours += breakTimeHours;
+            }
+
+            return (int)Math.Ceiling(MissingHours);
         }
 
         private int getMaxTimeCAO(Employee employee,Department department, DateOnly startDate, DateOnly scheduledate, int startinghour)
@@ -657,6 +676,7 @@ namespace BumboApp.Controllers
             {
                 return (int)Math.Ceiling(schedule.DurationInHours);
             }
+        }
         public IActionResult DeleteWeek(DateOnly startDay)
         {
             return RedirectToAction("Index");
