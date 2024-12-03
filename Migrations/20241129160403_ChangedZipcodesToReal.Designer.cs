@@ -4,6 +4,7 @@ using BumboApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BumboApp.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    partial class BumboDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241129160403_ChangedZipcodesToReal")]
+    partial class ChangedZipcodesToReal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,59 +49,10 @@ namespace BumboApp.Migrations
                     b.HasData(
                         new
                         {
-                            EmployeeNumber = 2,
-                            Date = new DateOnly(2024, 12, 2),
+                            EmployeeNumber = 1,
+                            Date = new DateOnly(2024, 12, 9),
                             EndTime = new TimeOnly(17, 0, 0),
                             StartTime = new TimeOnly(9, 0, 0)
-                        },
-                        new
-                        {
-                            EmployeeNumber = 2,
-                            Date = new DateOnly(2024, 12, 3),
-                            EndTime = new TimeOnly(18, 0, 0),
-                            StartTime = new TimeOnly(10, 0, 0)
-                        },
-                        new
-                        {
-                            EmployeeNumber = 2,
-                            Date = new DateOnly(2024, 12, 4),
-                            EndTime = new TimeOnly(15, 0, 0),
-                            StartTime = new TimeOnly(11, 0, 0)
-                        },
-                        new
-                        {
-                            EmployeeNumber = 2,
-                            Date = new DateOnly(2024, 12, 5),
-                            EndTime = new TimeOnly(16, 0, 0),
-                            StartTime = new TimeOnly(8, 0, 0)
-                        },
-                        new
-                        {
-                            EmployeeNumber = 2,
-                            Date = new DateOnly(2024, 12, 6),
-                            EndTime = new TimeOnly(20, 0, 0),
-                            StartTime = new TimeOnly(12, 0, 0)
-                        },
-                        new
-                        {
-                            EmployeeNumber = 2,
-                            Date = new DateOnly(2024, 12, 7),
-                            EndTime = new TimeOnly(14, 0, 0),
-                            StartTime = new TimeOnly(9, 0, 0)
-                        },
-                        new
-                        {
-                            EmployeeNumber = 2,
-                            Date = new DateOnly(2024, 12, 8),
-                            EndTime = new TimeOnly(16, 0, 0),
-                            StartTime = new TimeOnly(10, 0, 0)
-                        },
-                        new
-                        {
-                            EmployeeNumber = 2,
-                            Date = new DateOnly(2024, 12, 9),
-                            EndTime = new TimeOnly(19, 0, 0),
-                            StartTime = new TimeOnly(11, 0, 0)
                         },
                         new
                         {
@@ -109,38 +63,10 @@ namespace BumboApp.Migrations
                         },
                         new
                         {
-                            EmployeeNumber = 2,
+                            EmployeeNumber = 3,
                             Date = new DateOnly(2024, 12, 11),
-                            EndTime = new TimeOnly(15, 0, 0),
-                            StartTime = new TimeOnly(9, 0, 0)
-                        },
-                        new
-                        {
-                            EmployeeNumber = 2,
-                            Date = new DateOnly(2024, 12, 12),
-                            EndTime = new TimeOnly(20, 0, 0),
-                            StartTime = new TimeOnly(12, 0, 0)
-                        },
-                        new
-                        {
-                            EmployeeNumber = 2,
-                            Date = new DateOnly(2024, 12, 13),
-                            EndTime = new TimeOnly(18, 0, 0),
-                            StartTime = new TimeOnly(10, 0, 0)
-                        },
-                        new
-                        {
-                            EmployeeNumber = 2,
-                            Date = new DateOnly(2024, 12, 14),
-                            EndTime = new TimeOnly(13, 0, 0),
-                            StartTime = new TimeOnly(9, 0, 0)
-                        },
-                        new
-                        {
-                            EmployeeNumber = 2,
-                            Date = new DateOnly(2024, 12, 15),
-                            EndTime = new TimeOnly(17, 0, 0),
-                            StartTime = new TimeOnly(11, 0, 0)
+                            EndTime = new TimeOnly(14, 0, 0),
+                            StartTime = new TimeOnly(8, 0, 0)
                         });
                 });
 
@@ -1141,6 +1067,18 @@ namespace BumboApp.Migrations
                     b.HasData(
                         new
                         {
+                            EmployeeNumber = 1,
+                            Date = new DateOnly(2024, 12, 9),
+                            DurationInHours = 4f
+                        },
+                        new
+                        {
+                            EmployeeNumber = 1,
+                            Date = new DateOnly(2024, 12, 10),
+                            DurationInHours = 4f
+                        },
+                        new
+                        {
                             EmployeeNumber = 2,
                             Date = new DateOnly(2024, 12, 9),
                             DurationInHours = 3f
@@ -1153,51 +1091,15 @@ namespace BumboApp.Migrations
                         },
                         new
                         {
-                            EmployeeNumber = 2,
-                            Date = new DateOnly(2024, 12, 11),
-                            DurationInHours = 3f
-                        },
-                        new
-                        {
-                            EmployeeNumber = 2,
-                            Date = new DateOnly(2024, 12, 12),
-                            DurationInHours = 3f
-                        },
-                        new
-                        {
-                            EmployeeNumber = 2,
-                            Date = new DateOnly(2024, 12, 13),
-                            DurationInHours = 3f
-                        },
-                        new
-                        {
                             EmployeeNumber = 3,
                             Date = new DateOnly(2024, 12, 9),
-                            DurationInHours = 3f
+                            DurationInHours = 6f
                         },
                         new
                         {
                             EmployeeNumber = 3,
                             Date = new DateOnly(2024, 12, 10),
-                            DurationInHours = 3f
-                        },
-                        new
-                        {
-                            EmployeeNumber = 3,
-                            Date = new DateOnly(2024, 12, 11),
-                            DurationInHours = 3f
-                        },
-                        new
-                        {
-                            EmployeeNumber = 3,
-                            Date = new DateOnly(2024, 12, 12),
-                            DurationInHours = 3f
-                        },
-                        new
-                        {
-                            EmployeeNumber = 3,
-                            Date = new DateOnly(2024, 12, 13),
-                            DurationInHours = 3f
+                            DurationInHours = 6f
                         });
                 });
 
@@ -1297,127 +1199,6 @@ namespace BumboApp.Migrations
                     b.HasKey("EmployeeNumber", "Date");
 
                     b.ToTable("SickLeaves");
-                });
-
-            modelBuilder.Entity("BumboApp.Models.StandardAvailability", b =>
-                {
-                    b.Property<int>("Day")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EmployeeNumber")
-                        .HasColumnType("int");
-
-                    b.Property<TimeOnly>("EndTime")
-                        .HasColumnType("time");
-
-                    b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time");
-
-                    b.HasKey("Day", "EmployeeNumber");
-
-                    b.HasIndex("EmployeeNumber");
-
-                    b.ToTable("StandardAvailabilities");
-
-                    b.HasData(
-                        new
-                        {
-                            Day = 1,
-                            EmployeeNumber = 2,
-                            EndTime = new TimeOnly(21, 0, 0),
-                            StartTime = new TimeOnly(9, 0, 0)
-                        },
-                        new
-                        {
-                            Day = 2,
-                            EmployeeNumber = 2,
-                            EndTime = new TimeOnly(21, 0, 0),
-                            StartTime = new TimeOnly(9, 0, 0)
-                        },
-                        new
-                        {
-                            Day = 3,
-                            EmployeeNumber = 2,
-                            EndTime = new TimeOnly(21, 0, 0),
-                            StartTime = new TimeOnly(9, 0, 0)
-                        },
-                        new
-                        {
-                            Day = 4,
-                            EmployeeNumber = 2,
-                            EndTime = new TimeOnly(21, 0, 0),
-                            StartTime = new TimeOnly(9, 0, 0)
-                        },
-                        new
-                        {
-                            Day = 5,
-                            EmployeeNumber = 2,
-                            EndTime = new TimeOnly(21, 0, 0),
-                            StartTime = new TimeOnly(9, 0, 0)
-                        },
-                        new
-                        {
-                            Day = 6,
-                            EmployeeNumber = 2,
-                            EndTime = new TimeOnly(21, 0, 0),
-                            StartTime = new TimeOnly(9, 0, 0)
-                        },
-                        new
-                        {
-                            Day = 0,
-                            EmployeeNumber = 2,
-                            EndTime = new TimeOnly(21, 0, 0),
-                            StartTime = new TimeOnly(9, 0, 0)
-                        },
-                        new
-                        {
-                            Day = 1,
-                            EmployeeNumber = 3,
-                            EndTime = new TimeOnly(14, 30, 0),
-                            StartTime = new TimeOnly(8, 30, 0)
-                        },
-                        new
-                        {
-                            Day = 2,
-                            EmployeeNumber = 3,
-                            EndTime = new TimeOnly(19, 0, 0),
-                            StartTime = new TimeOnly(13, 0, 0)
-                        },
-                        new
-                        {
-                            Day = 3,
-                            EmployeeNumber = 3,
-                            EndTime = new TimeOnly(17, 0, 0),
-                            StartTime = new TimeOnly(9, 0, 0)
-                        },
-                        new
-                        {
-                            Day = 4,
-                            EmployeeNumber = 3,
-                            EndTime = new TimeOnly(16, 0, 0),
-                            StartTime = new TimeOnly(10, 0, 0)
-                        },
-                        new
-                        {
-                            Day = 5,
-                            EmployeeNumber = 3,
-                            EndTime = new TimeOnly(20, 0, 0),
-                            StartTime = new TimeOnly(14, 0, 0)
-                        },
-                        new
-                        {
-                            Day = 6,
-                            EmployeeNumber = 3,
-                            EndTime = new TimeOnly(18, 0, 0),
-                            StartTime = new TimeOnly(11, 0, 0)
-                        },
-                        new
-                        {
-                            Day = 0,
-                            EmployeeNumber = 3,
-                            EndTime = new TimeOnly(16, 0, 0),
-                            StartTime = new TimeOnly(12, 0, 0)
-                        });
                 });
 
             modelBuilder.Entity("BumboApp.Models.UniqueDay", b =>
@@ -1887,17 +1668,6 @@ namespace BumboApp.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("BumboApp.Models.StandardAvailability", b =>
-                {
-                    b.HasOne("BumboApp.Models.Employee", "Employee")
-                        .WithMany("StandardAvailability")
-                        .HasForeignKey("EmployeeNumber")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1956,8 +1726,6 @@ namespace BumboApp.Migrations
                     b.Navigation("SchoolSchedules");
 
                     b.Navigation("Shifts");
-
-                    b.Navigation("StandardAvailability");
 
                     b.Navigation("leaveRequests");
 

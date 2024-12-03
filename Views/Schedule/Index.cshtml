@@ -1,3 +1,564 @@
-﻿@{
+﻿@using System.Globalization
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+
+@model BumboApp.ViewModels.ScheduleViewModel
+@{
     ViewData["Title"] = "Rooster";
+    var role = Model.Role;
+}
+
+@* Header for manager and employee *@
+<header>
+    @* concept header *@
+    @if (role == Role.Manager && Model.ViewIsConcept)
+    {
+        <div class="d-flex align-items-lg-center justify-content-between flex-column flex-lg-row mb-3">
+            <h3 class="fst-italic text-secondary">Concept rooster</h3>
+            <div class="buttons">
+                <a class="btn btn-outline-danger d-block d-lg-inline-block mt-2 mt-lg-0">
+                    <i class="fas fa-trash-alt"></i>
+                    Concept week verwijderen
+                </a>
+                <a class="btn btn-success d-block d-lg-inline-block mt-2 mb-3 my-lg-0">
+                    <i class="fas fa-check"></i>
+                    Week publiceren
+                </a>
+            </div>
+        </div>
+    }
+    @* day & week header *@
+    <div class="d-flex align-items-center justify-content-between flex-column flex-lg-row gap-2 flex-wrap">
+        <div class="d-flex align-items-center w-100 w-lg-auto">
+            @if (!Model.IsDayView)
+            {
+                <button class="unset-all text-body" onclick="GoToDate('@Model.SelectedStartDate.AddDays(-7).ToString()')">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <span class="fw-bold px-1 text-capitalize">
+                    Week @Model.WeekNumber
+                </span>
+                <button class="unset-all text-body" onclick="GoToDate('@Model.SelectedStartDate.AddDays(7).ToString()')">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            }
+            else
+            {
+                <button class="unset-all text-body" onclick="GoToDate('@Model.SelectedStartDate.AddDays(-1).ToString()')">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <span class="fw-bold px-1 text-capitalize">
+                    @Model.SelectedStartDate.ToString("ddd dd-MM-yyyy", CultureInfo.GetCultureInfo("nl-NL"))
+                </span>
+                <button class="unset-all text-body" onclick="GoToDate('@Model.SelectedStartDate.AddDays(1).ToString()')">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            }
+            @if (Model.SelectedStartDate != DateOnly.FromDateTime(DateTime.Today))
+            {
+                <a class="btn btn-outline-secondary btn-sm d-lg-none ms-auto" onclick="GoToDate('@DateOnly.FromDateTime(DateTime.Today).ToString()')">
+                    <i class="fas fa-calendar-day me-1"></i>
+                    @(Model.IsDayView ? "Vandaag" : "Deze week")
+                </a>
+            }
+        </div>
+        <button onclick="toggleFilterBtns()" class="btn btn-dark d-block d-lg-none mt-2 w-100">
+            <i class="fas fa-filter"></i>
+            Filters & acties
+        </button>
+        <div class="buttons d-none d-flex d-lg-flex align-items-center gap-2 flex-column-reverse flex-lg-row w-100 w-lg-auto" id="filterButtons">
+            @if (role == Role.Manager && !Model.ViewIsConcept && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
+            {
+                <button class="btn btn-outline-danger w-100 w-lg-auto" data-bs-toggle="modal" data-bs-target="#delete-week-modal">
+                    <i class="fas fa-trash-alt"></i>
+                    Verwijder week
+                </button>
+            }
+            @if (role == Role.Manager)
+            {
+                <a class="btn btn-primary w-100 w-lg-auto" asp-controller="Shifts" asp-action="Create" asp-route-date="@(Model.IsDayView ? Model.SelectedStartDate : null)">
+                    <i class="fas fa-plus"></i>
+                    Dienst toevoegen
+                </a>
+            }
+            @if (role == Role.Employee)
+            {
+                <a class="btn btn-primary w-100 w-lg-auto" asp-controller="Shifts" asp-action="MyShifts">
+                    Mijn diensten
+                </a>
+            }
+            @if (Model.SelectedEmployee != null)
+            {
+                <select class="form-select w-100 w-lg-auto" onchange="GoToView(this)">
+                    <option value="day" selected="@(Model.IsDayView)">Dag overzicht</option>
+                    <option value="week" selected="@(!Model.IsDayView)">Week overzicht</option>
+                </select>
+            }
+            @if (role == Role.Manager)
+            {
+                <select class="form-select w-100 w-lg-auto" onchange="GoToEmployee(this)">
+                    <optgroup label="Toon alle werknemers">
+                        <option value="all" selected="@(Model.SelectedEmployee == null)">Alle werknemers</option>
+                    </optgroup>
+                    <optgroup label="Toon één werknemer">
+                        @foreach (Employee employee in Model.Employees)
+                        {
+                            <option value="@employee.EmployeeNumber" selected="@(employee == Model.SelectedEmployee)">@employee.FirstName @employee.LastName</option>
+                        }
+                    </optgroup>
+                </select>
+            }
+        </div>
+    </div>
+    <div class="mt-2 d-flex align-items-center justify-content-between">
+        @if (Model.SelectedStartDate != DateOnly.FromDateTime(DateTime.Today))
+        {
+            <a class="btn btn-outline-secondary btn-sm d-none d-lg-inline-block" onclick="GoToDate('@DateOnly.FromDateTime(DateTime.Today).ToString()')">
+                <i class="fas fa-calendar-day me-1"></i>
+                @(Model.IsDayView ? "Vandaag" : "Deze week")
+            </a>
+        }
+        @if (role == Role.Manager && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
+        {
+            <p class="text-secondary m-0 fst-italic">
+                <i class="fas fa-info-circle"></i>
+                Tip! Dubbelklik op een uur om een dienst toe te voegen.
+            </p>
+        }
+    </div>
+</header>
+
+@if (Model.IsDayView)
+{
+@* Calendar day view *@
+<div class="table-container cdr-dayview">
+    <div class="border-bottom d-block d-md-block d-xl-none py-1 small text-center text-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" xml:space="preserve"
+             style="height: 1.5em;fill: var(--bs-secondary);" viewBox="10.04 59.98 131.86 59.8">  
+            <g>
+                <g>
+                    <g>
+                        <path fill="inherit" d="M120.3,62.5c-0.8,1.4-0.8,3.8,0,5.5c1.1,1.9-15.8,2.7-49.2,2.7c-47,0-50.8,0.3-50,4.6c0.8,4.4,6,5.2,50,6.3c39.9,1.1,49.2,2.2,49.2,5.2c0,7.1,5.5,6,13.7-2.5l7.9-8.2l-7.9-8.2C125.5,59.2,123,58.1,120.3,62.5z"></path>
+                        <path fill="inherit" d="M15.7,96.1c-7.6,7.9-7.6,10.4,0.3,17.8c7.9,7.6,13.9,7.9,12,0.5c-1.4-5.2,0.3-5.5,49.4-6c67.5-1.1,67.7-6,0.5-7.1c-47-0.5-49.2-0.8-49.2-6C28.8,87.9,22.8,88.4,15.7,96.1z"></path>
+                    </g>
+                </g>
+            </g>
+        </svg>
+        <span>Horizontale scroll</span>
+    </div>
+    <div class="calendar-container">
+
+        @* Layer 1: Base Grid *@
+        <div class="calendar-grid row g-0 @(role == Role.Employee ? "pointer-events-none" : "")">
+            <div class="time-slots-col">
+                <div class="time-slot time-slot-header"></div>
+                @for (int i = 6; i < 24; i++)
+                {
+                    <div class="time-slot">
+                        <span>@i.ToString("D2"):00</span>
+                    </div>
+                }
+            </div>
+            @for (int i = 0; i < 3; i++)
+            {
+                var departmentName = i switch
+                {
+                    0 => Department.Vers.ToFriendlyString(),
+                    1 => Department.Vakkenvullen.ToFriendlyString(),
+                    2 => Department.Kassa.ToFriendlyString(),
+                    _ => string.Empty
+                };
+                
+                <div class="col day-col">
+                    <div class="day-header">
+                        <strong class="text-center d-block fs-5">@departmentName</strong>
+                    </div>
+                    <div class="day-hours-grid">
+                        @for (int j = 6; j < 24; j++)
+                        {
+                            if (role == Role.Manager && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
+                            {
+                                <div class="hour" ondblclick="GoToCreateShift('@Model.SelectedStartDate.ToString()', @j, '@departmentName')"><i class="fas fa-plus"></i></div>
+                            }
+                            else
+                            {
+                                <div class="hour pointer-events-none"></div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        @* Layer 2: Overlay *@
+        @{
+            List<List<Shift>> GetShiftGroups(List<Shift> shifts)
+            {
+                shifts = shifts.OrderBy(shift => shift.Start).ToList();
+                var groups = new List<List<Shift>>();
+
+                foreach (var shift in shifts)
+                {
+                    var overlappingGroup = groups.FirstOrDefault(group =>
+                        group.Any(g => g.End > shift.Start && g.Start < shift.End && g.Department == shift.Department));
+        
+                    if (overlappingGroup == null)
+                    {
+                        groups.Add(new List<Shift> { shift });
+                    }
+                    else
+                    {
+                        overlappingGroup.Add(shift);
+                    }
+                }
+                return groups;
+            }
+            var shiftGroups = GetShiftGroups(Model.Shifts);
+        }
+        
+        <div class="shifts-overlay shifts-overlay--day">
+            @foreach (var group in shiftGroups)
+            {
+                // show single shifts
+                if (group.Count == 1)
+                {
+                    var shift = group.First();
+                    var departmentGridPosition = shift.Department switch
+                    {
+                        Department.Vers => 1,
+                        Department.Vakkenvullen => 2,
+                        Department.Kassa => 3,
+                        _ => 0
+                    };
+                    var startHour = shift.Start.Hour;
+                    var endHour = shift.End.Hour;
+                    var gridSpanCol = endHour - startHour;
+
+                    <button
+                        class="unset-all shift-container 
+                            @shift.Department.ToString().ToLower() 
+                            @(shift.Employee == null ? "no-employee" : "")
+                            @(!shift.IsFinal ? "concept" : "")"
+                        style="grid-area: @(startHour - 5) / @departmentGridPosition  / span @gridSpanCol / span 1"
+                        data-bs-toggle="popover"
+                        data-bs-trigger="focus"
+                        data-bs-placement="left"
+                        data-bs-html="true"
+                        data-bs-custom-class="popover-shift @shift.Department.ToString().ToLower()"
+                        data-bs-title="
+                            @if (!shift.IsFinal) { <span class='text-secondary small fst-italic'>Concept</span> }
+                            <div class='d-flex justify-content-between align-items-center gap-3'>
+                                <span class='fw-500' style='min-width: 3em'>@shift.Department</span>
+                                @if (shift.Start.Date > DateTime.Today.Date && role == Role.Manager) { <a href='/shifts/update?id=@shift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
+                            </div>
+                            "
+                        data-bs-content="
+                            <div>
+                                <p class='text-secondary m-0'>@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                                @if (shift.Employee != null) {
+                                    <p class='fw-500 mb-1'><i class='fas fa-user me-1'></i>@shift.Employee?.FirstName @shift.Employee?.LastName</p> 
+                                } else {
+                                    <p class='fw-500 text-danger mb-1'><i class='fas fa-user-slash me-1'></i>Zoek intern vervanging en pas de dienst aan of zoek extern.</p> 
+                                }
+                            </div>">
+                        <div class="shift">
+                            <p class="text-secondary m-0">@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                            @if (shift.Employee != null)
+                            {
+                                <p class="fw-500">@shift.Employee.FirstName @shift.Employee.LastName</p>
+                            }
+                            else
+                            {
+                                <p class="fw-500 text-danger">
+                                    <i class="fas fa-user-slash"></i>
+                                    Geen werknemer
+                                </p>
+                            }
+                        </div>
+                    </button>
+                }
+                // Show shift groups
+                else
+                {
+                    var departmentGridPosition = group.First().Department switch
+                    {
+                        Department.Vers => 1,
+                        Department.Vakkenvullen => 2,
+                        Department.Kassa => 3,
+                        _ => 0
+                    };
+
+                    var startHour = group.Min(shift => shift.Start.Hour);
+                    var endHour = group.Max(shift => shift.End.Hour);
+                    var gridSpanCol = endHour - startHour;
+                    
+                    var firstShift = group.Find(shift => shift.Start.Hour == startHour) ?? group.First();
+                    bool groupHasEmptyShift = group.Any(shift => shift.Employee == null);
+                    
+                    <button
+                        class="unset-all shift-container 
+                            @firstShift.Department.ToString().ToLower() 
+                            @(groupHasEmptyShift ? "no-employee" : "")
+                            @(!firstShift.IsFinal ? "concept" : "")"
+                        style="grid-area: @(startHour - 5) / @departmentGridPosition  / span @gridSpanCol / span 1"
+                        data-bs-toggle="popover"
+                        data-bs-trigger="focus"
+                        data-bs-placement="left"
+                        data-bs-html="true"
+                        data-bs-custom-class="popover-shift @firstShift.Department.ToString().ToLower()"
+                        data-bs-title="
+                            @if (!firstShift.IsFinal) { <span class='text-secondary small fst-italic'>Concept</span> }
+                            <div class='d-flex justify-content-between align-items-center gap-3'>
+                                <span class='fw-500' style='min-width: 3em'>@firstShift.Department</span>
+                                @if (firstShift.Start.Date > DateTime.Today.Date && role == Role.Manager) { <a href='/shifts/update?id=@firstShift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
+                            </div>
+                            "
+                        data-bs-content="
+                            @foreach (var timeGroup in group.GroupBy(shift => new { shift.Start, shift.End }))
+                            {
+                                <div class='mb-2'>
+                                    <p class='text-secondary m-0'>@timeGroup.Key.Start.ToShortTimeString() - @timeGroup.Key.End.ToShortTimeString()</p>
+
+                                    @foreach (var shiftContent in timeGroup)
+                                    {
+                                        if (shiftContent.Employee != null)
+                                        {
+                                            <p class='fw-500 mb-1'><i class='fas fa-user me-1'></i>@shiftContent.Employee?.FirstName @shiftContent.Employee?.LastName</p>
+                                        }
+                                        else
+                                        {
+                                            <p class='fw-500 text-danger mb-1'><i class='fas fa-user-slash me-1'></i>Zoek intern vervanging en pas de dienst aan of zoek extern.</p>
+                                        }
+                                    }
+                                </div>
+                            }">
+                        
+                        <div class="shift">
+                            @foreach (var timeGroup in group.GroupBy(shift => new { shift.Start, shift.End }))
+                            {
+                                <div class="mb-2">
+                                    <p class="text-secondary m-0">@timeGroup.Key.Start.ToShortTimeString() - @timeGroup.Key.End.ToShortTimeString()</p>
+
+                                    @foreach (var shiftContent in timeGroup)
+                                    {
+                                        if (shiftContent.Employee != null)
+                                        {
+                                            <p class="fw-500 mb-1">@shiftContent.Employee?.FirstName @shiftContent.Employee?.LastName</p>
+                                        }
+                                        else
+                                        {
+                                            <p class="fw-500 mb-1 text-danger">
+                                                <i class="fas fa-user-slash"></i>
+                                                Geen werknemer
+                                            </p>
+                                        }
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                    </button>
+                }
+            }
+        </div>
+    </div>
+</div>
+}
+else
+{
+@* Calender week view *@
+<div class="table-container cdr-weekview">
+    <div class="border-bottom d-block d-md-block d-xl-none py-1 small text-center text-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" xml:space="preserve" 
+             style="height: 1.5em;fill: var(--bs-secondary);" viewBox="10.04 59.98 131.86 59.8">  
+            <g>
+                <g>
+                    <g>
+                        <path fill="inherit" d="M120.3,62.5c-0.8,1.4-0.8,3.8,0,5.5c1.1,1.9-15.8,2.7-49.2,2.7c-47,0-50.8,0.3-50,4.6c0.8,4.4,6,5.2,50,6.3c39.9,1.1,49.2,2.2,49.2,5.2c0,7.1,5.5,6,13.7-2.5l7.9-8.2l-7.9-8.2C125.5,59.2,123,58.1,120.3,62.5z"></path>
+                        <path fill="inherit" d="M15.7,96.1c-7.6,7.9-7.6,10.4,0.3,17.8c7.9,7.6,13.9,7.9,12,0.5c-1.4-5.2,0.3-5.5,49.4-6c67.5-1.1,67.7-6,0.5-7.1c-47-0.5-49.2-0.8-49.2-6C28.8,87.9,22.8,88.4,15.7,96.1z"></path>
+                    </g>
+                </g>
+            </g>
+        </svg>
+        <span>Horizontale scroll</span>
+    </div>
+    <div class="calendar-container">
+
+        @* Layer 1: Base Grid *@
+        <div class="calendar-grid row g-0 @(role == Role.Employee ? "pointer-events-none" : "")">
+            <div class="time-slots-col">
+                <div class="time-slot time-slot-header"></div>
+                @for (int i = 6; i < 24; i++)
+                {
+                    <div class="time-slot">
+                        <span>@i.ToString("D2"):00</span>
+                    </div>
+                }
+            </div>
+            @for (int i = 0; i < 7; i++)
+            {
+                <div class="col day-col @(Model.SelectedStartDate.AddDays(i) == DateOnly.FromDateTime(DateTime.Today) ? "today" : "")">
+                    <div class="day-header">
+                        <span class="text-center d-block small lh-1">@Model.SelectedStartDate.AddDays(i).ToString("ddd", CultureInfo.GetCultureInfo("nl-NL"))</span>
+                        <strong class="text-center d-block fs-5 lh-1">@Model.SelectedStartDate.AddDays(i).ToString("dd", CultureInfo.GetCultureInfo("nl-NL"))</strong>
+                    </div>
+                    <div class="day-hours-grid">
+                        @for (int j = 6; j < 24; j++)
+                        {
+                            if (role == Role.Manager && Model.SelectedStartDate.AddDays(i) > DateOnly.FromDateTime(DateTime.Today))
+                            {
+                                <div class="hour" ondblclick="GoToCreateShift('@Model.SelectedStartDate.AddDays(i).ToString()', @j)"><i class="fas fa-plus"></i></div>
+                            }
+                            else
+                            {
+                                <div class="hour pointer-events-none"></div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        @* Layer 2: Overlay *@
+        <div class="shifts-overlay shifts-overlay--week">
+            @foreach (Shift shift in Model.Shifts)
+            {
+                var dayGridPosition = shift.Start.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)shift.Start.DayOfWeek;
+                var startHour = shift.Start.Hour;
+                var endHour = shift.End.Hour;
+                var gridSpan = endHour - startHour;
+
+                <button
+                    class="unset-all shift-container 
+                        @shift.Department.ToString().ToLower() 
+                        @(shift.Employee == null ? "no-employee" : "")
+                        @(!shift.IsFinal ? "concept" : "")"
+                    style="grid-area: @(startHour - 5) / @dayGridPosition / span @gridSpan"
+                    data-bs-toggle="popover"
+                    data-bs-trigger="focus"
+                    data-bs-placement="left"
+                    data-bs-html="true"
+                    data-bs-custom-class="popover-shift @shift.Department.ToString().ToLower()"
+                    data-bs-title="
+                        @if (!shift.IsFinal) { <span class='text-secondary small fst-italic'>Concept</span> }
+                        <div class='d-flex justify-content-between align-items-center gap-3'>
+                            <span class='fw-500' style='min-width: 3em'>@shift.Department</span>
+                            @if (shift.Start.Date > DateTime.Today.Date && role == Role.Manager) { <a href='/shifts/update?id=@shift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
+                        </div>
+                        "
+                    data-bs-content="
+                        <div>
+                            <p class='text-secondary m-0'>@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                            @if (shift.Employee != null) { <p class='fw-500 mb-1'><i class='fas fa-user me-1'></i>@shift.Employee?.FirstName @shift.Employee?.LastName</p> }else { <p class='fw-500 text-danger mb-1'><i class='fas fa-user-slash me-1'></i>Zoek intern vervanging en pas de dienst aan of zoek extern.</p> }
+                        </div>">
+                    <div class="shift">
+                        <p class="text-secondary m-0">@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                        @if (shift.Employee != null)
+                        {
+                            <p class="fw-500">@shift.Employee?.FirstName @shift.Employee?.LastName</p>
+                        }
+                        else
+                        {
+                            <p class="fw-500 text-danger">
+                                <i class="fas fa-user-slash"></i>
+                                Geen werknemer
+                            </p>
+                        }
+                    </div>
+                </button>
+            }
+        </div>
+    </div>
+</div>
+}
+@* Legenda *@
+<div class="legenda table-container p-3">
+    <h4>Legenda</h4>
+    <div class="d-flex align-items-center gap-4 flex-wrap">
+        <div class="legenda-item">
+            <div class="legenda-color kassa"></div>
+            <span>Kassa</span>
+        </div>
+        <div class="legenda-item">
+            <div class="legenda-color vers"></div>
+            <span>Vers</span>
+        </div>
+        <div class="legenda-item">
+            <div class="legenda-color vakkenvullen"></div>
+            <span>Vakkenvullen</span>
+        </div>
+        @if (role == Role.Manager)
+        {
+            <div class="legenda-item">
+                <div class="legenda-color no-employee"></div>
+                <span>Geen werknemer</span>
+            </div>
+            <div class="legenda-item">
+                <div class="legenda-color concept"></div>
+                <span>Concept</span>
+            </div>
+        }
+    </div>
+</div>
+
+@* Modals *@
+@if (role == Role.Manager)
+{
+    <div class="modal fade" id="delete-week-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Weet je zeker dat je alle diensten deze week wilt verwijderen?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Door op "Verwijderen" te klikken worden alle diensten van deze week verwijderd. Dit kan niet ongedaan worden gemaakt.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuleren</button>
+                    <a class="btn btn-danger" asp-controller="Schedule" asp-action="DeleteWeek" asp-route-startDay="@Model.SelectedStartDate">
+                        Verwijderen
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts
+{
+    <script type="text/javascript">
+        function GoToDate(date) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("startDate", date);
+            location.href = url;
+        }
+        
+        function GoToEmployee(select) {
+            const url = new URL(window.location.href);
+            if (select.value.toLowerCase() === "all") {
+                url.searchParams.delete("employeeNumber");
+                url.searchParams.delete("dayView");
+            } else {
+                url.searchParams.set("employeeNumber", select.value);
+            }
+            location.href = url;
+        }    
+        
+        function GoToCreateShift(date, startHour, departmentName = null) {
+            location.href = departmentName === null
+                ? `/shifts/create?date=${date}&startHour=${startHour}`
+                : `/shifts/create?date=${date}&startHour=${startHour}&department=${departmentName}`;
+        }
+        
+        function GoToView(select) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("dayView", select.value === "day");
+            location.href = url;
+        }
+
+        function toggleFilterBtns() {
+            const filterButtons = document.getElementById("filterButtons");
+            filterButtons.classList.toggle("d-none");
+        }
+    </script>
 }
