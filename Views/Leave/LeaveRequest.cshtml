@@ -1,6 +1,7 @@
 ﻿@model BumboApp.ViewModels.LeaveRequestDetailViewModel
 @{
     ViewData["Title"] = "Verlof aanvragen";
+    var leftOverLeaveHours = Model.LoggedInEmployee.LeaveHours - Model.AmountOfUsedLeaveRequestHours;
 }
 
 @if (User.IsInRole(Role.Employee.ToString()))
@@ -33,7 +34,7 @@
         </form>
 
         <div class="card p-3">
-            <p class="card-text mb-0">Je hebt nog @Model.LoggedInEmployee.LeaveHours verlofuren over</p>
+            <p class="card-text mb-0">Je hebt nog @leftOverLeaveHours verlofuren over dit jaar</p>
         </div>
     </div>
 }

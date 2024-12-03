@@ -1,17 +1,15 @@
-﻿using Azure.Core;
-using BumboApp.Models;
+﻿using BumboApp.Models;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace BumboApp.Controllers
 {
     public class LeaveController : MainController
     {
         private Employee _loggedInEmployee;
+        private readonly int hoursPerDay = 8;
         public IActionResult Index(int? page, SortOrder? orderBy = SortOrder.Ascending, Status? selectedStatus = null)
         {
             _loggedInEmployee = GetLoggedInEmployee();
@@ -75,13 +73,19 @@ namespace BumboApp.Controllers
             _loggedInEmployee = GetLoggedInEmployee();
 
             LeaveRequest leaveRequest;
+            int amountOfLeaveHours = 0;
             if (id == null)
             {
                 leaveRequest = null;
+                var leaveRequests = Context.LeaveRequests
+                    .Where(e => e.Employee == _loggedInEmployee)
+                    .Where(s => s.Status == Status.Geaccepteerd || s.Status == Status.Aangevraagd)
+                    .ToList();
+                var usedLeaveHoursThisYear = CalculateLeaveHoursByYearForAllRequests(leaveRequests);
+                amountOfLeaveHours = usedLeaveHoursThisYear[DateTime.Now.Year];
             }
             else
             {
-
                 leaveRequest = Context.LeaveRequests
                           .Include(lr => lr.Employee)
                           .FirstOrDefault(lr => lr.Id == id);
@@ -90,7 +94,8 @@ namespace BumboApp.Controllers
             var viewModel = new LeaveRequestDetailViewModel
             {
                 LoggedInEmployee = _loggedInEmployee,
-                LeaveRequest = leaveRequest
+                LeaveRequest = leaveRequest,
+                AmountOfUsedLeaveRequestHours = amountOfLeaveHours
             };
             return View(viewModel);
         }
@@ -99,10 +104,19 @@ namespace BumboApp.Controllers
         {
             _loggedInEmployee = GetLoggedInEmployee();
             request.Employee = _loggedInEmployee;
+            var employeeLeaveRequests = Context.LeaveRequests
+                    .Where(e => e.Employee == _loggedInEmployee)
+                    .Where(s => s.Status == Status.Geaccepteerd || s.Status == Status.Aangevraagd)
+                    .ToList();
 
-            // calculate amount of leavehours
-            int amountOfLeaveHours = GetAmountOfLeaveHours(request.Id);
-            
+            var amountOfLeaveHoursYear = CalculateLeaveHoursByYearForAllRequests(employeeLeaveRequests);
+            var amountOfLeaveHoursLeaveRequest = CalculateLeaveHoursByYear(request.StartDate, request.EndDate);
+
+            var startYearHours = amountOfLeaveHoursLeaveRequest.GetValueOrDefault(request.StartDate.Year, 0)
+                     + amountOfLeaveHoursYear.GetValueOrDefault(request.StartDate.Year, 0);
+            var endYearHours = amountOfLeaveHoursLeaveRequest.GetValueOrDefault(request.EndDate.Year, 0)
+                               + amountOfLeaveHoursYear.GetValueOrDefault(request.EndDate.Year, 0);
+
             // validation 
             if (request.StartDate < DateTime.Now)
             {
@@ -112,7 +126,8 @@ namespace BumboApp.Controllers
             {
                 return NotifyErrorAndRedirect("De startdatum moet voor of op de einddatum vallen.", "LeaveRequest");
             }
-            if (_loggedInEmployee.LeaveHours < amountOfLeaveHours)
+
+            if (_loggedInEmployee.LeaveHours < startYearHours || _loggedInEmployee.LeaveHours < endYearHours)
             {
                 return NotifyErrorAndRedirect("Je hebt niet genoeg verlofuren om een verlofaanvraag te doen.", "Index");
             }
@@ -137,7 +152,6 @@ namespace BumboApp.Controllers
             try
             {
                 Context.LeaveRequests.Add(request);
-                _loggedInEmployee.LeaveHours = _loggedInEmployee.LeaveHours - amountOfLeaveHours;
 
                 var manager = Context.Employees.Find(1);
                 var notification = new Notification
@@ -173,12 +187,6 @@ namespace BumboApp.Controllers
                     var leaveRequestEmployee = Context.Employees.Find(leaveRequest.Employee.EmployeeNumber);
                     leaveRequest.Status = status;
 
-                    if(status == Status.Afgewezen)
-                    {
-                        int amountOfLeaveHours= GetAmountOfLeaveHours(leaveRequestId);
-                        leaveRequestEmployee.LeaveHours += amountOfLeaveHours;
-                    }
-
                     var notification = new Notification
                     {
                         Employee = leaveRequestEmployee,
@@ -205,30 +213,91 @@ namespace BumboApp.Controllers
             }
         }
 
-        private int GetAmountOfLeaveHours(int leaveRequestId)
+        public Dictionary<int, int> CalculateLeaveHoursByYearForAllRequests(
+                List<LeaveRequest> leaveRequests)
         {
-            var request = Context.LeaveRequests.Find(leaveRequestId);
-            TimeSpan difference = request.EndDate - request.StartDate;
-            int totalDays = difference.Days;
+            // Dictionary to store total leave hours used per year
+            var totalLeaveHoursByYear = new Dictionary<int, int>();
 
-            // calculate amount of leavehours
-            int amountOfLeaveHours = 0;
-            if (totalDays > 0)
+            foreach (var leaveRequest in leaveRequests)
             {
-                amountOfLeaveHours = totalDays * 8;
-            }
-            else
-            {
-                if (difference.Hours > 8)
+                // Calculate leave hours by year for the current leave request
+                var leaveHoursByYear = CalculateLeaveHoursByYear(leaveRequest.StartDate, leaveRequest.EndDate);
+
+                // Aggregate the leave hours into the total dictionary
+                foreach (var entry in leaveHoursByYear)
                 {
-                    amountOfLeaveHours = 8;
+                    if (!totalLeaveHoursByYear.ContainsKey(entry.Key))
+                    {
+                        totalLeaveHoursByYear[entry.Key] = 0;
+                    }
+
+                    totalLeaveHoursByYear[entry.Key] += entry.Value;
+                }
+            }
+
+            return totalLeaveHoursByYear;
+        }
+
+        // Splits leave hours for a single leave request across years
+        public Dictionary<int, int> CalculateLeaveHoursByYear(DateTime start, DateTime end)
+        {
+            var leaveHoursByYear = new Dictionary<int, int>();
+
+            // Ensure the start date is not after the end date
+            if (start > end)
+                return leaveHoursByYear;
+
+            // Iterate over each year involved in the leave request
+            var yearsInvolved = Enumerable.Range(start.Year, end.Year - start.Year + 1);
+
+            foreach (var year in yearsInvolved)
+            {
+                var yearStart = new DateTime(year, 1, 1);
+                var yearEnd = new DateTime(year, 12, 31, 23, 59, 59);
+
+                // Calculate the overlap for the current year
+                var effectiveStart = (start > yearStart) ? start : yearStart;
+                var effectiveEnd = (end < yearEnd) ? end : yearEnd;
+
+                // Skip if there's no overlap
+                if (effectiveStart > effectiveEnd)
+                    continue;
+
+                // Calculate the difference between start and end dates
+                TimeSpan difference = effectiveEnd - effectiveStart;
+                int totalDays = difference.Days;
+
+                int amountOfLeaveHours = 0;
+
+                // Calculate leave hours based on the given logic
+                if (totalDays > 0)
+                {
+                    amountOfLeaveHours = totalDays * 8;
                 }
                 else
                 {
-                    amountOfLeaveHours = difference.Hours;
+                    // Handle partial days
+                    if (difference.Hours > 8)
+                    {
+                        amountOfLeaveHours = 8;
+                    }
+                    else
+                    {
+                        amountOfLeaveHours = difference.Hours;
+                    }
                 }
+
+                // Add the leave hours for the current year to the dictionary
+                if (!leaveHoursByYear.ContainsKey(year))
+                {
+                    leaveHoursByYear[year] = 0;
+                }
+
+                leaveHoursByYear[year] += amountOfLeaveHours;
             }
-            return amountOfLeaveHours;
+
+            return leaveHoursByYear;
         }
 
         private Employee GetLoggedInEmployee()
@@ -239,6 +308,7 @@ namespace BumboApp.Controllers
 
             return _loggedInEmployee;
         }
+
 
         [HttpPost]
         public IActionResult CreateSickLeave(SickLeave sickLeave)
@@ -300,12 +370,14 @@ namespace BumboApp.Controllers
                 Context.SaveChanges();
                 transaction.Commit();
                 return NotifySuccessAndRedirect("De ziekmelding is opgeslagen.", "Index");
-        }
+            }
             catch
             {
                 transaction.Rollback();
                 return NotifyErrorAndRedirect("Er is iets mis gegaan bij het toevoegen van de ziekmelding", "Index");
-    }
-}
+            }
+        }
+
+
     }
 }

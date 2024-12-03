@@ -6,6 +6,7 @@ namespace BumboApp.ViewModels
     {
         public required Employee LoggedInEmployee { get; set; }
         public LeaveRequest LeaveRequest { get; set; }
+        public int AmountOfUsedLeaveRequestHours { get; set; }
 
     }
 }
