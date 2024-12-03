@@ -7,17 +7,20 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Identity;
 using BumboApp.ViewModels;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace BumboApp.Controllers
 {
     public class EmployeesController : MainController
     {
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<User> _userManager;
         private HttpClient client = new HttpClient();
 
-        public EmployeesController(UserManager<User> userManager)
+        public EmployeesController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
@@ -75,11 +78,11 @@ namespace BumboApp.Controllers
         }
         public IActionResult Create()
         {
-
             var viewModel = new UserEmployeeViewModel
             {
-                Employee = new Employee()
+                DateOfBirth = new DateOnly(2000, 1, 1)
             };
+
             return View(viewModel);
         }
 
@@ -88,29 +91,48 @@ namespace BumboApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                //foreach (var state in ModelState)
-                //{
-                //    foreach (var error in state.Value.Errors)
-                //    {
-                //        Console.WriteLine($"Field: {state.Key}, Error: {error.ErrorMessage}");
-                //    }
-                //}
                 return View(viewModel);
             }
 
-            var user = new User()
+            var roleExists = await _roleManager.RoleExistsAsync(viewModel.Role.ToString());
+            if (!roleExists)
             {
-                Email = viewModel.Email
-            };
+                NotifyService.Error("Er is iets mis gegaan met het maken ivm de Rol"); //Gebeurt als het goed is nooit
+                return View(viewModel);
+            }
 
+            var user = new User
+            {
+                UserName = viewModel.FirstName,
+                NormalizedUserName = viewModel.FirstName.ToUpper(),
+                Email = viewModel.Email,
+                NormalizedEmail = viewModel.Email.ToUpper(),
+                Id = Guid.NewGuid().ToString()
+            };
             var passwordHasher = new PasswordHasher<User>();
             user.PasswordHash = passwordHasher.HashPassword(user, viewModel.Password);
 
-            viewModel.Employee.User = user;
-            Context.Employees.Add(viewModel.Employee);
 
+            await _userManager.CreateAsync(user);
+            await _userManager.AddToRoleAsync(user, viewModel.Role.ToString());
+
+
+            var employee = new Employee
+            {
+                FirstName = viewModel.FirstName,
+                LastName = viewModel.LastName,
+                DateOfBirth = viewModel.DateOfBirth,
+                Zipcode = viewModel.Zipcode,
+                HouseNumber = viewModel.HouseNumber,
+                ContractHours = viewModel.ContractHours,
+                LeaveHours = viewModel.LeaveHours,
+                UserId = user.Id
+            };
+
+            Context.Employees.Add(employee);
             await Context.SaveChangesAsync();
-            return RedirectToAction(nameof(Details), new { id = viewModel.Employee.EmployeeNumber });
+
+            return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Update(int id)
@@ -141,7 +163,6 @@ namespace BumboApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Update(int id, EmployeeUpdateViewModel model)
         {
-            Console.WriteLine("----------------UpdatePOST------------");
             if (!ModelState.IsValid)
             {
                 NotifyService.Error("Er is iets misgegaan");

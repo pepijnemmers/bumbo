@@ -17,59 +17,70 @@
 
         <div class="form-group">
             <label asp-for="@Model.Password" class="control-label">Wachtwoord</label>
-            <input asp-for="@Model.Password" type="password" class="form-control"/>
+            <input asp-for="@Model.Password" type="password" class="form-control" />
             <span asp-validation-for="@Model.Password" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="Role" class="control-label"></label>
+            <select asp-for="Role" class="form-control">
+                @foreach (var role in Enum.GetValues(typeof(Role)))
+                {
+                    <option value="@role">@role</option>
+                }
+            </select>
+            <span asp-validation-for="Role" class="text-danger"></span>
         </div>
     </div>
 
     <div class="table-container">
         <h3>Persoonsgegevens</h3>
         <div class="form-group">
-            <label asp-for="@Model.Employee.FirstName" class="control-label">Voornaam</label>
-            <input asp-for="@Model.Employee.FirstName" class="form-control" />
-            <span asp-validation-for="@Model.Employee.FirstName" class="text-danger"></span>
+            <label asp-for="@Model.FirstName" class="control-label">Voornaam</label>
+            <input asp-for="@Model.FirstName" class="form-control" />
+            <span asp-validation-for="@Model.FirstName" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label asp-for="@Model.Employee.LastName" class="control-label">Achternaam</label>
-            <input asp-for="@Model.Employee.LastName" class="form-control" placeholder="van den Bos" />
-            <span asp-validation-for="@Model.Employee.LastName" class="text-danger"></span>
+            <label asp-for="@Model.LastName" class="control-label">Achternaam</label>
+            <input asp-for="@Model.LastName" class="form-control" placeholder="van den Bos" />
+            <span asp-validation-for="@Model.LastName" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label asp-for="@Model.Employee.DateOfBirth" class="control-label">Geboortedatum</label>
-            <input asp-for="@Model.Employee.DateOfBirth" type="date" class="form-control" />
-            <span asp-validation-for="@Model.Employee.DateOfBirth" class="text-danger"></span>
+            <label asp-for="@Model.DateOfBirth" class="control-label">Geboortedatum</label>
+            <input asp-for="@Model.DateOfBirth" type="date" class="form-control" />
+            <span asp-validation-for="@Model.DateOfBirth" class="text-danger"></span>
         </div>
     </div>
 
     <div class="table-container">
         <h3>Addresgegevens</h3>
         <div class="form-group">
-            <label asp-for="@Model.Employee.Zipcode" class="control-label">Postcode</label>
-            <input asp-for="@Model.Employee.Zipcode" class="form-control" placeholder="Formaat: 1234AB" />
-            <span asp-validation-for="@Model.Employee.Zipcode" class="text-danger" placeholder="1a"></span>
+            <label asp-for="@Model.Zipcode" class="control-label">Postcode</label>
+            <input asp-for="@Model.Zipcode" class="form-control" placeholder="Formaat: 1234AB" />
+            <span asp-validation-for="@Model.Zipcode" class="text-danger" placeholder="1a"></span>
         </div>
 
         <div class="form-group">
-            <label asp-for="@Model.Employee.HouseNumber" class="control-label">Huisnummer + toevoeging</label>
-            <input asp-for="@Model.Employee.HouseNumber" class="form-control" />
-            <span asp-validation-for="@Model.Employee.HouseNumber" class="text-danger"></span>
+            <label asp-for="@Model.HouseNumber" class="control-label">Huisnummer + toevoeging</label>
+            <input asp-for="@Model.HouseNumber" class="form-control" />
+            <span asp-validation-for="@Model.HouseNumber" class="text-danger"></span>
         </div>
     </div>
 
     <div class="table-container">
         <h3>Contractgegevens</h3>
         <div class="form-group">
-            <label asp-for="@Model.Employee.ContractHours" class="control-label">Contracturen</label>
-            <input asp-for="@Model.Employee.ContractHours" type="number" class="form-control" />
-            <span asp-validation-for="@Model.Employee.ContractHours" class="text-danger"></span>
+            <label asp-for="@Model.ContractHours" class="control-label">Contracturen</label>
+            <input asp-for="@Model.ContractHours" type="number" class="form-control" />
+            <span asp-validation-for="@Model.ContractHours" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label asp-for="@Model.Employee.LeaveHours" class="control-label">Verlofuren</label>
-            <input asp-for="@Model.Employee.LeaveHours" type="number" class="form-control" />
-            <span asp-validation-for="@Model.Employee.LeaveHours" class="text-danger"></span>
+            <label asp-for="@Model.LeaveHours" class="control-label">Verlofuren</label>
+            <input asp-for="@Model.LeaveHours" type="number" class="form-control" />
+            <span asp-validation-for="@Model.LeaveHours" class="text-danger"></span>
         </div>
     </div>
 
