@@ -14,8 +14,9 @@ namespace BumboApp.Controllers
             CheckPageAccess(Role.Manager);
         }
         
-        public IActionResult Index()
+        public IActionResult Index(int id)
         {
+            Console.WriteLine(id);
             return View();
         }
 
