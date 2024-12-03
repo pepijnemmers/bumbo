@@ -73,7 +73,10 @@ namespace BumboApp.Controllers
 
         public IActionResult LeaveRequest()
         {
-            return View();
+            var username = User?.Identity?.Name;
+            _loggedInEmployee = Context.Employees
+            .FirstOrDefault(e => e.FirstName.Equals(username));
+            return View(_loggedInEmployee);
         }
 
         [HttpPost]
@@ -139,17 +142,18 @@ namespace BumboApp.Controllers
             try
             {
                 Context.LeaveRequests.Add(request);
-                // TODO fix notification
-                //var manager = Context.Employees.Find(1);
-                //var notification = new Notification
-                //{
-                //    Employee = manager,
-                //    Title = "Nieuwe verlofaanvraag",
-                //    Description = "Er staat een nieuwe verlofaanvraag klaar om beoordeeld te worden.",
-                //    SentAt = DateTime.Now,
-                //    HasBeenRead = false
-                //};
-                //Context.Notifications.Add(notification);
+                _loggedInEmployee.LeaveHours = _loggedInEmployee.LeaveHours - amountOfLeaveHours;
+
+                var manager = Context.Employees.Find(1);
+                var notification = new Notification
+                {
+                    Employee = manager,
+                    Title = "Nieuwe verlofaanvraag",
+                    Description = "Er is een nieuwe verlofaanvraag om te beoordelen",
+                    SentAt = DateTime.Now,
+                    HasBeenRead = false
+                };
+                Context.Notifications.Add(notification);
                 Context.SaveChanges();
                 transaction.Commit();
                 return NotifySuccessAndRedirect("De verlofaanvraag is opgeslagen.", "Index");

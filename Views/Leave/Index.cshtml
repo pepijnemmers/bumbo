@@ -40,7 +40,7 @@
             </tr>
         </thead>
         <tbody>
-            @if (Model != null)
+            @if (Model.LeaveRequestsForPage.Count > 0)
             {
                 foreach (var request in Model.LeaveRequestsForPage)
                 {
@@ -70,7 +70,13 @@
                         </td>
                     </tr>
                 }
-            }        
+            }
+            else
+            {
+                <tr>
+                    <td colspan="100%" class="text-center">Er zijn verlofverzoeken</td>
+                </tr>
+            }
         </tbody>
     </table>
     @if (ViewBag.MaxPages > 1)
