@@ -88,12 +88,10 @@ namespace BumboApp.Controllers
             List<Employee> employees = Context.Employees
                 .Include(e => e.Shifts).ToList();
             List<Employee> managers = employees.Where(e => GetUserRoleAsync(e.User.Id).Result == Role.Manager).ToList();
-
-            foreach (Employee employee in managers) { Console.WriteLine(employee.FirstName); }
-
             int weekNumber = new GregorianCalendar(GregorianCalendarTypes.Localized).GetWeekOfYear(startDate.ToDateTime(new TimeOnly()), CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
             foreach (Employee e in employees)
             {
+                if (managers.Contains(e)) continue;
                 if (e.ContractHours >
                     GetWorkingHours(e.Shifts.Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly())
                     && e.End.Date <= endDate.ToDateTime(new TimeOnly())).ToList()) && 
@@ -104,6 +102,7 @@ namespace BumboApp.Controllers
                     {
                         Context.Notifications.Add(new Notification()
                         {
+                            SentAt = DateTime.Now,
                             Title = name + "heeft te weinig uren in week " + weekNumber,
                             Description = name + "heeft minder dan " + e.ContractHours + " uren in week " + weekNumber,
                             Employee = m
