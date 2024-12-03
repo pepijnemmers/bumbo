@@ -103,6 +103,92 @@
     }
 </div>
 
+<div class="row align-items-center mb-3">
+    <div class="col">
+        <h3>Ziekmeldingen</h3>
+    </div>
+
+    <div class="col-auto">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sickLeaveModal">Nieuwe ziekmelding</button>
+    </div>
+
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Werknemer</th>
+                <th>Datum</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null)
+            {
+                foreach (var sickLeave in Model.SickLeaves)
+                {
+                    <tr>
+                        <td>@sickLeave.Employee.FirstName @sickLeave.Employee.LastName</td>
+                        <td>@sickLeave.Date</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    @if (ViewBag.MaxPages > 1)
+    {
+        <Component type="typeof(Pagination)"
+                   render-mode="ServerPrerendered"
+                   param-PageNumber="ViewBag.PageNumber"
+                   param-MaxPages="ViewBag.MaxPages" />
+    }
+</div>
+
+<div class="modal fade align-content-center" id="sickLeaveModal" tabindex="-1" aria-labelledby="sickLeave" aria-hidden="true">
+    <div class="modal-dialog">
+        <form asp-action="CreateSickLeave" asp-controller="Leave" method="post">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="newSickLeave">Nieuwe ziekmelding</h1>
+            </div>
+            <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="date" class="col-form-label">Datum</label>
+                        <input type="date" class="form-control" id="date" name="date" placeholder="Datum" onchange="checkDate()" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" required>
+                    </div>
+                    @if (User.IsInRole(Role.Manager.ToString()))
+                    {
+                        <div class="mb-3">
+                            <label for="Employee" class="col-form-label">Werknemer</label>
+                            <select class="form-select" id="employeeSelect" aria-label="Employee" onchange="updateEmployeeNumber()" required>
+                                <option value="" disabled selected>Selecteer werknemer</option>
+
+                                @foreach (var employee in Model.AllEmployees)
+                                {
+                                    <option value="@employee.EmployeeNumber">@employee.FirstName @employee.LastName</option>
+                                }
+                            </select>
+                        </div>
+
+                        <input type="hidden" id="EmployeeNumber" name="EmployeeNumber" value="">
+
+                    }
+                    else
+                    {
+                        <input type="hidden" name="Employee" value="@Model.LoggedInEmployee"/>
+                        <input type="hidden" name="EmployeeNumber" value="@Model.LoggedInEmployee.EmployeeNumber"/>
+                    }
+
+            </div>
+            <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" id="sickLeaveCreateButton" class="btn btn-primary">Ziekmelden</button>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+
 <script>
     function GoToStatus(select) {
         const url = new URL(window.location.href);
@@ -112,5 +198,10 @@
             url.searchParams.set("selectedStatus", select.value);
         }
         location.href = url;
+    }
+
+    function updateEmployeeNumber() {
+        const selectedEmployeeNumber = document.getElementById('employeeSelect').value;
+        document.getElementById('EmployeeNumber').value = selectedEmployeeNumber;
     }
 </script>

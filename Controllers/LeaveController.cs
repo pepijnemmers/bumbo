@@ -1,7 +1,9 @@
-﻿using BumboApp.Models;
+﻿using Azure.Core;
+using BumboApp.Models;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -15,12 +17,14 @@ namespace BumboApp.Controllers
             _loggedInEmployee = GetLoggedInEmployee();
 
             List<LeaveRequest> leaveRequests;
+            List<SickLeave> sickLeaves;
             if (LoggedInUserRole == Role.Manager)
             {
                 leaveRequests = Context.LeaveRequests
-                    .Where(p => selectedStatus == null || p.Status == selectedStatus)
+                    .Where(p => (selectedStatus == null || p.Status == selectedStatus) && p.EndDate > DateTime.Now)
                     .OrderBy(p => p.StartDate)
                     .ToList();
+                sickLeaves = Context.SickLeaves.OrderByDescending(p => p.Date).ToList();
             }
             else
             {
@@ -29,6 +33,7 @@ namespace BumboApp.Controllers
                     .Where(p => selectedStatus == null || p.Status == selectedStatus)
                     .OrderBy(p => p.StartDate)
                     .ToList();
+                sickLeaves = Context.SickLeaves.Where(e => e.Employee == _loggedInEmployee).OrderByDescending(p => p.Date).ToList();
             }
 
             if (orderBy == SortOrder.Descending)
@@ -54,7 +59,12 @@ namespace BumboApp.Controllers
                     .Skip((currentPageNumber - 1) * PageSize)
                     .Take(PageSize)
                     .ToList(),
-                SelectedStatus = selectedStatus
+                SelectedStatus = selectedStatus,
+                SickLeaves = sickLeaves.Skip((currentPageNumber - 1) * PageSize)
+                    .Take(PageSize)
+                    .ToList(),
+                LoggedInEmployee = _loggedInEmployee,
+                AllEmployees = Context.Employees.Skip(1).ToList()
             };
 
             return View(viewModel);
@@ -229,5 +239,73 @@ namespace BumboApp.Controllers
 
             return _loggedInEmployee;
         }
+
+        [HttpPost]
+        public IActionResult CreateSickLeave(SickLeave sickLeave)
+        {
+            if (sickLeave.EmployeeNumber == 0)
+            {
+                return NotifyErrorAndRedirect("Er was geen werknemer geselecteerd", "Index");
+            }
+            if (sickLeave.Date.ToDateTime(TimeOnly.MinValue) < DateTime.Now.Date)
+            {
+                return NotifyErrorAndRedirect("Je kunt geen ziekmelding in het verleden doen.", "Index");
+            }
+            if (sickLeave.Date.ToDateTime(TimeOnly.MinValue) > DateTime.Now.Date.AddDays(1))
+            {
+                return NotifyErrorAndRedirect("Je kunt je niet verder dan 1 dag in de toekomst ziekmelden.", "Index");
+            }
+
+            bool hasOverlappingSickLeave = Context.SickLeaves
+                .Any(sl =>
+                    sl.EmployeeNumber == sickLeave.EmployeeNumber &&
+                    sl.Date == sickLeave.Date);
+
+            if (hasOverlappingSickLeave)
+            {
+                return NotifyErrorAndRedirect("Werknemer is al ziekgemeld op deze dag", "Index");
+            }
+
+            Employee employee = Context.Employees.FirstOrDefault(e => e.EmployeeNumber == sickLeave.EmployeeNumber);
+            sickLeave.Employee = employee;
+
+            List<Shift> EmployeeShifts = Context.Shifts
+                                    .Where(s => s.Employee != null &&
+                                                s.Employee.EmployeeNumber == sickLeave.EmployeeNumber &&
+                                                s.Start.Date == sickLeave.Date.ToDateTime(TimeOnly.MinValue).Date) // checks if the shift starts on the sick leave date
+                                    .ToList();
+
+            using var transaction = Context.Database.BeginTransaction();
+
+            try
+            {
+                Context.SickLeaves.Add(sickLeave);
+                foreach (Shift shift in EmployeeShifts)
+                {
+                    ShiftTakeOver existingShiftTakeOver = Context.ShiftTakeOvers.FirstOrDefault(st => st.ShiftId == shift.Id);
+                    if (existingShiftTakeOver == null)
+                    {
+                        var shiftTakeOver = new ShiftTakeOver
+                        {
+                            ShiftId = shift.Id,
+                            Shift = shift,
+                            Status = Status.Aangevraagd
+                        };
+                        shift.ShiftTakeOver = shiftTakeOver;
+                        Context.ShiftTakeOvers.Add(shiftTakeOver);
+                    }
+                    shift.Employee = null;
+
+                }
+                Context.SaveChanges();
+                transaction.Commit();
+                return NotifySuccessAndRedirect("De ziekmelding is opgeslagen.", "Index");
+        }
+            catch
+            {
+                transaction.Rollback();
+                return NotifyErrorAndRedirect("Er is iets mis gegaan bij het toevoegen van de ziekmelding", "Index");
+    }
+}
     }
 }
