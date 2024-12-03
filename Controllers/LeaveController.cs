@@ -132,17 +132,17 @@ namespace BumboApp.Controllers
             {
                 Context.LeaveRequests.Add(request);
                 _loggedInEmployee.LeaveHours = _loggedInEmployee.LeaveHours - amountOfLeaveHours;
-                // TODO fix notification
-                //var manager = Context.Employees.Find(1);
-                //var notification = new Notification
-                //{
-                //    Employee = manager,
-                //    Title = "Nieuwe verlofaanvraag",
-                //    Description = "Er staat een nieuwe verlofaanvraag klaar om beoordeeld te worden.",
-                //    SentAt = DateTime.Now,
-                //    HasBeenRead = false
-                //};
-                //Context.Notifications.Add(notification);
+
+                var manager = Context.Employees.Find(1);
+                var notification = new Notification
+                {
+                    Employee = manager,
+                    Title = "Nieuwe verlofaanvraag",
+                    Description = "Er is een nieuwe verlofaanvraag om te beoordelen",
+                    SentAt = DateTime.Now,
+                    HasBeenRead = false
+                };
+                Context.Notifications.Add(notification);
                 Context.SaveChanges();
                 transaction.Commit();
                 return NotifySuccessAndRedirect("De verlofaanvraag is opgeslagen.", "Index");
