@@ -7,7 +7,7 @@ namespace BumboApp.Controllers
 {
     public class ShiftsController : MainController
     {
-        public IActionResult Create()
+        public IActionResult Create(DateOnly? date, TimeOnly? startTime, TimeOnly? endTime )
         {
             CheckPageAccess(Role.Manager);
             return View();

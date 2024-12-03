@@ -144,3 +144,8 @@ a {
     padding: .1em .45em;
     border-radius: .2em;
 }
+
+/* main */
+.main-content {
+    overflow-x: auto;
+}
