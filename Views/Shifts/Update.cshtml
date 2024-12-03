@@ -6,20 +6,21 @@
 @if (Model?.Shift != null && Model.Shift.Start > DateTime.Now)
 {
 <div class="table-container p-3">
-    <form asp-action="Create" asp-controller="Shifts" method="post">
+    <form asp-action="Update" asp-controller="Shifts" method="post">
+        <input type="hidden" name="id" value="@Model.Shift.Id">
         <div class="form-group mb-2">
             <label for="date" class="form-label fw-bold">Datum</label>
-            <input type="date" class="form-control" id="date" name="date" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" value="@(Model.SelectedDate.HasValue ? Model.SelectedDate.Value.ToString("yyyy-MM-dd") : String.Empty)" required>
+            <input type="date" class="form-control" id="date" name="date" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" value="@Model.Shift.Start.Date.ToString("yyyy-MM-dd")" required>
         </div>
         <div class="row">
             <div class="form-group mb-2 col">
                 <label for="start" class="form-label fw-bold">Starttijd</label>
-                <input type="time" step="3600" class="form-control" id="start" name="start" value="@(Model.SelectedStartHour.HasValue ? Model.SelectedStartHour.Value.ToString("hh:mm") : String.Empty)" required>
+                <input type="time" step="3600" class="form-control" id="start" name="start" value="@(TimeOnly.FromDateTime(Model.Shift.Start))" required>
                 <p class="small text-secondary">Alleen hele uren zijn toegestaan.</p>
             </div>
             <div class="form-group mb-2 col">
                 <label for="end" class="form-label fw-bold">Eindtijd</label>
-                <input type="time" step="3600" class="form-control" id="end" name="end" required>
+                <input type="time" step="3600" class="form-control" id="end" name="end" value="@(TimeOnly.FromDateTime(Model.Shift.End))" required>
                 <p class="small text-secondary">Alleen hele uren zijn toegestaan.</p>
             </div>
         </div>
@@ -29,24 +30,24 @@
                 <option>Selecteer een afdeling</option>
                 @foreach (var department in Model.Departments)
                 {
-                    <option value="@department" selected="@(Model.SelectedDepartment == department)">
+                    <option value="@department" selected="@(Model.Shift.Department == department)">
                         @department.ToFriendlyString()
                     </option>
                 }
             </select>
         </div>
         <div class="form-group mb-2">
-            <label for="employee" class="form-label fw-bold">Medewerker</label>
-            <select class="form-select" id="employee" name="employee" required>
-                <option value="0" selected>Geen medewerker</option>
+            <label for="employee" class="form-label fw-bold">Werknemer</label>
+            <select class="form-select" id="employee" name="employeeNumber" required>
+                <option value="0" selected="@(Model.Shift.Employee == null)">Geen werknemer</option>
                 @foreach (var employee in Model.Employees)
                 {
-                    <option value="@employee.EmployeeNumber">@employee.FirstName @employee.LastName</option>
+                    <option value="@employee.EmployeeNumber" selected="@(Model.Shift.Employee == employee)">@employee.FirstName @employee.LastName</option>
                 }
             </select>
             <p class="small text-secondary">
                 <i class="fas fa-info-circle"></i>
-                Als er geen medewerker is geselecteerd, wordt de dienst als open dienst aangemaakt.
+                Als er geen werknemer is geselecteerd, wordt de dienst als open dienst aangemaakt.
             </p>
         </div>
         @if (!Model.Shift.IsFinal)
@@ -58,6 +59,10 @@
                 <input type="radio" id="isConcept" name="isFinal" value="false" checked>
                 <label for="isConcept" class="form-label fw-normal">Concept</label>
             </div>
+        }
+        else
+        {
+            <input type="hidden" name="isFinal" value="true">
         }
         <div class="d-flex justify-content-between">
             <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#confirmDelete">Verwijderen</button>
@@ -72,7 +77,7 @@
 <div class="modal fade" id="confirmDelete" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <form class="modal-content" method="post" asp-controller="Shifts" asp-action="Delete" enctype="multipart/form-data">
-            <input type="hidden" name="id" value="0" /> @* TODO *@
+            <input type="hidden" name="id" value="@Model.Shift.Id">
             <div class="modal-header">
                 <h5 class="modal-title">Dienst verwijderen</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
