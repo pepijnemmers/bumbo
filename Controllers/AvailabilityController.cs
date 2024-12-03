@@ -83,7 +83,7 @@ namespace BumboApp.Controllers
             {
                 for (int i = 0; i < 7; i++)
                 {
-                    var a = new Availability
+                    var availability = new Availability
                     {
                         Date = startDate,
                         EmployeeNumber = employeeNumber,
@@ -91,7 +91,24 @@ namespace BumboApp.Controllers
                         EndTime = new TimeOnly(21, 0)
                     };
                     startDate = startDate.AddDays(1);
-                    availabilities.Add(a);
+                    availabilities.Add(availability);
+                }
+            }
+            else
+            {
+                var standardAvailabilities = Context.StandardAvailabilities
+                    .Where(sa => sa.EmployeeNumber == employee.EmployeeNumber);
+                foreach (var standardAvailability in standardAvailabilities)
+                {
+                    int diffDays = ((int)standardAvailability.Day + 6) % 7;
+                    var availability = new Availability
+                    {
+                        EmployeeNumber = employeeNumber,
+                        StartTime = standardAvailability.StartTime,
+                        EndTime = standardAvailability.EndTime,
+                        Date = startDate.AddDays(diffDays)
+                    };
+                    availabilities.Add(availability);
                 }
             }
 
