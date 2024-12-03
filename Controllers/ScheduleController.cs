@@ -553,7 +553,6 @@ namespace BumboApp.Controllers
             }
             else
             {
-                int maxWeekHours;
                 int maxTimeWithSchoolHours;
                 int maxhoursWithAverage;
                 int maxAllowedHours = maxWeeklyHoursAlmostAdult * timeframeInWeeksMaxWeeklyHoursAlmostAdult;
@@ -565,7 +564,7 @@ namespace BumboApp.Controllers
                 .ToList());
 
                 maxhoursWithAverage = maxAllowedHours + workedHoursInTimeframe;            
-                if (employee.SchoolSchedules.Where(e => e.Date >= startDate && e.Date <= startDate.AddDays(6)).Any()) // magic number
+                if (employee.SchoolSchedules.Where(e => e.Date >= startDate && e.Date <= startDate.AddDays(6)).Any())
                 {
                     maxTimeWithSchoolHours = maxHoursWithSchoolAlmostAdult;
                 }
