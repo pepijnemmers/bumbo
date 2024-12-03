@@ -1,6 +1,13 @@
 ﻿@model BumboApp.ViewModels.LeaveRequestDetailViewModel
 @{
-    ViewData["Title"] = "Verlof aanvragen";
+    if (User.IsInRole(Role.Employee.ToString()))
+    {
+        ViewData["Title"] = "Nieuwe verlof aanvraag";
+    }
+    else if (User.IsInRole(Role.Manager.ToString()))
+    {
+        ViewData["Title"] = "Verlof aanvraag beoordelen";
+    }
     var leftOverLeaveHours = Model.LoggedInEmployee.LeaveHours - Model.AmountOfUsedLeaveRequestHours;
 }
 
