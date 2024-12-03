@@ -69,12 +69,12 @@ namespace BumboApp.Controllers
             DateOnly endDate = startDate.AddDays(6);
 
             //for testing comment out the code between the comments (because there are already 2 shifts in the Db)
-            if (Context.Shifts
-                .Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) &&
-                e.End.Date <= endDate.ToDateTime(new TimeOnly())).Any())
-            {
-                return NotifyErrorAndRedirect("er is al een rooster voor deze week", "Index");
-            }
+            //if (Context.Shifts
+            //    .Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) &&
+            //    e.End.Date <= endDate.ToDateTime(new TimeOnly())).Any())
+            //{
+            //    return NotifyErrorAndRedirect("er is al een rooster voor deze week", "Index");
+            //}
             //so till this point
 
             foreach (Department department in departmentList)
@@ -163,6 +163,13 @@ namespace BumboApp.Controllers
             .ThenByDescending(e => e.ContractHours).ToList();
 
             int index = 0;
+            //true if not cash register or it is cash register but the whole list is looped and prognose hours not hit yet
+            bool cantFindConcurrentForRegister; 
+            if(department == Department.Kassa)
+            {
+                cantFindConcurrentForRegister = false;
+            }
+            else { cantFindConcurrentForRegister= true; }
             while (index < employees.Count)
             { 
                 Employee employee = employees.ElementAt(index);
@@ -192,7 +199,12 @@ namespace BumboApp.Controllers
                     ScheduleShift(department, scheduledate, startDate, employee);
                     index++;
                 }
-                if (index >= employees.Count || PrognoseHoursHit(department,scheduledate)) break;
+                if(index >= employees.Count && !cantFindConcurrentForRegister) 
+                { 
+                    cantFindConcurrentForRegister = true;
+                    index = 0;
+                }
+                if ((index >= employees.Count && cantFindConcurrentForRegister) || PrognoseHoursHit(department,scheduledate)) break;
             }
             return;
         }
