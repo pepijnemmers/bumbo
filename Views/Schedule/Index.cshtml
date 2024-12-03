@@ -75,7 +75,7 @@
             }
             @if (role == Role.Manager)
             {
-                <a class="btn btn-primary w-100 w-lg-auto" asp-controller="Shifts" asp-action="Create" asp-route-date="@(Model.IsDayView ? Model.SelectedStartDate : null)">
+                <a class="btn btn-primary w-100 w-lg-auto" asp-controller="Shifts" asp-action="Create">
                     <i class="fas fa-plus"></i>
                     Dienst toevoegen
                 </a>
@@ -309,7 +309,6 @@
                             @if (!firstShift.IsFinal) { <span class='text-secondary small fst-italic'>Concept</span> }
                             <div class='d-flex justify-content-between align-items-center gap-3'>
                                 <span class='fw-500' style='min-width: 3em'>@firstShift.Department</span>
-                                @if (firstShift.Start.Date > DateTime.Today.Date && role == Role.Manager) { <a href='/shifts/update?id=@firstShift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
                             </div>
                             "
                         data-bs-content="
@@ -322,11 +321,23 @@
                                     {
                                         if (shiftContent.Employee != null)
                                         {
-                                            <p class='fw-500 mb-1'><i class='fas fa-user me-1'></i>@shiftContent.Employee?.FirstName @shiftContent.Employee?.LastName</p>
+                                            <div class='d-flex justify-content-between align-items-center gap-3'>
+                                                <p class='fw-500 mb-1'><i class='fas fa-user me-1'></i>@shiftContent.Employee?.FirstName @shiftContent.Employee?.LastName</p>
+                                                @if (shiftContent.Start.Date > DateTime.Today.Date && role == Role.Manager)
+                                                {
+                                                    <a href='/shifts/update?id=@shiftContent.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a>
+                                                }
+                                            </div>
                                         }
                                         else
                                         {
+                                            <div class='d-flex justify-content-between align-items-center gap-3'>
                                             <p class='fw-500 text-danger mb-1'><i class='fas fa-user-slash me-1'></i>Zoek intern vervanging en pas de dienst aan of zoek extern.</p>
+                                                @if (shiftContent.Start.Date > DateTime.Today.Date && role == Role.Manager)
+                                                {
+                                                    <a href='/shifts/update?id=@shiftContent.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a>
+                                                }
+                                            </div>
                                         }
                                     }
                                 </div>
