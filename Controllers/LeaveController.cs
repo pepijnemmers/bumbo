@@ -22,7 +22,7 @@ namespace BumboApp.Controllers
             if (LoggedInUserRole == Role.Manager)
             {
                 leaveRequests = Context.LeaveRequests
-                    .Where(p => selectedStatus == null || p.Status == selectedStatus)
+                    .Where(p => (selectedStatus == null || p.Status == selectedStatus) && p.EndDate > DateTime.Now)
                     .OrderBy(p => p.StartDate)
                     .ToList();
                 sickLeaves = Context.SickLeaves.OrderByDescending(p => p.Date).ToList();
