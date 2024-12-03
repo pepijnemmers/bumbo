@@ -69,9 +69,18 @@
                             }
                             @if (User.IsInRole(Role.Manager.ToString()))
                             {
-                                <a asp-controller="Leave" asp-action="LeaveRequest" asp-route-id="@(request.Id)">
-                                    <img width="20px" height="auto" src="~/img/details-icon.svg" alt="Alternate Text" />
-                                </a>
+                                if (request.Status == Status.Aangevraagd)
+                                {
+                                    <a asp-controller="Leave" asp-action="LeaveRequest" asp-route-id="@(request.Id)">
+                                        <img width="20px" height="auto" src="~/img/details-icon.svg" alt="Alternate Text" />
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Leave" asp-action="LeaveRequest" asp-route-id="@(request.Id)">
+                                        <img width="20px" src="~/img/update-icon.svg" alt="Alternate Text" />
+                                    </a>
+                                }
                             }
                         </td>
                     </tr>

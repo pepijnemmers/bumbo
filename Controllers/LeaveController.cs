@@ -2,6 +2,7 @@
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace BumboApp.Controllers
@@ -11,9 +12,7 @@ namespace BumboApp.Controllers
         private Employee _loggedInEmployee;
         public IActionResult Index(int? page, SortOrder? orderBy = SortOrder.Ascending, Status? selectedStatus = null)
         {
-            var username = User?.Identity?.Name;
-            _loggedInEmployee = Context.Employees
-            .FirstOrDefault(e => e.FirstName.Equals(username));
+            _loggedInEmployee = GetLoggedInEmployee();
 
             List<LeaveRequest> leaveRequests;
             if (LoggedInUserRole == Role.Manager)
@@ -63,9 +62,7 @@ namespace BumboApp.Controllers
 
         public IActionResult LeaveRequest(int? id)
         {
-            var username = User?.Identity?.Name;
-            _loggedInEmployee = Context.Employees
-            .FirstOrDefault(e => e.FirstName.Equals(username));
+            _loggedInEmployee = GetLoggedInEmployee();
 
             LeaveRequest leaveRequest;
             if (id == null)
@@ -74,7 +71,10 @@ namespace BumboApp.Controllers
             }
             else
             {
-                leaveRequest = Context.LeaveRequests.FirstOrDefault(lr => lr.Id == id);
+
+                leaveRequest = Context.LeaveRequests
+                          .Include(lr => lr.Employee)
+                          .FirstOrDefault(lr => lr.Id == id);
             }
 
             var viewModel = new LeaveRequestDetailViewModel
@@ -87,31 +87,11 @@ namespace BumboApp.Controllers
 
         public IActionResult CreateLeaveRequest(LeaveRequest request)
         {
-            var username = User?.Identity?.Name;
-            _loggedInEmployee = Context.Employees
-            .FirstOrDefault(e => e.FirstName.Equals(username));
+            _loggedInEmployee = GetLoggedInEmployee();
             request.Employee = _loggedInEmployee;
 
-            TimeSpan difference = request.EndDate - request.StartDate;
-            int totalDays = difference.Days;
-
             // calculate amount of leavehours
-            int amountOfLeaveHours = 0;
-            if (totalDays > 0)
-            {
-                amountOfLeaveHours = totalDays * 8;
-            }
-            else
-            {
-                if (difference.Hours > 8)
-                {
-                    amountOfLeaveHours = 8;
-                }
-                else
-                {
-                    amountOfLeaveHours = difference.Hours;
-                }
-            }
+            int amountOfLeaveHours = GetAmountOfLeaveHours(request.Id);
             
             // validation 
             if (request.StartDate < DateTime.Now)
@@ -170,14 +150,35 @@ namespace BumboApp.Controllers
             }
         }
 
-        public IActionResult AssessLeaveRequest(Status status, LeaveRequest leaveRequest)
+        public IActionResult AssessLeaveRequest(Status status, int leaveRequestId)
         {
-            if (leaveRequest != null)
+            if (leaveRequestId != null && LoggedInUserRole == Role.Manager)
             {
                 using var transaction = Context.Database.BeginTransaction();
                 try
                 {
+                    var leaveRequest = Context.LeaveRequests
+                                  .Include(lr => lr.Employee)
+                                  .FirstOrDefault(lr => lr.Id == leaveRequestId);
+                    var leaveRequestEmployee = Context.Employees.Find(leaveRequest.Employee.EmployeeNumber);
                     leaveRequest.Status = status;
+
+                    if(status == Status.Afgewezen)
+                    {
+                        int amountOfLeaveHours= GetAmountOfLeaveHours(leaveRequestId);
+                        leaveRequestEmployee.LeaveHours += amountOfLeaveHours;
+                    }
+
+                    var notification = new Notification
+                    {
+                        Employee = leaveRequestEmployee,
+                        Title = "Nieuwe verlofaanvraag status",
+                        Description = "Je verlofaanvraag is beoordeeld",
+                        SentAt = DateTime.Now,
+                        HasBeenRead = false
+                    };
+                    Context.Notifications.Add(notification);
+
                     Context.SaveChanges();
                     transaction.Commit();
                     return NotifySuccessAndRedirect("De nieuwe verlofaanvraag status is opgeslagen.", "Index");
@@ -192,6 +193,41 @@ namespace BumboApp.Controllers
             {
                 return NotifyErrorAndRedirect("Er is iets misgegaan", "Index");
             }
+        }
+
+        private int GetAmountOfLeaveHours(int leaveRequestId)
+        {
+            var request = Context.LeaveRequests.Find(leaveRequestId);
+            TimeSpan difference = request.EndDate - request.StartDate;
+            int totalDays = difference.Days;
+
+            // calculate amount of leavehours
+            int amountOfLeaveHours = 0;
+            if (totalDays > 0)
+            {
+                amountOfLeaveHours = totalDays * 8;
+            }
+            else
+            {
+                if (difference.Hours > 8)
+                {
+                    amountOfLeaveHours = 8;
+                }
+                else
+                {
+                    amountOfLeaveHours = difference.Hours;
+                }
+            }
+            return amountOfLeaveHours;
+        }
+
+        private Employee GetLoggedInEmployee()
+        {
+            var username = User?.Identity?.Name;
+            _loggedInEmployee = Context.Employees
+            .FirstOrDefault(e => e.FirstName.Equals(username));
+
+            return _loggedInEmployee;
         }
     }
 }
