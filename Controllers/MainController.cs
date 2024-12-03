@@ -36,13 +36,13 @@ namespace BumboApp.Controllers
             NotifyService.Error(message);
             return RedirectToAction(redirect, redirectController);
         }
-        
+
         protected IActionResult NotifySuccessAndRedirect(string message, string redirect)
         {
             NotifyService.Success(message);
             return RedirectToAction(redirect);
         }
-        
+
         protected IActionResult NotifySuccessAndRedirect(string message, string redirect, string redirectController)
         {
             NotifyService.Success(message);
@@ -55,7 +55,7 @@ namespace BumboApp.Controllers
         /// </summary>
         /// <param name="context">The context in which the action is executed.</param>
         public override void OnActionExecuting(ActionExecutingContext context)
-        {    
+        {
             base.OnActionExecuting(context);
             NotifyService = HttpContext.RequestServices.GetService<INotyfService>()!;
             _configuration = HttpContext.RequestServices.GetService<IConfiguration>()!;
