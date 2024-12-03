@@ -172,17 +172,12 @@ namespace BumboApp.Controllers
 
         public IActionResult AssessLeaveRequest(Status status, LeaveRequest leaveRequest)
         {
-            if (status != null && leaveRequest != null)
+            if (leaveRequest != null)
             {
-                leaveRequest.Status = status;
                 using var transaction = Context.Database.BeginTransaction();
                 try
                 {
-                    var existingLeaveRequest = Context.LeaveRequests.Find(leaveRequest.Id);
-                    if (existingLeaveRequest != null)
-                    {
-                        Context.Entry(existingLeaveRequest).CurrentValues.SetValues(leaveRequest);
-                    }
+                    leaveRequest.Status = status;
                     Context.SaveChanges();
                     transaction.Commit();
                     return NotifySuccessAndRedirect("De nieuwe verlofaanvraag status is opgeslagen.", "Index");
