@@ -200,12 +200,12 @@ label {
 }
 
 /*Create prognosis and leave request*/
-.create-card {
+.create-prognosis-card {
     width: 30rem;
 }
 
 @media (max-width: 768px) {
-    .create-card {
+    .create-prognosis-card {
         width: 100%;
     }
 
