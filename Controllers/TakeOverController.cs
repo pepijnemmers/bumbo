@@ -39,7 +39,45 @@ namespace BumboApp.Controllers
                 return NotifyErrorAndRedirect("Kon de shift niet vinden", "Index", "Dashboard");
             };
 
+            // Define start and end of the current week
+            var today = DateTime.Today;
+            var startOfWeek = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Monday);
+            if (today.DayOfWeek == DayOfWeek.Sunday)
+            {
+                startOfWeek = startOfWeek.AddDays(-7);
+            }
+            var endOfWeek = startOfWeek.AddDays(6);
+
+            // Fetch scheduled hours for an employee
+            double GetScheduledHours(Employee employee)
+            {
+                if (employee == null) return 0;
+
+                // Fetch shifts from the database
+                var shifts = Context.Shifts
+                    .Where(s => s.Employee.EmployeeNumber == employee.EmployeeNumber
+                                && s.Start.Date >= startOfWeek
+                                && s.Start.Date <= endOfWeek)
+                    .ToList(); // Fetch to memory
+
+                // Calculate total hours in memory
+                return shifts
+                    .Select(s => (s.End - s.Start).TotalHours)
+                    .Sum();
+            }
+
+            var employeeWithShift = shiftTakeOver.Shift.Employee;
+            var employeeTakingOver = shiftTakeOver.EmployeeTakingOver;
+
+            // Calculate hours
+            var hoursEmployeeWithShift = GetScheduledHours(employeeWithShift);
+            var hoursEmployeeTakingOver = GetScheduledHours(employeeTakingOver);
+
             ViewBag.ShiftDetails = shiftTakeOver;
+            ViewBag.HoursEmployeeWithShift = hoursEmployeeWithShift;
+            ViewBag.ContractHoursEmployeeWithShift = employeeWithShift?.ContractHours ?? 0;
+            ViewBag.HoursEmployeeTakingOver = hoursEmployeeTakingOver;
+            ViewBag.ContractHoursEmployeeTakingOver = employeeTakingOver?.ContractHours ?? 0;
 
             return View();
         }
