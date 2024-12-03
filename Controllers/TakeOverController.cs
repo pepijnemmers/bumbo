@@ -26,8 +26,77 @@ namespace BumboApp.Controllers
         
         public IActionResult Index(int id)
         {
-            Console.WriteLine(id);
+            // Fetch the shift and associated shift take over data
+            var shiftTakeOver = Context.ShiftTakeOvers
+                .Include(sto => sto.Shift)
+                .ThenInclude(s => s.Employee)
+                .Include(sto => sto.EmployeeTakingOver) // Include the EmployeeTakingOver
+                .Where(sto => sto.ShiftId == id) // Filter by the ShiftId
+                .FirstOrDefault(); // Retrieve the first match
+
+            if (shiftTakeOver == null)
+            {
+                return NotifyErrorAndRedirect("Kon de shift niet vinden", "Index", "Dashboard");
+            };
+
+            ViewBag.ShiftDetails = shiftTakeOver;
+
             return View();
+        }
+
+        public IActionResult RejectTakeOver(int shiftId)
+        {
+            try
+            {
+                // Find the ShiftTakeOver record based on the shiftId
+                var shiftTakeOver = Context.ShiftTakeOvers
+                    .FirstOrDefault(sto => sto.ShiftId == shiftId);
+
+                if (shiftTakeOver == null)
+                {
+                    return NotifyErrorAndRedirect("De overname kon niet worden gevonden", "Index", "Dashboard");
+                }
+
+                // Set the EmployeeTakingOverEmployeeNumber to null
+                shiftTakeOver.EmployeeTakingOverEmployeeNumber = null;
+
+                // Save the changes to the database
+                Context.SaveChanges();
+                return NotifySuccessAndRedirect("De overname is afgewezen", "Index", "Dashboard");
+            }
+            catch
+            {
+                return NotifyErrorAndRedirect("Er is een fout opgetreden bij het afwijzen van de overname.", "Index", "Dashboard");
+            }
+        }
+
+        public IActionResult AcceptTakeOver(int shiftId)
+        {
+            try
+            {
+                // Find the ShiftTakeOver record based on the shiftId
+                var shiftTakeOver = Context.ShiftTakeOvers
+                    .Include(sto => sto.Shift)
+                    .Include(sto => sto.EmployeeTakingOver)
+                    .FirstOrDefault(sto => sto.ShiftId == shiftId);
+
+                if (shiftTakeOver == null)
+                {
+                    return NotifyErrorAndRedirect("De overname kon niet worden gevonden", "Index", "Dashboard");
+                }
+
+                // Set the EmployeeTakingOverEmployeeNumber to null
+                shiftTakeOver.Status = Status.Geaccepteerd;
+                shiftTakeOver.Shift.Employee = shiftTakeOver.EmployeeTakingOver;
+
+                // Save the changes to the database
+                Context.SaveChanges();
+                return NotifySuccessAndRedirect("De overname is goedgekeurd", "Index", "Dashboard");
+            }
+            catch
+            {
+                return NotifyErrorAndRedirect("Er is een fout opgetreden bij het accepteren van de overname.", "Index", "Dashboard");
+            }
         }
 
         public IActionResult EmployeeTakeOver(int shiftId)

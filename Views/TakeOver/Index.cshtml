@@ -1,5 +1,6 @@
 ﻿@{
-    ViewData["Title"] = "Overname";
+    ViewData["Title"] = "Overname beoordelen";
+    var shiftDetails = ViewBag.ShiftDetails;
 }
 
 <div class="container mt-4">
@@ -7,25 +8,32 @@
         <div class="card-body">
             <div class="row">
                 <!-- Column 1 -->
-                <div class="col-md-6 d-flex align-items-center justify-content-center" style="border-right: 1px solid #ddd;">
-                    <div>
-                        <h5 class="card-title">Left Column</h5>
-                        <p class="card-text">
-                            Content for the left column goes here.
-                        </p>
+                <div class="col-md-6" style="border-right: 1px solid #ddd;">
+                    <div class="ms-4">
+                        <h6 class="card-title"><strong>Datum en tijd</strong></h6>
+                        <p class="card-text">@shiftDetails.Shift.Start.ToString("dd-MM-yyyy") @shiftDetails.Shift.Start.ToString("HH:mm") - @shiftDetails.Shift.End.ToString("HH:mm")</p>
+                        <h6 class="card-title"><strong>Afdeling</strong></h6>
+                        <p class="card-text">@shiftDetails.Shift.Department.ToString()</p>
                     </div>
                 </div>
 
                 <!-- Column 2 -->
-                <div class="col-md-6 d-flex align-items-center justify-content-center">
-                    <div>
-                        <h5 class="card-title">Right Column</h5>
-                        <p class="card-text">
-                            Content for the right column goes here.
-                        </p>
+                <div class="col-md-6">
+                    <div class="ms-4">
+                        <h6 class="card-title"><strong>Dienst van</strong></h6>
+                        <p class="card-text">@shiftDetails.Shift.Employee.FirstName @shiftDetails.Shift.Employee.LastName</p>
+                        <h6 class="card-title"><strong>Overgenomen door</strong></h6>
+                        <p class="card-text">@shiftDetails.EmployeeTakingOver.FirstName @shiftDetails.EmployeeTakingOver.LastName</p>
                     </div>
                 </div>
             </div>
+
+            <!-- Buttons at the bottom right -->
+            <div class="d-flex justify-content-end align-items-end mt-3">
+                <a asp-controller="TakeOver" asp-action="RejectTakeOver" asp-route-shiftId="@shiftDetails.ShiftId" class="btn btn-danger me-2" type="button">Afkeuren</a>
+                <a asp-controller="TakeOver" asp-action="AcceptTakeOver" asp-route-shiftId="@shiftDetails.ShiftId" class="btn btn-dark" type="button">Goedkeuren</a>
+            </div>
+
         </div>
     </div>
 </div>
