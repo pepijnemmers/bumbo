@@ -109,7 +109,7 @@ namespace BumboApp.Controllers
             ViewData["LeaveHourUsed"] = leaveHoursUsed;
 
             //var apiKey = Environment.GetEnvironmentVariable("POSTCODE_API_KEY");
-            var apiKey = "669869e4-b372-430b-9b87-d41c72fcfc91"; //TODO deze uit github secrets eigenlijk
+            var apiKey = ""; //TODO: deze uit github secrets eigenlijk
             var apiURL = $"https://json.api-postcode.nl?postcode={employee.Zipcode}&number={employee.HouseNumber}";
 
             client.DefaultRequestHeaders.Clear();
