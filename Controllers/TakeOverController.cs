@@ -1,4 +1,5 @@
 ﻿using BumboApp.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,15 @@ namespace BumboApp.Controllers
 {
     public class TakeOverController : MainController
     {
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+
+        public TakeOverController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+        {
+            _userManager = userManager;
+            _roleManager = roleManager;
+        }
+
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             base.OnActionExecuting(context);
@@ -38,10 +48,59 @@ namespace BumboApp.Controllers
 
             //TODO: Checken CAO regels.
 
-            shiftTakeOver.EmployeeTakingOverEmployeeNumber = employee.EmployeeNumber;
-            Context.SaveChanges();
+            //shiftTakeOver.EmployeeTakingOverEmployeeNumber = employee.EmployeeNumber;
+            //Context.SaveChanges();
 
-            return NotifySuccessAndRedirect("De overname is doorgegeven.", "Index", "Dashboard");
+            //return NotifySuccessAndRedirect("De overname is doorgegeven.", "Index", "Dashboard");
+
+            using var transaction = Context.Database.BeginTransaction();
+            try
+            {
+                // Assign the employee to the shift takeover
+                shiftTakeOver.EmployeeTakingOverEmployeeNumber = employee.EmployeeNumber;
+
+                // Find all managers
+                var managers = GetEmployeesInRole("Manager");
+
+                // Create notifications for each manager
+                var notifications = new List<Notification>();
+                foreach (var manager in managers)
+                {
+                    notifications.Add(new Notification
+                    {
+                        Employee = manager,
+                        Title = "Nieuwe shift overname",
+                        Description = $"{employee.FirstName} {employee.LastName} heeft een shift overgenomen.",
+                        SentAt = DateTime.Now,
+                        HasBeenRead = false
+                    });
+                }
+
+                // Update the ShiftTakeOver and add notifications
+                Context.Notifications.AddRange(notifications);
+                Context.SaveChanges();
+
+                transaction.Commit();
+
+                return NotifySuccessAndRedirect("De overname is doorgegeven.", "Index", "Dashboard");
+            }
+            catch
+            {
+                transaction.Rollback();
+                return NotifyErrorAndRedirect("Er is een fout opgetreden bij het verwerken van de overname.", "Index", "Dashboard");
+            }
+        }
+
+        private List<Employee> GetEmployeesInRole(string roleName)
+        {
+            var role = _roleManager.FindByNameAsync(roleName).Result;
+            if (role == null) throw new Exception($"Role '{roleName}' not found.");
+
+            var usersInRole = _userManager.GetUsersInRoleAsync(roleName).Result;
+
+            return Context.Employees
+                .Where(e => usersInRole.Select(u => u.Id).Contains(e.User.Id))
+                .ToList();
         }
 
         public IActionResult EmployeeTakeOverRequest(int shiftId) 
@@ -65,8 +124,16 @@ namespace BumboApp.Controllers
                 Status = Status.Aangevraagd
             };
 
-            Context.ShiftTakeOvers.Add(shiftTakeOver);
-            Context.SaveChanges();
+            try
+            {
+                Context.ShiftTakeOvers.Add(shiftTakeOver);
+                Context.SaveChanges();
+            }
+            catch
+            {
+                return NotifyErrorAndRedirect("Er is een fout opgetreden bij het aanmaken van de overname aanvraag", "MyShifts", "Shifts");
+            }
+
             return RedirectToAction("MyShifts", "Shifts");
         }
     }
