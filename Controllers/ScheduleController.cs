@@ -45,7 +45,7 @@ namespace BumboApp.Controllers
             return Role.Unknown;
         }
 
-        public IActionResult Index(DateOnly date)
+        public IActionResult Index()
         {
             return View();
         }
@@ -116,7 +116,7 @@ namespace BumboApp.Controllers
                 Context.SaveChanges();
             }
             catch(Exception e) { return NotifyErrorAndRedirect("er is een probleem opgetreden", "Index"); }
-            return RedirectToAction("Index",startDate);
+            return RedirectToAction("Index",null,startDate.ToString());
         }
 
         private void InsertEmptyShifts(Department department, DateOnly scheduledate)
@@ -139,7 +139,6 @@ namespace BumboApp.Controllers
                         new Shift()
                         {
                             Department = department,
-                            Employee = null,
                             Start = scheduledate.ToDateTime(new TimeOnly(startingHour, 00, 00)),
                             End = scheduledate.ToDateTime(new TimeOnly(maxTime, 00, 00)),
                             IsFinal = false,
@@ -338,7 +337,7 @@ namespace BumboApp.Controllers
                 else return;
                 }
 
-            int maxTimeCAO = getMaxTimeCAO(employee, startDate, scheduledate, startinghour);
+            int maxTimeCAO = getMaxTimeCAO(employee, department, startDate, scheduledate, startinghour);
             int maxTimePrognose = getMaxTimePrognose(department, scheduledate);
             int maxTimeContract = getMaxTimeContract(employee, startDate, scheduledate);
             List<int> maxhours = new List<int> { maxTimeCAO, maxTimePrognose, maxTimeContract,maxTimeAvailable };
@@ -397,7 +396,7 @@ namespace BumboApp.Controllers
                 availableTill = 24;
             }
 
-            int maxTimeCAO = getMaxTimeCAO(employee, startDate, scheduledate, startingHour);
+            int maxTimeCAO = getMaxTimeCAO(employee, department, startDate, scheduledate, startingHour);
             int maxTimePrognose = getMaxTimePrognose(department, scheduledate);
             int maxTimeContract = getMaxTimeContract(employee, startDate, scheduledate);
             int maxTimeAvailable = availableTill - availableFrom;
@@ -493,7 +492,7 @@ namespace BumboApp.Controllers
             return (int)Math.Ceiling(prognosis.NeededHours - GetWorkingHours(departmentDayShifts));
         }
 
-        private int getMaxTimeCAO(Employee employee, DateOnly startDate, DateOnly scheduledate, int startinghour)
+        private int getMaxTimeCAO(Employee employee,Department department, DateOnly startDate, DateOnly scheduledate, int startinghour)
         {
             List<int> hours = new List<int>();
             int age = DateTime.Now.Year - employee.DateOfBirth.Year;
@@ -531,7 +530,7 @@ namespace BumboApp.Controllers
                             workingDays++;
                         }
                     }
-                    if(workingDays >= maxWorkingDaysUnderSixteen) { return 0; }
+                    if(workingDays >= maxWorkingDaysUnderSixteen || department == Department.Kassa) { return 0; }
                 }
                 if (!employee.SchoolSchedules.Where(e => e.Date >= startDate && e.Date <= startDate.AddDays(6)).Any()) // magic number
                 {
