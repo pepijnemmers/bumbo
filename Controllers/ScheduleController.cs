@@ -129,12 +129,12 @@ namespace BumboApp.Controllers
             DateOnly endDate = startDate.AddDays(6);
 
             //for testing comment out the code between the comments (because there are already 2 shifts in the Db)
-            //if (Context.Shifts
-            //    .Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) &&
-            //    e.End.Date <= endDate.ToDateTime(new TimeOnly())).Any())
-            //{
-            //    return NotifyErrorAndRedirect("er is al een rooster voor deze week", "Index");
-            //}
+            if (Context.Shifts
+                .Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) &&
+                e.End.Date <= endDate.ToDateTime(new TimeOnly())).Any())
+            {
+                return NotifyErrorAndRedirect("er is al een rooster voor deze week", "Index");
+            }
             //so till this point
 
             foreach (Department department in departmentList)
