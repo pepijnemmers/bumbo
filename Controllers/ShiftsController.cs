@@ -220,6 +220,7 @@ namespace BumboApp.Controllers
                 {
                     Context.Notifications.Add(new Notification
                     {
+                        // TODO: gives error
                         Employee = employee,
                         Title =
                             $"Dienst {shift.Department.ToFriendlyString()} toegevoegd - {shift.Start.ToString("dd/MM/yyyy")}",
@@ -246,8 +247,9 @@ namespace BumboApp.Controllers
                 }
                 Context.SaveChanges();
             }
-            catch
+            catch (Exception e)
             {
+                
                 NotifyService.Error("Er is iets fout gegaan bij het wijzigen van de dienst. Probeer het opnieuw");
                 return RedirectToAction("Update", new { id = id });
             }
