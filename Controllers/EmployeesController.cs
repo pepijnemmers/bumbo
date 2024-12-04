@@ -10,6 +10,7 @@ using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using BumboApp.Helpers;
 
 namespace BumboApp.Controllers
 {
@@ -104,7 +105,6 @@ namespace BumboApp.Controllers
             }
 
 
-
             var user = new User
             {
                 UserName = viewModel.FirstName,
@@ -130,6 +130,7 @@ namespace BumboApp.Controllers
                 ContractHours = viewModel.ContractHours,
                 LeaveHours = viewModel.LeaveHours,
                 UserId = user.Id,
+                StartOfEmployment = DateOnly.FromDateTime(DateTime.Now),
                 StandardAvailability = new List<StandardAvailability>()
             };
             if (viewModel.Role == Role.Employee)
@@ -221,22 +222,18 @@ namespace BumboApp.Controllers
                 return NotifyErrorAndRedirect("Werknemer niet gevonden", nameof(Index));
             }
 
-            var acceptedLeaves = employee.leaveRequests
-                .Where(lr => lr.Status == Status.Geaccepteerd
-                && lr.StartDate.Year.Equals(DateTime.Now.Year));
+            var leaveRequests = employee.leaveRequests
+                .Where(lr => lr.Status != Status.Afgewezen).ToList();
 
-            double leaveHoursUsed = 0;
-            foreach (var leaveRequest in acceptedLeaves)
-            {
-                leaveHoursUsed += (leaveRequest.EndDate - leaveRequest.StartDate).TotalHours;
-            }
+            var usedLeaveHoursThisYear = LeaveHoursCalculationHelper.CalculateLeaveHoursByYearForAllRequests(leaveRequests);
+            int amountOfLeaveHours = usedLeaveHoursThisYear[DateTime.Now.Year];
 
             var employeeRole = await GetUserRoleAsync(employee.User.Id);
             ViewData["EmployeeRole"] = employeeRole.ToFriendlyString();
-            ViewData["LeaveHourUsed"] = leaveHoursUsed;
+            ViewData["LeaveHourUsed"] = amountOfLeaveHours;
 
             //var apiKey = Environment.GetEnvironmentVariable("POSTCODE_API_KEY");
-            var apiKey = ""; //TODO: deze uit github secrets eigenlijk
+            var apiKey = "";
             var apiURL = $"https://json.api-postcode.nl?postcode={employee.Zipcode}&number={employee.HouseNumber}";
 
             client.DefaultRequestHeaders.Clear();
