@@ -1,15 +1,9 @@
 ﻿using BumboApp.Models;
 using System.Globalization;
-using BumboApp.Models;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Globalization;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
-using System.Reflection.Metadata.Ecma335;
 
 namespace BumboApp.Controllers
 {
@@ -21,7 +15,7 @@ namespace BumboApp.Controllers
         {
             _userManager = userManager;
         }
-        // will need to be in a json file eventually 
+        // will need to be in a json file eventually
         private const int _maxShiftLengthAdult = 12;
         private const int _maxWeeklyHoursAdult = 60;
 
@@ -134,7 +128,7 @@ namespace BumboApp.Controllers
                 .Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) &&
                 e.End.Date <= endDate.ToDateTime(new TimeOnly())).Any())
             {
-                return NotifyErrorAndRedirect("er is al een rooster voor deze week", "Index");
+                return NotifyErrorAndRedirect("Er is al een rooster voor deze week", "Index");
             }
             ///so till this point
 
@@ -177,7 +171,7 @@ namespace BumboApp.Controllers
             {
                 Context.SaveChanges();
             }
-            catch (Exception e) { return NotifyErrorAndRedirect("er is een probleem opgetreden", "Index"); }
+            catch (Exception e) { return NotifyErrorAndRedirect("Er is een probleem opgetreden", "Index"); }
             return RedirectToAction("Index",new {startDate = startDate.ToString()});
         }
 
