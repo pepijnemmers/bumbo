@@ -377,26 +377,19 @@ namespace BumboApp.Controllers
         //schedules shift if possible
         private void ScheduleShift(Department department, DateOnly scheduledate, DateOnly startDate, Employee employee)
         {
-            Availability availability = employee.Availabilities.Where(e => e.Date == scheduledate).FirstOrDefault();
-            OpeningHour openingHour = Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).FirstOrDefault();
+            Availability? availability = employee.Availabilities.Where(e => e.Date == scheduledate).FirstOrDefault();
+            OpeningHour? openingHour = Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).FirstOrDefault();
             int startinghour;
             int maxTimeAvailable;
+            if(openingHour == null) { return; }
 
-            //checks if employee is available and sets starting time
-            try
-            {
-                TimeOnly oTime = (TimeOnly)openingHour.OpeningTime;
-                TimeOnly cTime = (TimeOnly)openingHour.ClosingTime;
-                if (oTime.Hour == cTime.Hour) return;
-            }
-            catch (Exception ex) { return; }
+            TimeOnly oTime = openingHour.OpeningTime.GetValueOrDefault();
+            TimeOnly cTime = openingHour.ClosingTime.GetValueOrDefault();
+            if (oTime.Hour == cTime.Hour) return;
             if (availability == null)
             {
-                try
-                {
-                    startinghour = openingHour.OpeningTime.Value.Hour;
-                    maxTimeAvailable = maxShiftLengthAdult;
-                } catch (Exception ex) { return; }
+                startinghour = oTime.Hour;
+                maxTimeAvailable = maxShiftLengthAdult;
             }
             else {
                 maxTimeAvailable = (availability.EndTime - availability.StartTime).Hours;
@@ -418,7 +411,7 @@ namespace BumboApp.Controllers
             {
                 int endTime = maxhours.First() + startinghour;
                 if (endTime > 24) { endTime = 24; } //till closing or keep it like this
-                if (department == Department.Kassa && endTime > openingHour.ClosingTime.Value.Hour + 1) { return; }
+                if (department == Department.Kassa && endTime > cTime.Hour + 1) { return; }
                 Context.Add(
                     new Shift()
                     {
