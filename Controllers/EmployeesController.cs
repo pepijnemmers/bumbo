@@ -1,15 +1,10 @@
 ﻿using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Identity;
 using BumboApp.ViewModels;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.Linq.Expressions;
-using System.Text.RegularExpressions;
 using BumboApp.Helpers;
 
 namespace BumboApp.Controllers
@@ -18,7 +13,7 @@ namespace BumboApp.Controllers
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<User> _userManager;
-        private HttpClient client = new HttpClient();
+        private HttpClient _client = new HttpClient();
 
         public EmployeesController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
@@ -236,12 +231,12 @@ namespace BumboApp.Controllers
             var apiKey = "";
             var apiURL = $"https://json.api-postcode.nl?postcode={employee.Zipcode}&number={employee.HouseNumber}";
 
-            client.DefaultRequestHeaders.Clear();
-            client.DefaultRequestHeaders.Add("token", apiKey);
+            _client.DefaultRequestHeaders.Clear();
+            _client.DefaultRequestHeaders.Add("token", apiKey);
 
             try
             {
-                var response = await client.GetAsync(apiURL);
+                var response = await _client.GetAsync(apiURL);
                 if (response.IsSuccessStatusCode)
                 {
                     string jsonResponse = await response.Content.ReadAsStringAsync();
