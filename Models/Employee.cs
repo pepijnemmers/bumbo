@@ -37,5 +37,6 @@ namespace BumboApp.Models
         public List<Availability> Availabilities { get; set; }
         public List<Shift> Shifts { get; set; }
         public List<ShiftTakeOver> shiftTakeOvers { get; set; }
+        public List<StandardAvailability> StandardAvailability { get; set; }
     }
 }

@@ -15,11 +15,11 @@
         <div class="d-flex align-items-lg-center justify-content-between flex-column flex-lg-row mb-3">
             <h3 class="fst-italic text-secondary">Concept rooster</h3>
             <div class="buttons">
-                <a class="btn btn-outline-danger d-block d-lg-inline-block mt-2 mt-lg-0">
+                <button class="btn btn-outline-danger d-block d-lg-inline-block mt-2 mt-lg-0" data-bs-toggle="modal" data-bs-target="#delete-week-modal">
                     <i class="fas fa-trash-alt"></i>
                     Concept week verwijderen
-                </a>
-                <a class="btn btn-success d-block d-lg-inline-block mt-2 mb-3 my-lg-0">
+                </button>
+                <a asp-controller="Schedule" asp-action="PublishWeek" asp-route-weekNumber="@Model.WeekNumber" asp-route-year="@Model.SelectedStartDate.Year" class="btn btn-success d-block d-lg-inline-block mt-2 mb-3 my-lg-0">
                     <i class="fas fa-check"></i>
                     Week publiceren
                 </a>
@@ -75,7 +75,7 @@
             }
             @if (role == Role.Manager)
             {
-                <a class="btn btn-primary w-100 w-lg-auto" asp-controller="Shifts" asp-action="Create" asp-route-date="@(Model.IsDayView ? Model.SelectedStartDate : null)">
+                <a class="btn btn-primary w-100 w-lg-auto" asp-controller="Shifts" asp-action="Create">
                     <i class="fas fa-plus"></i>
                     Dienst toevoegen
                 </a>
@@ -309,7 +309,6 @@
                             @if (!firstShift.IsFinal) { <span class='text-secondary small fst-italic'>Concept</span> }
                             <div class='d-flex justify-content-between align-items-center gap-3'>
                                 <span class='fw-500' style='min-width: 3em'>@firstShift.Department</span>
-                                @if (firstShift.Start.Date > DateTime.Today.Date && role == Role.Manager) { <a href='/shifts/update?id=@firstShift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
                             </div>
                             "
                         data-bs-content="
@@ -322,11 +321,23 @@
                                     {
                                         if (shiftContent.Employee != null)
                                         {
-                                            <p class='fw-500 mb-1'><i class='fas fa-user me-1'></i>@shiftContent.Employee?.FirstName @shiftContent.Employee?.LastName</p>
+                                            <div class='d-flex justify-content-between align-items-center gap-3'>
+                                                <p class='fw-500 mb-1'><i class='fas fa-user me-1'></i>@shiftContent.Employee?.FirstName @shiftContent.Employee?.LastName</p>
+                                                @if (shiftContent.Start.Date > DateTime.Today.Date && role == Role.Manager)
+                                                {
+                                                    <a href='/shifts/update?id=@shiftContent.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a>
+                                                }
+                                            </div>
                                         }
                                         else
                                         {
+                                            <div class='d-flex justify-content-between align-items-center gap-3'>
                                             <p class='fw-500 text-danger mb-1'><i class='fas fa-user-slash me-1'></i>Zoek intern vervanging en pas de dienst aan of zoek extern.</p>
+                                                @if (shiftContent.Start.Date > DateTime.Today.Date && role == Role.Manager)
+                                                {
+                                                    <a href='/shifts/update?id=@shiftContent.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a>
+                                                }
+                                            </div>
                                         }
                                     }
                                 </div>
@@ -515,7 +526,7 @@ else
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuleren</button>
-                    <a class="btn btn-danger" asp-controller="Schedule" asp-action="DeleteWeek" asp-route-startDay="@Model.SelectedStartDate">
+                    <a class="btn btn-danger" asp-controller="Schedule" asp-action="DeleteWeek" asp-route-weekNumber="@Model.WeekNumber" asp-route-year="@Model.SelectedStartDate.Year">
                         Verwijderen
                     </a>
                 </div>
