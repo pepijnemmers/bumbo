@@ -23,22 +23,29 @@ namespace BumboApp.Controllers
             if (employee == null) { return View(); }
 
             // Retrieve ShiftTakeOvers where the status indicates they need assessment and are in the future
-            var shiftTakeOvers = Context.ShiftTakeOvers
-                .Include(sto => sto.Shift) 
+            if (LoggedInUserRole == Role.Manager)
+            {
+                var shiftTakeOvers = Context.ShiftTakeOvers
+                .Include(sto => sto.Shift)
                 .Where(sto => sto.Status == Status.Aangevraagd
                               && sto.EmployeeTakingOver != null
-                              && sto.Shift.Start > DateTime.Now) 
-                .OrderBy(sto => sto.Shift.Start) 
+                              && sto.Shift.Start > DateTime.Now)
+                .OrderBy(sto => sto.Shift.Start)
                 .ToList();
-
-            var shiftTakeOversEmployee = Context.ShiftTakeOvers
-                .Include(sto => sto.Shift) 
-                .Where(sto => sto.Status == Status.Aangevraagd
-                              && sto.EmployeeTakingOver == null
-                              && sto.Shift.Employee != employee
-                              && sto.Shift.Start > DateTime.Now) 
-                .OrderBy(sto => sto.Shift.Start) 
+                ViewBag.ShiftTakeOvers = shiftTakeOvers;
+            }
+            else
+            {
+                var shiftTakeOversEmployee = Context.ShiftTakeOvers
+                    .Include(sto => sto.Shift)
+                    .Where(sto => sto.Status == Status.Aangevraagd
+                  && sto.EmployeeTakingOver == null
+                  && sto.Shift.Employee != employee
+                  && sto.Shift.Start > DateTime.Now)
+                .OrderBy(sto => sto.Shift.Start)
                 .ToList();
+                ViewBag.ShiftTakeOversEmployee = shiftTakeOversEmployee;
+            }
 
             var leaveRequests = Context.LeaveRequests
                 .Include(lr => lr.Employee) 
@@ -67,8 +74,7 @@ namespace BumboApp.Controllers
                 .OrderBy(s => s.Start)
                 .ToList();
 
-            ViewBag.ShiftTakeOvers = shiftTakeOvers;
-            ViewBag.ShiftTakeOversEmployee = shiftTakeOversEmployee;
+
             ViewBag.LeaveRequests = leaveRequests;
             ViewBag.LoggedInUserRole = LoggedInUserRole;
             ViewBag.UnreadNotifications = unreadNotifications;
