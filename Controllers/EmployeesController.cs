@@ -181,7 +181,6 @@ namespace BumboApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                NotifyService.Error("Er is iets misgegaan");
                 return View(model);
             }
 
