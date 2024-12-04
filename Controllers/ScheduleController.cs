@@ -244,7 +244,7 @@ namespace BumboApp.Controllers
                     index++;
                     continue;
                 }
-                if (employee.leaveRequests.Any(e => e.Status == Status.Geaccepteerd && e.StartDate <= scheduledate.ToDateTime(new TimeOnly()) && e.EndDate >= scheduledate.ToDateTime(new TimeOnly())))
+                if (employee.leaveRequests.Any(e => e.Status == Status.Geaccepteerd && e.StartDate < scheduledate.ToDateTime(new TimeOnly()) && e.EndDate > scheduledate.ToDateTime(new TimeOnly())))
                 {
                     index++;
                     continue;
