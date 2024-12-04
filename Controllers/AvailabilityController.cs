@@ -2,6 +2,7 @@
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Globalization;
@@ -240,7 +241,35 @@ namespace BumboApp.Controllers
 
         public IActionResult UpdateDefault()
         {
-            return View();
+            var employee = getLoggedinEmployee();
+            if (employee == null) { return View(); }
+            ViewData["EmployeeNumber"] = employee.EmployeeNumber;
+
+            var standardAvailabilities = Context.StandardAvailabilities.Where(sa => sa.EmployeeNumber == employee.EmployeeNumber).ToList();
+            return View(standardAvailabilities);
+        }
+
+        [HttpPost]
+        public IActionResult UpdateDefault(List<StandardAvailability> standardAvailabilities)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(standardAvailabilities);
+            }
+
+            foreach (var sa in standardAvailabilities)
+            {
+                if (sa.EndTime < sa.StartTime)
+                {
+                    NotifyService.Error("Eindtijd moet na de starttijd zijn");
+                    return View(standardAvailabilities);
+                }
+            }
+
+            Context.StandardAvailabilities.UpdateRange(standardAvailabilities);
+            Context.SaveChanges();
+
+            return NotifySuccessAndRedirect("De standaardbeschikbaarheid is succesvol bijgewerkt", nameof(Index));
         }
 
         //Help methods--------------------------------
