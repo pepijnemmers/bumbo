@@ -460,7 +460,10 @@ namespace BumboApp.Controllers
             {
                 if (startingHour > leaveRequest.StartDate.Hour) { return false; } ;
             }
-
+            if (availability == null)
+            {
+                
+            }
 
             if(availability != null)
             {
