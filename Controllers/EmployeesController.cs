@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Identity;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 
 namespace BumboApp.Controllers
 {
@@ -241,19 +243,25 @@ namespace BumboApp.Controllers
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("token", apiKey);
 
-            var response = await client.GetAsync(apiURL);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                string jsonResponse = await response.Content.ReadAsStringAsync();
-
-                using (JsonDocument doc = JsonDocument.Parse(jsonResponse))
+                var response = await client.GetAsync(apiURL);
+                if (response.IsSuccessStatusCode)
                 {
-                    JsonElement root = doc.RootElement;
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
 
-                    ViewData["StreetName"] = root.GetProperty("street").GetString();
-                    ViewData["CityName"] = root.GetProperty("city").GetString();
+                    using (JsonDocument doc = JsonDocument.Parse(jsonResponse))
+                    {
+                        JsonElement root = doc.RootElement;
+
+                        ViewData["StreetName"] = root.GetProperty("street").GetString();
+                        ViewData["CityName"] = root.GetProperty("city").GetString();
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+
             }
 
             return View(employee);

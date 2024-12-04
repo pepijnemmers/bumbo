@@ -26,6 +26,7 @@ namespace BumboApp.ViewModels
         public DateOnly DateOfBirth { get; set; }
         [Required]
         [StringLength(6)]
+        [RegularExpression(@"^\d{4}[A-Z]{2}$", ErrorMessage = "Postcode moet van het formaat '1234AB'")]
         public string Zipcode { get; set; }
         [Required]
         [StringLength(10)]
