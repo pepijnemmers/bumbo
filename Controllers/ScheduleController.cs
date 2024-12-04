@@ -196,8 +196,8 @@ namespace BumboApp.Controllers
 
             while (!PrognoseHoursHit(department, scheduledate))
             {
-                int MissedTime = getMaxTimePrognose(department, scheduledate);
-                int maxTime = startingHour + (int)MissedTime;
+                int missedTime = getMaxTimePrognose(department, scheduledate);
+                int maxTime = startingHour + missedTime;
 
                 if (maxTime > closingHour) { maxTime = closingHour; }
                 if (startingHour >= maxTime) { return; }
@@ -209,7 +209,10 @@ namespace BumboApp.Controllers
                         End = scheduledate.ToDateTime(new TimeOnly(maxTime, 00, 00)),
                         IsFinal = false,
                     });
-                Context.SaveChanges();
+                try
+                {
+                    Context.SaveChanges();
+                } catch(Exception ex) { break; }
             }
             return;
         }
@@ -223,7 +226,7 @@ namespace BumboApp.Controllers
                 .Include(e => e.Availabilities)
                 .ToList();
 
-            employees = employees.OrderBy(e => e.ContractHours / GetWorkingHoursNoZero(e.Shifts.Where(e => e.Start.Date <= startDate.ToDateTime(new TimeOnly()) && e.End.Date >= scheduledate.ToDateTime(new TimeOnly()))))
+            employees = employees.OrderBy(e => e.ContractHours / GetWorkingHoursNoZero(e.Shifts.Where(s => s.Start.Date <= startDate.ToDateTime(new TimeOnly()) && s.End.Date >= scheduledate.ToDateTime(new TimeOnly()))))
             .ThenByDescending(e => e.ContractHours).ToList();
 
             int index = 0;
@@ -259,9 +262,7 @@ namespace BumboApp.Controllers
                 }
                 if (department == Department.Kassa && OpeningInCashRegister(scheduledate))
                 {
-                    bool result = ScheduleConcurrentShift(department, scheduledate,startDate , employee);
-                    index++;
-                    if (result) index = 0;
+                    index = ScheduleConcurrentShift(department, scheduledate,startDate , employee) ? 0 : index + 1;
                 }
                 else
                 {
@@ -272,7 +273,6 @@ namespace BumboApp.Controllers
             return;
         }
 
-        //works if shifts start and end on a full hour
         private int GetWorkingHours(IEnumerable<Shift> shifts)
         {
             float hours = 0;
@@ -374,7 +374,6 @@ namespace BumboApp.Controllers
             return true;
         }
 
-        //schedules shift if possible
         private void ScheduleShift(Department department, DateOnly scheduledate, DateOnly startDate, Employee employee)
         {
             Availability? availability = employee.Availabilities.Where(e => e.Date == scheduledate).FirstOrDefault();
@@ -395,10 +394,10 @@ namespace BumboApp.Controllers
                 maxTimeAvailable = (availability.EndTime - availability.StartTime).Hours;
                 if (maxTimeAvailable == 0)
                 {
-                startinghour = availability.StartTime.Hour;
-                if (availability.StartTime.Minute > 0) { startinghour++; }
+                    startinghour = availability.StartTime.Hour;
+                    if (availability.StartTime.Minute > 0) { startinghour++; }
                 }
-                else return;
+                else { return; }
                 }
 
             int maxTimeCAO = getMaxTimeCAO(employee, department, startDate, scheduledate, startinghour);
@@ -418,7 +417,7 @@ namespace BumboApp.Controllers
                         Department = department,
                         Employee = employee,
                         Start = scheduledate.ToDateTime(new TimeOnly(startinghour, 00, 00)),
-                        End = scheduledate.ToDateTime(new TimeOnly(startinghour + maxhours.First(), 00, 00)),
+                        End = scheduledate.ToDateTime(new TimeOnly(endTime, 00, 00)),
                         IsFinal = false
                     });
                 try
@@ -436,7 +435,7 @@ namespace BumboApp.Controllers
             int availableFrom;
             int availableTill;
             OpeningHour? openingHour = Context.OpeningHours.FirstOrDefault(e => e.WeekDay == scheduledate.DayOfWeek);
-            if (openingHour == null) { return false; } //not very likely but else the IDE doesn't like it
+            if (openingHour == null) { return false; }
             TimeOnly cTime = openingHour.ClosingTime.GetValueOrDefault();
             int startingHour = getNextEmptySpot(department, scheduledate);
             int closingHour = cTime.Hour;
@@ -496,7 +495,7 @@ namespace BumboApp.Controllers
         private int getNextEmptySpot(Department department, DateOnly scheduledate)
         {
             OpeningHour? openingTimes = Context.OpeningHours.FirstOrDefault(e => e.WeekDay == scheduledate.DayOfWeek);
-            if (openingTimes == null) { return 8; } //just random number as it is very unlikely that it will be null at this point (only with Db malfunction its possible)
+            if (openingTimes == null) { return 8; }
             TimeOnly oTime = openingTimes.OpeningTime.GetValueOrDefault();
             TimeOnly cTime = openingTimes.ClosingTime.GetValueOrDefault();
             int openingHour = oTime.Hour;
@@ -550,7 +549,7 @@ namespace BumboApp.Controllers
         {
             Prognosis? prognosis = Context.Prognoses.FirstOrDefault(e => e.Date == scheduledate && e.Department == department);
             
-                List<Shift> departmentDayShifts = (List<Shift>)Context.Shifts
+                List<Shift> departmentDayShifts = Context.Shifts
                 .Where(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly()))
                 .Where(e => e.Department == department)
                 .ToList();
