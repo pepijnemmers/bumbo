@@ -34,9 +34,9 @@
             </select>
         </div>
         <div class="form-group mb-2">
-            <label for="employee" class="form-label fw-bold">Werkgever</label>
+            <label for="employee" class="form-label fw-bold">Werknemer</label>
             <select class="form-select" id="employee" name="employee" required>
-                <option value="0" selected>Geen werkgever</option>
+                <option value="0" selected>Geen werknemer</option>
                 @foreach (var employee in Model.Employees)
                 {
                     <option value="@employee.EmployeeNumber">@employee.FirstName @employee.LastName</option>
@@ -44,7 +44,7 @@
             </select>
             <p class="small text-secondary">
                 <i class="fas fa-info-circle"></i>
-                Als er geen werkgever is geselecteerd, wordt de dienst als open dienst aangemaakt.
+                Als er geen werknemer is geselecteerd, wordt de dienst als open dienst aangemaakt.
             </p>
         </div>
         <div class="form-group mb-2">
