@@ -66,14 +66,13 @@ namespace BumboApp.Controllers
         {
             DateOnly startDate;
             try
-            {
+            {   
                 startDate = StringToDate(id);
             }
             catch
             {
                 return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", nameof(Index), "Dashboard");
             }
-
 
             var employee = getLoggedinEmployee();
             if (employee == null) { return RedirectToAction(nameof(Index), new { id }); }
@@ -113,8 +112,16 @@ namespace BumboApp.Controllers
                 }
             }
 
-            Context.Availabilities.AddRange(availabilities);
-            await Context.SaveChangesAsync();
+            try
+            {
+                Context.Availabilities.AddRange(availabilities);
+                await Context.SaveChangesAsync();
+            }
+            catch
+            {
+                NotifyService.Error("Er is iets misgegaan");
+            }
+
             return RedirectToAction(nameof(Index), new { id });
         }
 
@@ -156,8 +163,16 @@ namespace BumboApp.Controllers
                     return View(availabilities);
                 }
             }
-            Context.Availabilities.UpdateRange(availabilities);
-            await Context.SaveChangesAsync();
+
+            try
+            {
+                Context.Availabilities.UpdateRange(availabilities);
+                await Context.SaveChangesAsync();
+            }
+            catch
+            {
+                NotifyService.Error("Er is iets misgegaan");
+            }
 
             return NotifySuccessAndRedirect("Wijzigingen succesvol opgeslagen", "Index");
         }
@@ -195,8 +210,15 @@ namespace BumboApp.Controllers
                 schoolSchedules.Add(ss);
             }
 
-            Context.SchoolSchedules.AddRange(schoolSchedules);
-            await Context.SaveChangesAsync();
+            try
+            {
+                Context.SchoolSchedules.AddRange(schoolSchedules);
+                await Context.SaveChangesAsync();
+            }
+            catch
+            {
+                NotifyService.Error("Er is iets misgegaan");
+            }
 
             return RedirectToAction(nameof(UpdateSchoolSchedule), new { id });
         }
@@ -230,11 +252,19 @@ namespace BumboApp.Controllers
         {
             if (!ModelState.IsValid)
             {
+                NotifyService.Error("Eindtijd moet na de starttijd zijn");
                 return View(schedules);
             }
 
-            Context.SchoolSchedules.UpdateRange(schedules);
-            await Context.SaveChangesAsync();
+            try
+            {
+                Context.SchoolSchedules.UpdateRange(schedules);
+                await Context.SaveChangesAsync();
+            }
+            catch
+            {
+                NotifyService.Error("Er is iets misgegaan");
+            }
 
             return NotifySuccessAndRedirect("Wijzigingen succesvol opgeslagen", "Index");
         }
@@ -266,8 +296,15 @@ namespace BumboApp.Controllers
                 }
             }
 
-            Context.StandardAvailabilities.UpdateRange(standardAvailabilities);
-            Context.SaveChanges();
+            try
+            {
+                Context.StandardAvailabilities.UpdateRange(standardAvailabilities);
+                Context.SaveChanges();
+            }
+            catch
+            {
+                NotifyService.Error("Er is iets misgegaan");
+            }
 
             return NotifySuccessAndRedirect("De standaardbeschikbaarheid is succesvol bijgewerkt", nameof(Index));
         }
