@@ -91,8 +91,12 @@ namespace BumboApp.Controllers
                     .Where(e => e.Employee == _loggedInEmployee)
                     .Where(s => s.Status == Status.Geaccepteerd || s.Status == Status.Aangevraagd)
                     .ToList();
-                var usedLeaveHoursThisYear = LeaveHoursCalculationHelper.CalculateLeaveHoursByYearForAllRequests(leaveRequests);
-                amountOfLeaveHours = usedLeaveHoursThisYear[DateTime.Now.Year];
+                if (leaveRequests.Count != 0)
+                {
+                    var usedLeaveHoursThisYear = LeaveHoursCalculationHelper.CalculateLeaveHoursByYearForAllRequests(leaveRequests);
+                    amountOfLeaveHours = usedLeaveHoursThisYear[DateTime.Now.Year];
+                }
+
             }
             else
             {

@@ -7,9 +7,16 @@ namespace BumboApp.Helpers
         private const int HoursPerDay = 8;
 
         public static Dictionary<int, int> CalculateLeaveHoursByYearForAllRequests(
-                List<LeaveRequest> leaveRequests)
+            List<LeaveRequest> leaveRequests)
         {
             var totalLeaveHoursByYear = new Dictionary<int, int>();
+
+            // Ensure the current year is always included
+            int currentYear = DateTime.Now.Year;
+            if (!totalLeaveHoursByYear.ContainsKey(currentYear))
+            {
+                totalLeaveHoursByYear[currentYear] = 0;
+            }
 
             foreach (var leaveRequest in leaveRequests)
             {
