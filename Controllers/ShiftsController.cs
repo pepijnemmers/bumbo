@@ -179,7 +179,7 @@ namespace BumboApp.Controllers
                 return RedirectToAction("Update", new { id = id });
             }
             var employee = employeeNumber != null ? Context.Employees.Find(int.Parse(employeeNumber)) : null;
-            if (employeeNumber == null || employee == null)
+            if ((employeeNumber == null || employee == null) && employeeNumber != "0")
             {
                 NotifyService.Error("De werknemer kon niet worden gevonden");
                 return RedirectToAction("Update", new { id = id });
@@ -216,39 +216,41 @@ namespace BumboApp.Controllers
                 shift.IsFinal = isFinal;
                 Context.Shifts.Update(shift);
 
-                if (conceptMadeFinal)
+                if (employee != null)
                 {
-                    Context.Notifications.Add(new Notification
+                    if (conceptMadeFinal)
                     {
-                        Employee = employee,
-                        Title =
-                            $"Dienst {shift.Department.ToFriendlyString()} toegevoegd - {shift.Start.ToString("dd/MM/yyyy")}",
-                        Description =
-                            $"Er is een dienst voor jou toegevoegd op {shift.Start.ToString("dd/MM/yyyy")}.",
-                        SentAt = DateTime.Now,
-                        HasBeenRead = false,
-                        ActionUrl = $"/Schedule?startDate={shift.Start.ToString("dd/MM/yyyy")}"
-                    });
-                }
-                else
-                {
-                    Context.Notifications.Add(new Notification
+                        Context.Notifications.Add(new Notification
+                        {
+                            Employee = employee,
+                            Title =
+                                $"Dienst {shift.Department.ToFriendlyString()} toegevoegd - {shift.Start.ToString("dd/MM/yyyy")}",
+                            Description =
+                                $"Er is een dienst voor jou toegevoegd op {shift.Start.ToString("dd/MM/yyyy")}.",
+                            SentAt = DateTime.Now,
+                            HasBeenRead = false,
+                            ActionUrl = $"/Schedule?startDate={shift.Start.ToString("dd/MM/yyyy")}"
+                        });
+                    }
+                    else
                     {
-                        Employee = employee,
-                        Title =
-                            $"Dienst {shift.Department.ToFriendlyString()} gewijzigd - {shift.Start.ToString("dd/MM/yyyy")}",
-                        Description =
-                            $"Je dienst op {shift.Start.ToString("dd/MM/yyyy")} van {shift.Start.ToString("HH:mm")} tot {shift.End.ToString("HH:mm")} is gewijzigd.",
-                        SentAt = DateTime.Now,
-                        HasBeenRead = false,
-                        ActionUrl = $"/Schedule?startDate={shift.Start.ToString("dd/MM/yyyy")}"
-                    });
+                        Context.Notifications.Add(new Notification
+                        {
+                            Employee = employee,
+                            Title =
+                                $"Dienst {shift.Department.ToFriendlyString()} gewijzigd - {shift.Start.ToString("dd/MM/yyyy")}",
+                            Description =
+                                $"Je dienst op {shift.Start.ToString("dd/MM/yyyy")} van {shift.Start.ToString("HH:mm")} tot {shift.End.ToString("HH:mm")} is gewijzigd.",
+                            SentAt = DateTime.Now,
+                            HasBeenRead = false,
+                            ActionUrl = $"/Schedule?startDate={shift.Start.ToString("dd/MM/yyyy")}"
+                        });
+                    }
                 }
                 Context.SaveChanges();
             }
             catch (Exception e)
             {
-                
                 NotifyService.Error("Er is iets fout gegaan bij het wijzigen van de dienst. Probeer het opnieuw");
                 return RedirectToAction("Update", new { id = id });
             }
