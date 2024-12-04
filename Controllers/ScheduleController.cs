@@ -1,8 +1,8 @@
 ﻿using BumboApp.Models;
 using System.Globalization;
-using BumboApp.Models;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BumboApp.Controllers
 {
@@ -75,9 +75,81 @@ namespace BumboApp.Controllers
             return View();
         }
 
-        public IActionResult DeleteWeek(DateOnly startDay)
+        public IActionResult DeleteWeek(int weekNumber, int year)
         {
-            return RedirectToAction("Index");
+            var deleteDate = new DateOnly(year, 1, 1).AddDays((weekNumber - 1) * 7);
+            var shifts = Context.Shifts
+                .Where(shift => DateOnly.FromDateTime(shift.Start) >= deleteDate
+                                && DateOnly.FromDateTime(shift.Start) < deleteDate.AddDays(7))
+                .ToList();
+            
+            if (shifts.Count == 0)
+            {
+                NotifyService.Error("Er zijn geen diensten gevonden voor de week");
+                return RedirectToAction("Index", new { startDate = deleteDate.ToString("dd/MM/yyyy") });
+            }
+
+            try
+            {
+                Context.ShiftTakeOvers.RemoveRange(Context.ShiftTakeOvers.Where(takeOver => shifts.Contains(takeOver.Shift)));
+                Context.Shifts.RemoveRange(shifts);
+                Context.SaveChanges();
+                NotifyService.Success("De shifts van de week zijn verwijderd");
+                return RedirectToAction("Index", new { startDate = deleteDate.ToString("dd/MM/yyyy") });
+            }
+            catch
+            {
+                NotifyService.Error("Er is iets fout gegaan bij het verwijderen van de shifts");
+                return RedirectToAction("Index", new { startDate = deleteDate.ToString("dd/MM/yyyy") });
+            }
+        }
+
+        public IActionResult PublishWeek(int weekNumber, int year)
+        {
+            var publishDate = new DateOnly(year, 1, 1).AddDays((weekNumber - 1) * 7);
+            var shifts = Context.Shifts
+                .Where(shift => DateOnly.FromDateTime(shift.Start) >= publishDate
+                                && DateOnly.FromDateTime(shift.Start) < publishDate.AddDays(7)
+                                && !shift.IsFinal).Include(shift => shift.Employee)
+                .ToList();
+
+            if (shifts.Count == 0)
+            {
+                NotifyService.Error("Er zijn geen concept diensten gevonden voor de week");
+                return RedirectToAction("Index", new { startDate = publishDate.ToString("dd/MM/yyyy") });
+            }
+
+            try
+            {
+                foreach (var shift in shifts)
+                {
+                    shift.IsFinal = true;
+                    
+                    // send notification to employee
+                    if (shift.Employee != null)
+                    {
+                        Context.Notifications.Add(new Notification
+                        {
+                            Employee = shift.Employee,
+                            Title = $"Dienst {shift.Department} toegevoegd - {shift.Start.ToString("dd-MM-yyyy")}",
+                            Description = $"Er is een dienst voor jou toegevoegd op {shift.Start.ToString("dd-MM-yyyy")}",
+                            SentAt = DateTime.Now,
+                            HasBeenRead = false,
+                            ActionUrl = $"/Schedule?startDate={shift.Start.ToString("dd/MM/yyyy")}"
+                        });
+                    }
+                }
+                
+                Context.SaveChanges();
+                NotifyService.Success("De concept diensten zijn gepubliceerd");
+                return RedirectToAction("Index", new { startDate = publishDate.ToString("dd/MM/yyyy") });
+            }
+            catch (Exception e)
+            {
+                NotifyService.Error("Er is iets fout gegaan bij het publiceren van de diensten");
+                return RedirectToAction("Index", new { startDate = publishDate.ToString("dd/MM/yyyy") });
+            }
+            
         }
     }
 }
