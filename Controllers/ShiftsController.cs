@@ -139,8 +139,8 @@ namespace BumboApp.Controllers
                     Context.Notifications.Add(new Notification
                     {
                         Employee = employeeToInsert,
-                        Title = $"Dienst {department} toegevoegd - {startToInsert.ToString("dd/MM/yyyy")}",
-                        Description = $"Er is een dienst voor jou toegevoegd op {startToInsert.ToString("dd/MM/yyyy")} van {startToInsert.ToString("HH:mm")} tot {endToInsert.ToString("HH:mm")}",
+                        Title = $"Dienst {department} toegevoegd - {startToInsert.ToString("dd-MM-yyyy")}",
+                        Description = $"Er is een dienst voor jou toegevoegd op {startToInsert.ToString("dd-MM-yyyy")}",
                         SentAt = DateTime.Now,
                         HasBeenRead = false,
                         ActionUrl = $"/Schedule?startDate={startToInsert.ToString("dd/MM/yyyy")}"
