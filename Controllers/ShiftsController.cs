@@ -2,6 +2,7 @@
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BumboApp.Controllers
 {
@@ -54,6 +55,75 @@ namespace BumboApp.Controllers
         public IActionResult MyShifts()
         {
             CheckPageAccess(Role.Employee);
+
+            // Get the current logged-in user's ID
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null) { return View(); }
+
+            // Fetch the employee associated with the logged-in user
+            var employee = Context.Employees
+                .Include(e => e.Shifts)
+                .FirstOrDefault(e => e.User.Id == userId);
+
+            if (employee == null) { return View(); }
+
+            var today = DateTime.Today;
+            var now = DateTime.Now;
+            var startOfWeek = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Monday); // Start of the week                                                                               // If today is Sunday, we want the week to start from the previous Monday
+            if (today.DayOfWeek == DayOfWeek.Sunday)
+            {
+                startOfWeek = startOfWeek.AddDays(-7); // Move back to the previous Monday
+            }
+            var endOfWeek = startOfWeek.AddDays(6); // End of the week
+
+            // Filter shifts for the current week (shifts left this week)
+            var shiftsThisWeek = employee.Shifts
+                .Where(s => s.Start.Date >= today && s.Start.Date <= endOfWeek && s.IsFinal && s.Start > now)
+                .OrderBy(s => s.Start)
+                .ToList();
+
+            // Filter shifts for the rest of the month (after this week)
+            var endOfMonth = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month)); // Last day of the current month
+            var shiftsThisMonth = employee.Shifts
+                .Where(s => s.Start.Date > endOfWeek && s.Start.Date <= endOfMonth && s.IsFinal)
+                .OrderBy(s => s.Start)
+                .ToList();
+
+            // Filter shifts for later dates (after the current month)
+            var shiftsLater = employee.Shifts
+                .Where(s => s.Start.Date > endOfMonth && s.IsFinal)
+                .OrderBy(s => s.Start)
+                .ToList();
+
+            var takenOverShiftIds = Context.ShiftTakeOvers
+                .Select(st => st.ShiftId)
+                .ToList();
+
+            var takenOverShiftsThisWeek = shiftsThisWeek
+                .Where(s => takenOverShiftIds.Contains(s.Id))
+                .ToList();
+
+            var takenOverShiftsThisMonth = shiftsThisMonth
+                .Where(s => takenOverShiftIds.Contains(s.Id))
+                .ToList();
+
+            var takenOverShiftsLater = shiftsLater
+                .Where(s => takenOverShiftIds.Contains(s.Id))
+                .ToList();
+
+            // Group the shifts
+            ViewBag.StartOfWeek = startOfWeek;
+            ViewBag.EndOfWeek = endOfWeek;
+            ViewBag.EndOfMonth = endOfMonth;
+
+            ViewBag.ShiftsThisWeek = shiftsThisWeek;
+            ViewBag.ShiftsThisMonth = shiftsThisMonth;
+            ViewBag.ShiftsLater = shiftsLater;
+
+            ViewBag.TakenOverShiftsThisWeek = takenOverShiftsThisWeek;
+            ViewBag.TakenOverShiftsThisMonth = takenOverShiftsThisMonth;
+            ViewBag.TakenOverShiftsLater = takenOverShiftsLater;
             return View();
         }
 
@@ -179,7 +249,7 @@ namespace BumboApp.Controllers
                 return RedirectToAction("Update", new { id = id });
             }
             var employee = employeeNumber != null ? Context.Employees.Find(int.Parse(employeeNumber)) : null;
-            if (employeeNumber == null || employee == null)
+            if ((employeeNumber == null || employee == null) && employeeNumber != "0")
             {
                 NotifyService.Error("De werknemer kon niet worden gevonden");
                 return RedirectToAction("Update", new { id = id });
@@ -216,39 +286,41 @@ namespace BumboApp.Controllers
                 shift.IsFinal = isFinal;
                 Context.Shifts.Update(shift);
 
-                if (conceptMadeFinal)
+                if (employee != null)
                 {
-                    Context.Notifications.Add(new Notification
+                    if (conceptMadeFinal)
                     {
-                        Employee = employee,
-                        Title =
-                            $"Dienst {shift.Department.ToFriendlyString()} toegevoegd - {shift.Start.ToString("dd/MM/yyyy")}",
-                        Description =
-                            $"Er is een dienst voor jou toegevoegd op {shift.Start.ToString("dd/MM/yyyy")}.",
-                        SentAt = DateTime.Now,
-                        HasBeenRead = false,
-                        ActionUrl = $"/Schedule?startDate={shift.Start.ToString("dd/MM/yyyy")}"
-                    });
-                }
-                else
-                {
-                    Context.Notifications.Add(new Notification
+                        Context.Notifications.Add(new Notification
+                        {
+                            Employee = employee,
+                            Title =
+                                $"Dienst {shift.Department.ToFriendlyString()} toegevoegd - {shift.Start.ToString("dd/MM/yyyy")}",
+                            Description =
+                                $"Er is een dienst voor jou toegevoegd op {shift.Start.ToString("dd/MM/yyyy")}.",
+                            SentAt = DateTime.Now,
+                            HasBeenRead = false,
+                            ActionUrl = $"/Schedule?startDate={shift.Start.ToString("dd/MM/yyyy")}"
+                        });
+                    }
+                    else
                     {
-                        Employee = employee,
-                        Title =
-                            $"Dienst {shift.Department.ToFriendlyString()} gewijzigd - {shift.Start.ToString("dd/MM/yyyy")}",
-                        Description =
-                            $"Je dienst op {shift.Start.ToString("dd/MM/yyyy")} van {shift.Start.ToString("HH:mm")} tot {shift.End.ToString("HH:mm")} is gewijzigd.",
-                        SentAt = DateTime.Now,
-                        HasBeenRead = false,
-                        ActionUrl = $"/Schedule?startDate={shift.Start.ToString("dd/MM/yyyy")}"
-                    });
+                        Context.Notifications.Add(new Notification
+                        {
+                            Employee = employee,
+                            Title =
+                                $"Dienst {shift.Department.ToFriendlyString()} gewijzigd - {shift.Start.ToString("dd/MM/yyyy")}",
+                            Description =
+                                $"Je dienst op {shift.Start.ToString("dd/MM/yyyy")} van {shift.Start.ToString("HH:mm")} tot {shift.End.ToString("HH:mm")} is gewijzigd.",
+                            SentAt = DateTime.Now,
+                            HasBeenRead = false,
+                            ActionUrl = $"/Schedule?startDate={shift.Start.ToString("dd/MM/yyyy")}"
+                        });
+                    }
                 }
                 Context.SaveChanges();
             }
             catch (Exception e)
             {
-                
                 NotifyService.Error("Er is iets fout gegaan bij het wijzigen van de dienst. Probeer het opnieuw");
                 return RedirectToAction("Update", new { id = id });
             }
