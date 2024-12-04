@@ -30,6 +30,14 @@ namespace BumboApp.Models
         public DateOnly? EndOfEmployment { get; set; }
 
         // Navigation properties
+        public List<Notification> notifications { get; set; }
+        public List<SchoolSchedule> SchoolSchedules { get; set; }
+        public List<LeaveRequest> leaveRequests { get; set; }
+        public List<SickLeave> sickLeaves { get; set; }
+        public List<Availability> Availabilities { get; set; }
+        public List<Shift> Shifts { get; set; }
+        public List<ShiftTakeOver> shiftTakeOvers { get; set; }
+        public List<StandardAvailability> StandardAvailability { get; set; }
         public User? User { get; set; }
 
         public List<Notification>? notifications { get; set; }

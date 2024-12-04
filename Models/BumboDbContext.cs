@@ -46,11 +46,12 @@ public partial class BumboDbContext : IdentityDbContext<User>
     public virtual DbSet<Shift> Shifts { get; set; }
     public virtual DbSet<ShiftTakeOver> ShiftTakeOvers { get; set; }
     public virtual DbSet<SickLeave> SickLeaves { get; set; }
+    public virtual DbSet<StandardAvailability> StandardAvailabilities { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
         //Module 1 classes
         modelBuilder.Entity<WeekPrognosis>()
             .HasIndex(wp => wp.StartDate)
@@ -126,6 +127,15 @@ public partial class BumboDbContext : IdentityDbContext<User>
             .HasForeignKey(ss => ss.EmployeeNumber)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<StandardAvailability>()
+            .HasKey(sa => new { sa.Day, sa.EmployeeNumber });
+
+        modelBuilder.Entity<StandardAvailability>()
+            .HasOne(sa => sa.Employee)
+            .WithMany(e => e.StandardAvailability)
+            .HasForeignKey(sa => sa.EmployeeNumber)
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<Shift>()
             .HasOne(s => s.ShiftTakeOver)
             .WithOne(sto => sto.Shift)
@@ -154,7 +164,7 @@ public partial class BumboDbContext : IdentityDbContext<User>
             },
             new IdentityRole
             {
-                Id=employeeRoleId,
+                Id = employeeRoleId,
                 Name = Role.Employee.ToString(),
                 NormalizedName = Role.Employee.ToString().ToUpper()
             }
@@ -314,6 +324,109 @@ public partial class BumboDbContext : IdentityDbContext<User>
                 ClosingTime = null
             }
         );
+
+        modelBuilder.Entity<StandardAvailability>().HasData(
+            new StandardAvailability
+            {
+                Day = DayOfWeek.Monday,
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(18, 0),
+                EndTime = new TimeOnly(21, 0)
+            },
+            new StandardAvailability
+            {
+                Day = DayOfWeek.Tuesday,
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(9, 0),
+                EndTime = new TimeOnly(21, 0)
+            },
+            new StandardAvailability
+            {
+                Day = DayOfWeek.Wednesday,
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(9, 0),
+                EndTime = new TimeOnly(21, 0)
+            },
+            new StandardAvailability
+            {
+                Day = DayOfWeek.Thursday,
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(9, 0),
+                EndTime = new TimeOnly(18, 0)
+            },
+            new StandardAvailability
+            {
+                Day = DayOfWeek.Friday,
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(9, 0),
+                EndTime = new TimeOnly(21, 0)
+            },
+            new StandardAvailability
+            {
+                Day = DayOfWeek.Saturday,
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(9, 0),
+                EndTime = new TimeOnly(16, 0)
+            },
+            new StandardAvailability
+            {
+                Day = DayOfWeek.Sunday,
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(9, 0),
+                EndTime = new TimeOnly(21, 0)
+            },
+
+            //Employee 3
+            new StandardAvailability
+            {
+                Day = DayOfWeek.Monday,
+                EmployeeNumber = 3,
+                StartTime = new TimeOnly(8, 30),
+                EndTime = new TimeOnly(14, 30)
+            },
+            new StandardAvailability
+            {
+                Day = DayOfWeek.Tuesday,
+                EmployeeNumber = 3,
+                StartTime = new TimeOnly(13, 0),
+                EndTime = new TimeOnly(19, 0)
+            },
+            new StandardAvailability
+            {
+                Day = DayOfWeek.Wednesday,
+                EmployeeNumber = 3,
+                StartTime = new TimeOnly(9, 0),
+                EndTime = new TimeOnly(17, 0)
+            },
+            new StandardAvailability
+            {
+                Day = DayOfWeek.Thursday,
+                EmployeeNumber = 3,
+                StartTime = new TimeOnly(10, 0),
+                EndTime = new TimeOnly(16, 0)
+            },
+            new StandardAvailability
+            {
+                Day = DayOfWeek.Friday,
+                EmployeeNumber = 3,
+                StartTime = new TimeOnly(14, 0),
+                EndTime = new TimeOnly(20, 0)
+            },
+            new StandardAvailability
+            {
+                Day = DayOfWeek.Saturday,
+                EmployeeNumber = 3,
+                StartTime = new TimeOnly(11, 0),
+                EndTime = new TimeOnly(18, 0)
+            },
+            new StandardAvailability
+            {
+                Day = DayOfWeek.Sunday,
+                EmployeeNumber = 3,
+                StartTime = new TimeOnly(12, 0),
+                EndTime = new TimeOnly(16, 0)
+            }
+        );
     }
 
     private void SeedData(ModelBuilder modelBuilder)
@@ -465,10 +578,59 @@ public partial class BumboDbContext : IdentityDbContext<User>
         modelBuilder.Entity<Availability>().HasData(
             new
             {
-                Date = new DateOnly(2024, 12, 9),
-                EmployeeNumber = 1,
+                Date = new DateOnly(2024, 12, 2),
+                EmployeeNumber = 2,
                 StartTime = new TimeOnly(9, 0),
                 EndTime = new TimeOnly(17, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 3),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(10, 0),
+                EndTime = new TimeOnly(18, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 4),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(11, 0),
+                EndTime = new TimeOnly(15, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 5),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(8, 0),
+                EndTime = new TimeOnly(16, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 6),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(12, 0),
+                EndTime = new TimeOnly(20, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 7),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(9, 0),
+                EndTime = new TimeOnly(14, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 8),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(10, 0),
+                EndTime = new TimeOnly(16, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 9),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(11, 0),
+                EndTime = new TimeOnly(19, 0)
             },
             new
             {
@@ -480,22 +642,53 @@ public partial class BumboDbContext : IdentityDbContext<User>
             new
             {
                 Date = new DateOnly(2024, 12, 11),
-                EmployeeNumber = 3,
-                StartTime = new TimeOnly(8, 0),
-                EndTime = new TimeOnly(14, 0)
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(9, 0),
+                EndTime = new TimeOnly(15, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 12),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(12, 0),
+                EndTime = new TimeOnly(20, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 13),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(10, 0),
+                EndTime = new TimeOnly(18, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 14),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(9, 0),
+                EndTime = new TimeOnly(13, 0)
+            },
+            new
+            {
+                Date = new DateOnly(2024, 12, 15),
+                EmployeeNumber = 2,
+                StartTime = new TimeOnly(11, 0),
+                EndTime = new TimeOnly(17, 0)
             }
         );
 
         modelBuilder.Entity<SchoolSchedule>().HasData(
-            // Schedule for John (Employee 1)
-            new { EmployeeNumber = 1, Date = new DateOnly(2024, 12, 9), DurationInHours = 4.0f },
-            new { EmployeeNumber = 1, Date = new DateOnly(2024, 12, 10), DurationInHours = 4.0f },
             // Schedule for Jane (Employee 2)
             new { EmployeeNumber = 2, Date = new DateOnly(2024, 12, 9), DurationInHours = 3.0f },
             new { EmployeeNumber = 2, Date = new DateOnly(2024, 12, 10), DurationInHours = 3.0f },
+            new { EmployeeNumber = 2, Date = new DateOnly(2024, 12, 11), DurationInHours = 3.0f },
+            new { EmployeeNumber = 2, Date = new DateOnly(2024, 12, 12), DurationInHours = 3.0f },
+            new { EmployeeNumber = 2, Date = new DateOnly(2024, 12, 13), DurationInHours = 3.0f },
             // Schedule for Emily (Employee 3)
-            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 9), DurationInHours = 6.0f },
-            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 10), DurationInHours = 6.0f }
+            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 9), DurationInHours = 3.0f },
+            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 10), DurationInHours = 3.0f },
+            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 11), DurationInHours = 3.0f },
+            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 12), DurationInHours = 3.0f },
+            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 13), DurationInHours = 3.0f }
         );
 
         modelBuilder.Entity<LeaveRequest>().HasData(

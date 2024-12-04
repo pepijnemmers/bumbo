@@ -1,3 +1,40 @@
-﻿@{
+﻿@model List<BumboApp.Models.StandardAvailability>
+
+@{
     ViewData["Title"] = "Standaard beschikbaarheid bewerken";
 }
+
+<div class="row">
+    <div class="col-12 col-xl-8">
+        <form class="table-container" asp-action="UpdateDefault" method="post">
+            <table class="table">
+                <tbody>
+                    @for (int i = 0; i < 7; i++)
+                    {
+                        DayOfWeek day = (DayOfWeek)((i + 1) % 7); // Start with Monday
+                        StandardAvailability? standardAvailability = Model.SingleOrDefault(a => a.Day == day);
+                        <tr>
+                            <td>@day</td>
+                            <td>
+                                <input type="hidden" name="standardAvailabilities[@i].Day" value="@standardAvailability.Day" />
+                                <input type="hidden" name="standardAvailabilities[@i].EmployeeNumber" value="@standardAvailability.EmployeeNumber" />
+                            </td>
+                            <td>vanaf</td>
+                            <td>
+                                <input type="time" name="standardAvailabilities[@i].StartTime" value="@standardAvailability.StartTime" required />
+                            </td>
+                            <td>tot</td>
+                            <td>
+                                <input type="time" name="standardAvailabilities[@i].EndTime" value="@standardAvailability.EndTime" required />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-end m-3">
+                <a class="btn btn-secondary" asp-action="Index" asp-route-id="@ViewData["StartDate"]">Annuleren</a>
+                <button type="submit" class="btn btn-primary">Opslaan</button>
+            </div>
+        </form>
+    </div>
+</div>
