@@ -2,7 +2,6 @@
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace BumboApp.Controllers
