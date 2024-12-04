@@ -16,27 +16,27 @@ namespace BumboApp.Controllers
 
     public class ScheduleController : MainController
     {
-        private UserManager<User> _userManager;
+        private readonly UserManager<User> _userManager;
         public ScheduleController(UserManager<User> userManager)
         {
             _userManager = userManager;
         }
         // will need to be in a json file eventually 
-        private const int maxShiftLengthAdult = 12;
-        private const int maxWeeklyHoursAdult = 60;
+        private const int _maxShiftLengthAdult = 12;
+        private const int _maxWeeklyHoursAdult = 60;
 
-        private const int maxWeeklyHoursAlmostAdult = 40;
-        private const int timeframeInWeeksMaxWeeklyHoursAlmostAdult = 4;
-        private const int maxHoursWithSchoolAlmostAdult = 9;
+        private const int _maxWeeklyHoursAlmostAdult = 40;
+        private const int _timeframeInWeeksMaxWeeklyHoursAlmostAdult = 4;
+        private const int _maxHoursWithSchoolAlmostAdult = 9;
 
-        private const int maxWeeklyHoursUnderSixteen = 40;
-        private const int maxWeeklyHoursSchoolweekUnderSixteen = 12;
-        private const int maxHoursWithSchoolUnderSixteen = 8;
-        private const int maxWorkingDaysUnderSixteen = 5;
-        private readonly TimeOnly maxWorkTimeForUnderSixteen = new TimeOnly(19,00,00);
+        private const int _maxWeeklyHoursUnderSixteen = 40;
+        private const int _maxWeeklyHoursSchoolweekUnderSixteen = 12;
+        private const int _maxHoursWithSchoolUnderSixteen = 8;
+        private const int _maxWorkingDaysUnderSixteen = 5;
+        private readonly TimeOnly _maxWorkTimeForUnderSixteen = new TimeOnly(19,00,00);
 
-        private const float breakTimeHours = (float)0.5;
-        private readonly int[] breakTimes = { 4, 8 };
+        private const float _breakTimeHours = (float)0.5;
+        private readonly int[] _breakTimes = { 4, 8 };
 
         public async Task<Role> GetUserRoleAsync(string userId)
         {
@@ -129,13 +129,13 @@ namespace BumboApp.Controllers
             List<Department> departmentList = new List<Department> { Department.Kassa, Department.Vers, Department.Vakkenvullen };
             DateOnly endDate = startDate.AddDays(6);
 
-            //for testing comment out the code between the comments (because there are already 2 shifts in the Db)
-            if (Context.Shifts
-                .Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) &&
-                e.End.Date <= endDate.ToDateTime(new TimeOnly())).Any())
-            {
-                return NotifyErrorAndRedirect("er is al een rooster voor deze week", "Index");
-            }
+            // when testing comment out the code between the comments (because there are already 2 shifts in the Db)
+            //if (Context.Shifts
+            //    .Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) &&
+            //    e.End.Date <= endDate.ToDateTime(new TimeOnly())).Any())
+            //{
+            //    return NotifyErrorAndRedirect("er is al een rooster voor deze week", "Index");
+            //}
             //so till this point
 
             foreach (Department department in departmentList)
@@ -178,7 +178,7 @@ namespace BumboApp.Controllers
                 Context.SaveChanges();
             }
             catch (Exception e) { return NotifyErrorAndRedirect("er is een probleem opgetreden", "Index"); }
-            return RedirectToAction("Index",null,startDate.ToString());
+            return RedirectToAction("Index",new {startDate = startDate.ToString()});
         }
 
         private void InsertEmptyShifts(Department department, DateOnly scheduledate)
@@ -280,11 +280,11 @@ namespace BumboApp.Controllers
             {
                 TimeSpan time = shift.End - shift.Start; 
                 hours += time.Hours;
-                foreach(int breakTime in breakTimes)
+                foreach(int breakTime in _breakTimes)
                 {
                     if(time.Hours > breakTime)
                     {
-                        hours -= breakTimeHours;
+                        hours -= _breakTimeHours;
                     }
                 }
             }
@@ -297,11 +297,11 @@ namespace BumboApp.Controllers
             {
                 TimeSpan time = shift.End - shift.Start;
                 hours += time.Hours;
-                foreach (int breakTime in breakTimes)
+                foreach (int breakTime in _breakTimes)
                 {
                     if (time.Hours > breakTime)
                     {
-                        hours -= breakTimeHours;
+                        hours -= _breakTimeHours;
                     }
                 }
             }
@@ -389,7 +389,7 @@ namespace BumboApp.Controllers
             if (availability == null)
             {
                 startinghour = oTime.Hour;
-                maxTimeAvailable = maxShiftLengthAdult;
+                maxTimeAvailable = _maxShiftLengthAdult;
             }
             else {
                 maxTimeAvailable = (availability.EndTime - availability.StartTime).Hours;
@@ -559,9 +559,9 @@ namespace BumboApp.Controllers
                 return 0;
             }
             float MissingHours = prognosis.NeededHours - GetWorkingHours(departmentDayShifts);
-            foreach (int time in breakTimes)
+            foreach (int time in _breakTimes)
             {
-                MissingHours += breakTimeHours;
+                MissingHours += _breakTimeHours;
             }
 
             return (int)Math.Ceiling(MissingHours);
@@ -583,9 +583,9 @@ namespace BumboApp.Controllers
             if ( age >= 18 )
             {
 
-                int maxShiftLenght = maxShiftLengthAdult - GetWorkingHours(workingShiftsThisWeek.
+                int maxShiftLenght = _maxShiftLengthAdult - GetWorkingHours(workingShiftsThisWeek.
                     Where(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly())));
-                int maxWeekHoursLeft = maxWeeklyHoursAdult - GetWorkingHours(workingShiftsThisWeek);
+                int maxWeekHoursLeft = _maxWeeklyHoursAdult - GetWorkingHours(workingShiftsThisWeek);
                 hours.Add(maxWeekHoursLeft);
                 hours.Add(maxShiftLenght);
             }
@@ -595,7 +595,7 @@ namespace BumboApp.Controllers
                 int maxWeekHours;
                 int maxTimeWithSchoolHours;
                 int maxHoursTillMaxTime;
-                if(!((scheduledate.ToDateTime(new TimeOnly()) - startDate.ToDateTime(new TimeOnly())).Days < maxWorkingDaysUnderSixteen))
+                if(!((scheduledate.ToDateTime(new TimeOnly()) - startDate.ToDateTime(new TimeOnly())).Days < _maxWorkingDaysUnderSixteen))
                 {
                     int workingDays = 0;
                     for(DateTime day = startDate.ToDateTime(new TimeOnly()); startDate <= scheduledate; day.AddDays(1))
@@ -605,22 +605,22 @@ namespace BumboApp.Controllers
                             workingDays++;
                         }
                     }
-                    if(workingDays >= maxWorkingDaysUnderSixteen || department == Department.Kassa) { return 0; }
+                    if(workingDays >= _maxWorkingDaysUnderSixteen || department == Department.Kassa) { return 0; }
                 }
                 if (!employee.SchoolSchedules.Where(e => e.Date >= startDate && e.Date <= startDate.AddDays(6)).Any()) // magic number
                 {
-                    maxWeekHours = maxWeeklyHoursSchoolweekUnderSixteen - workingHours;
-                    maxTimeWithSchoolHours = maxHoursWithSchoolUnderSixteen;
+                    maxWeekHours = _maxWeeklyHoursSchoolweekUnderSixteen - workingHours;
+                    maxTimeWithSchoolHours = _maxHoursWithSchoolUnderSixteen;
                 }
                 else
                 {
-                    maxWeekHours = maxWeeklyHoursSchoolweekUnderSixteen - workingHours;
-                    maxTimeWithSchoolHours = maxHoursWithSchoolUnderSixteen - GetSchoolHours(scheduledate, employee) -GetWorkingHours(workingShiftsThisWeek.
+                    maxWeekHours = _maxWeeklyHoursSchoolweekUnderSixteen - workingHours;
+                    maxTimeWithSchoolHours = _maxHoursWithSchoolUnderSixteen - GetSchoolHours(scheduledate, employee) -GetWorkingHours(workingShiftsThisWeek.
                     Where(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly())));
                 }
 
-                if(new TimeOnly(startinghour,00,00) >= maxWorkTimeForUnderSixteen) { return 0; }
-                else { maxHoursTillMaxTime = maxWorkTimeForUnderSixteen.Hour - startinghour; }
+                if(new TimeOnly(startinghour,00,00) >= _maxWorkTimeForUnderSixteen) { return 0; }
+                else { maxHoursTillMaxTime = _maxWorkTimeForUnderSixteen.Hour - startinghour; }
 
                 hours.Add(maxWeekHours);
                 hours.Add(maxTimeWithSchoolHours);
@@ -630,8 +630,8 @@ namespace BumboApp.Controllers
             {
                 int maxTimeWithSchoolHours;
                 int maxhoursWithAverage;
-                int maxAllowedHours = maxWeeklyHoursAlmostAdult * timeframeInWeeksMaxWeeklyHoursAlmostAdult;
-                int amountOfDaysLookedAtForMaxAllowedHours = timeframeInWeeksMaxWeeklyHoursAlmostAdult * 7;
+                int maxAllowedHours = _maxWeeklyHoursAlmostAdult * _timeframeInWeeksMaxWeeklyHoursAlmostAdult;
+                int amountOfDaysLookedAtForMaxAllowedHours = _timeframeInWeeksMaxWeeklyHoursAlmostAdult * 7;
 
                 int workedHoursInTimeframe = GetWorkingHours(Context.Shifts
                 .Where(e => e.Start.Date <= scheduledate.ToDateTime(new TimeOnly()))
@@ -641,11 +641,11 @@ namespace BumboApp.Controllers
                 maxhoursWithAverage = maxAllowedHours + workedHoursInTimeframe;            
                 if (employee.SchoolSchedules.Where(e => e.Date >= startDate && e.Date <= startDate.AddDays(6)).Any())
                 {
-                    maxTimeWithSchoolHours = maxHoursWithSchoolAlmostAdult;
+                    maxTimeWithSchoolHours = _maxHoursWithSchoolAlmostAdult;
                 }
                 else
                 {
-                    maxTimeWithSchoolHours = maxHoursWithSchoolAlmostAdult - GetSchoolHours(scheduledate, employee) - GetWorkingHours(workingShiftsThisWeek.
+                    maxTimeWithSchoolHours = _maxHoursWithSchoolAlmostAdult - GetSchoolHours(scheduledate, employee) - GetWorkingHours(workingShiftsThisWeek.
                     Where(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly())));
                 }
             }
