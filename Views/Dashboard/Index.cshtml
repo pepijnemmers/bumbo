@@ -180,7 +180,7 @@
                                                         @leaveRequest.StartDate.ToString("dd-MM-yyyy") - @leaveRequest.EndDate.ToString("dd-MM-yyyy")
                                                     </p>
                                                 </div>
-                                                <a asp-controller="Leave" asp-action="Index" class="btn btn-outline-dark align-self-center" type="button">Beoordelen</a>
+                                                <a asp-controller="Leave" asp-action="LeaveRequest" asp-route-id="@leaveRequest.Id" class="btn btn-outline-dark align-self-center" type="button">Beoordelen</a>
                                             </div>
                                         </div>
                                     </div>
