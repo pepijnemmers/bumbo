@@ -117,7 +117,7 @@ namespace BumboApp.Controllers
             Prognosis? prognosis = Context.Prognoses.FirstOrDefault(e => e.Date == startDate);
             if (prognosis == null)
             {
-                return NotifyErrorAndRedirect("Geen prognose om het rooster te maken", "Index"); //route to prognose page?
+                return NotifyErrorAndRedirect("Geen prognose om het rooster te maken.", "Index"); //route to prognose page?
             }
 
             List<Department> departmentList = new List<Department> { Department.Kassa, Department.Vers, Department.Vakkenvullen };
@@ -128,7 +128,7 @@ namespace BumboApp.Controllers
                 .Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) &&
                 e.End.Date <= endDate.ToDateTime(new TimeOnly())).Any())
             {
-                return NotifyErrorAndRedirect("Er is al een rooster voor deze week", "Index");
+                return NotifyErrorAndRedirect("Er is al een rooster voor deze week.", "Index");
             }
             ///so till this point
 
@@ -160,8 +160,8 @@ namespace BumboApp.Controllers
                         Context.Notifications.Add(new Notification()
                         {
                             SentAt = DateTime.Now,
-                            Title = name + "heeft te weinig uren in week " + weekNumber,
-                            Description = name + "heeft minder dan " + e.ContractHours + " uren in week " + weekNumber,
+                            Title = name + "heeft te weinig uren in week " + weekNumber + ".",
+                            Description = name + "heeft minder dan " + e.ContractHours + " uren in week " + weekNumber + ".",
                             Employee = m
                         });
                     }
@@ -171,7 +171,7 @@ namespace BumboApp.Controllers
             {
                 Context.SaveChanges();
             }
-            catch (Exception e) { return NotifyErrorAndRedirect("Er is een probleem opgetreden", "Index"); }
+            catch (Exception e) { return NotifyErrorAndRedirect("Er is een probleem opgetreden.", "Index"); }
             return RedirectToAction("Index",new {startDate = startDate.ToString()});
         }
 
