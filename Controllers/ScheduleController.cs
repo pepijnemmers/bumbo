@@ -217,6 +217,7 @@ namespace BumboApp.Controllers
                 .Include(e => e.SchoolSchedules)
                 .Include(e => e.leaveRequests)
                 .Include(e => e.Availabilities)
+                .Where(e => e.EndOfEmployment == null)
                 .ToList();
 
             employees = employees.OrderBy(e => e.ContractHours / GetWorkingHoursNoZero(e.Shifts.Where(s => s.Start.Date <= startDate.ToDateTime(new TimeOnly()) && s.End.Date >= scheduledate.ToDateTime(new TimeOnly()))))
