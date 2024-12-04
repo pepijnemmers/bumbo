@@ -79,7 +79,10 @@ public partial class BumboDbContext : IdentityDbContext<User>
 
         //Module 2 classes
         modelBuilder.Entity<Availability>().ToTable(t => t.
-            HasCheckConstraint("CK_Availability_StartTime_EndTime", "[StartTime] < [EndTime]"));
+            HasCheckConstraint("CK_Availability_StartTime_EndTime", "[StartTime] <= [EndTime]"));
+
+        modelBuilder.Entity<StandardAvailability>().ToTable(t => t.
+            HasCheckConstraint("CK_StandardAvailability_StartTime_EndTime", "[StartTime] <= [EndTime]"));
 
         modelBuilder.Entity<Employee>().ToTable(t =>
             {
