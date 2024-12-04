@@ -22,6 +22,228 @@ namespace BumboApp.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("BumboApp.Models.Availability", b =>
+                {
+                    b.Property<int>("EmployeeNumber")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
+
+                    b.HasKey("EmployeeNumber", "Date");
+
+                    b.ToTable("Availabilities", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Availability_StartTime_EndTime", "[StartTime] <= [EndTime]");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 2),
+                            EndTime = new TimeOnly(17, 0, 0),
+                            StartTime = new TimeOnly(9, 0, 0)
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 3),
+                            EndTime = new TimeOnly(18, 0, 0),
+                            StartTime = new TimeOnly(10, 0, 0)
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 4),
+                            EndTime = new TimeOnly(15, 0, 0),
+                            StartTime = new TimeOnly(11, 0, 0)
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 5),
+                            EndTime = new TimeOnly(16, 0, 0),
+                            StartTime = new TimeOnly(8, 0, 0)
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 6),
+                            EndTime = new TimeOnly(20, 0, 0),
+                            StartTime = new TimeOnly(12, 0, 0)
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 7),
+                            EndTime = new TimeOnly(14, 0, 0),
+                            StartTime = new TimeOnly(9, 0, 0)
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 8),
+                            EndTime = new TimeOnly(16, 0, 0),
+                            StartTime = new TimeOnly(10, 0, 0)
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 9),
+                            EndTime = new TimeOnly(19, 0, 0),
+                            StartTime = new TimeOnly(11, 0, 0)
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 10),
+                            EndTime = new TimeOnly(17, 0, 0),
+                            StartTime = new TimeOnly(13, 0, 0)
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 11),
+                            EndTime = new TimeOnly(15, 0, 0),
+                            StartTime = new TimeOnly(9, 0, 0)
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 12),
+                            EndTime = new TimeOnly(20, 0, 0),
+                            StartTime = new TimeOnly(12, 0, 0)
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 13),
+                            EndTime = new TimeOnly(18, 0, 0),
+                            StartTime = new TimeOnly(10, 0, 0)
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 14),
+                            EndTime = new TimeOnly(13, 0, 0),
+                            StartTime = new TimeOnly(9, 0, 0)
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 15),
+                            EndTime = new TimeOnly(17, 0, 0),
+                            StartTime = new TimeOnly(11, 0, 0)
+                        });
+                });
+
+            modelBuilder.Entity("BumboApp.Models.Employee", b =>
+                {
+                    b.Property<int>("EmployeeNumber")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeNumber"));
+
+                    b.Property<int>("ContractHours")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("DateOfBirth")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("EndOfEmployment")
+                        .HasColumnType("date");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("HouseNumber")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("LeaveHours")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("StartOfEmployment")
+                        .HasColumnType("date");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Zipcode")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
+
+                    b.HasKey("EmployeeNumber");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Employees", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Employees_StartOfEmployment_EndOfEmployment", "[StartOfEmployment] <= [EndOfEmployment]");
+
+                            t.HasCheckConstraint("CK_Employees_Zipcode", "[Zipcode] LIKE '[1-9][0-9][0-9][0-9][A-Z][A-Z]'");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            EmployeeNumber = 1,
+                            ContractHours = 40,
+                            DateOfBirth = new DateOnly(1990, 5, 20),
+                            FirstName = "John",
+                            HouseNumber = "1",
+                            LastName = "Doe",
+                            LeaveHours = 60,
+                            StartOfEmployment = new DateOnly(2020, 1, 15),
+                            UserId = "2ab03136-c316-4b70-a7fc-4c9cb044a6be",
+                            Zipcode = "5583AA"
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            ContractHours = 20,
+                            DateOfBirth = new DateOnly(1995, 8, 12),
+                            FirstName = "Jane",
+                            HouseNumber = "2",
+                            LastName = "Smith",
+                            LeaveHours = 5,
+                            StartOfEmployment = new DateOnly(2021, 3, 1),
+                            UserId = "12544476-38da-4113-9c40-4bc508f8c0f2",
+                            Zipcode = "5684AS"
+                        },
+                        new
+                        {
+                            EmployeeNumber = 3,
+                            ContractHours = 35,
+                            DateOfBirth = new DateOnly(1998, 12, 5),
+                            FirstName = "Emily",
+                            HouseNumber = "1",
+                            LastName = "Jones",
+                            LeaveHours = 40,
+                            StartOfEmployment = new DateOnly(2019, 7, 30),
+                            UserId = "2667ab01-7225-451b-adbb-c99eea968d02",
+                            Zipcode = "5683AA"
+                        });
+                });
+
             modelBuilder.Entity("BumboApp.Models.Expectation", b =>
                 {
                     b.Property<int>("Id")
@@ -44,155 +266,259 @@ namespace BumboApp.Migrations
                     b.HasIndex("Date")
                         .IsUnique();
 
-                    b.ToTable("Expectations");
+                    b.ToTable("Expectations", (string)null);
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            Date = new DateOnly(2024, 10, 14),
-                            ExpectedCargo = 32,
-                            ExpectedCustomers = 850
+                            Date = new DateOnly(2024, 11, 18),
+                            ExpectedCargo = 30,
+                            ExpectedCustomers = 800
                         },
                         new
                         {
                             Id = 2,
-                            Date = new DateOnly(2024, 10, 15),
+                            Date = new DateOnly(2024, 11, 19),
                             ExpectedCargo = 40,
                             ExpectedCustomers = 900
                         },
                         new
                         {
                             Id = 3,
-                            Date = new DateOnly(2024, 10, 16),
-                            ExpectedCargo = 50,
-                            ExpectedCustomers = 980
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Date = new DateOnly(2024, 10, 17),
-                            ExpectedCargo = 60,
-                            ExpectedCustomers = 1050
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Date = new DateOnly(2024, 10, 18),
-                            ExpectedCargo = 45,
-                            ExpectedCustomers = 870
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Date = new DateOnly(2024, 10, 19),
-                            ExpectedCargo = 38,
-                            ExpectedCustomers = 810
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Date = new DateOnly(2024, 10, 20),
-                            ExpectedCargo = 55,
-                            ExpectedCustomers = 1000
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Date = new DateOnly(2024, 10, 21),
-                            ExpectedCargo = 33,
-                            ExpectedCustomers = 830
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Date = new DateOnly(2024, 10, 22),
-                            ExpectedCargo = 48,
-                            ExpectedCustomers = 920
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Date = new DateOnly(2024, 10, 23),
-                            ExpectedCargo = 42,
-                            ExpectedCustomers = 880
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Date = new DateOnly(2024, 10, 24),
-                            ExpectedCargo = 60,
-                            ExpectedCustomers = 1050
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Date = new DateOnly(2024, 10, 25),
-                            ExpectedCargo = 36,
-                            ExpectedCustomers = 840
-                        },
-                        new
-                        {
-                            Id = 13,
-                            Date = new DateOnly(2024, 10, 26),
-                            ExpectedCargo = 53,
-                            ExpectedCustomers = 980
-                        },
-                        new
-                        {
-                            Id = 14,
-                            Date = new DateOnly(2024, 10, 27),
+                            Date = new DateOnly(2024, 11, 20),
                             ExpectedCargo = 50,
                             ExpectedCustomers = 950
                         },
                         new
                         {
-                            Id = 15,
-                            Date = new DateOnly(2024, 10, 28),
+                            Id = 4,
+                            Date = new DateOnly(2024, 11, 21),
+                            ExpectedCargo = 60,
+                            ExpectedCustomers = 1000
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Date = new DateOnly(2024, 11, 22),
+                            ExpectedCargo = 45,
+                            ExpectedCustomers = 850
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Date = new DateOnly(2024, 11, 23),
+                            ExpectedCargo = 38,
+                            ExpectedCustomers = 780
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Date = new DateOnly(2024, 11, 24),
+                            ExpectedCargo = 55,
+                            ExpectedCustomers = 960
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Date = new DateOnly(2024, 11, 25),
+                            ExpectedCargo = 35,
+                            ExpectedCustomers = 810
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Date = new DateOnly(2024, 11, 26),
+                            ExpectedCargo = 50,
+                            ExpectedCustomers = 900
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Date = new DateOnly(2024, 11, 27),
+                            ExpectedCargo = 42,
+                            ExpectedCustomers = 850
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Date = new DateOnly(2024, 11, 28),
+                            ExpectedCargo = 60,
+                            ExpectedCustomers = 1000
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Date = new DateOnly(2024, 11, 29),
                             ExpectedCargo = 37,
                             ExpectedCustomers = 820
                         },
                         new
                         {
+                            Id = 13,
+                            Date = new DateOnly(2024, 11, 30),
+                            ExpectedCargo = 53,
+                            ExpectedCustomers = 940
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Date = new DateOnly(2024, 12, 1),
+                            ExpectedCargo = 50,
+                            ExpectedCustomers = 900
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Date = new DateOnly(2024, 12, 2),
+                            ExpectedCargo = 36,
+                            ExpectedCustomers = 810
+                        },
+                        new
+                        {
                             Id = 16,
-                            Date = new DateOnly(2024, 10, 29),
+                            Date = new DateOnly(2024, 12, 3),
                             ExpectedCargo = 47,
-                            ExpectedCustomers = 930
+                            ExpectedCustomers = 870
                         },
                         new
                         {
                             Id = 17,
-                            Date = new DateOnly(2024, 10, 30),
-                            ExpectedCargo = 35,
-                            ExpectedCustomers = 850
+                            Date = new DateOnly(2024, 12, 4),
+                            ExpectedCargo = 38,
+                            ExpectedCustomers = 780
                         },
                         new
                         {
                             Id = 18,
-                            Date = new DateOnly(2024, 10, 31),
-                            ExpectedCargo = 52,
-                            ExpectedCustomers = 1000
+                            Date = new DateOnly(2024, 12, 5),
+                            ExpectedCargo = 55,
+                            ExpectedCustomers = 950
                         },
                         new
                         {
                             Id = 19,
-                            Date = new DateOnly(2024, 11, 1),
+                            Date = new DateOnly(2024, 12, 6),
+                            ExpectedCargo = 45,
+                            ExpectedCustomers = 840
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Date = new DateOnly(2024, 12, 7),
+                            ExpectedCargo = 60,
+                            ExpectedCustomers = 1000
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Date = new DateOnly(2024, 12, 8),
                             ExpectedCargo = 40,
                             ExpectedCustomers = 890
                         },
                         new
                         {
-                            Id = 20,
-                            Date = new DateOnly(2024, 11, 2),
-                            ExpectedCargo = 60,
-                            ExpectedCustomers = 1050
+                            Id = 22,
+                            Date = new DateOnly(2024, 12, 9),
+                            ExpectedCargo = 50,
+                            ExpectedCustomers = 920
                         },
                         new
                         {
-                            Id = 21,
-                            Date = new DateOnly(2024, 11, 3),
-                            ExpectedCargo = 44,
-                            ExpectedCustomers = 870
+                            Id = 23,
+                            Date = new DateOnly(2024, 12, 10),
+                            ExpectedCargo = 42,
+                            ExpectedCustomers = 860
+                        },
+                        new
+                        {
+                            Id = 24,
+                            Date = new DateOnly(2024, 12, 11),
+                            ExpectedCargo = 60,
+                            ExpectedCustomers = 1000
+                        },
+                        new
+                        {
+                            Id = 25,
+                            Date = new DateOnly(2024, 12, 12),
+                            ExpectedCargo = 48,
+                            ExpectedCustomers = 930
+                        },
+                        new
+                        {
+                            Id = 26,
+                            Date = new DateOnly(2024, 12, 13),
+                            ExpectedCargo = 35,
+                            ExpectedCustomers = 780
+                        },
+                        new
+                        {
+                            Id = 27,
+                            Date = new DateOnly(2024, 12, 14),
+                            ExpectedCargo = 53,
+                            ExpectedCustomers = 950
+                        },
+                        new
+                        {
+                            Id = 28,
+                            Date = new DateOnly(2024, 12, 15),
+                            ExpectedCargo = 50,
+                            ExpectedCustomers = 900
+                        });
+                });
+
+            modelBuilder.Entity("BumboApp.Models.LeaveRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EmployeeNumber")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeNumber");
+
+                    b.ToTable("LeaveRequests", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_LeaveRequests_StartDate_EndDate", "[StartDate] <= [EndDate]");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            EmployeeNumber = 1,
+                            EndDate = new DateTime(2024, 12, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Reason = "Family event",
+                            StartDate = new DateTime(2024, 12, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Status = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            EmployeeNumber = 2,
+                            EndDate = new DateTime(2024, 12, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Reason = "Medical appointment",
+                            StartDate = new DateTime(2024, 12, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Status = 0
                         });
                 });
 
@@ -218,7 +544,7 @@ namespace BumboApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Norms");
+                    b.ToTable("Norms", (string)null);
 
                     b.HasData(
                         new
@@ -263,6 +589,63 @@ namespace BumboApp.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BumboApp.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActionUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<int>("EmployeeNumber")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("HasBeenRead")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeNumber");
+
+                    b.ToTable("Notifications", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Don't forget the department meeting on Dec 10.",
+                            EmployeeNumber = 1,
+                            HasBeenRead = false,
+                            SentAt = new DateTime(2024, 12, 8, 9, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Meeting Reminder"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Check your holiday hours for December.",
+                            EmployeeNumber = 3,
+                            HasBeenRead = true,
+                            SentAt = new DateTime(2024, 12, 7, 15, 30, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Holiday Hours"
+                        });
+                });
+
             modelBuilder.Entity("BumboApp.Models.OpeningHour", b =>
                 {
                     b.Property<int>("WeekDay")
@@ -276,7 +659,10 @@ namespace BumboApp.Migrations
 
                     b.HasKey("WeekDay");
 
-                    b.ToTable("OpeningHours");
+                    b.ToTable("OpeningHours", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_OpeningHours_OpeningTime_ClosingTime", "([OpeningTime] IS NULL AND [ClosingTime] IS NULL) OR ([OpeningTime] IS NOT NULL AND [ClosingTime] IS NOT NULL AND [OpeningTime] < [ClosingTime])");
+                        });
 
                     b.HasData(
                         new
@@ -348,7 +734,13 @@ namespace BumboApp.Migrations
 
                     b.HasIndex("WeekPrognosisId");
 
-                    b.ToTable("Prognoses");
+                    b.HasIndex("Date", "Department")
+                        .IsUnique();
+
+                    b.ToTable("Prognoses", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Prognoses_NeededHours_NeededEmployees", "[NeededHours] = [NeededEmployees] * 8");
+                        });
 
                     b.HasData(
                         new
@@ -366,7 +758,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 7),
                             Department = 1,
                             NeededEmployees = 4f,
-                            NeededHours = 35f,
+                            NeededHours = 32f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -375,7 +767,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 7),
                             Department = 2,
                             NeededEmployees = 3f,
-                            NeededHours = 30f,
+                            NeededHours = 24f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -384,7 +776,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 8),
                             Department = 0,
                             NeededEmployees = 4f,
-                            NeededHours = 38f,
+                            NeededHours = 32f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -393,7 +785,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 8),
                             Department = 1,
                             NeededEmployees = 3f,
-                            NeededHours = 37f,
+                            NeededHours = 24f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -402,7 +794,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 8),
                             Department = 2,
                             NeededEmployees = 2f,
-                            NeededHours = 28f,
+                            NeededHours = 16f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -411,7 +803,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 9),
                             Department = 0,
                             NeededEmployees = 6f,
-                            NeededHours = 42f,
+                            NeededHours = 48f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -420,7 +812,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 9),
                             Department = 1,
                             NeededEmployees = 3f,
-                            NeededHours = 32f,
+                            NeededHours = 24f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -429,7 +821,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 9),
                             Department = 2,
                             NeededEmployees = 2f,
-                            NeededHours = 26f,
+                            NeededHours = 16f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -438,7 +830,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 10),
                             Department = 0,
                             NeededEmployees = 6f,
-                            NeededHours = 42f,
+                            NeededHours = 48f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -447,7 +839,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 10),
                             Department = 1,
                             NeededEmployees = 3f,
-                            NeededHours = 32f,
+                            NeededHours = 24f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -456,7 +848,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 10),
                             Department = 2,
                             NeededEmployees = 2f,
-                            NeededHours = 26f,
+                            NeededHours = 16f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -465,7 +857,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 11),
                             Department = 0,
                             NeededEmployees = 6f,
-                            NeededHours = 42f,
+                            NeededHours = 48f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -474,7 +866,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 11),
                             Department = 1,
                             NeededEmployees = 3f,
-                            NeededHours = 32f,
+                            NeededHours = 24f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -483,7 +875,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 11),
                             Department = 2,
                             NeededEmployees = 2f,
-                            NeededHours = 26f,
+                            NeededHours = 16f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -492,7 +884,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 12),
                             Department = 0,
                             NeededEmployees = 6f,
-                            NeededHours = 42f,
+                            NeededHours = 48f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -501,7 +893,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 12),
                             Department = 1,
                             NeededEmployees = 3f,
-                            NeededHours = 32f,
+                            NeededHours = 24f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -510,7 +902,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 12),
                             Department = 2,
                             NeededEmployees = 2f,
-                            NeededHours = 26f,
+                            NeededHours = 16f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -519,7 +911,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 13),
                             Department = 0,
                             NeededEmployees = 6f,
-                            NeededHours = 42f,
+                            NeededHours = 48f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -528,7 +920,7 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 13),
                             Department = 1,
                             NeededEmployees = 3f,
-                            NeededHours = 32f,
+                            NeededHours = 24f,
                             WeekPrognosisId = 1
                         },
                         new
@@ -537,8 +929,497 @@ namespace BumboApp.Migrations
                             Date = new DateOnly(2024, 10, 13),
                             Department = 2,
                             NeededEmployees = 2f,
-                            NeededHours = 26f,
+                            NeededHours = 16f,
                             WeekPrognosisId = 1
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Date = new DateOnly(2024, 12, 9),
+                            Department = 0,
+                            NeededEmployees = 5f,
+                            NeededHours = 40f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 23,
+                            Date = new DateOnly(2024, 12, 9),
+                            Department = 1,
+                            NeededEmployees = 4.5f,
+                            NeededHours = 36f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 24,
+                            Date = new DateOnly(2024, 12, 9),
+                            Department = 2,
+                            NeededEmployees = 2.5f,
+                            NeededHours = 20f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 25,
+                            Date = new DateOnly(2024, 12, 10),
+                            Department = 0,
+                            NeededEmployees = 4f,
+                            NeededHours = 32f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 26,
+                            Date = new DateOnly(2024, 12, 10),
+                            Department = 1,
+                            NeededEmployees = 3.5f,
+                            NeededHours = 28f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 27,
+                            Date = new DateOnly(2024, 12, 10),
+                            Department = 2,
+                            NeededEmployees = 2f,
+                            NeededHours = 16f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 28,
+                            Date = new DateOnly(2024, 12, 11),
+                            Department = 0,
+                            NeededEmployees = 5f,
+                            NeededHours = 40f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 29,
+                            Date = new DateOnly(2024, 12, 11),
+                            Department = 1,
+                            NeededEmployees = 3f,
+                            NeededHours = 24f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 30,
+                            Date = new DateOnly(2024, 12, 11),
+                            Department = 2,
+                            NeededEmployees = 2.5f,
+                            NeededHours = 20f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 31,
+                            Date = new DateOnly(2024, 12, 12),
+                            Department = 0,
+                            NeededEmployees = 6f,
+                            NeededHours = 48f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 32,
+                            Date = new DateOnly(2024, 12, 12),
+                            Department = 1,
+                            NeededEmployees = 4.5f,
+                            NeededHours = 36f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 33,
+                            Date = new DateOnly(2024, 12, 12),
+                            Department = 2,
+                            NeededEmployees = 2f,
+                            NeededHours = 16f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 34,
+                            Date = new DateOnly(2024, 12, 13),
+                            Department = 0,
+                            NeededEmployees = 5f,
+                            NeededHours = 40f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 35,
+                            Date = new DateOnly(2024, 12, 13),
+                            Department = 1,
+                            NeededEmployees = 3.5f,
+                            NeededHours = 28f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 36,
+                            Date = new DateOnly(2024, 12, 13),
+                            Department = 2,
+                            NeededEmployees = 1.5f,
+                            NeededHours = 12f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 37,
+                            Date = new DateOnly(2024, 12, 14),
+                            Department = 0,
+                            NeededEmployees = 4f,
+                            NeededHours = 32f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 38,
+                            Date = new DateOnly(2024, 12, 14),
+                            Department = 1,
+                            NeededEmployees = 5f,
+                            NeededHours = 40f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 39,
+                            Date = new DateOnly(2024, 12, 14),
+                            Department = 2,
+                            NeededEmployees = 3f,
+                            NeededHours = 24f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 40,
+                            Date = new DateOnly(2024, 12, 15),
+                            Department = 0,
+                            NeededEmployees = 6f,
+                            NeededHours = 48f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 41,
+                            Date = new DateOnly(2024, 12, 15),
+                            Department = 1,
+                            NeededEmployees = 4f,
+                            NeededHours = 32f,
+                            WeekPrognosisId = 2
+                        },
+                        new
+                        {
+                            Id = 42,
+                            Date = new DateOnly(2024, 12, 15),
+                            Department = 2,
+                            NeededEmployees = 2f,
+                            NeededHours = 16f,
+                            WeekPrognosisId = 2
+                        });
+                });
+
+            modelBuilder.Entity("BumboApp.Models.SchoolSchedule", b =>
+                {
+                    b.Property<int>("EmployeeNumber")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<float>("DurationInHours")
+                        .HasColumnType("real");
+
+                    b.HasKey("EmployeeNumber", "Date");
+
+                    b.ToTable("SchoolSchedules", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 9),
+                            DurationInHours = 3f
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 10),
+                            DurationInHours = 3f
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 11),
+                            DurationInHours = 3f
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 12),
+                            DurationInHours = 3f
+                        },
+                        new
+                        {
+                            EmployeeNumber = 2,
+                            Date = new DateOnly(2024, 12, 13),
+                            DurationInHours = 3f
+                        },
+                        new
+                        {
+                            EmployeeNumber = 3,
+                            Date = new DateOnly(2024, 12, 9),
+                            DurationInHours = 3f
+                        },
+                        new
+                        {
+                            EmployeeNumber = 3,
+                            Date = new DateOnly(2024, 12, 10),
+                            DurationInHours = 3f
+                        },
+                        new
+                        {
+                            EmployeeNumber = 3,
+                            Date = new DateOnly(2024, 12, 11),
+                            DurationInHours = 3f
+                        },
+                        new
+                        {
+                            EmployeeNumber = 3,
+                            Date = new DateOnly(2024, 12, 12),
+                            DurationInHours = 3f
+                        },
+                        new
+                        {
+                            EmployeeNumber = 3,
+                            Date = new DateOnly(2024, 12, 13),
+                            DurationInHours = 3f
+                        });
+                });
+
+            modelBuilder.Entity("BumboApp.Models.Shift", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Department")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EmployeeNumber")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("End")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsFinal")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Start")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeNumber");
+
+                    b.ToTable("Shifts", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Shifts_Start_End", "[Start] < [End]");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Department = 2,
+                            EmployeeNumber = 1,
+                            End = new DateTime(2024, 12, 9, 17, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsFinal = false,
+                            Start = new DateTime(2024, 12, 9, 9, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Department = 1,
+                            EmployeeNumber = 2,
+                            End = new DateTime(2024, 12, 10, 17, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsFinal = false,
+                            Start = new DateTime(2024, 12, 10, 13, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
+                });
+
+            modelBuilder.Entity("BumboApp.Models.ShiftTakeOver", b =>
+                {
+                    b.Property<int>("ShiftId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EmployeeTakingOverEmployeeNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("ShiftId");
+
+                    b.HasIndex("EmployeeTakingOverEmployeeNumber");
+
+                    b.ToTable("ShiftTakeOvers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ShiftId = 2,
+                            EmployeeTakingOverEmployeeNumber = 3,
+                            Status = 0
+                        },
+                        new
+                        {
+                            ShiftId = 1,
+                            EmployeeTakingOverEmployeeNumber = 2,
+                            Status = 2
+                        });
+                });
+
+            modelBuilder.Entity("BumboApp.Models.SickLeave", b =>
+                {
+                    b.Property<int>("EmployeeNumber")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.HasKey("EmployeeNumber", "Date");
+
+                    b.ToTable("SickLeaves", (string)null);
+                });
+
+            modelBuilder.Entity("BumboApp.Models.StandardAvailability", b =>
+                {
+                    b.Property<int>("Day")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EmployeeNumber")
+                        .HasColumnType("int");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
+
+                    b.HasKey("Day", "EmployeeNumber");
+
+                    b.HasIndex("EmployeeNumber");
+
+                    b.ToTable("StandardAvailabilities", t =>
+                        {
+                            t.HasCheckConstraint("CK_StandardAvailability_StartTime_EndTime", "[StartTime] <= [EndTime]");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Day = 1,
+                            EmployeeNumber = 2,
+                            EndTime = new TimeOnly(21, 0, 0),
+                            StartTime = new TimeOnly(18, 0, 0)
+                        },
+                        new
+                        {
+                            Day = 2,
+                            EmployeeNumber = 2,
+                            EndTime = new TimeOnly(21, 0, 0),
+                            StartTime = new TimeOnly(9, 0, 0)
+                        },
+                        new
+                        {
+                            Day = 3,
+                            EmployeeNumber = 2,
+                            EndTime = new TimeOnly(21, 0, 0),
+                            StartTime = new TimeOnly(9, 0, 0)
+                        },
+                        new
+                        {
+                            Day = 4,
+                            EmployeeNumber = 2,
+                            EndTime = new TimeOnly(18, 0, 0),
+                            StartTime = new TimeOnly(9, 0, 0)
+                        },
+                        new
+                        {
+                            Day = 5,
+                            EmployeeNumber = 2,
+                            EndTime = new TimeOnly(21, 0, 0),
+                            StartTime = new TimeOnly(9, 0, 0)
+                        },
+                        new
+                        {
+                            Day = 6,
+                            EmployeeNumber = 2,
+                            EndTime = new TimeOnly(16, 0, 0),
+                            StartTime = new TimeOnly(9, 0, 0)
+                        },
+                        new
+                        {
+                            Day = 0,
+                            EmployeeNumber = 2,
+                            EndTime = new TimeOnly(21, 0, 0),
+                            StartTime = new TimeOnly(9, 0, 0)
+                        },
+                        new
+                        {
+                            Day = 1,
+                            EmployeeNumber = 3,
+                            EndTime = new TimeOnly(14, 30, 0),
+                            StartTime = new TimeOnly(8, 30, 0)
+                        },
+                        new
+                        {
+                            Day = 2,
+                            EmployeeNumber = 3,
+                            EndTime = new TimeOnly(19, 0, 0),
+                            StartTime = new TimeOnly(13, 0, 0)
+                        },
+                        new
+                        {
+                            Day = 3,
+                            EmployeeNumber = 3,
+                            EndTime = new TimeOnly(17, 0, 0),
+                            StartTime = new TimeOnly(9, 0, 0)
+                        },
+                        new
+                        {
+                            Day = 4,
+                            EmployeeNumber = 3,
+                            EndTime = new TimeOnly(16, 0, 0),
+                            StartTime = new TimeOnly(10, 0, 0)
+                        },
+                        new
+                        {
+                            Day = 5,
+                            EmployeeNumber = 3,
+                            EndTime = new TimeOnly(20, 0, 0),
+                            StartTime = new TimeOnly(14, 0, 0)
+                        },
+                        new
+                        {
+                            Day = 6,
+                            EmployeeNumber = 3,
+                            EndTime = new TimeOnly(18, 0, 0),
+                            StartTime = new TimeOnly(11, 0, 0)
+                        },
+                        new
+                        {
+                            Day = 0,
+                            EmployeeNumber = 3,
+                            EndTime = new TimeOnly(16, 0, 0),
+                            StartTime = new TimeOnly(12, 0, 0)
                         });
                 });
 
@@ -566,96 +1447,150 @@ namespace BumboApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UniqueDays");
+                    b.ToTable("UniqueDays", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_UniqueDays_StartDate_EndDate", "[StartDate] <= [EndDate]");
+                        });
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            EndDate = new DateOnly(2024, 10, 20),
+                            EndDate = new DateOnly(2024, 11, 22),
                             Factor = 1.25f,
                             Name = "Customer Appreciation Day",
-                            StartDate = new DateOnly(2024, 10, 20)
+                            StartDate = new DateOnly(2024, 11, 22)
                         },
                         new
                         {
                             Id = 2,
-                            EndDate = new DateOnly(2024, 10, 20),
+                            EndDate = new DateOnly(2024, 11, 29),
                             Factor = 1.5f,
                             Name = "VIP Shopping Day",
-                            StartDate = new DateOnly(2024, 10, 20)
+                            StartDate = new DateOnly(2024, 11, 29)
                         },
                         new
                         {
                             Id = 3,
-                            EndDate = new DateOnly(2024, 10, 29),
+                            EndDate = new DateOnly(2024, 12, 8),
                             Factor = 1.8f,
                             Name = "Weekend Sale",
-                            StartDate = new DateOnly(2024, 10, 28)
+                            StartDate = new DateOnly(2024, 12, 7)
                         });
                 });
 
             modelBuilder.Entity("BumboApp.Models.User", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
 
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            Id = "2ab03136-c316-4b70-a7fc-4c9cb044a6be",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "static-concurrency-stamp",
                             Email = "john.doe@example.com",
-                            FirstName = "John",
-                            LastName = "Doe",
-                            Password = "qwer1234",
-                            Role = 1
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "JOHN.DOE@EXAMPLE.COM",
+                            NormalizedUserName = "JOHN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHElifiD+iCmgFS/WCucV8tMzAcHwDdy1B4kwXCYsxB7xOwvRsxjkQbdJ6YrI77xDA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "static-security-stamp",
+                            TwoFactorEnabled = false,
+                            UserName = "John"
                         },
                         new
                         {
-                            Id = 2,
+                            Id = "12544476-38da-4113-9c40-4bc508f8c0f2",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "static-concurrency-stamp",
                             Email = "jane.smith@example.com",
-                            FirstName = "Jane",
-                            LastName = "Smith",
-                            Password = "asdf1234",
-                            Role = 1
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "JANE.SMITH@EXAMPLE.COM",
+                            NormalizedUserName = "JANE",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGk4lj3QRvRZzy4Oas9sTTW0A2nJ1X41eB0uiNnGNFQT7RdiOs/FLSjxWz/x4KDk+w==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "static-security-stamp",
+                            TwoFactorEnabled = false,
+                            UserName = "Jane"
                         },
                         new
                         {
-                            Id = 3,
+                            Id = "2667ab01-7225-451b-adbb-c99eea968d02",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "static-concurrency-stamp",
                             Email = "emily.jones@example.com",
-                            FirstName = "Emily",
-                            LastName = "Jones",
-                            Password = "zxcv1234",
-                            Role = 1
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "EMILY.JONES@EXAMPLE.COM",
+                            NormalizedUserName = "EMILY",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHv/0P6Xoo7fFyIXoIwA78DUHxHCFNYGaR8vPnMjmnx+QoW0Khto6+ptFaVzpYAWFw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "static-security-stamp",
+                            TwoFactorEnabled = false,
+                            UserName = "Emily"
                         });
                 });
 
@@ -672,14 +1607,230 @@ namespace BumboApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("WeekPrognoses");
+                    b.HasIndex("StartDate")
+                        .IsUnique();
+
+                    b.ToTable("WeekPrognoses", (string)null);
 
                     b.HasData(
                         new
                         {
                             Id = 1,
                             StartDate = new DateOnly(2024, 10, 7)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            StartDate = new DateOnly(2024, 12, 9)
                         });
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "dc065cdc-e1d7-4202-936a-fbf03070c74d",
+                            Name = "Manager",
+                            NormalizedName = "MANAGER"
+                        },
+                        new
+                        {
+                            Id = "4cd8ce88-df2a-49fb-ac51-0610e1be0f0b",
+                            Name = "Employee",
+                            NormalizedName = "EMPLOYEE"
+                        });
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "2ab03136-c316-4b70-a7fc-4c9cb044a6be",
+                            RoleId = "dc065cdc-e1d7-4202-936a-fbf03070c74d"
+                        },
+                        new
+                        {
+                            UserId = "12544476-38da-4113-9c40-4bc508f8c0f2",
+                            RoleId = "4cd8ce88-df2a-49fb-ac51-0610e1be0f0b"
+                        },
+                        new
+                        {
+                            UserId = "2667ab01-7225-451b-adbb-c99eea968d02",
+                            RoleId = "4cd8ce88-df2a-49fb-ac51-0610e1be0f0b"
+                        });
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("BumboApp.Models.Availability", b =>
+                {
+                    b.HasOne("BumboApp.Models.Employee", "Employee")
+                        .WithMany("Availabilities")
+                        .HasForeignKey("EmployeeNumber")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("BumboApp.Models.Employee", b =>
+                {
+                    b.HasOne("BumboApp.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BumboApp.Models.LeaveRequest", b =>
+                {
+                    b.HasOne("BumboApp.Models.Employee", "Employee")
+                        .WithMany("leaveRequests")
+                        .HasForeignKey("EmployeeNumber")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("BumboApp.Models.Notification", b =>
+                {
+                    b.HasOne("BumboApp.Models.Employee", "Employee")
+                        .WithMany("notifications")
+                        .HasForeignKey("EmployeeNumber")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("BumboApp.Models.Prognosis", b =>
@@ -688,6 +1839,141 @@ namespace BumboApp.Migrations
                         .WithMany("Prognoses")
                         .HasForeignKey("WeekPrognosisId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BumboApp.Models.SchoolSchedule", b =>
+                {
+                    b.HasOne("BumboApp.Models.Employee", "Employee")
+                        .WithMany("SchoolSchedules")
+                        .HasForeignKey("EmployeeNumber")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("BumboApp.Models.Shift", b =>
+                {
+                    b.HasOne("BumboApp.Models.Employee", "Employee")
+                        .WithMany("Shifts")
+                        .HasForeignKey("EmployeeNumber");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("BumboApp.Models.ShiftTakeOver", b =>
+                {
+                    b.HasOne("BumboApp.Models.Employee", "EmployeeTakingOver")
+                        .WithMany("shiftTakeOvers")
+                        .HasForeignKey("EmployeeTakingOverEmployeeNumber");
+
+                    b.HasOne("BumboApp.Models.Shift", "Shift")
+                        .WithOne("ShiftTakeOver")
+                        .HasForeignKey("BumboApp.Models.ShiftTakeOver", "ShiftId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("EmployeeTakingOver");
+
+                    b.Navigation("Shift");
+                });
+
+            modelBuilder.Entity("BumboApp.Models.SickLeave", b =>
+                {
+                    b.HasOne("BumboApp.Models.Employee", "Employee")
+                        .WithMany("sickLeaves")
+                        .HasForeignKey("EmployeeNumber")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("BumboApp.Models.StandardAvailability", b =>
+                {
+                    b.HasOne("BumboApp.Models.Employee", "Employee")
+                        .WithMany("StandardAvailability")
+                        .HasForeignKey("EmployeeNumber")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("BumboApp.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("BumboApp.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BumboApp.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("BumboApp.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BumboApp.Models.Employee", b =>
+                {
+                    b.Navigation("Availabilities");
+
+                    b.Navigation("SchoolSchedules");
+
+                    b.Navigation("Shifts");
+
+                    b.Navigation("StandardAvailability");
+
+                    b.Navigation("leaveRequests");
+
+                    b.Navigation("notifications");
+
+                    b.Navigation("shiftTakeOvers");
+
+                    b.Navigation("sickLeaves");
+                });
+
+            modelBuilder.Entity("BumboApp.Models.Shift", b =>
+                {
+                    b.Navigation("ShiftTakeOver")
                         .IsRequired();
                 });
 

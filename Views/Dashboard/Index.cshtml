@@ -2,31 +2,232 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="container dashboard">
-    <div class="row gap-3">
-        <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="Dashboard" asp-action="Index">
-            <i class="fa-solid fa-house fs-4 mb-2"></i>
-            Dashboard
-        </a>
-        <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="Norms" asp-action="Index">
-            <i class="fa-solid fa-square-pen fs-4 mb-2"></i>
-            Normeringen
-        </a>
-        <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="Prognoses" asp-action="Index">
-            <i class="fa-solid fa-file-lines fs-4 mb-2"></i>
-            Prognoses
-        </a>
-        <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="Expectations" asp-action="Index">
-            <i class="fa-solid fa-layer-group fs-4 mb-2"></i>
-            Verwachtingen
-        </a>
-        <a class="col d-flex flex-column align-items-center btn btn-outline-primary py-4" asp-area="" asp-controller="OpeningHours" asp-action="Index">
-            <i class="fa-solid fa-clock fs-4 mb-2"></i>
-            Openingstijden
-        </a>
-        <a class="col d-flex flex-column align-items-center btn btn-outline-danger py-4" asp-area="" asp-controller="Login" asp-action="Logout">
-            <i class="fa-solid fa-right-from-bracket fs-4 mb-2"></i>
-            Uitloggen
-        </a>
+@if (ViewBag.LoggedInUserRole == Role.Employee)
+{
+    <div class="container dashboard">
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-md-7">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h5><strong>Jouw diensten deze week</strong></h5>
+                            <a asp-controller="Shifts" asp-action="MyShifts" class="text-black text-decoration-underline ms-2">Bekijk alle</a>
+                        </div>
+                        <div class="row">
+                            @if (ViewBag.ShiftsThisWeek == null || ViewBag.ShiftsThisWeek.Count == 0)
+                            {
+                                <p class="card-text">Je hebt deze week geen diensten.</p>
+                            }
+                            else
+                            {
+                                @foreach (var shiftThisWeek in ViewBag.ShiftsThisWeek)
+                                {
+                                    <div class="col-12 mb-3">
+                                        <div class="card w-100">
+                                            <div class="card-body">
+                                                    <h6 class="card-title">
+                                                        <strong>Dienst @shiftThisWeek.Department</strong>
+                                                    </h6>
+                                                    <p class="card-text">
+                                                        @shiftThisWeek.Start.ToString("dd-MM-yyyy")
+                                                        @shiftThisWeek.Start.ToString("HH:mm") -
+                                                        @shiftThisWeek.End.ToString("HH:mm")
+                                                    </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Right Column -->
+            <div class="col-md-5">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5><strong>Openstaande diensten</strong></h5>
+                        <div class="row">
+                            @if (ViewBag.ShiftTakeOversEmployee == null || ViewBag.ShiftTakeOversEmployee.Count == 0)
+                            {
+                                <p class="card-text">Er zijn geen openstaande diensten.</p>
+                            }
+                            else
+                            {
+                                @foreach (var shiftTakeOver in ViewBag.ShiftTakeOversEmployee)
+                                {
+                                    <div class="col-12 mb-3">
+                                        <div class="card w-100">
+                                            <div class="card-body">
+                                                    <h6 class="card-title">
+                                                        <strong>Dienst @shiftTakeOver.Shift.Department</strong>
+                                                    </h6>
+                                                    <p class="card-text">
+                                                        @shiftTakeOver.Shift.Start.ToString("dd-MM-yyyy")
+                                                        @shiftTakeOver.Shift.Start.ToString("HH:mm") -
+                                                        @shiftTakeOver.Shift.End.ToString("HH:mm")
+                                                    </p>
+                                                <a asp-controller="TakeOver" asp-action="EmployeeTakeOver" asp-route-shiftId="@shiftTakeOver.Shift.Id" class="btn btn-outline-dark align-self-center" type="button">Overnemen</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h5><strong>Ongelezen meldingen</strong></h5>
+                            <a asp-controller="Notifications" asp-action="Index" class="text-black text-decoration-underline ms-2">Bekijk alle</a>
+                        </div>
+                        @if (ViewBag.UnreadNotifications == null || ViewBag.UnreadNotifications.Count == 0)
+                        {
+                            <p class="card-text">Je hebt geen ongelezen meldingen.</p>
+                        }
+                        else
+                        {
+                            <div class="row">
+                                @foreach (var notification in ViewBag.UnreadNotifications)
+                                {
+                                    <div class="col-12 mb-3">
+                                        <div class="card w-100">
+                                            <div class="card-body">
+                                                <small class="text-muted">@notification.SentAt.ToString("dd-MM-yyyy HH:mm")</small>
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <span class="bg-danger border border-light rounded-circle me-2"
+                                                          style="width: 10px; height: 10px; display: inline-block;"></span>
+                                                    <h6 class="card-title mb-0">
+                                                        <strong>@notification.Title</strong>
+                                                    </h6>
+                                                </div>
+                                                <small class="card-text">@notification.Description</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+}
+
+@if (ViewBag.LoggedInUserRole == Role.Manager)
+{
+    <div class="container dashboard">
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-md-7">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5><strong>Overnames te beoordelen</strong></h5>
+                        <div class="row">
+                            @if (ViewBag.ShiftTakeOvers == null || ViewBag.ShiftTakeOvers.Count == 0)
+                            {
+                                <p class="card-text">Er zijn geen overnames om te beoordelen.</p>
+                            }
+                            else
+                            {
+                                @foreach (var shiftTakeOver in ViewBag.ShiftTakeOvers)
+                                {
+                                    <div class="col-12 mb-3">
+                                        <div class="card w-100">
+                                            <div class="card-body d-flex justify-content-between">
+                                                <div>
+                                                    <h6 class="card-title">
+                                                        <strong>Dienst @shiftTakeOver.Shift.Department</strong>
+                                                    </h6>
+                                                    <p class="card-text">
+                                                        @shiftTakeOver.Shift.Start.ToString("dd-MM-yyyy")
+                                                        @shiftTakeOver.Shift.Start.ToString("HH:mm") -
+                                                        @shiftTakeOver.Shift.End.ToString("HH:mm")
+                                                    </p>
+                                                </div>
+                                                <a asp-controller="TakeOver" asp-action="Index" asp-route-id="@shiftTakeOver.ShiftId" class="btn btn-outline-dark align-self-center" type="button">Beoordelen</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5><strong>Verlof te beoordelen</strong></h5>
+                        <div class="row">
+                            @if (ViewBag.LeaveRequests == null || ViewBag.LeaveRequests.Count == 0)
+                            {
+                                <p class="card-text">Er zijn geen verlof aanvragen om te beoordelen.</p>
+                            }
+                            else
+                            {
+                                @foreach (var leaveRequest in ViewBag.LeaveRequests)
+                                {
+                                    <div class="col-12 mb-3">
+                                        <div class="card w-100">
+                                            <div class="card-body d-flex justify-content-between">
+                                                <div>
+                                                    <h6 class="card-title">
+                                                        <strong>Verlof verzoek - @leaveRequest.Employee.FirstName @leaveRequest.Employee.LastName</strong>
+                                                    </h6>
+                                                    <p class="card-text">
+                                                        @leaveRequest.StartDate.ToString("dd-MM-yyyy") - @leaveRequest.EndDate.ToString("dd-MM-yyyy")
+                                                    </p>
+                                                </div>
+                                                <a asp-controller="Leave" asp-action="LeaveRequest" asp-route-id="@leaveRequest.Id" class="btn btn-outline-dark align-self-center" type="button">Beoordelen</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }   
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Right Column -->
+            <div class="col-md-5">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h5><strong>Ongelezen meldingen</strong></h5>
+                            <a asp-controller="Notifications" asp-action="Index" class="text-black text-decoration-underline ms-2">Bekijk alle</a>
+                        </div>
+                        @if (ViewBag.UnreadNotifications == null || ViewBag.UnreadNotifications.Count == 0)
+                        {
+                            <p class="card-text">Je hebt geen ongelezen meldingen.</p>
+                        }
+                        else
+                        {
+                            <div class="row">
+                                @foreach (var notification in ViewBag.UnreadNotifications)
+                                {
+                                    <div class="col-12 mb-3">
+                                        <div class="card w-100">
+                                            <div class="card-body">
+                                                <small class="text-muted">@notification.SentAt.ToString("dd-MM-yyyy HH:mm")</small>
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <span class="bg-danger border border-light rounded-circle me-2"
+                                                          style="width: 10px; height: 10px; display: inline-block;"></span>
+                                                    <h6 class="card-title mb-0">
+                                                        <strong>@notification.Title</strong>
+                                                    </h6>
+                                                </div>
+                                                <small class="card-text">@notification.Description</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

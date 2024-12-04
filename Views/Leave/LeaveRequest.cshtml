@@ -1,0 +1,108 @@
+﻿@model BumboApp.ViewModels.LeaveRequestDetailViewModel
+@{
+    if (User.IsInRole(Role.Employee.ToString()))
+    {
+        ViewData["Title"] = "Nieuwe verlof aanvraag";
+    }
+    else if (User.IsInRole(Role.Manager.ToString()))
+    {
+        ViewData["Title"] = "Verlof aanvraag beoordelen";
+    }
+    var leftOverLeaveHours = Model.LoggedInEmployee.LeaveHours - Model.AmountOfUsedLeaveRequestHours;
+}
+
+@if (User.IsInRole(Role.Employee.ToString()))
+{
+    <div class="d-flex flex-column flex-lg-row align-items-start gap-3">
+        <form asp-action="CreateLeaveRequest" asp-controller="Leave" method="post" class="create-prognosis-card">
+            <div class="card p-4 create-prognosis-card">
+                <div class="mb-3">
+                    <label for="startDate" class="form-label fw-bold">Begin Datum</label>
+                    <input type="datetime-local" class="form-control" id="startDate" name="StartDate" placeholder="Begindatum" onchange="checkDate()" required>
+                </div>
+
+                <div class="mb-2">
+                    <label for="endDate" class="form-label fw-bold">Eind Datum</label>
+                    <input type="datetime-local" class="form-control" id="endDate" name="EndDate" placeholder="Einddatum" onchange="checkDate()" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="reason" class="form-label fw-bold">Reden</label>
+                    <textarea class="form-control textAreaLeaveRequestReason" name="Reason" placeholder="Reden" maxlength="255" required></textarea>
+                </div>
+
+                <input type="hidden" name="Status" value="@Status.Aangevraagd" />
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a asp-controller="Leave" asp-action="Index" class="btn btn-outline-primary" type="button">Annuleer</a>
+                    <button class="btn btn-primary me-md-2" id="leaveCreateButton" type="submit">Aanvragen</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="card p-3">
+            <p class="card-text mb-0">Je hebt nog @leftOverLeaveHours verlofuren over dit jaar</p>
+        </div>
+    </div>
+}
+else if (User.IsInRole(Role.Manager.ToString()))
+{
+    <div class="d-flex flex-column flex-lg-row align-items-start gap-3">
+        <div class="card p-4 create-prognosis-card">
+            <div class="mb-3">
+                <label for="employeeName" class="form-label fw-bold">Werknemer</label>
+                <p>@Model.LeaveRequest.Employee.FirstName @Model.LeaveRequest.Employee.LastName</p>
+            </div>
+            <div class="mb-3">
+                <label for="startDate" class="form-label fw-bold">Begin Datum</label>
+                <p>@Model.LeaveRequest.StartDate</p>
+            </div>
+
+            <div class="mb-2">
+                <label for="endDate" class="form-label fw-bold">Eind Datum</label>
+                <p>@Model.LeaveRequest.EndDate</p>
+            </div>
+
+            <div class="mb-3">
+                <label for="reason" class="form-label fw-bold">Reden</label>
+                <p>@Model.LeaveRequest.Reason</p>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a asp-controller="Leave" asp-action="AssessLeaveRequest" asp-route-status="@Status.Afgewezen" asp-route-leaveRequestId="@Model.LeaveRequest.Id" class="btn btn-outline-danger" type="button">Afkeuren</a>
+                <a asp-controller="Leave" asp-action="AssessLeaveRequest" asp-route-status="@Status.Geaccepteerd" asp-route-leaveRequestId="@Model.LeaveRequest.Id" class="btn btn-primary" type="button">Goedkeuren</a>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+
+    
+    function getLocalDateTime() {
+        const now = new Date();
+
+        // Get components of the local date and time
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+
+        // Combine them into the required format
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    // Set the min startDate
+    startDateInput.min = getLocalDateTime();
+
+    // Function to set the minimum value of endDate based on startDate
+    function setEndDateMin() {
+        const startDateValue = startDateInput.value;
+        if (startDateValue) {
+            endDateInput.min = startDateValue;
+        }
+    }
+</script>

@@ -1,0 +1,115 @@
+﻿@model BumboApp.ViewModels.AvailabilityViewModel
+
+@{
+    ViewData["Title"] = "Beschikbaarheid";
+
+    var isDisabledButton = Model.StartDate < DateOnly.FromDateTime(DateTime.Now.AddDays(7)) ? "disabled" : "";
+    var isDisabled = !(Model.StartDate < DateOnly.FromDateTime(DateTime.Now.AddDays(7)));
+}
+
+<div class="row justify-content-between align-items-center">
+    <h2 class="col d-none d-lg-block">Week @Model.WeekNr</h2>
+    <div class="col-12 mb-2 mb-lg-0 col-lg text-center text-lg-end">
+        <a asp-controller="Availability" asp-action="Index" asp-route-id="@Model.StartDate.AddDays(-7).ToString("dd-MM-yyyy")">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 18L9 12L15 6" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </a>
+        <strong>
+            Week @Model.WeekNr
+        </strong>
+        (@Model.StartDate.ToString("dd-MM-yyyy") / @Model.StartDate.AddDays(6).ToString("dd-MM-yyyy"))
+        <a asp-controller="Availability" asp-action="Index" asp-route-id="@Model.StartDate.AddDays(7).ToString("dd-MM-yyyy")">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 18L15 12L9 6" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </a>
+        <a class="btn btn-primary" asp-action="UpdateDefault">Standaard aanpassen</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-xl-8">
+        @if (Model.AvailabilityList.Count == 0)
+        {
+            <p>Er is nog geen beschikbaarheid voor deze week opgegeven</p>
+            <form asp-action="AddAvailability" method="post">
+                <input type="hidden" name="id" value="@Model.StartDate.ToString("dd-MM-yyyy")" />
+                <input type="hidden" name="useStandard" value="true" />
+                <button type="submit" class="btn btn-secondary" @isDisabledButton>Standaard gebruiken</button>
+            </form>
+            <form asp-action="AddAvailability" method="post">
+                <input type="hidden" name="id" value="@Model.StartDate.ToString("dd-MM-yyyy")" />
+                <input type="hidden" name="useStandard" value="false" />
+                <button type="submit" class="btn btn-primary" @isDisabledButton>Toevoegen</button>
+            </form>
+        }
+        else
+        {
+            <div class="table-container">
+                <table class="table">
+                    <tbody>
+                        @for (int i = 0; i < 7; i++)
+                        {
+                            DayOfWeek day = (DayOfWeek)((i + 1) % 7); // Start with Monday
+                            Availability? availability = Model.AvailabilityList.SingleOrDefault(a => a.Date.DayOfWeek == day);
+                            <tr>
+                                <td>@day @Model.StartDate.AddDays(i).ToString("dd-MM")</td>
+                                @if (availability != null)
+                                {
+                                    <td>vanaf</td>
+                                    <td>@availability.StartTime</td>
+                                    <td>tot</td>
+                                    <td>@availability.EndTime</td>
+                                }
+                                else
+                                {
+                                    <td colspan="4">Niet beschikbaar</td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (isDisabled)
+                {
+                    <div class="d-flex justify-content-end m-3">
+                        <a class="btn btn-primary" asp-action="UpdateAvailability"
+                                asp-route-id="@Model.StartDate.ToString("dd-MM-yyyy")">
+                            Bewerken
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="col-12 col-xl-4 table-container">
+        <h3>Schooluren</h3>
+        <p>Laat leeg als je geen schooluren hebt</p>
+
+        @if (Model.SchoolScheduleList.Count == 0)
+        {
+            <form class="d-flex justify-content-end" asp-action="AddSchoolSchedule" asp-route-id="@Model.StartDate.ToString("dd-MM-yyyy")">
+                <button type="submit" class="btn btn-primary" @isDisabledButton>Toevoegen</button>
+            </form>
+        }
+        else
+        {
+            @for (int dayNr = 1; dayNr <= 5; dayNr++)
+            {
+                DayOfWeek day = (DayOfWeek)dayNr;
+                SchoolSchedule? schoolSchedule = Model.SchoolScheduleList.SingleOrDefault(ss => ss.Date.DayOfWeek == day);
+                <label>@day: @Model.StartDate.AddDays(dayNr).ToString("dd-MM")</label>
+                <p>
+                    @(schoolSchedule != null ? schoolSchedule.DurationInHours + " uur" : "-")
+                </p>
+            }
+            @if (isDisabled)
+            {
+                <div class="d-flex justify-content-end m-3">
+                    <a class="btn btn-primary" asp-action="UpdateSchoolSchedule" asp-route-id="@Model.StartDate.ToString("dd-MM-yyyy")">bewerken</a>
+                </div>
+            }
+        }
+    </div>
+</div>

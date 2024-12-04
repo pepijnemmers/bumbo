@@ -1,0 +1,88 @@
+﻿@model BumboApp.ViewModels.EmployeeUpdateViewModel
+
+@{
+    ViewData["Title"] = "Werknemer bewerken";
+}
+
+@if (Model == null)
+{
+    <p>Fout met medewerker ophalen</p>
+}
+else
+{
+    <form asp-action="Update" asp-route-id="@Model.EmployeeNumber" method="post">
+        <div class="table-container p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4>@Model.FirstName @Model.LastName</h4>
+                    <p class="text-muted">In dienst sinds: @Model.StartOfEmployment</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container p-3 my-3">
+            <h5>Gegevens</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <input type="hidden" asp-for="EmployeeNumber" />
+                    <div class="form-group">
+                        <label asp-for="FirstName" class="form-label">Voornaam</label>
+                        <input asp-for="FirstName" class="form-control" required />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="LastName" class="form-label">Achternaam</label>
+                        <input asp-for="LastName" class="form-control" required />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" type="email" required />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="DateOfBirth" class="form-label">Geboortedatum</label>
+                        <input asp-for="DateOfBirth" class="form-control" type="date" required />
+                        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ContractHours" class="form-label">Contracturen</label>
+                        <input asp-for="ContractHours" class="form-control" type="number" required />
+                        <span asp-validation-for="ContractHours" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="LeaveHours" class="form-label">Verlofuren</label>
+                        <input asp-for="LeaveHours" class="form-control" type="number" />
+                        <span asp-validation-for="LeaveHours" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container p-3">
+            <h5>Adres</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Zipcode" class="form-label">Postcode</label>
+                        <input asp-for="Zipcode" class="form-control" placeholder="Formaat: 1234AB" required />
+                        <span asp-validation-for="Zipcode" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="HouseNumber" class="form-label">Huisnummer + toevoeging</label>
+                        <input asp-for="HouseNumber" class="form-control" placeholder="1a" required />
+                        <span asp-validation-for="HouseNumber" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary">Opslaan</button>
+        </div>
+    </form>
+}

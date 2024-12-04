@@ -1,12 +1,19 @@
 ﻿using BumboApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using BumboApp.ViewModels;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Data.SqlClient;
 
 namespace BumboApp.Controllers
 {
     public class OpeningHoursController : MainController
     {
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+            CheckPageAccess(Role.Manager);
+        }
+        
         public IActionResult Index(int? page, SortOrder? orderBy = SortOrder.Ascending, bool oldDays = false)
         {
             int currentPageNumber = page ?? DefaultPage;

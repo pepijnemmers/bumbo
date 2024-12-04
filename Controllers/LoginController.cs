@@ -1,27 +1,34 @@
 ﻿using BumboApp.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging.Abstractions;
-using System.Diagnostics;
-using System.Runtime.Intrinsics.X86;
 
 namespace BumboApp.Controllers
 {
     public class LoginController : MainController
     {
+        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
+
+        public LoginController(SignInManager<User> signInManager, UserManager<User> userManager)
+        {
+            _signInManager = signInManager;
+            _userManager = userManager;
+        }
+
         public IActionResult Index()
         {
             return View();
         }
 
-        public IActionResult Login(User model, string password)
+        [HttpPost]
+        public async Task<IActionResult> Login(string email, string password)
         {
-            var user = Context.Users.SingleOrDefault(u => u.Email == model.Email);
+            var user = await _userManager.FindByEmailAsync(email);
             if (user != null)
             {
-                var dbPassword = Context.Entry(user).Property("Password").CurrentValue as string;
-                if (dbPassword == password)
+                var result = await _signInManager.PasswordSignInAsync(user, password, isPersistent: false, lockoutOnFailure: false);
+                if (result.Succeeded)
                 {
-                    LoggedInUser = user;
                     return NotifySuccessAndRedirect("Je bent ingelogd", "Index", "Dashboard");
                 }
             }
@@ -30,9 +37,9 @@ namespace BumboApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            LoggedInUser = null;
+            await _signInManager.SignOutAsync();
             return NotifySuccessAndRedirect("Je bent uitgelogd", "Index", "Login");
         }
     }
