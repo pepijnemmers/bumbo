@@ -4,13 +4,13 @@
 
 @if (ViewBag.LoggedInUserRole == Role.Employee)
 {
-    <div class="container dashboard">
+    <div class="dashboard">
         <div class="row">
             <!-- Left Column -->
             <div class="col-md-7">
                 <div class="card mb-3">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between align-items-center my-2">
                             <h5><strong>Jouw diensten deze week</strong></h5>
                             <a asp-controller="Shifts" asp-action="MyShifts" class="text-black text-decoration-underline ms-2">Bekijk alle</a>
                         </div>
@@ -79,7 +79,7 @@
                 </div>
                 <div class="card mb-3">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between align-items-center my-2">
                             <h5><strong>Ongelezen meldingen</strong></h5>
                             <a asp-controller="Notifications" asp-action="Index" class="text-black text-decoration-underline ms-2">Bekijk alle</a>
                         </div>
@@ -92,18 +92,31 @@
                             <div class="row">
                                 @foreach (var notification in ViewBag.UnreadNotifications)
                                 {
-                                    <div class="col-12 mb-3">
-                                        <div class="card w-100">
-                                            <div class="card-body">
-                                                <small class="text-muted">@notification.SentAt.ToString("dd-MM-yyyy HH:mm")</small>
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <span class="bg-danger border border-light rounded-circle me-2"
-                                                          style="width: 10px; height: 10px; display: inline-block;"></span>
-                                                    <h6 class="card-title mb-0">
-                                                        <strong>@notification.Title</strong>
-                                                    </h6>
+                                    <div class="card p-3 mb-2">
+                                        <div class="d-block d-xl-flex align-items-center justify-content-between gap-2 gap-md-3">
+                                            <div>
+                                                <span class="text-secondary small">@notification.SentAt.ToString("dd-MM-yyyy HH:mm")</span>
+                                                <a asp-action="GoToActionUrl" asp-controller="Notifications" asp-route-id="@notification.Id" class="d-flex align-items-center gap-2 text-body mb-2 mt-1">
+                                                    @if (!notification.HasBeenRead)
+                                                    {
+                                                        <i class="fa-solid fa-circle text-danger small"></i>
+                                                    }
+                                                    <strong class="mb-0">@notification.Title</strong>
+                                                </a>
+                                                <p class="mb-0">@notification.Description</p>
+                                            </div>
+                                            <div>
+                                                <div class="d-flex align-items-center gap-1">
+                                                    @if (notification.ActionUrl != null)
+                                                    {
+                                                        <a asp-action="GoToActionUrl" asp-controller="Notifications" asp-route-id="@notification.Id" class="p-2" title="Bekijk details"><img src="/img/details-icon.svg" alt="Details" /></a>
+                                                    }
+                                                    @if (!notification.HasBeenRead)
+                                                    {
+                                                        <a asp-action="MarkAsRead" asp-controller="Notifications" asp-route-id="@notification.Id" class="p-2" title="Markeer als gelezen"><img src="/img/envelope-icon.svg" alt="Mark as read"/></a>
+                                                    }
+                                                    <a asp-action="Delete" asp-controller="Notifications" asp-route-id="@notification.Id" class="p-2" title="Verwijder"><img src="/img/delete-icon.svg" alt="Delete"/></a>
                                                 </div>
-                                                <small class="card-text">@notification.Description</small>
                                             </div>
                                         </div>
                                     </div>
@@ -119,7 +132,7 @@
 
 @if (ViewBag.LoggedInUserRole == Role.Manager)
 {
-    <div class="container dashboard">
+    <div class="dashboard">
         <div class="row">
             <!-- Left Column -->
             <div class="col-md-7">
@@ -194,7 +207,7 @@
             <div class="col-md-5">
                 <div class="card mb-3">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between align-items-center my-2">
                             <h5><strong>Ongelezen meldingen</strong></h5>
                             <a asp-controller="Notifications" asp-action="Index" class="text-black text-decoration-underline ms-2">Bekijk alle</a>
                         </div>
@@ -204,26 +217,37 @@
                         }
                         else
                         {
-                            <div class="row">
-                                @foreach (var notification in ViewBag.UnreadNotifications)
-                                {
-                                    <div class="col-12 mb-3">
-                                        <div class="card w-100">
-                                            <div class="card-body">
-                                                <small class="text-muted">@notification.SentAt.ToString("dd-MM-yyyy HH:mm")</small>
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <span class="bg-danger border border-light rounded-circle me-2"
-                                                          style="width: 10px; height: 10px; display: inline-block;"></span>
-                                                    <h6 class="card-title mb-0">
-                                                        <strong>@notification.Title</strong>
-                                                    </h6>
-                                                </div>
-                                                <small class="card-text">@notification.Description</small>
+                            @foreach (var notification in ViewBag.UnreadNotifications)
+                            {
+                                <div class="card p-3 mb-2">
+                                    <div class="d-block d-xl-flex align-items-center justify-content-between gap-2 gap-md-3">
+                                        <div>
+                                            <span class="text-secondary small">@notification.SentAt.ToString("dd-MM-yyyy HH:mm")</span>
+                                            <a asp-action="GoToActionUrl" asp-controller="Notifications" asp-route-id="@notification.Id" class="d-flex align-items-center gap-2 text-body mb-2 mt-1">
+                                                @if (!notification.HasBeenRead)
+                                                {
+                                                    <i class="fa-solid fa-circle text-danger small"></i>
+                                                }
+                                                <strong class="mb-0">@notification.Title</strong>
+                                            </a>
+                                            <p class="mb-0">@notification.Description</p>
+                                        </div>
+                                        <div>
+                                            <div class="d-flex align-items-center gap-1">
+                                                @if (notification.ActionUrl != null)
+                                                {
+                                                    <a asp-action="GoToActionUrl" asp-controller="Notifications" asp-route-id="@notification.Id" class="p-2" title="Bekijk details"><img src="/img/details-icon.svg" alt="Details" /></a>
+                                                }
+                                                @if (!notification.HasBeenRead)
+                                                {
+                                                    <a asp-action="MarkAsRead" asp-controller="Notifications" asp-route-id="@notification.Id" class="p-2" title="Markeer als gelezen"><img src="/img/envelope-icon.svg" alt="Mark as read"/></a>
+                                                }
+                                                <a asp-action="Delete" asp-controller="Notifications" asp-route-id="@notification.Id" class="p-2" title="Verwijder"><img src="/img/delete-icon.svg" alt="Delete"/></a>
                                             </div>
                                         </div>
                                     </div>
-                                }
-                            </div>
+                                </div>
+                            }
                         }
                     </div>
                 </div>

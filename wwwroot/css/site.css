@@ -130,10 +130,12 @@ html {
     margin-inline: 0;
 }
 
-.table-container {
+.table-container, .card {
     background-color: var(--bs-white);
     border: 1px solid var(--border-clr);
     border-radius: 8px;
+}
+.table-container {
     margin: 15px 0;
 }
 
