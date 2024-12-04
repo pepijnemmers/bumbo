@@ -50,6 +50,7 @@ namespace BumboApp.Controllers
             var unreadNotifications = employee.notifications
                 .Where(n => !n.HasBeenRead)
                 .OrderByDescending(n => n.SentAt)
+                .Take(5)
                 .ToList();
 
             var today = DateTime.Today;
