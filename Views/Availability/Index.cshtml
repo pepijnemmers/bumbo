@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Beschikbaarheid";
+
+    var isDisabledButton = Model.StartDate < DateOnly.FromDateTime(DateTime.Now.AddDays(7)) ? "disabled" : "";
+    var isDisabled = !(Model.StartDate < DateOnly.FromDateTime(DateTime.Now.AddDays(7)));
 }
 
 <div class="row justify-content-between align-items-center">
@@ -33,12 +36,12 @@
             <form asp-action="AddAvailability" method="post">
                 <input type="hidden" name="id" value="@Model.StartDate.ToString("dd-MM-yyyy")" />
                 <input type="hidden" name="useStandard" value="true" />
-                <button type="submit" class="btn btn-secondary">Standaard gebruiken</button>
+                <button type="submit" class="btn btn-secondary" @isDisabledButton>Standaard gebruiken</button>
             </form>
             <form asp-action="AddAvailability" method="post">
                 <input type="hidden" name="id" value="@Model.StartDate.ToString("dd-MM-yyyy")" />
                 <input type="hidden" name="useStandard" value="false" />
-                <button type="submit" class="btn btn-primary">Toevoegen</button>
+                <button type="submit" class="btn btn-primary" @isDisabledButton>Toevoegen</button>
             </form>
         }
         else
@@ -67,9 +70,15 @@
                         }
                     </tbody>
                 </table>
-                <div class="d-flex justify-content-end m-3">
-                    <a class="btn btn-primary" asp-action="UpdateAvailability" asp-route-id="@Model.StartDate.ToString("dd-MM-yyyy")">Bewerken</a>
-                </div>
+                @if (isDisabled)
+                {
+                    <div class="d-flex justify-content-end m-3">
+                        <a class="btn btn-primary" asp-action="UpdateAvailability"
+                                asp-route-id="@Model.StartDate.ToString("dd-MM-yyyy")">
+                            Bewerken
+                        </a>
+                    </div>
+                }
             </div>
         }
     </div>
@@ -81,23 +90,26 @@
         @if (Model.SchoolScheduleList.Count == 0)
         {
             <form class="d-flex justify-content-end" asp-action="AddSchoolSchedule" asp-route-id="@Model.StartDate.ToString("dd-MM-yyyy")">
-                <button type="submit" class="btn btn-primary">Toevoegen</button>
+                <button type="submit" class="btn btn-primary" @isDisabledButton>Toevoegen</button>
             </form>
         }
         else
         {
             @for (int dayNr = 1; dayNr <= 5; dayNr++)
             {
-                DayOfWeek day = (DayOfWeek) dayNr;
+                DayOfWeek day = (DayOfWeek)dayNr;
                 SchoolSchedule? schoolSchedule = Model.SchoolScheduleList.SingleOrDefault(ss => ss.Date.DayOfWeek == day);
                 <label>@day: @Model.StartDate.AddDays(dayNr).ToString("dd-MM")</label>
                 <p>
                     @(schoolSchedule != null ? schoolSchedule.DurationInHours + " uur" : "-")
                 </p>
             }
-            <div class="d-flex justify-content-end m-3">
-                <a class="btn btn-primary" asp-action="UpdateSchoolSchedule" asp-route-id="@Model.StartDate.ToString("dd-MM-yyyy")">bewerken</a>
-            </div>
+            @if (isDisabled)
+            {
+                <div class="d-flex justify-content-end m-3">
+                    <a class="btn btn-primary" asp-action="UpdateSchoolSchedule" asp-route-id="@Model.StartDate.ToString("dd-MM-yyyy")">bewerken</a>
+                </div>
+            }
         }
     </div>
 </div>
