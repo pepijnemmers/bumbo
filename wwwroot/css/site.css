@@ -222,9 +222,19 @@ label {
     text-align: left;
 }
 
-/*Create prognosis*/
+/*Create prognosis and leave request*/
 .create-prognosis-card {
     width: 30rem;
+}
+
+@media (max-width: 768px) {
+    .create-prognosis-card {
+        width: 100%;
+    }
+
+    .leaveRequestReason {
+        display: none;
+    }
 }
 
 /* Opening hours view*/
@@ -452,4 +462,9 @@ label {
     .w-lg-auto {
         width: auto !important;
     }
+}
+
+.textAreaLeaveRequestReason {
+    resize: none;
+    height: 100px;
 }
