@@ -21,9 +21,17 @@
                 <div class="col-md-6">
                     <div class="ms-4">
                         <h6 class="card-title"><strong>Dienst van</strong></h6>
-                        <p class="card-text">@shiftDetails.Shift.Employee.FirstName @shiftDetails.Shift.Employee.LastName<br />
-                            <em>Ingeplande uren: @ViewBag.HoursEmployeeWithShift v.d. @ViewBag.ContractHoursEmployeeWithShift</em>
-                        </p>
+                        @if(shiftDetails.Shift.Employee != null)
+                        {
+                            <p class="card-text">
+                                @shiftDetails.Shift.Employee.FirstName @shiftDetails.Shift.Employee.LastName<br />
+                                <em>Ingeplande uren: @ViewBag.HoursEmployeeWithShift v.d. @ViewBag.ContractHoursEmployeeWithShift</em>
+                            </p>
+                        }
+                        else
+                        {
+                            <p>Geen eerdere medewerker.</p>
+                        }
 
                         <h6 class="card-title"><strong>Overgenomen door</strong></h6>
                         <p class="card-text">@shiftDetails.EmployeeTakingOver.FirstName @shiftDetails.EmployeeTakingOver.LastName<br />
