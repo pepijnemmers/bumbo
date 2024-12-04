@@ -1,4 +1,88 @@
-﻿
+﻿@model BumboApp.ViewModels.UserEmployeeViewModel
+
 @{
     ViewData["Title"] = "Nieuwe werknemer aanmaken";
 }
+
+<a asp-action="Index" class="btn btn-secondary">Terug</a>
+
+<form method="post">
+    <div class="table-container p-3">
+        <h3>Accountgegevens</h3>
+        <div class="form-group">
+            <label asp-for="@Model.Email" class="control-label">Email</label>
+            <input asp-for="@Model.Email" class="form-control" />
+            <span asp-validation-for="@Model.Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="@Model.Password" class="control-label">Wachtwoord</label>
+            <input asp-for="@Model.Password" type="password" class="form-control" />
+            <span asp-validation-for="@Model.Password" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="Role" class="control-label">Functie</label>
+            <select asp-for="Role" class="form-control">
+                <option value="@Role.Manager">Manager</option>
+                <option value="@Role.Employee">Employee</option>
+            </select>
+            <span asp-validation-for="Role" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="table-container p-3">
+        <h3>Persoonsgegevens</h3>
+        <div class="form-group">
+            <label asp-for="@Model.FirstName" class="control-label">Voornaam</label>
+            <input asp-for="@Model.FirstName" class="form-control" />
+            <span asp-validation-for="@Model.FirstName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="@Model.LastName" class="control-label">Achternaam</label>
+            <input asp-for="@Model.LastName" class="form-control" placeholder="van den Bos" />
+            <span asp-validation-for="@Model.LastName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="@Model.DateOfBirth" class="control-label">Geboortedatum</label>
+            <input asp-for="@Model.DateOfBirth" type="date" class="form-control" />
+            <span asp-validation-for="@Model.DateOfBirth" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="table-container p-3">
+        <h3>Adresgegevens</h3>
+        <div class="form-group">
+            <label asp-for="@Model.Zipcode" class="control-label">Postcode</label>
+            <input asp-for="@Model.Zipcode" class="form-control" placeholder="Formaat: 1234AB" />
+            <span asp-validation-for="@Model.Zipcode" class="text-danger" placeholder="1a"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="@Model.HouseNumber" class="control-label">Huisnummer + toevoeging</label>
+            <input asp-for="@Model.HouseNumber" class="form-control" />
+            <span asp-validation-for="@Model.HouseNumber" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="table-container p-3">
+        <h3>Contractgegevens</h3>
+        <div class="form-group">
+            <label asp-for="@Model.ContractHours" class="control-label">Contracturen</label>
+            <input asp-for="@Model.ContractHours" type="number" class="form-control" />
+            <span asp-validation-for="@Model.ContractHours" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="@Model.LeaveHours" class="control-label">Verlofuren</label>
+            <input asp-for="@Model.LeaveHours" type="number" class="form-control" />
+            <span asp-validation-for="@Model.LeaveHours" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary">Aanmaken</button>
+    </div>
+</form>
