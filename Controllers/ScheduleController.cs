@@ -9,6 +9,7 @@ using System.Globalization;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using System.Reflection.Metadata.Ecma335;
 
 namespace BumboApp.Controllers
 {
@@ -21,21 +22,21 @@ namespace BumboApp.Controllers
             _userManager = userManager;
         }
         // will need to be in a json file eventually 
-        private int maxShiftLengthAdult = 12;
-        private int maxWeeklyHoursAdult = 60;
+        private const int maxShiftLengthAdult = 12;
+        private const int maxWeeklyHoursAdult = 60;
 
-        private int maxWeeklyHoursAlmostAdult = 40;
-        private int timeframeInWeeksMaxWeeklyHoursAlmostAdult = 4;
-        private int maxHoursWithSchoolAlmostAdult = 9;
+        private const int maxWeeklyHoursAlmostAdult = 40;
+        private const int timeframeInWeeksMaxWeeklyHoursAlmostAdult = 4;
+        private const int maxHoursWithSchoolAlmostAdult = 9;
 
-        private int maxWeeklyHoursUnderSixteen = 40;
-        private int maxWeeklyHoursSchoolweekUnderSixteen = 12;
-        private int maxHoursWithSchoolUnderSixteen = 8;
-        private int maxWorkingDaysUnderSixteen = 5;
-        private TimeOnly maxWorkTimeForUnderSixteen = new TimeOnly(19,00,00);
+        private const int maxWeeklyHoursUnderSixteen = 40;
+        private const int maxWeeklyHoursSchoolweekUnderSixteen = 12;
+        private const int maxHoursWithSchoolUnderSixteen = 8;
+        private const int maxWorkingDaysUnderSixteen = 5;
+        private readonly TimeOnly maxWorkTimeForUnderSixteen = new TimeOnly(19,00,00);
 
-        private float breakTimeHours = (float)0.5;
-        private int[] breakTimes = { 4, 8 };
+        private const float breakTimeHours = (float)0.5;
+        private readonly int[] breakTimes = { 4, 8 };
 
         public async Task<Role> GetUserRoleAsync(string userId)
         {
@@ -119,7 +120,7 @@ namespace BumboApp.Controllers
         [HttpPost]
         public IActionResult MakeSchedule(DateOnly startDate)
         {
-            Prognosis prognosis = Context.Prognoses.Where(e => e.Date == startDate).FirstOrDefault();
+            Prognosis? prognosis = Context.Prognoses.FirstOrDefault(e => e.Date == startDate);
             if (prognosis == null)
             {
                 return NotifyErrorAndRedirect("Geen prognose om het rooster te maken", "Index"); //route to prognose page?
@@ -146,7 +147,9 @@ namespace BumboApp.Controllers
                 }
             }
             List<Employee> employees = Context.Employees
-                .Include(e => e.Shifts).ToList();
+                .Include(e => e.Shifts)
+                .Include(e => e.User)
+                .ToList();
             List<Employee> managers = employees.Where(e => GetUserRoleAsync(e.User.Id).Result == Role.Manager).ToList();
             int weekNumber = new GregorianCalendar(GregorianCalendarTypes.Localized).GetWeekOfYear(startDate.ToDateTime(new TimeOnly()), CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
             foreach (Employee e in employees)
@@ -174,39 +177,40 @@ namespace BumboApp.Controllers
             {
                 Context.SaveChanges();
             }
-            catch(Exception e) { return NotifyErrorAndRedirect("er is een probleem opgetreden", "Index"); }
+            catch (Exception e) { return NotifyErrorAndRedirect("er is een probleem opgetreden", "Index"); }
             return RedirectToAction("Index",null,startDate.ToString());
         }
 
         private void InsertEmptyShifts(Department department, DateOnly scheduledate)
         {
-            OpeningHour openingHour = Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).First();
-            try
+            OpeningHour? openingHour = Context.OpeningHours.FirstOrDefault(e => e.WeekDay == scheduledate.DayOfWeek);
+            if (openingHour == null)
             {
-                TimeOnly oTime = openingHour.OpeningTime.GetValueOrDefault();
-                TimeOnly cTime = openingHour.ClosingTime.GetValueOrDefault();
-                int startingHour = oTime.Hour;
-                int closingHour = cTime.Hour;
-                if (cTime.Minute > 0) { closingHour++; }
-                while (!PrognoseHoursHit(department, scheduledate))
-                {
-                    int MissedTime = getMaxTimePrognose(department, scheduledate);
-                    int maxTime = startingHour + (int)MissedTime;
-
-                    if (maxTime > closingHour) { maxTime = closingHour; }
-                    if (startingHour >= maxTime) { return; }
-                    Context.Add(
-                        new Shift()
-                        {
-                            Department = department,
-                            Start = scheduledate.ToDateTime(new TimeOnly(startingHour, 00, 00)),
-                            End = scheduledate.ToDateTime(new TimeOnly(maxTime, 00, 00)),
-                            IsFinal = false,
-                        });
-                    Context.SaveChanges();
-                }
+                return;
             }
-            catch (Exception ex) { return; }
+            TimeOnly oTime = openingHour.OpeningTime.GetValueOrDefault();
+            TimeOnly cTime = openingHour.ClosingTime.GetValueOrDefault();
+            int startingHour = oTime.Hour;
+            int closingHour = cTime.Hour;
+            if (cTime.Minute > 0) { closingHour++; }
+
+            while (!PrognoseHoursHit(department, scheduledate))
+            {
+                int MissedTime = getMaxTimePrognose(department, scheduledate);
+                int maxTime = startingHour + (int)MissedTime;
+
+                if (maxTime > closingHour) { maxTime = closingHour; }
+                if (startingHour >= maxTime) { return; }
+                Context.Add(
+                    new Shift()
+                    {
+                        Department = department,
+                        Start = scheduledate.ToDateTime(new TimeOnly(startingHour, 00, 00)),
+                        End = scheduledate.ToDateTime(new TimeOnly(maxTime, 00, 00)),
+                        IsFinal = false,
+                    });
+                Context.SaveChanges();
+            }
             return;
         }
 
@@ -224,12 +228,7 @@ namespace BumboApp.Controllers
 
             int index = 0;
             //true if not cash register or it is cash register but the whole list is looped and prognose hours not hit yet
-            bool cantFindConcurrentForRegister; 
-            if(department == Department.Kassa)
-            {
-                cantFindConcurrentForRegister = false;
-            }
-            else { cantFindConcurrentForRegister= true; }
+            bool cantFindConcurrentForRegister = department != Department.Kassa; 
             while (true)
             {
                 if (PrognoseHoursHit(department, scheduledate)) break;
@@ -248,12 +247,12 @@ namespace BumboApp.Controllers
                     index++;
                     continue;
                 }
-                if (employee.leaveRequests.Where(e => e.Status == Status.Geaccepteerd && e.StartDate <= scheduledate.ToDateTime(new TimeOnly()) && e.EndDate >= scheduledate.ToDateTime(new TimeOnly())).Any())
+                if (employee.leaveRequests.Any(e => e.Status == Status.Geaccepteerd && e.StartDate <= scheduledate.ToDateTime(new TimeOnly()) && e.EndDate >= scheduledate.ToDateTime(new TimeOnly())))
                 {
                     index++;
                     continue;
                 }
-                if (employee.Shifts.Where(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly()) && e.End.Date == scheduledate.ToDateTime(new TimeOnly())).Any())
+                if (employee.Shifts.Any(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly()) && e.End.Date == scheduledate.ToDateTime(new TimeOnly())))
                 {
                     index++;
                     continue;
@@ -315,15 +314,7 @@ namespace BumboApp.Controllers
 
         private bool PrognoseHoursHit(Department department, DateOnly scheduledate)
         {
-            try
-            {
-                Context.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                return true;
-            }
-            Prognosis prognosis= Context.Prognoses.Where(e => e.Date == scheduledate && e.Department == department).FirstOrDefault();
+            Prognosis? prognosis= Context.Prognoses.FirstOrDefault(e => e.Date == scheduledate && e.Department == department);
             List<Shift> departmentDayShifts = Context.Shifts
                 .Where(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly()))
                 .Where(e => e.Department == department)
@@ -341,15 +332,11 @@ namespace BumboApp.Controllers
 
         private bool OpeningInCashRegister(DateOnly scheduledate)
         {
-            OpeningHour times = Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).First();
+            OpeningHour? times = Context.OpeningHours.FirstOrDefault(e => e.WeekDay == scheduledate.DayOfWeek);
+            if (times == null) { return false; }
 
-            TimeOnly oTime;
-            TimeOnly cTime;
-            try
-            {
-                oTime = (TimeOnly)times.OpeningTime;
-                cTime = (TimeOnly)times.ClosingTime;
-            } catch (Exception ex) { return false; }
+            TimeOnly oTime = times.OpeningTime.GetValueOrDefault();
+            TimeOnly cTime = times.ClosingTime.GetValueOrDefault();
 
             int openingHour = oTime.Hour;
             int closingHour = cTime.Hour;
@@ -357,7 +344,7 @@ namespace BumboApp.Controllers
             List<Shift> shifts = Context.Shifts
                     .Where(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly())
                     && e.Department == Department.Kassa).OrderBy(e => e.Start.Hour).ToList();
-            Shift previous = null;
+            Shift? previous = null;
             foreach (Shift shift in shifts)
             {
                 if (previous == null)
@@ -441,21 +428,23 @@ namespace BumboApp.Controllers
                         End = scheduledate.ToDateTime(new TimeOnly(startinghour + maxhours.First(), 00, 00)),
                         IsFinal = false
                     });
+                try
+                {
+                    Context.SaveChanges();
+                }
+                catch (Exception ex) { };
             }
             return;
         }
 
         private bool ScheduleConcurrentShift(Department department, DateOnly scheduledate, DateOnly startDate, Employee employee)
         {
-            Availability availability = null;
-            try
-            {
-                availability = employee.Availabilities.Where(e => e.Date == scheduledate).First();
-            }
-            catch (Exception ex) { }
+            Availability? availability = employee.Availabilities.FirstOrDefault(e => e.Date == scheduledate);
             int availableFrom;
             int availableTill;
-            TimeOnly cTime = (TimeOnly)Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).FirstOrDefault().ClosingTime;
+            OpeningHour? openingHour = Context.OpeningHours.FirstOrDefault(e => e.WeekDay == scheduledate.DayOfWeek);
+            if (openingHour == null) { return false; } //not very likely but else the IDE doesn't like it
+            TimeOnly cTime = openingHour.ClosingTime.GetValueOrDefault();
             int startingHour = getNextEmptySpot(department, scheduledate);
             int closingHour = cTime.Hour;
             if (cTime.Minute > 0) { closingHour++; }
@@ -501,6 +490,11 @@ namespace BumboApp.Controllers
                         End = scheduledate.ToDateTime(new TimeOnly(startingHour + maxhours.First(), 00, 00)),
                         IsFinal = false
                     });
+                try
+                {
+                    Context.SaveChanges();
+                }
+                catch (Exception ex) { return false; }
                 return true;
             }
             return false;
@@ -508,15 +502,17 @@ namespace BumboApp.Controllers
 
         private int getNextEmptySpot(Department department, DateOnly scheduledate)
         {
-            TimeOnly oTime = (TimeOnly)Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).FirstOrDefault().OpeningTime;
-            TimeOnly cTime = (TimeOnly)Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).FirstOrDefault().ClosingTime;
+            OpeningHour? openingTimes = Context.OpeningHours.FirstOrDefault(e => e.WeekDay == scheduledate.DayOfWeek);
+            if (openingTimes == null) { return 8; } //just random number as it is very unlikely that it will be null at this point (only with Db malfunction its possible)
+            TimeOnly oTime = openingTimes.OpeningTime.GetValueOrDefault();
+            TimeOnly cTime = openingTimes.ClosingTime.GetValueOrDefault();
             int openingHour = oTime.Hour;
             int closingHour = cTime.Hour;
             if (cTime.Minute > 0) { closingHour++; }
             List<Shift> shifts = Context.Shifts
                     .Where(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly())
                     && e.Department == Department.Kassa).OrderBy(e => e.Start.Hour).ToList();
-            Shift previous = null;
+            Shift? previous = null;
             if (!shifts.Any())
             {
                 return openingHour;
@@ -538,6 +534,7 @@ namespace BumboApp.Controllers
                     continue;
                 }
             }
+            if(previous == null) { return openingHour; }
             if (previous.End.Hour == closingHour)
             {
                 return closingHour;
@@ -558,12 +555,7 @@ namespace BumboApp.Controllers
 
         private int getMaxTimePrognose(Department department, DateOnly scheduledate)
         {
-            Prognosis prognosis = null;
-            try
-            {
-                prognosis = Context.Prognoses.Where(e => e.Date == scheduledate && e.Department == department).First();
-            }
-            catch (Exception ex) { }
+            Prognosis? prognosis = Context.Prognoses.FirstOrDefault(e => e.Date == scheduledate && e.Department == department);
             
                 List<Shift> departmentDayShifts = (List<Shift>)Context.Shifts
                 .Where(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly()))
