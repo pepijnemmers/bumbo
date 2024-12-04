@@ -1325,7 +1325,7 @@ namespace BumboApp.Migrations
                             Day = 1,
                             EmployeeNumber = 2,
                             EndTime = new TimeOnly(21, 0, 0),
-                            StartTime = new TimeOnly(9, 0, 0)
+                            StartTime = new TimeOnly(18, 0, 0)
                         },
                         new
                         {
@@ -1345,7 +1345,7 @@ namespace BumboApp.Migrations
                         {
                             Day = 4,
                             EmployeeNumber = 2,
-                            EndTime = new TimeOnly(21, 0, 0),
+                            EndTime = new TimeOnly(18, 0, 0),
                             StartTime = new TimeOnly(9, 0, 0)
                         },
                         new
@@ -1359,7 +1359,7 @@ namespace BumboApp.Migrations
                         {
                             Day = 6,
                             EmployeeNumber = 2,
-                            EndTime = new TimeOnly(21, 0, 0),
+                            EndTime = new TimeOnly(16, 0, 0),
                             StartTime = new TimeOnly(9, 0, 0)
                         },
                         new

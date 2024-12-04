@@ -330,7 +330,7 @@ public partial class BumboDbContext : IdentityDbContext<User>
             {
                 Day = DayOfWeek.Monday,
                 EmployeeNumber = 2,
-                StartTime = new TimeOnly(9, 0),
+                StartTime = new TimeOnly(18, 0),
                 EndTime = new TimeOnly(21, 0)
             },
             new StandardAvailability
@@ -352,7 +352,7 @@ public partial class BumboDbContext : IdentityDbContext<User>
                 Day = DayOfWeek.Thursday,
                 EmployeeNumber = 2,
                 StartTime = new TimeOnly(9, 0),
-                EndTime = new TimeOnly(21, 0)
+                EndTime = new TimeOnly(18, 0)
             },
             new StandardAvailability
             {
@@ -366,7 +366,7 @@ public partial class BumboDbContext : IdentityDbContext<User>
                 Day = DayOfWeek.Saturday,
                 EmployeeNumber = 2,
                 StartTime = new TimeOnly(9, 0),
-                EndTime = new TimeOnly(21, 0)
+                EndTime = new TimeOnly(16, 0)
             },
             new StandardAvailability
             {

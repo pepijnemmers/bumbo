@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BumboApp.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    [Migration("20241203203031_StandardAvailability")]
+    [Migration("20241204073453_StandardAvailability")]
     partial class StandardAvailability
     {
         /// <inheritdoc />
@@ -212,12 +212,12 @@ namespace BumboApp.Migrations
                             ContractHours = 40,
                             DateOfBirth = new DateOnly(1990, 5, 20),
                             FirstName = "John",
-                            HouseNumber = "1A",
+                            HouseNumber = "1",
                             LastName = "Doe",
                             LeaveHours = 60,
                             StartOfEmployment = new DateOnly(2020, 1, 15),
                             UserId = "2ab03136-c316-4b70-a7fc-4c9cb044a6be",
-                            Zipcode = "1234AB"
+                            Zipcode = "5583AA"
                         },
                         new
                         {
@@ -225,12 +225,12 @@ namespace BumboApp.Migrations
                             ContractHours = 20,
                             DateOfBirth = new DateOnly(1995, 8, 12),
                             FirstName = "Jane",
-                            HouseNumber = "2B",
+                            HouseNumber = "2",
                             LastName = "Smith",
                             LeaveHours = 5,
                             StartOfEmployment = new DateOnly(2021, 3, 1),
                             UserId = "12544476-38da-4113-9c40-4bc508f8c0f2",
-                            Zipcode = "5684AC"
+                            Zipcode = "5684AS"
                         },
                         new
                         {
@@ -238,12 +238,12 @@ namespace BumboApp.Migrations
                             ContractHours = 35,
                             DateOfBirth = new DateOnly(1998, 12, 5),
                             FirstName = "Emily",
-                            HouseNumber = "3C",
+                            HouseNumber = "1",
                             LastName = "Jones",
                             LeaveHours = 40,
                             StartOfEmployment = new DateOnly(2019, 7, 30),
                             UserId = "2667ab01-7225-451b-adbb-c99eea968d02",
-                            Zipcode = "5211DG"
+                            Zipcode = "5683AA"
                         });
                 });
 
@@ -1328,7 +1328,7 @@ namespace BumboApp.Migrations
                             Day = 1,
                             EmployeeNumber = 2,
                             EndTime = new TimeOnly(21, 0, 0),
-                            StartTime = new TimeOnly(9, 0, 0)
+                            StartTime = new TimeOnly(18, 0, 0)
                         },
                         new
                         {
@@ -1348,7 +1348,7 @@ namespace BumboApp.Migrations
                         {
                             Day = 4,
                             EmployeeNumber = 2,
-                            EndTime = new TimeOnly(21, 0, 0),
+                            EndTime = new TimeOnly(18, 0, 0),
                             StartTime = new TimeOnly(9, 0, 0)
                         },
                         new
@@ -1362,7 +1362,7 @@ namespace BumboApp.Migrations
                         {
                             Day = 6,
                             EmployeeNumber = 2,
-                            EndTime = new TimeOnly(21, 0, 0),
+                            EndTime = new TimeOnly(16, 0, 0),
                             StartTime = new TimeOnly(9, 0, 0)
                         },
                         new
