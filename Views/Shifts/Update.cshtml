@@ -67,7 +67,7 @@
         <div class="d-flex justify-content-between">
             <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#confirmDelete">Verwijderen</button>
             <div>
-                <a class="btn btn-outline-primary px-3 me-1" asp-controller="Schedule" asp-action="Index">Annuleren</a>
+                <a class="btn btn-outline-primary px-3 me-1" asp-controller="Schedule" asp-action="Index" asp-route-startDate="@(DateOnly.FromDateTime(Model.Shift.Start))">Annuleren</a>
                 <button class="btn btn-primary px-3" type="submit">Opslaan</button>
             </div>
         </div>

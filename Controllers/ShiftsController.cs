@@ -1,7 +1,7 @@
 ﻿using BumboApp.Models;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore;
 
 namespace BumboApp.Controllers
 {
@@ -121,17 +121,31 @@ namespace BumboApp.Controllers
                         isFinal = isFinal?.ToString()
                     });
                 }
-                
+
+                var employeeToInsert = employee != 0 ? Context.Employees.Find(employee) : null;
                 Context.Shifts.Add(
                     new Shift
                     {
                         Start = startToInsert,
                         End = endToInsert,
                         Department = (Department)department!,
-                        Employee = employee != 0 ? Context.Employees.Find(employee) : null,
+                        Employee = employeeToInsert,
                         IsFinal = isFinal!.Value
                     }
                 );
+
+                if ((bool)isFinal && employeeToInsert != null)
+                {
+                    Context.Notifications.Add(new Notification
+                    {
+                        Employee = employeeToInsert,
+                        Title = $"Dienst {department} toegevoegd - {startToInsert.ToString("dd/MM/yyyy")}",
+                        Description = $"Er is een dienst voor jou toegevoegd op {startToInsert.ToString("dd/MM/yyyy")} van {startToInsert.ToString("HH:mm")} tot {endToInsert.ToString("HH:mm")}",
+                        SentAt = DateTime.Now,
+                        HasBeenRead = false,
+                        ActionUrl = $"/Schedule?startDate={startToInsert.ToString("dd/MM/yyyy")}"
+                    });
+                }
                 Context.SaveChanges();
             }
             catch
@@ -139,7 +153,7 @@ namespace BumboApp.Controllers
                 return NotifyErrorAndRedirect("Er is iets fout gegaan bij het toevoegen van de dienst. Probeer het opnieuw", "Create", "Schedule");
             }
             NotifyService.Success("De dienst is toegevoegd");
-            return RedirectToAction("Index", "Schedule", new { date = date.Value.ToString("dd-MM-yyyy") });
+            return RedirectToAction("Index", "Schedule", new { startDate = date.Value.ToString("dd/MM/yyyy") });
         }
         
         [HttpPost]
@@ -165,20 +179,19 @@ namespace BumboApp.Controllers
                 return RedirectToAction("Update", new { id = id });
             }
             var employee = employeeNumber != null ? Context.Employees.Find(int.Parse(employeeNumber)) : null;
-            if (employeeNumber != null && employee == null)
+            if (employeeNumber == null || employee == null)
             {
                 NotifyService.Error("De werknemer kon niet worden gevonden");
                 return RedirectToAction("Update", new { id = id });
             }
             
             // check if employee already has a shift at that time
-            if (employee != null && 
-                Context.Shifts
-                    .Any(s => s.Employee != null
-                              && s.Id != id
-                              && s.Employee == employee
-                              && s.Start < shiftEnd
-                              && s.End > shiftStart))
+            if (Context.Shifts
+                .Any(s => s.Employee != null
+                          && s.Id != id
+                          && s.Employee == employee
+                          && s.Start < shiftEnd
+                          && s.End > shiftStart))
             {
                 NotifyService.Error("Deze werknemer heeft al een dienst op dat moment");
                 return RedirectToAction("Update", new { id = id });
@@ -193,14 +206,44 @@ namespace BumboApp.Controllers
                     NotifyService.Error("De dienst kon niet worden gevonden");
                     return RedirectToAction("Update", new { id = id });
                 }
+
+                bool conceptMadeFinal = !shift.IsFinal && isFinal;
                 
                 shift.Start = shiftStart;
                 shift.End = shiftEnd;
                 shift.Department = department;
                 shift.Employee = employee;
                 shift.IsFinal = isFinal;
-                
                 Context.Shifts.Update(shift);
+
+                if (conceptMadeFinal)
+                {
+                    Context.Notifications.Add(new Notification
+                    {
+                        Employee = employee,
+                        Title =
+                            $"Dienst {shift.Department.ToFriendlyString()} toegevoegd - {shift.Start.ToString("dd/MM/yyyy")}",
+                        Description =
+                            $"Er is een dienst voor jou toegevoegd op {shift.Start.ToString("dd/MM/yyyy")} van {shift.Start.ToString("HH:mm")} tot {shift.End.ToString("HH:mm")}",
+                        SentAt = DateTime.Now,
+                        HasBeenRead = false,
+                        ActionUrl = $"/Schedule?startDate={shift.Start.ToString("dd/MM/yyyy")}"
+                    });
+                }
+                else
+                {
+                    Context.Notifications.Add(new Notification
+                    {
+                        Employee = employee,
+                        Title =
+                            $"Dienst {shift.Department.ToFriendlyString()} gewijzigd - {shift.Start.ToString("dd/MM/yyyy")}",
+                        Description =
+                            $"Je dienst op {shift.Start.ToString("dd/MM/yyyy")} van {shift.Start.ToString("HH:mm")} tot {shift.End.ToString("HH:mm")} is gewijzigd.",
+                        SentAt = DateTime.Now,
+                        HasBeenRead = false,
+                        ActionUrl = $"/Schedule?startDate={shift.Start.ToString("dd/MM/yyyy")}"
+                    });
+                }
                 Context.SaveChanges();
             }
             catch
@@ -213,11 +256,50 @@ namespace BumboApp.Controllers
         }
         
         [HttpPost]
-        public IActionResult Delete(Shift shift)
+        public IActionResult Delete(int id)
         {
-            // TODO delete shift and redirect to schedule page to corresponding date
+            var shiftToDelete = Context.Shifts.Include(s => s.Employee).FirstOrDefault(std => std.Id == id);
+            
+            // validation
+            if (shiftToDelete == null)
+            {
+                return NotifyErrorAndRedirect("De dienst kon niet worden gevonden", "Index", "Schedule");
+            }
+            if (shiftToDelete.Start < DateTime.Today)
+            {
+                return NotifyErrorAndRedirect("De dienst kan niet worden verwijderd, omdat deze in het verleden is.", "Index", "Schedule");
+            }
+            
+            // delete from database
+            try
+            {
+                Context.Shifts.Remove(shiftToDelete);
+                
+                if (shiftToDelete.Employee != null)
+                {
+                    Context.Notifications.Add(new Notification
+                    {
+                        Employee = shiftToDelete.Employee,
+                        Title =
+                            $"Dienst {shiftToDelete.Department.ToFriendlyString()} verwijderd - {shiftToDelete.Start.ToString("dd/MM/yyyy")}",
+                        Description =
+                            $"Je dienst op {shiftToDelete.Start.ToString("dd/MM/yyyy")} van {shiftToDelete.Start.ToString("HH:mm")} tot {shiftToDelete.End.ToString("HH:mm")} is verwijderd.",
+                        SentAt = DateTime.Now,
+                        HasBeenRead = false,
+                        ActionUrl = $"/Schedule?startDate={shiftToDelete.Start.ToString("dd/MM/yyyy")}"
+                    });   
+                }
+                
+                Context.SaveChanges();
+            }
+            catch
+            {
+                NotifyService.Error("Er is iets fout gegaan bij het verwijderen van de dienst. Probeer het opnieuw");
+                return RedirectToAction("Update", new { id = id });
+            }
+            
             NotifyService.Success("De dienst is verwijderd");
-            return RedirectToAction("Index", "Schedule", new { startDate = "2024-12-02" });
+            return RedirectToAction("Index", "Schedule", new { startDate = shiftToDelete.Start.ToString("dd/MM/yyyyy") });
         }
     }
 }
