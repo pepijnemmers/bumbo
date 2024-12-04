@@ -386,7 +386,7 @@ namespace BumboApp.Controllers
             }
             else {
                 maxTimeAvailable = (availability.EndTime - availability.StartTime).Hours;
-                if (maxTimeAvailable == 0)
+                if (maxTimeAvailable <= 0)
                 {
                     startinghour = availability.StartTime.Hour;
                     if (availability.StartTime.Minute > 0) { startinghour++; }
@@ -403,7 +403,7 @@ namespace BumboApp.Controllers
             if (maxhours.First() > 0)
             {
                 int endTime = maxhours.First() + startinghour;
-                if (endTime > 24) { endTime = 24; } //till closing or keep it like this
+                if (endTime > 23) { endTime = 23; } //till closing or keep it like this
                 if (department == Department.Kassa && endTime > cTime.Hour + 1) { return; }
                 Context.Add(
                     new Shift()
@@ -439,6 +439,7 @@ namespace BumboApp.Controllers
 
             if(availability != null)
             {
+                if ((availability.EndTime - availability.StartTime).Hours <= 0) { return false; }
                 availableFrom = availability.StartTime.Hour;
                 availableTill = availability.EndTime.Hour;
                 if (availability.StartTime.Minute > 0) { availableFrom++; }
