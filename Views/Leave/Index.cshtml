@@ -1,4 +1,207 @@
-﻿
+﻿@model BumboApp.ViewModels.LeaveRequestViewModel
+@using BumboApp.Views.Components
+@using Microsoft.Data.SqlClient
 @{
-    ViewData["Title"] = "Verlofaanvragen overzicht";
+    ViewData["Title"] = "Verlof en ziekmelden";
 }
+
+<div class="row align-items-center mb-3">
+    <div class="col">
+        <h3>Verlof</h3>
+    </div>
+
+    <div class="col-auto d-flex ms-auto">
+        @if (User.IsInRole(Role.Employee.ToString()))
+        {
+            <a asp-controller="Leave" asp-action="LeaveRequest" class="btn btn-primary d-inline-block me-2">Verlof aanvragen</a>
+        }
+        <select class="form-select w-auto" onchange="GoToStatus(this)">
+            <option value="all" selected="@(Model.SelectedStatus == null)">Alles</option>
+            <option value="@Status.Geaccepteerd" selected="@(Model.SelectedStatus == Status.Geaccepteerd)">Geaccepteerd</option>
+            <option value="@Status.Afgewezen" selected="@(Model.SelectedStatus == Status.Afgewezen)">Afgewezen</option>
+            <option value="@Status.Aangevraagd" selected="@(Model.SelectedStatus == Status.Aangevraagd)">Aangevraagd</option>
+        </select>
+    </div>
+     
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th><a asp-controller="Leave" asp-action="Index" asp-route-OrderBy="@(ViewBag.OrderBy == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending)" class="text-dark">
+                    Begin datum
+                    <img width="20px" src="~/img/chevron-@(ViewBag.OrderBy == SortOrder.Ascending ? "down" : "up").svg" alt="Arrow" />
+                </a>
+                </th>
+                <th>Eind datum</th>
+                <th class="leaveRequestReason">Reden</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.LeaveRequestsForPage.Count > 0)
+            {
+                foreach (var request in Model.LeaveRequestsForPage)
+                {
+                    <tr>
+                        <td>@request.StartDate</td>
+                        <td>@request.EndDate</td>
+                        <td class="leaveRequestReason">@request.Reason</td>
+                        <td>
+                            @switch (request.Status)
+                            {
+                                case Status.Afgewezen:
+                                    <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger d-inline-flex align-items-center">
+                                        @request.Status
+                                    </span>
+                                    break;
+                                case Status.Geaccepteerd:
+                                    <span class="badge rounded-pill bg-success bg-opacity-10 text-success d-inline-flex align-items-center">
+                                        @request.Status
+                                    </span>
+                                    break;
+                                default:
+                                    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary d-inline-flex align-items-center">
+                                        @request.Status
+                                    </span>
+                                    break;
+                            }
+                            @if (User.IsInRole(Role.Manager.ToString()))
+                            {
+                                if (request.Status == Status.Aangevraagd)
+                                {
+                                    <a asp-controller="Leave" asp-action="LeaveRequest" asp-route-id="@(request.Id)">
+                                        <img width="20px" height="auto" src="~/img/details-icon.svg" alt="Alternate Text" />
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Leave" asp-action="LeaveRequest" asp-route-id="@(request.Id)">
+                                        <img width="20px" src="~/img/update-icon.svg" alt="Alternate Text" />
+                                    </a>
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="100%" class="text-center">Er zijn geen verlofverzoeken</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (ViewBag.MaxPages > 1)
+    {
+        <Component type="typeof(Pagination)"
+            render-mode="ServerPrerendered"
+            param-PageNumber="ViewBag.PageNumber"
+            param-MaxPages="ViewBag.MaxPages" />
+    }
+</div>
+
+<div class="row align-items-center mb-3">
+    <div class="col">
+        <h3>Ziekmeldingen</h3>
+    </div>
+
+    <div class="col-auto">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sickLeaveModal">Nieuwe ziekmelding</button>
+    </div>
+
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Werknemer</th>
+                <th>Datum</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null)
+            {
+                foreach (var sickLeave in Model.SickLeaves)
+                {
+                    <tr>
+                        <td>@sickLeave.Employee.FirstName @sickLeave.Employee.LastName</td>
+                        <td>@sickLeave.Date</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    @if (ViewBag.MaxPages > 1)
+    {
+        <Component type="typeof(Pagination)"
+                   render-mode="ServerPrerendered"
+                   param-PageNumber="ViewBag.PageNumber"
+                   param-MaxPages="ViewBag.MaxPages" />
+    }
+</div>
+
+<div class="modal fade align-content-center" id="sickLeaveModal" tabindex="-1" aria-labelledby="sickLeave" aria-hidden="true">
+    <div class="modal-dialog">
+        <form asp-action="CreateSickLeave" asp-controller="Leave" method="post">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="newSickLeave">Nieuwe ziekmelding</h1>
+            </div>
+            <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="date" class="col-form-label">Datum</label>
+                        <input type="date" class="form-control" id="date" name="date" placeholder="Datum" onchange="checkDate()" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" required>
+                    </div>
+                    @if (User.IsInRole(Role.Manager.ToString()))
+                    {
+                        <div class="mb-3">
+                            <label for="Employee" class="col-form-label">Werknemer</label>
+                            <select class="form-select" id="employeeSelect" aria-label="Employee" onchange="updateEmployeeNumber()" required>
+                                <option value="" disabled selected>Selecteer werknemer</option>
+
+                                @foreach (var employee in Model.AllEmployees)
+                                {
+                                    <option value="@employee.EmployeeNumber">@employee.FirstName @employee.LastName</option>
+                                }
+                            </select>
+                        </div>
+
+                        <input type="hidden" id="EmployeeNumber" name="EmployeeNumber" value="">
+
+                    }
+                    else
+                    {
+                        <input type="hidden" name="Employee" value="@Model.LoggedInEmployee"/>
+                        <input type="hidden" name="EmployeeNumber" value="@Model.LoggedInEmployee.EmployeeNumber"/>
+                    }
+
+            </div>
+            <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" id="sickLeaveCreateButton" class="btn btn-primary">Ziekmelden</button>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function GoToStatus(select) {
+        const url = new URL(window.location.href);
+        if (select.value.toLowerCase() === "all") {
+            url.searchParams.delete("selectedStatus");
+        } else {
+            url.searchParams.set("selectedStatus", select.value);
+        }
+        location.href = url;
+    }
+
+    function updateEmployeeNumber() {
+        const selectedEmployeeNumber = document.getElementById('employeeSelect').value;
+        document.getElementById('EmployeeNumber').value = selectedEmployeeNumber;
+    }
+</script>
