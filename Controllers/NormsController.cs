@@ -1,14 +1,20 @@
 ﻿using BumboApp.Models;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace BumboApp.Controllers
 {
     public class NormsController : MainController
     {
         private int _amountOfNormsInSet = 5;
+        
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+            CheckPageAccess(Role.Manager);
+        }
+        
         public IActionResult Index(int? page)
         {
             List<Norm> norms = Context.Norms.OrderByDescending(n => n.CreatedAt).Skip(_amountOfNormsInSet).ToList();

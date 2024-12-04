@@ -15,10 +15,10 @@ namespace BumboApp.Models
         [Required]
         public DateOnly Date { get; set; }
 
-        [Required]
+        [Required, Range(0, int.MaxValue)]
         public int ExpectedCustomers { get; set; }
 
-        [Required]
+        [Required, Range(0, int.MaxValue)]
         public int ExpectedCargo { get; set; }
     }
 }

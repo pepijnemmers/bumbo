@@ -1,0 +1,60 @@
+﻿@model List<BumboApp.ViewModels.EmployeeIndexViewModel>
+@using System.Globalization
+@using BumboApp.Views.Components
+@using Microsoft.Data.SqlClient
+@{
+    ViewData["Title"] = "Werknemers";
+}
+
+<div class="row align-items-center mb-3">
+    <div class="col">
+        <h2>Werknemers</h2>
+    </div>
+    <div class="col-auto">
+        <a asp-controller="Employees" asp-action="Create" class="btn btn-primary d-inline-block">Nieuwe werknemer</a>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Personeelnummer</th>
+                <th>Naam </th>
+                <th>Rol</th>
+                <th>Acties</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="100" class="text-center">Er zijn geen Werknemers</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var employee in Model)
+                {
+                    <tr>
+                        <td>@employee.Id</td>
+                        <td>@employee.Name</td>
+                        <td>@employee.Role</td>
+                        <td>
+                            <a asp-controller="Employees" asp-action="details" asp-route-id="@employee.Id">
+                                <img width="20px" height="auto" src="~/img/details-icon.svg" alt="Alternate Text" />
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    @if (ViewBag.MaxPages > 1)
+    {
+        <Component type="typeof(Pagination)"
+                   render-mode="ServerPrerendered"
+                   param-PageNumber="ViewBag.PageNumber"
+                   param-MaxPages="ViewBag.MaxPages" />
+    }
+</div>

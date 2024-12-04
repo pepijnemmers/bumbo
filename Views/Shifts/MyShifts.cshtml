@@ -1,0 +1,117 @@
+﻿@{
+    ViewData["Title"] = "Mijn diensten";
+}
+
+<h5><strong>Deze week (@ViewBag.StartOfWeek.ToString("dd-MM-yyyy") - @ViewBag.EndOfWeek.ToString("dd-MM-yyyy"))</strong></h5>
+@if (ViewBag.ShiftsThisWeek != null && ViewBag.ShiftsThisWeek.Count != 0)
+{
+    @foreach (var shift in ViewBag.ShiftsThisWeek)
+    {
+        <div class="col-12 mb-3">
+            <div class="card w-100">
+                <div class="card-body d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center">
+                    <div>
+                        <h6 class="card-title">
+                            <strong>Dienst @shift.Department</strong>
+                        </h6>
+                        <p class="card-text">
+                            @shift.Start.ToString("dd-MM-yyyy")
+                            @shift.Start.ToString("HH:mm") -
+                            @shift.End.ToString("HH:mm")
+                        </p>
+                    </div>
+                    @if (ViewBag.TakenOverShiftsThisWeek.Contains(shift))
+                    {
+                        <div class="bg-secondary text-white rounded-pill px-3 py-2 mt-3 mt-sm-0">
+                            Overname aangevraagd
+                        </div>
+                    }
+                    else
+                    {
+                        <a asp-controller="TakeOver" asp-action="EmployeeTakeOverRequest" asp-route-shiftId="@shift.Id" class="btn btn-outline-dark mt-3 mt-sm-0">Overname vragen</a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <p>Er zijn geen diensten in de rest van de week.</p>
+}
+
+<h5><strong>Deze maand (@ViewBag.EndOfWeek.AddDays(1).ToString("dd-MM-yyyy") - @ViewBag.EndOfMonth.ToString("dd-MM-yyyy"))</strong></h5>
+@if (ViewBag.ShiftsThisMonth != null && ViewBag.ShiftsThisMonth.Count != 0)
+{
+    @foreach (var shift in ViewBag.ShiftsThisMonth)
+    {
+        <div class="col-12 mb-3">
+            <div class="card w-100">
+                <div class="card-body d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center">
+                    <div>
+                        <h6 class="card-title">
+                            <strong>Dienst @shift.Department</strong>
+                        </h6>
+                        <p class="card-text">
+                            @shift.Start.ToString("dd-MM-yyyy")
+                            @shift.Start.ToString("HH:mm") -
+                            @shift.End.ToString("HH:mm")
+                        </p>
+                    </div>
+                    @if (ViewBag.TakenOverShiftsThisMonth.Contains(shift))
+                    {
+                        <div class="bg-secondary text-white rounded-pill px-3 py-2 mt-3 mt-sm-0">
+                            Overname aangevraagd
+                        </div>
+                    }
+                    else
+                    {
+                        <a asp-controller="TakeOver" asp-action="EmployeeTakeOverRequest" asp-route-shiftId="@shift.Id" class="btn btn-outline-dark mt-3 mt-sm-0">Overname vragen</a>
+                    }
+                 </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <p>Er zijn geen diensten in de rest van de maand.</p>
+}
+
+<h5><strong>Vanaf @ViewBag.EndOfMonth.AddDays(1).ToString("dd-MM-yyyy")</strong></h5>
+@if (ViewBag.ShiftsLater != null && ViewBag.ShiftsLater.Count != 0)
+{
+    @foreach (var shift in ViewBag.ShiftsLater)
+    {
+        <div class="col-12 mb-3">
+            <div class="card w-100">
+                <div class="card-body d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center">
+                    <div>
+                        <h6 class="card-title">
+                            <strong>Dienst @shift.Department</strong>
+                        </h6>
+                        <p class="card-text">
+                            @shift.Start.ToString("dd-MM-yyyy")
+                            @shift.Start.ToString("HH:mm") -
+                            @shift.End.ToString("HH:mm")
+                        </p>
+                    </div>
+                    @if (ViewBag.TakenOverShiftsLater.Contains(shift))
+                    {
+                        <div class="bg-secondary text-white rounded-pill px-3 py-2 mt-3 mt-sm-0">
+                            Overname aangevraagd
+                        </div>
+                    }
+                    else
+                    {
+                        <a asp-controller="TakeOver" asp-action="EmployeeTakeOverRequest" asp-route-shiftId="@shift.Id" class="btn btn-outline-dark mt-3 mt-sm-0">Overname vragen</a>
+                    }
+                 </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <p>Er zijn nog geen latere diensten.</p>
+}

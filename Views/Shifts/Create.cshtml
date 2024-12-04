@@ -1,0 +1,61 @@
+﻿@model BumboApp.ViewModels.CreateUpdateShiftViewModel
+@{
+    ViewData["Title"] = "Dienst aanmaken";
+}
+
+<div class="table-container p-3">
+    <form asp-action="Create" asp-controller="Shifts" method="post">
+        <div class="form-group mb-2">
+            <label for="date" class="form-label fw-bold">Datum</label>
+            <input type="date" class="form-control" id="date" name="date" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" value="@(Model.SelectedDate.HasValue ? Model.SelectedDate.Value.ToString("yyyy-MM-dd") : String.Empty)" required>
+        </div>
+        <div class="row">
+            <div class="form-group mb-2 col">
+                <label for="start" class="form-label fw-bold">Starttijd</label>
+                <input type="time" step="3600" class="form-control" id="start" name="start" value="@(Model.SelectedStartHour.HasValue ? Model.SelectedStartHour.Value : string.Empty)" required>
+                <p class="small text-secondary">Alleen hele uren zijn toegestaan.</p>
+            </div>
+            <div class="form-group mb-2 col">
+                <label for="end" class="form-label fw-bold">Eindtijd</label>
+                <input type="time" step="3600" class="form-control" id="end" name="end" required>
+                <p class="small text-secondary">Alleen hele uren zijn toegestaan.</p>
+            </div>
+        </div>
+        <div class="form-group mb-2">
+            <label for="department" class="form-label fw-bold">Afdeling</label>
+            <select class="form-select" id="department" name="department" placeholder="Selecteer een afdeling" required>
+                <option>Selecteer een afdeling</option>
+                @foreach (var department in Model.Departments)
+                {
+                    <option value="@department" selected="@(Model.SelectedDepartment == department)">
+                        @department.ToFriendlyString()
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="form-group mb-2">
+            <label for="employee" class="form-label fw-bold">Werknemer</label>
+            <select class="form-select" id="employee" name="employee" required>
+                <option value="0" selected>Geen werknemer</option>
+                @foreach (var employee in Model.Employees)
+                {
+                    <option value="@employee.EmployeeNumber">@employee.FirstName @employee.LastName</option>
+                }
+            </select>
+            <p class="small text-secondary">
+                <i class="fas fa-info-circle"></i>
+                Als er geen werknemer is geselecteerd, wordt de dienst als open dienst aangemaakt.
+            </p>
+        </div>
+        <div class="form-group mb-2">
+            <p class="form-label fw-bold">Status</p>
+            <input type="radio" id="isFinal" name="isFinal" value="true" checked>
+            <label for="isFinal" class="form-label fw-normal me-2">Definitief</label>
+            <input type="radio" id="isConcept" name="isFinal" value="false">
+            <label for="isConcept" class="form-label fw-normal">Concept</label>
+        </div>
+        <div class="text-end">
+            <button class="btn btn-primary px-3" type="submit">Dienst aanmaken</button>
+        </div>
+    </form>
+</div>
