@@ -12,7 +12,7 @@
         <div class="row">
             <div class="form-group mb-2 col">
                 <label for="start" class="form-label fw-bold">Starttijd</label>
-                <input type="time" step="3600" class="form-control" id="start" name="start" value="@(Model.SelectedStartHour.HasValue ? Model.SelectedStartHour.Value.ToString("hh:mm") : String.Empty)" required>
+                <input type="time" step="3600" class="form-control" id="start" name="start" value="@(Model.SelectedStartHour.HasValue ? Model.SelectedStartHour.Value : string.Empty)" required>
                 <p class="small text-secondary">Alleen hele uren zijn toegestaan.</p>
             </div>
             <div class="form-group mb-2 col">
@@ -34,9 +34,9 @@
             </select>
         </div>
         <div class="form-group mb-2">
-            <label for="employee" class="form-label fw-bold">Medewerker</label>
+            <label for="employee" class="form-label fw-bold">Werkgever</label>
             <select class="form-select" id="employee" name="employee" required>
-                <option value="0" selected>Geen medewerker</option>
+                <option value="0" selected>Geen werkgever</option>
                 @foreach (var employee in Model.Employees)
                 {
                     <option value="@employee.EmployeeNumber">@employee.FirstName @employee.LastName</option>
@@ -44,7 +44,7 @@
             </select>
             <p class="small text-secondary">
                 <i class="fas fa-info-circle"></i>
-                Als er geen medewerker is geselecteerd, wordt de dienst als open dienst aangemaakt.
+                Als er geen werkgever is geselecteerd, wordt de dienst als open dienst aangemaakt.
             </p>
         </div>
         <div class="form-group mb-2">
