@@ -372,29 +372,42 @@ namespace BumboApp.Controllers
         {
             Availability? availability = employee.Availabilities.Where(e => e.Date == scheduledate).FirstOrDefault();
             OpeningHour? openingHour = Context.OpeningHours.Where(e => e.WeekDay == scheduledate.DayOfWeek).FirstOrDefault();
-            int startinghour;
+            int startingHour;
             int maxTimeAvailable;
-            if(openingHour == null) { return; }
+
+            LeaveRequest? leaveRequest = Context.LeaveRequests.Where(lr => lr.Employee == employee && lr.Status == Status.Geaccepteerd)
+               .FirstOrDefault(lr => lr.StartDate.Date == scheduledate.ToDateTime(new TimeOnly()) && lr.EndDate >= scheduledate.ToDateTime(new TimeOnly()));
+
+            if (openingHour == null) { return; }
 
             TimeOnly oTime = openingHour.OpeningTime.GetValueOrDefault();
             TimeOnly cTime = openingHour.ClosingTime.GetValueOrDefault();
             if (oTime.Hour == cTime.Hour) return;
             if (availability == null)
             {
-                startinghour = oTime.Hour;
+                startingHour = oTime.Hour;
                 maxTimeAvailable = _maxShiftLengthAdult;
             }
-            else {
+            else 
+            {
                 maxTimeAvailable = (availability.EndTime - availability.StartTime).Hours;
                 if (maxTimeAvailable <= 0)
                 {
-                    startinghour = availability.StartTime.Hour;
-                    if (availability.StartTime.Minute > 0) { startinghour++; }
+                    startingHour = availability.StartTime.Hour;
+                    if (availability.StartTime.Minute > 0) { startingHour++; }
                 }
                 else { return; }
-                }
+            }
 
-            int maxTimeCAO = getMaxTimeCAO(employee, department, startDate, scheduledate, startinghour);
+            if (leaveRequest != null)
+            {
+                if (startingHour > leaveRequest.StartDate.Hour)
+                {
+                    if (startingHour < (leaveRequest.EndDate.Minute > 0 ? leaveRequest.EndDate.Hour + 1 : leaveRequest.EndDate.Hour)) { return; }
+                }
+            }
+
+            int maxTimeCAO = getMaxTimeCAO(employee, department, startDate, scheduledate, startingHour);
             int maxTimePrognose = getMaxTimePrognose(department, scheduledate);
             int maxTimeContract = getMaxTimeContract(employee, startDate, scheduledate);
             List<int> maxhours = new List<int> { maxTimeCAO, maxTimePrognose, maxTimeContract,maxTimeAvailable };
@@ -402,7 +415,12 @@ namespace BumboApp.Controllers
 
             if (maxhours.First() > 0)
             {
-                int endTime = maxhours.First() + startinghour;
+                int endTime = maxhours.First() + startingHour;
+                if(leaveRequest != null && leaveRequest.StartDate.Hour > startingHour)
+                {
+                    if(leaveRequest.StartDate.Hour < endTime) { endTime = leaveRequest.StartDate.Hour; }
+                }
+                if (startingHour >= endTime) { return; }
                 if (endTime > 23) { endTime = 23; } //till closing or keep it like this
                 if (department == Department.Kassa && endTime > cTime.Hour + 1) { return; }
                 Context.Add(
@@ -410,7 +428,7 @@ namespace BumboApp.Controllers
                     {
                         Department = department,
                         Employee = employee,
-                        Start = scheduledate.ToDateTime(new TimeOnly(startinghour, 00, 00)),
+                        Start = scheduledate.ToDateTime(new TimeOnly(startingHour, 00, 00)),
                         End = scheduledate.ToDateTime(new TimeOnly(endTime, 00, 00)),
                         IsFinal = false
                     });
@@ -429,12 +447,19 @@ namespace BumboApp.Controllers
             int availableFrom;
             int availableTill;
             OpeningHour? openingHour = Context.OpeningHours.FirstOrDefault(e => e.WeekDay == scheduledate.DayOfWeek);
+
+            LeaveRequest? leaveRequest = Context.LeaveRequests.Where(lr => lr.Employee == employee && lr.Status == Status.Geaccepteerd)
+                .FirstOrDefault(lr => lr.StartDate.Date == scheduledate.ToDateTime(new TimeOnly()) && lr.EndDate >= scheduledate.ToDateTime(new TimeOnly()));
+
             if (openingHour == null) { return false; }
             TimeOnly cTime = openingHour.ClosingTime.GetValueOrDefault();
             int startingHour = getNextEmptySpot(department, scheduledate);
             int closingHour = cTime.Hour;
             if (cTime.Minute > 0) { closingHour++; }
-
+            if (leaveRequest != null) 
+            {
+                if (startingHour > leaveRequest.StartDate.Hour) { return false; } ;
+            }
 
 
             if(availability != null)
@@ -468,6 +493,8 @@ namespace BumboApp.Controllers
             if (maxhours.First() > 0)
             {
                 int endTime = maxhours.First() + startingHour;
+                if (leaveRequest != null && endTime >= leaveRequest.StartDate.Hour) { endTime = leaveRequest.StartDate.Hour; }
+                if (endTime > 23 || endTime <= startingHour) { return false; }
                 Context.Add(
                     new Shift()
                     {
