@@ -220,12 +220,11 @@ namespace BumboApp.Controllers
                 {
                     Context.Notifications.Add(new Notification
                     {
-                        // TODO: gives error
                         Employee = employee,
                         Title =
                             $"Dienst {shift.Department.ToFriendlyString()} toegevoegd - {shift.Start.ToString("dd/MM/yyyy")}",
                         Description =
-                            $"Er is een dienst voor jou toegevoegd op {shift.Start.ToString("dd/MM/yyyy")} van {shift.Start.ToString("HH:mm")} tot {shift.End.ToString("HH:mm")}",
+                            $"Er is een dienst voor jou toegevoegd op {shift.Start.ToString("dd/MM/yyyy")}.",
                         SentAt = DateTime.Now,
                         HasBeenRead = false,
                         ActionUrl = $"/Schedule?startDate={shift.Start.ToString("dd/MM/yyyy")}"
