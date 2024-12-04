@@ -493,7 +493,11 @@ namespace BumboApp.Controllers
             if (maxhours.First() > 0)
             {
                 int endTime = maxhours.First() + startingHour;
-                if (leaveRequest != null && endTime >= leaveRequest.StartDate.Hour) { endTime = leaveRequest.StartDate.Hour; }
+                if (leaveRequest != null && leaveRequest.StartDate.Hour > startingHour)
+                {
+                    if (leaveRequest.StartDate.Hour < endTime) { endTime = leaveRequest.StartDate.Hour; }
+                }
+                if (startingHour >= endTime) { return false; }
                 if (endTime > 23 || endTime <= startingHour) { return false; }
                 Context.Add(
                     new Shift()
@@ -501,7 +505,7 @@ namespace BumboApp.Controllers
                         Department = department,
                         Employee = employee,
                         Start = scheduleDate.ToDateTime(new TimeOnly(startingHour, 00, 00)),
-                        End = scheduleDate.ToDateTime(new TimeOnly(startingHour + maxhours.First(), 00, 00)),
+                        End = scheduleDate.ToDateTime(new TimeOnly(endTime, 00, 00)),
                         IsFinal = false
                     });
                 try
