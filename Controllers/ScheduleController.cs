@@ -557,13 +557,9 @@ namespace BumboApp.Controllers
             {
                 return 0;
             }
-            float MissingHours = prognosis.NeededHours - GetWorkingHours(departmentDayShifts);
-            foreach (int time in _breakTimes)
-            {
-                MissingHours += _breakTimeHours;
-            }
-
-            return (int)Math.Ceiling(MissingHours);
+            int missingHours = (int)Math.Ceiling(prognosis.NeededHours - GetWorkingHours(departmentDayShifts)- _breakTimes.Sum(time => _breakTimeHours));
+            
+            return missingHours;
         }
 
         private int getMaxTimeCAO(Employee employee,Department department, DateOnly startDate, DateOnly scheduledate, int startinghour)
@@ -597,7 +593,7 @@ namespace BumboApp.Controllers
                 if(!((scheduledate.ToDateTime(new TimeOnly()) - startDate.ToDateTime(new TimeOnly())).Days < _maxWorkingDaysUnderSixteen))
                 {
                     int workingDays = 0;
-                    for(DateTime day = startDate.ToDateTime(new TimeOnly()); startDate <= scheduledate; day.AddDays(1))
+                    for(DateTime day = startDate.ToDateTime(new TimeOnly()); startDate <= scheduledate; day = day.AddDays(1))
                     {
                         if(workingShiftsThisWeek.Where(e => e.Start.Date == day.Date).Any())
                         {
@@ -606,7 +602,7 @@ namespace BumboApp.Controllers
                     }
                     if(workingDays >= _maxWorkingDaysUnderSixteen || department == Department.Kassa) { return 0; }
                 }
-                if (!employee.SchoolSchedules.Where(e => e.Date >= startDate && e.Date <= startDate.AddDays(6)).Any()) // magic number
+                if (!employee.SchoolSchedules.Where(e => e.Date >= startDate && e.Date <= startDate.AddDays(6)).Any())
                 {
                     maxWeekHours = _maxWeeklyHoursSchoolweekUnderSixteen - workingHours;
                     maxTimeWithSchoolHours = _maxHoursWithSchoolUnderSixteen;
@@ -647,6 +643,9 @@ namespace BumboApp.Controllers
                     maxTimeWithSchoolHours = _maxHoursWithSchoolAlmostAdult - GetSchoolHours(scheduledate, employee) - GetWorkingHours(workingShiftsThisWeek.
                     Where(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly())));
                 }
+                hours.Add(maxTimeWithSchoolHours);
+                hours.Add(maxhoursWithAverage);
+                hours.Add(maxAllowedHours);
             }
             hours.Sort();
             return hours.First();
@@ -654,7 +653,7 @@ namespace BumboApp.Controllers
 
         private int GetSchoolHours(DateOnly scheduledate, Employee employee)
         {
-            SchoolSchedule schedule = employee.SchoolSchedules.Where(e => e.Date == scheduledate).First();
+            SchoolSchedule? schedule = employee.SchoolSchedules.FirstOrDefault(e => e.Date == scheduledate);
             if (schedule == null) { return 0; }
             else
             {
