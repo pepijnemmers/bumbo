@@ -15,11 +15,11 @@
         <div class="d-flex align-items-lg-center justify-content-between flex-column flex-lg-row mb-3">
             <h3 class="fst-italic text-secondary">Concept rooster</h3>
             <div class="buttons">
-                <a class="btn btn-outline-danger d-block d-lg-inline-block mt-2 mt-lg-0">
+                <button class="btn btn-outline-danger d-block d-lg-inline-block mt-2 mt-lg-0" data-bs-toggle="modal" data-bs-target="#delete-week-modal">
                     <i class="fas fa-trash-alt"></i>
                     Concept week verwijderen
-                </a>
-                <a class="btn btn-success d-block d-lg-inline-block mt-2 mb-3 my-lg-0">
+                </button>
+                <a asp-controller="Schedule" asp-action="PublishWeek" asp-route-weekNumber="@Model.WeekNumber" asp-route-year="@Model.SelectedStartDate.Year" class="btn btn-success d-block d-lg-inline-block mt-2 mb-3 my-lg-0">
                     <i class="fas fa-check"></i>
                     Week publiceren
                 </a>
@@ -526,7 +526,7 @@ else
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuleren</button>
-                    <a class="btn btn-danger" asp-controller="Schedule" asp-action="DeleteWeek" asp-route-startDay="@Model.SelectedStartDate">
+                    <a class="btn btn-danger" asp-controller="Schedule" asp-action="DeleteWeek" asp-route-weekNumber="@Model.WeekNumber" asp-route-year="@Model.SelectedStartDate.Year">
                         Verwijderen
                     </a>
                 </div>
