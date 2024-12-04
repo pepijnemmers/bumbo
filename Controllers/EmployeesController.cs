@@ -89,7 +89,7 @@ namespace BumboApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(UserEmployeeViewModel viewModel)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || viewModel.Role.Equals(Role.Unknown))
             {
                 return View(viewModel);
             }
@@ -100,6 +100,8 @@ namespace BumboApp.Controllers
                 NotifyService.Error("Er is iets mis gegaan met het maken ivm de Rol"); //Gebeurt als het goed is nooit
                 return View(viewModel);
             }
+
+
 
             var user = new User
             {
@@ -116,7 +118,6 @@ namespace BumboApp.Controllers
             await _userManager.CreateAsync(user);
             await _userManager.AddToRoleAsync(user, viewModel.Role.ToString());
 
-
             var employee = new Employee
             {
                 FirstName = viewModel.FirstName,
@@ -126,8 +127,21 @@ namespace BumboApp.Controllers
                 HouseNumber = viewModel.HouseNumber,
                 ContractHours = viewModel.ContractHours,
                 LeaveHours = viewModel.LeaveHours,
-                UserId = user.Id
+                UserId = user.Id,
+                StandardAvailability = new List<StandardAvailability>()
             };
+            if (viewModel.Role == Role.Employee)
+            {
+                foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
+                {
+                    employee.StandardAvailability.Add(new StandardAvailability
+                    {
+                        Day = day,
+                        StartTime = new TimeOnly(9, 0),
+                        EndTime = new TimeOnly(21, 0),
+                    });
+                }
+            }
 
             Context.Employees.Add(employee);
             await Context.SaveChangesAsync();
