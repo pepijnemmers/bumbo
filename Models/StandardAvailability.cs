@@ -1,18 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace BumboApp.Models
 {
-    public class Availability
+    public class StandardAvailability
     {
-        public DateOnly Date { get; set; }
         [Required]
         public int EmployeeNumber { get; set; }
-        public Employee? Employee { get; set; }
-
+        [Required]
+        public DayOfWeek Day { get; set; }
         [Required]
         public TimeOnly StartTime { get; set; }
         [Required]
         public TimeOnly EndTime { get; set; }
+
+        //Navigational property
+        public Employee? Employee { get; set; }
     }
 }
