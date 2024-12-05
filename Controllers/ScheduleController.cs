@@ -385,8 +385,17 @@ namespace BumboApp.Controllers
             if (oTime.Hour == cTime.Hour) return;
             if (availability == null)
             {
-                startingHour = oTime.Hour;
-                maxTimeAvailable = MaxShiftLengthAdult;
+                Models.StandardAvailability? standardAvailability = Context.StandardAvailabilities.FirstOrDefault(e => e.Employee == employee);
+                if (standardAvailability == null)
+                {
+                    startingHour = oTime.Hour;
+                    maxTimeAvailable = MaxShiftLengthAdult;
+                }
+                else
+                {
+                    startingHour = (standardAvailability.StartTime.Minute > 0 ? standardAvailability.StartTime.Hour + 1 : standardAvailability.StartTime.Hour);
+                    maxTimeAvailable = (standardAvailability.EndTime - new TimeOnly(startingHour, 00, 00)).Hours;
+                }
             }
             else 
             {
@@ -460,10 +469,6 @@ namespace BumboApp.Controllers
             {
                 if (startingHour > leaveRequest.StartDate.Hour) { return false; } ;
             }
-            if (availability == null)
-            {
-                
-            }
 
             if(availability != null)
             {
@@ -480,8 +485,17 @@ namespace BumboApp.Controllers
             }
             else
             {
-                availableFrom = 0;
-                availableTill = 23;
+                StandardAvailability? standardAvailability = Context.StandardAvailabilities.FirstOrDefault(e => e.Employee == employee && e.Day == scheduleDate.DayOfWeek);
+                if(standardAvailability != null)
+                {
+                    availableFrom = (standardAvailability.StartTime.Minute > 0 ? standardAvailability.StartTime.Hour + 1 : standardAvailability.StartTime.Hour);
+                    availableTill = standardAvailability.EndTime.Hour;
+                }
+                else
+                {
+                    availableFrom = 0;
+                    availableTill = 23;
+                }
             }
 
             int maxTimeCao = GetMaxTimeCao(employee, department, startDate, scheduleDate, startingHour);
