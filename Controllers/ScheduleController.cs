@@ -149,9 +149,9 @@ namespace BumboApp.Controllers
             {
                 if (managers.Contains(e)) continue;
                 if (e.ContractHours >
-                    GetWorkingHours(e.Shifts.Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly())
-                    && e.End.Date <= endDate.ToDateTime(new TimeOnly())).ToList()) && 
-                    GetUserRoleAsync(e.User.Id).Result == Role.Manager)
+                    GetWorkingHours(e.Shifts.Where(em => em.Start.Date >= startDate.ToDateTime(new TimeOnly())
+                    && em.End.Date <= endDate.ToDateTime(new TimeOnly())).ToList()) && 
+                    GetUserRoleAsync(e.User.Id).Result != Role.Manager)
                 {
                     string name = e.FirstName + " " + e.LastName + " ";
                     foreach (Employee m in managers)
