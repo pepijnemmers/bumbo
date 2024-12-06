@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BumboApp.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace BumboApp.ViewModels
 {
@@ -6,10 +7,10 @@ namespace BumboApp.ViewModels
     {
         public int EmployeeNumber { get; set; }
         [Required]
-        [StringLength(255)]
+        [StringLength(20)]
         public string FirstName { get; set; }
         [Required]
-        [StringLength(255)]
+        [StringLength(20)]
         public string LastName { get; set; }
         [Required]
         public DateOnly DateOfBirth { get; set; }
@@ -19,14 +20,22 @@ namespace BumboApp.ViewModels
         public string Zipcode { get; set; }
         [Required]
         [StringLength(10)]
+        [RegularExpression(@"^[0-9]+[A-Za-z]*$", ErrorMessage = "Huisnummer moet beginnen met een cijfer en (optioneel) eindigen met letters")]
         public string HouseNumber { get; set; }
         [Required, Range(0, 55)]
         public int ContractHours { get; set; }
-        [Required, Range(0, 255)]
+        [Required, Range(0, 120)]
         public int LeaveHours { get; set; }
         [Required]
         public DateOnly StartOfEmployment { get; set; }
         public DateOnly? EndOfEmployment { get; set; }
+        [Required]
+        [RegularExpression(@"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$",
+            ErrorMessage = "Please enter a valid email address.")]
         public string Email { get; set; }
+        public Role Role { get; set; }
+
+        //Voor niet editen van je eigen rol, om te behouden na !Modelstate.IsValid (ViewData gaat hierbij verloren)
+        public bool IsOwner { get; set; }
     }
 }

@@ -22,12 +22,13 @@
         </div>
 
         <div>
-            <label asp-for="Role" class="control-label">Functie</label>
-            <select asp-for="Role" class="form-control">
+            <label asp-for="@Model.Role" class="control-label">Functie</label>
+            <select class="form-select" asp-for="Role" class="form-control">
+                <option value="@Role.Unknown" disabled selected>Selecteer medewerker</option>
                 <option value="@Role.Manager">Manager</option>
-                <option value="@Role.Employee">Employee</option>
+                <option value="@Role.Employee">Werknemer</option>
             </select>
-            <span asp-validation-for="Role" class="text-danger"></span>
+            <span asp-validation-for="@Model.Role" class="text-danger"></span>
         </div>
     </div>
 
@@ -40,8 +41,8 @@
         </div>
 
         <div class="form-group">
-            <label asp-for="@Model.LastName" class="control-label">Achternaam</label>
-            <input asp-for="@Model.LastName" class="form-control" placeholder="van den Bos" />
+            <label asp-for="@Model.LastName" class="control-label">Achternaam + tussenvoegsel</label>
+            <input asp-for="@Model.LastName" class="form-control" />
             <span asp-validation-for="@Model.LastName" class="text-danger"></span>
         </div>
 

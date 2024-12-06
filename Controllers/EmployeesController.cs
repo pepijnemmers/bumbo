@@ -147,14 +147,16 @@ namespace BumboApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Update(int id)
+        public async Task<IActionResult> Update(int id)
         {
-
             var employee = Context.Employees
                 .Include(e => e.User)
                 .Include(e => e.leaveRequests)
                 .SingleOrDefault(e => e.EmployeeNumber == id);
 
+            var employeeRole = await GetUserRoleAsync(employee.User.Id);
+
+            //ViewData["isOwner"] = ;
             var model = new EmployeeUpdateViewModel
             {
                 EmployeeNumber = employee.EmployeeNumber,
@@ -166,8 +168,13 @@ namespace BumboApp.Controllers
                 ContractHours = employee.ContractHours,
                 LeaveHours = employee.LeaveHours,
                 StartOfEmployment = employee.StartOfEmployment,
-                Email = employee.User.Email
+                Email = employee.User.Email,
+                Role = employeeRole,
+
+                IsOwner = LoggedInUserId == employee.User.Id
             };
+
+
 
             return View(model);
         }
@@ -186,10 +193,22 @@ namespace BumboApp.Controllers
 
             if (employee == null)
             {
-                return NotFound();
+                NotifyService.Error("Er is iets misgegaan");
+                return View(model);
+            }
+            var user = employee.User;
+            if (user == null)
+            {
+                NotifyService.Error("Er is iets misgegaan");
+                return View(model);
             }
 
+            //Username consistent houden tussen employee en user (is nodig voor verlof en ziek)
+            user.UserName = model.FirstName;
+            user.NormalizedUserName = model.FirstName;
             employee.FirstName = model.FirstName;
+
+
             employee.LastName = model.LastName;
             employee.DateOfBirth = model.DateOfBirth;
             employee.Zipcode = model.Zipcode;
@@ -198,7 +217,17 @@ namespace BumboApp.Controllers
             employee.LeaveHours = model.LeaveHours;
             employee.StartOfEmployment = model.StartOfEmployment;
             employee.EndOfEmployment = model.EndOfEmployment;
-            employee.User.Email = model.Email;
+            user.Email = model.Email;
+            user.NormalizedEmail = model.Email;
+
+            //TODO dit werkt niet, multiple tracking exception
+            var employeerole = await GetUserRoleAsync(user.Id);
+            if (!employeerole.Equals(model.Role))
+            {
+                await _userManager.AddToRoleAsync(user, model.Role.ToString());
+                await _userManager.RemoveFromRoleAsync(user, employeerole.ToString());
+            }
+
 
             await Context.SaveChangesAsync();
 
