@@ -3,11 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BumboApp.ViewModels
 {
-    public class UserEmployeeViewModel
+    public class EmployeeCreateViewModel
     {
-        [Required(ErrorMessage = "Waarom werkt dit niet?")]
-        [RegularExpression(@"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$",
-            ErrorMessage = "Please enter a valid email address.")]
+        [Required]
+        [RegularExpression(@"^[a-zA-Z0-9.]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$",
+            ErrorMessage = "Vul een geldig email adres in")]
         public string Email { get; set; }
 
         [Required]

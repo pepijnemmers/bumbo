@@ -16,7 +16,7 @@ namespace BumboApp.Controllers
 
             // Fetch the employee associated with the logged-in user
             var employee = Context.Employees
-                .Include(e => e.notifications)
+                .Include(e => e.Notifications)
                 .Include(e => e.Shifts)
                 .FirstOrDefault(e => e.User.Id == userId);
 
@@ -54,7 +54,7 @@ namespace BumboApp.Controllers
                 .OrderBy(lr => lr.StartDate) 
                 .ToList();
 
-            var unreadNotifications = employee.notifications
+            var unreadNotifications = employee.Notifications
                 .Where(n => !n.HasBeenRead)
                 .OrderByDescending(n => n.SentAt)
                 .Take(5)

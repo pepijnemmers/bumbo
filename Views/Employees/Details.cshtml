@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Werknemer details";
+    bool displayDismissButton = !(ViewData["EmployeeRole"].Equals("Manager") || (bool)ViewData["IsOwner"]) && Model.EndOfEmployment == null;
 }
 
 @if (Model == null)
@@ -14,9 +15,22 @@ else
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <h4>@Model.FirstName @Model.LastName</h4>
-                <p class="text-muted">In dienst sinds: @Model.StartOfEmployment</p>
+                @if (Model.EndOfEmployment == null)
+                {
+                    <p class="text-muted">In dienst sinds: @Model.StartOfEmployment.ToString("dd-MM-yyyy")</p>
+                }
+                else
+                {
+                    <p class="text-muted">In dienst vanaf @Model.StartOfEmployment.ToString("dd-MM-yyyy") tot @(((DateOnly)Model.EndOfEmployment).ToString("dd-MM-yyyy"))</p>
+                }
             </div>
-            <a class="btn btn-primary" asp-action="Update" asp-route-id="@Model.EmployeeNumber">Bewerken</a>
+            <div>
+                @if (displayDismissButton)
+                {
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#dismissEmployeeModal">Uit dienst zetten</button>
+                }
+                <a class="btn btn-primary" asp-action="Update" asp-route-id="@Model.EmployeeNumber">Bewerken</a>
+            </div>
         </div>
     </div>
 
@@ -29,7 +43,7 @@ else
                 <p><strong>Emailadres:</strong> @Model.User.Email</p>
             </div>
             <div class="col-md-6">
-                <p><strong>Geboortedatum:</strong> @Model.DateOfBirth</p>
+                <p><strong>Geboortedatum:</strong> @Model.DateOfBirth.ToString("dd-MM-yyyy")</p>
                 <p><strong>Rol:</strong> @ViewData["EmployeeRole"]</p>
                 <p><strong>Contracturen:</strong> @Model.ContractHours uur per week</p>
                 <p><strong>Verlofuren:</strong> @ViewData["LeaveHourUsed"] van de @Model.LeaveHours uur gebruikt</p>
@@ -38,7 +52,6 @@ else
     </div>
 
     <div class="table-container p-3">
-        @* <div class="card-body"> *@
         <h5>Adres</h5>
         <div class="row">
             <div class="col-md-6">
@@ -50,6 +63,28 @@ else
                 <p><strong>Plaats:</strong> @ViewData["CityName"]</p>
             </div>
         </div>
-        @* </div> *@
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="dismissEmployeeModal" tabindex="-1" aria-labelledby="itemDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="itemDeleteModalLabel">Uit dienst zetting van @Model.FirstName</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tekst iets</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                    <form asp-action="Dismiss" method="post">
+                        <input type="hidden" name="employeeNumber" value="@Model.EmployeeNumber" />
+                        <button type="submit" class="btn btn-danger">Bevestig uit dienst zetting</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 }
+

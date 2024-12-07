@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Identity;
 using BumboApp.ViewModels;
 using BumboApp.Helpers;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BumboApp.Controllers
 {
@@ -13,7 +14,7 @@ namespace BumboApp.Controllers
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<User> _userManager;
-        private HttpClient _client = new HttpClient();
+        private readonly HttpClient _client = new HttpClient();
 
         public EmployeesController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
@@ -55,7 +56,7 @@ namespace BumboApp.Controllers
                 .Take(PageSize)
                 .ToList();
 
-            List<EmployeeIndexViewModel> viewModels = new List<EmployeeIndexViewModel>();
+            List<EmployeeIndexViewModel> viewModels = [];
             foreach (var employee in employeesForPage)
             {
                 var employeeRole = await GetUserRoleAsync(employee.User.Id);
@@ -76,7 +77,7 @@ namespace BumboApp.Controllers
         }
         public IActionResult Create()
         {
-            var viewModel = new UserEmployeeViewModel
+            var viewModel = new EmployeeCreateViewModel
             {
                 DateOfBirth = new DateOnly(2000, 1, 1)
             };
@@ -85,10 +86,23 @@ namespace BumboApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(UserEmployeeViewModel viewModel)
+        public async Task<IActionResult> Create(EmployeeCreateViewModel viewModel)
         {
             if (!ModelState.IsValid || viewModel.Role.Equals(Role.Unknown))
             {
+                return View(viewModel);
+            }
+
+            if (viewModel.DateOfBirth <= new DateOnly(1900, 1, 1))
+            {
+                NotifyService.Error($"Geboortedatum moet na 1900 zijn. DEBUG: {viewModel.DateOfBirth}");
+                return View(viewModel);
+            }
+
+            int minimunAge = 15; //TODO uit CAO halen (minimunleeftijd)
+            if (viewModel.DateOfBirth > DateOnly.FromDateTime(DateTime.Now).AddYears(-minimunAge))
+            {
+                NotifyService.Error($"De minimunleeftijd bij Bumbo is {minimunAge}");
                 return View(viewModel);
             }
 
@@ -151,12 +165,11 @@ namespace BumboApp.Controllers
         {
             var employee = Context.Employees
                 .Include(e => e.User)
-                .Include(e => e.leaveRequests)
+                .Include(e => e.LeaveRequests)
                 .SingleOrDefault(e => e.EmployeeNumber == id);
 
             var employeeRole = await GetUserRoleAsync(employee.User.Id);
 
-            //ViewData["isOwner"] = ;
             var model = new EmployeeUpdateViewModel
             {
                 EmployeeNumber = employee.EmployeeNumber,
@@ -238,7 +251,7 @@ namespace BumboApp.Controllers
         {
             var employee = Context.Employees
                 .Include(e => e.User)
-                .Include(e => e.leaveRequests)
+                .Include(e => e.LeaveRequests)
                 .SingleOrDefault(e => e.EmployeeNumber == id);
 
             if (employee == null)
@@ -246,16 +259,22 @@ namespace BumboApp.Controllers
                 return NotifyErrorAndRedirect("Werknemer niet gevonden", nameof(Index));
             }
 
-            var leaveRequests = employee.leaveRequests
+            var leaveRequests = employee.LeaveRequests
                 .Where(lr => lr.Status != Status.Afgewezen).ToList();
 
             var usedLeaveHoursThisYear = LeaveHoursCalculationHelper.CalculateLeaveHoursByYearForAllRequests(leaveRequests);
             int amountOfLeaveHours = usedLeaveHoursThisYear[DateTime.Now.Year];
 
             var employeeRole = await GetUserRoleAsync(employee.User.Id);
+
+
+
+            ViewData["IsOwner"] = LoggedInUserId == employee.User.Id;
             ViewData["EmployeeRole"] = employeeRole.ToFriendlyString();
             ViewData["LeaveHourUsed"] = amountOfLeaveHours;
 
+
+            //Postcode API ----------------------------
             //var apiKey = Environment.GetEnvironmentVariable("POSTCODE_API_KEY");
             var apiKey = "";
             var apiURL = $"https://json.api-postcode.nl?postcode={employee.Zipcode}&number={employee.HouseNumber}";
@@ -270,21 +289,54 @@ namespace BumboApp.Controllers
                 {
                     string jsonResponse = await response.Content.ReadAsStringAsync();
 
-                    using (JsonDocument doc = JsonDocument.Parse(jsonResponse))
-                    {
-                        JsonElement root = doc.RootElement;
+                    using JsonDocument doc = JsonDocument.Parse(jsonResponse);
+                    JsonElement root = doc.RootElement;
 
-                        ViewData["StreetName"] = root.GetProperty("street").GetString();
-                        ViewData["CityName"] = root.GetProperty("city").GetString();
-                    }
+                    ViewData["StreetName"] = root.GetProperty("street").GetString();
+                    ViewData["CityName"] = root.GetProperty("city").GetString();
                 }
             }
             catch (Exception e)
             {
-
+                ViewData["StreetName"] = "-";
+                ViewData["CityName"] = "-";
             }
 
             return View(employee);
+        }
+
+        [HttpPost]
+        public IActionResult Dismiss(int employeeNumber)
+        {
+            var employee = Context.Employees.Find(employeeNumber);
+            if (employee == null)
+            {
+                return NotifyErrorAndRedirect("Er is iets misgegaan, werknemer niet gevonden", nameof(Index));
+            }
+            if (employee.EndOfEmployment != null)
+            {
+                NotifyService.Error("De werknemer is niet meer in dienst");
+                return RedirectToAction(nameof(Details), employeeNumber);
+            }
+
+            employee.EndOfEmployment = DateOnly.FromDateTime(DateTime.Now);
+
+            try
+            {
+                Context.SaveChanges();
+            }
+            catch
+            {
+                NotifyService.Error("Er is iets misgegaan met het bewerken");
+                return RedirectToAction(nameof(Details), employeeNumber);
+            }
+
+            var redirect = HttpContext.Request.Headers["Referer"];
+            if (redirect.IsNullOrEmpty())
+            {
+                return RedirectToAction(nameof(Details), employeeNumber);
+            }
+            return Redirect(redirect);
         }
     }
 }

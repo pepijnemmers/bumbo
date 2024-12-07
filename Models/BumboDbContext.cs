@@ -117,7 +117,7 @@ public partial class BumboDbContext : IdentityDbContext<User>
 
         modelBuilder.Entity<SickLeave>()
             .HasOne(ss => ss.Employee)
-            .WithMany(e => e.sickLeaves)
+            .WithMany(e => e.SickLeaves)
             .HasForeignKey(ss => ss.EmployeeNumber)
             .OnDelete(DeleteBehavior.Cascade);
 
@@ -152,7 +152,7 @@ public partial class BumboDbContext : IdentityDbContext<User>
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 
-    private void EssentialSeedData(ModelBuilder modelBuilder)
+    private static void EssentialSeedData(ModelBuilder modelBuilder)
     {
         //Add roles
         var managerRoleId = "dc065cdc-e1d7-4202-936a-fbf03070c74d";
