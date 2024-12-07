@@ -109,7 +109,7 @@ namespace BumboApp.Controllers
             var roleExists = await _roleManager.RoleExistsAsync(viewModel.Role.ToString());
             if (!roleExists)
             {
-                NotifyService.Error("Er is iets mis gegaan met het maken ivm de Rol"); //Gebeurt als het goed is nooit
+                NotifyService.Error("Er is iets mis gegaan met het maken ivm de Rol");
                 return View(viewModel);
             }
 
@@ -209,7 +209,7 @@ namespace BumboApp.Controllers
                 NotifyService.Error("Er is iets misgegaan");
                 return View(model);
             }
-            var user = employee.User;
+            var user = await _userManager.FindByIdAsync(employee.User.Id);
             if (user == null)
             {
                 NotifyService.Error("Er is iets misgegaan");
@@ -220,7 +220,6 @@ namespace BumboApp.Controllers
             user.UserName = model.FirstName;
             user.NormalizedUserName = model.FirstName;
             employee.FirstName = model.FirstName;
-
 
             employee.LastName = model.LastName;
             employee.DateOfBirth = model.DateOfBirth;
@@ -233,16 +232,23 @@ namespace BumboApp.Controllers
             user.Email = model.Email;
             user.NormalizedEmail = model.Email;
 
-            //TODO dit werkt niet, multiple tracking exception
-            var employeerole = await GetUserRoleAsync(user.Id);
+            try
+            {
+                await Context.SaveChangesAsync();
+            }
+            catch
+            {
+                NotifyService.Error("Er is iets misgegaan bij het bewerken");
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var employeerole = (Role)Enum.Parse(typeof(Role), roles[0]);
             if (!employeerole.Equals(model.Role))
             {
                 await _userManager.AddToRoleAsync(user, model.Role.ToString());
                 await _userManager.RemoveFromRoleAsync(user, employeerole.ToString());
             }
-
-
-            await Context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Details), new { id });
         }
