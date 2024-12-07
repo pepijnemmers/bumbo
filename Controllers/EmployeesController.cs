@@ -106,6 +106,12 @@ namespace BumboApp.Controllers
                 return View(viewModel);
             }
 
+            if (Context.Users.Where(u => u.NormalizedEmail.Equals(viewModel.Email)).Any())
+            {
+                NotifyService.Error("Deze email is al in gebruik");
+                return View(viewModel);
+            }
+
             var roleExists = await _roleManager.RoleExistsAsync(viewModel.Role.ToString());
             if (!roleExists)
             {

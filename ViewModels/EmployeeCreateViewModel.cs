@@ -1,4 +1,5 @@
 ﻿using BumboApp.Models;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace BumboApp.ViewModels
