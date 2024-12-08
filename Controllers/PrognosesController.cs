@@ -170,8 +170,9 @@ namespace BumboApp.Controllers
                 }
                 Context.SaveChanges();
                 transaction.Commit();
+                
                 NotifyService.Success("De prognose is bijgewerkt.");
-                return RedirectToAction("Details", new { id = id });
+                return id == null ? RedirectToAction("Index") : RedirectToAction("Details", new { id = id });
             }
             catch
             {
