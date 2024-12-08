@@ -8,9 +8,11 @@ namespace BumboApp.ViewModels
         public int EmployeeNumber { get; set; }
         [Required]
         [StringLength(20)]
+        [RegularExpression(@"^[a-zA-Z]$", ErrorMessage = "Gebruik alleen letters")]
         public string FirstName { get; set; }
         [Required]
         [StringLength(20)]
+        [RegularExpression(@"^[a-zA-Z]$", ErrorMessage = "Gebruik alleen letters")]
         public string LastName { get; set; }
         [Required]
         public DateOnly DateOfBirth { get; set; }
@@ -31,7 +33,7 @@ namespace BumboApp.ViewModels
         public DateOnly? EndOfEmployment { get; set; }
         [Required]
         [RegularExpression(@"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$",
-            ErrorMessage = "Please enter a valid email address.")]
+            ErrorMessage = "Vul een geldig email adres in")]
         public string Email { get; set; }
         public Role Role { get; set; }
 

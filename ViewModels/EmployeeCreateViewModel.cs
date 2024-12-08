@@ -20,15 +20,17 @@ namespace BumboApp.ViewModels
 
         [Required]
         [StringLength(20)]
+        [RegularExpression(@"^[a-zA-Z]$", ErrorMessage = "Gebruik alleen letters")]
         public string FirstName { get; set; }
         [Required]
         [StringLength(20)]
+        [RegularExpression(@"^[a-zA-Z]$", ErrorMessage = "Gebruik alleen letters")]
         public string LastName { get; set; }
         [Required]
         public DateOnly DateOfBirth { get; set; }
         [Required]
         [StringLength(6)]
-        [RegularExpression(@"^\d{4}[A-Z]{2}$", ErrorMessage = "Postcode moet van het formaat '1234AB'")]
+        [RegularExpression(@" ^\d{4}[A-Z]{2}$", ErrorMessage = "Postcode moet van het formaat '1234AB'")]
         public string Zipcode { get; set; }
         [Required]
         [StringLength(10)]
