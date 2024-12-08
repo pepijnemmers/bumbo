@@ -50,7 +50,7 @@ else
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (Department department in Department.GetValues(typeof(Department)))
+                    @foreach (Department department in Enum.GetValues(typeof(Department)))
                     {
                         <tr>
                             <td>@department</td>
@@ -73,7 +73,7 @@ else
         </div>
 
         <form id="form" style="display: none" asp-action="Update" method="post">
-
+            <input type="hidden" name="id" value="@Model.StartDate.ToString("dd-MM-yyyy")" />
             <table class="table">
                 <thead>
                     <tr>
@@ -89,7 +89,7 @@ else
                         // set localization to en-GB
                         CultureInfo.CurrentCulture = new CultureInfo("en-GB");
                     }
-                    @foreach (Department department in Department.GetValues(typeof(Department)))
+                    @foreach (Department department in Enum.GetValues(typeof(Department)))
                     {
                         <tr>
                             <td>@department</td>
@@ -246,9 +246,9 @@ else
     <script>
         //Prognoses details
         document.getElementById('prognosisEditButton').addEventListener('click', function () {
-            var form = document.getElementById("form");
-            var overview = document.getElementById("overview");
-            var prognosisEditButton = document.getElementById("prognosisEditButton");
+            const form = document.getElementById("form");
+            const overview = document.getElementById("overview");
+            const prognosisEditButton = document.getElementById("prognosisEditButton");
 
             if (form.style.display === "none") {
                 overview.style.display = "none";
