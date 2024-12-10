@@ -252,15 +252,13 @@ namespace BumboApp.Controllers
                     index++;
                     continue;
                 }
-                if (department == Department.Kassa && OpeningInCashRegister(scheduledate))
+                if (!cantFindConcurrentForRegister && department == Department.Kassa && OpeningInCashRegister(scheduledate))
                 {
                     index = ScheduleConcurrentShift(department, scheduledate,startDate , employee) ? 0 : index + 1;
+                    continue;
                 }
-                else
-                {
                     ScheduleShift(department, scheduledate, startDate, employee);
                     index++;
-                }
             }
             return;
         }
@@ -627,14 +625,14 @@ namespace BumboApp.Controllers
             }
             else if(age < 16)
             {
-
+                if (department == Department.Kassa) return 0;
                 int maxWeekHours;
                 int maxTimeWithSchoolHours;
                 int maxHoursTillMaxTime;
                 if(!((scheduleDate.ToDateTime(new TimeOnly()) - startDate.ToDateTime(new TimeOnly())).Days < MaxWorkingDaysUnderSixteen))
                 {
                     int workingDays = 0;
-                    for(DateTime day = startDate.ToDateTime(new TimeOnly()); startDate <= scheduleDate; day = day.AddDays(1))
+                    for(DateTime day = startDate.ToDateTime(new TimeOnly()); day <= scheduleDate.ToDateTime(new TimeOnly()); day = day.AddDays(1))
                     {
                         if(workingShiftsThisWeek.Where(e => e.Start.Date == day.Date).Any())
                         {
