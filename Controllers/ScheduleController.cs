@@ -629,19 +629,11 @@ namespace BumboApp.Controllers
                 int maxWeekHours;
                 int maxTimeWithSchoolHours;
                 int maxHoursTillMaxTime;
-                if(!((scheduleDate.ToDateTime(new TimeOnly()) - startDate.ToDateTime(new TimeOnly())).Days < MaxWorkingDaysUnderSixteen))
+                if (!((scheduleDate.ToDateTime(new TimeOnly()) - startDate.ToDateTime(new TimeOnly())).Days < MaxWorkingDaysUnderSixteen))
                 {
-                    int workingDays = 0;
-                    for(DateTime day = startDate.ToDateTime(new TimeOnly()); day <= scheduleDate.ToDateTime(new TimeOnly()); day = day.AddDays(1))
-                    {
-                        if(workingShiftsThisWeek.Where(e => e.Start.Date == day.Date).Any())
-                        {
-                            workingDays++;
-                        }
-                    }
-                    if(workingDays > MaxWorkingDaysUnderSixteen) { return 0; }
+                    return 0;
                 }
-                if (!employee.SchoolSchedules.Where(e => e.Date >= startDate && e.Date <= startDate.AddDays(6)).Any())
+                if (employee.SchoolSchedules == null || !employee.SchoolSchedules.Any(e => e.Date >= startDate && e.Date <= startDate.AddDays(6)))
                 {
                     maxWeekHours = MaxWeeklyHoursUnderSixteen - workingHours;
                     maxTimeWithSchoolHours = MaxHoursWithSchoolUnderSixteen;
