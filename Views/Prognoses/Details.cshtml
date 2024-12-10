@@ -144,7 +144,7 @@ else
 
             <div class="d-flex justify-content-end m-3">
                 <div class="w-auto">
-                    <button class="btn btn-outline-danger" asp-controller="Prognoses" asp-action="Delete" asp-route-weekPrognoseId="@Model.WeekPrognoseId">Verwijderen</button>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Verwijderen</button>
                     <button type="submit" class="btn btn-primary">Opslaan</button>
                 </div>
             </div>
@@ -240,6 +240,26 @@ else
         </div>
     </div>
 }
+
+<div class="modal fade align-content-center" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Bevestiging verwijderen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Weet je zeker dat je deze prognose wil verwijderen?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                <form id="deleteForm" method="post" asp-action="Delete" asp-controller="Prognoses" asp-route-weekPrognoseId="@Model.WeekPrognoseId">
+                    <button type="submit" class="btn btn-danger">Verwijderen</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts
 {
