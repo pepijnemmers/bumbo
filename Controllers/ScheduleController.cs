@@ -576,7 +576,7 @@ namespace BumboApp.Controllers
         private int GetMaxTimeContract(Employee employee, DateOnly startDate, DateOnly scheduleDate)
         {
             int hours = employee.ContractHours;
-            List<Shift> shifts = (List<Shift>)employee.Shifts.Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) && e.End.Date >= scheduleDate.ToDateTime(new TimeOnly())).ToList();
+            List<Shift> shifts = employee.Shifts.Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) && e.End.Date >= scheduleDate.ToDateTime(new TimeOnly())).ToList();
             if (shifts.Count == 0) { return hours; }
             else
             {
@@ -639,11 +639,11 @@ namespace BumboApp.Controllers
                             workingDays++;
                         }
                     }
-                    if(workingDays >= MaxWorkingDaysUnderSixteen || department == Department.Kassa) { return 0; }
+                    if(workingDays > MaxWorkingDaysUnderSixteen) { return 0; }
                 }
                 if (!employee.SchoolSchedules.Where(e => e.Date >= startDate && e.Date <= startDate.AddDays(6)).Any())
                 {
-                    maxWeekHours = MaxWeeklyHoursSchoolweekUnderSixteen - workingHours;
+                    maxWeekHours = MaxWeeklyHoursUnderSixteen - workingHours;
                     maxTimeWithSchoolHours = MaxHoursWithSchoolUnderSixteen;
                 }
                 else
