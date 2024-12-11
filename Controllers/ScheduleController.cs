@@ -199,7 +199,7 @@ namespace BumboApp.Controllers
                 {
                     Context.SaveChanges();
                 }
-                catch (Exception ex) { break; }
+                catch { break; }
             }
             return;
         }
@@ -402,7 +402,7 @@ namespace BumboApp.Controllers
                 {
                     Context.SaveChanges();
                 }
-                catch (Exception ex) { };
+                catch { };
             }
             return;
         }
@@ -492,7 +492,7 @@ namespace BumboApp.Controllers
                 {
                     Context.SaveChanges();
                 }
-                catch (Exception ex) { return false; }
+                catch { return false; }
                 return true;
             }
             return false;
