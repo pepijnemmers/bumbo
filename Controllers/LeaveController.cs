@@ -303,7 +303,7 @@ namespace BumboApp.Controllers
         {
             var username = User?.Identity?.Name;
             _loggedInEmployee = Context.Employees
-            .FirstOrDefault(e => e.FirstName.Equals(username));
+            .FirstOrDefault(e => e.User.UserName.Equals(username));
 
             return _loggedInEmployee;
         }

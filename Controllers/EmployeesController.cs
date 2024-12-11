@@ -122,15 +122,17 @@ namespace BumboApp.Controllers
 
             var user = new User
             {
-                UserName = viewModel.FirstName,
-                NormalizedUserName = viewModel.FirstName.ToUpper(),
+                UserName = viewModel.Email,
+                NormalizedUserName = viewModel.Email.ToUpper(),  //Dit moet uniek zijn van Asp
+                //UserName = viewModel.FirstName,
+                //NormalizedUserName = viewModel.FirstName.ToUpper(),
+
                 Email = viewModel.Email,
                 NormalizedEmail = viewModel.Email.ToUpper(),
                 Id = Guid.NewGuid().ToString()
             };
             var passwordHasher = new PasswordHasher<User>();
             user.PasswordHash = passwordHasher.HashPassword(user, viewModel.Password);
-
 
             await _userManager.CreateAsync(user);
             await _userManager.AddToRoleAsync(user, viewModel.Role.ToString());
@@ -140,7 +142,7 @@ namespace BumboApp.Controllers
                 FirstName = viewModel.FirstName,
                 LastName = viewModel.LastName,
                 DateOfBirth = viewModel.DateOfBirth,
-                Zipcode = viewModel.Zipcode,
+                Zipcode = viewModel.Zipcode.ToUpper(),
                 HouseNumber = viewModel.HouseNumber,
                 ContractHours = viewModel.ContractHours,
                 LeaveHours = viewModel.LeaveHours,
@@ -223,8 +225,8 @@ namespace BumboApp.Controllers
             }
 
             //Username consistent houden tussen employee en user (is nodig voor verlof en ziek)
-            user.UserName = model.FirstName;
-            user.NormalizedUserName = model.FirstName;
+            user.UserName = model.Email;
+            user.NormalizedUserName = model.Email.ToUpper();
             employee.FirstName = model.FirstName;
 
             employee.LastName = model.LastName;
