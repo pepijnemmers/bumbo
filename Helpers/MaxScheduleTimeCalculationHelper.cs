@@ -65,17 +65,25 @@ namespace BumboApp.Helpers
             }
             return hours;
         }
-        public int GetMaxTimeContract(Employee employee, DateOnly startDate, DateOnly scheduleDate)
+        public int GetMaxTimeContract(Employee employee, DateOnly startDate)
         {
             int hours = employee.ContractHours;
             List<Shift> shifts = employee.Shifts
-                .Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) && e.End.Date >= scheduleDate.ToDateTime(new TimeOnly()))
+                .Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) && e.End.Date <= startDate.AddDays(6).ToDateTime(new TimeOnly()))
                 .ToList();
-            if (shifts.Count == 0) { return hours; }
-            else
+            if (shifts.Count != 0) 
             {
-                return hours - GetWorkingHours(shifts);
+                float calculationHours = hours - GetWorkingHours(shifts);
+                foreach (int br in _breakTimes)
+                {
+                    if (calculationHours >= br)
+                    {
+                        calculationHours += BreakTimeHours;
+                    }
+                }
+                hours = (int)Math.Ceiling(calculationHours);
             }
+            return hours;
         }
 
         public int GetMaxTimePrognose(Department department, DateOnly scheduleDate)
@@ -86,16 +94,18 @@ namespace BumboApp.Helpers
             .Where(e => e.Start.Date == scheduleDate.ToDateTime(new TimeOnly()))
             .Where(e => e.Department == department)
             .ToList();
+
             if (prognosis == null)
             {
                 return 0;
             }
+
             int missingHours = (int)Math.Ceiling(prognosis.NeededHours - GetWorkingHours(departmentDayShifts) - _breakTimes.Sum(time => BreakTimeHours));
 
             return missingHours;
         }
 
-        public int GetMaxTimeCao(Employee employee, Department department, DateOnly startDate, DateOnly scheduleDate, int startingHour)
+        public int GetMaxTimeCao(Employee employee, Department department, DateOnly startDate, DateOnly endDate, int startingHour)
         {
             List<int> hours = new List<int>();
             int age = DateTime.Now.Year - employee.DateOfBirth.Year;
@@ -103,8 +113,9 @@ namespace BumboApp.Helpers
             {
                 age--;
             }
+
             List<Shift> workingShiftsThisWeek = employee.Shifts
-                .Where(e => e.Start.Date <= scheduleDate.ToDateTime(new TimeOnly()))
+                .Where(e => e.Start.Date <= startDate.AddDays(6).ToDateTime(new TimeOnly()))
                 .Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()))
                 .ToList();
             int workingHours = GetWorkingHours(workingShiftsThisWeek);
@@ -112,18 +123,21 @@ namespace BumboApp.Helpers
             {
 
                 int maxShiftLenght = MaxShiftLengthAdult - GetWorkingHours(workingShiftsThisWeek.
-                    Where(e => e.Start.Date == scheduleDate.ToDateTime(new TimeOnly())));
+                    Where(e => e.Start.Date == endDate.ToDateTime(new TimeOnly())));
                 int maxWeekHoursLeft = MaxWeeklyHoursAdult - GetWorkingHours(workingShiftsThisWeek);
                 hours.Add(maxWeekHoursLeft);
                 hours.Add(maxShiftLenght);
             }
+
             else if (age < 16)
             {
                 if (department == Department.Kassa) return 0;
+
                 int maxWeekHours;
                 int maxTimeWithSchoolHours;
                 int maxHoursTillMaxTime;
-                if (!((scheduleDate.ToDateTime(new TimeOnly()) - startDate.ToDateTime(new TimeOnly())).Days < MaxWorkingDaysUnderSixteen))
+
+                if (!((endDate.ToDateTime(new TimeOnly()) - startDate.ToDateTime(new TimeOnly())).Days < MaxWorkingDaysUnderSixteen))
                 {
                     return 0;
                 }
@@ -135,8 +149,8 @@ namespace BumboApp.Helpers
                 else
                 {
                     maxWeekHours = MaxWeeklyHoursSchoolweekUnderSixteen - workingHours;
-                    maxTimeWithSchoolHours = MaxHoursWithSchoolUnderSixteen - GetSchoolHours(scheduleDate, employee) - GetWorkingHours(workingShiftsThisWeek.
-                    Where(e => e.Start.Date == scheduleDate.ToDateTime(new TimeOnly())));
+                    maxTimeWithSchoolHours = MaxHoursWithSchoolUnderSixteen - GetSchoolHours(endDate, employee) - GetWorkingHours(workingShiftsThisWeek.
+                    Where(e => e.Start.Date == endDate.ToDateTime(new TimeOnly())));
                 }
 
                 if (new TimeOnly(startingHour, 00, 00) >= _maxWorkTimeForUnderSixteen) { return 0; }
@@ -147,15 +161,16 @@ namespace BumboApp.Helpers
                 hours.Add(maxTimeWithSchoolHours);
                 hours.Add(maxHoursTillMaxTime);
             }
-            else
+
+            else // age 16 and 17
             {
                 int maxTimeWithSchoolHours;
                 int maxAllowedHours = MaxWeeklyHoursAlmostAdult * TimeframeInWeeksMaxWeeklyHoursAlmostAdult;
                 int amountOfDaysLookedAtForMaxAllowedHours = TimeframeInWeeksMaxWeeklyHoursAlmostAdult * 7;
 
                 int workedHoursInTimeframe = GetWorkingHours(_context.Shifts
-                .Where(e => e.Start.Date <= scheduleDate.ToDateTime(new TimeOnly()))
-                .Where(e => e.Start.Date >= scheduleDate.AddDays(amountOfDaysLookedAtForMaxAllowedHours - 1).ToDateTime(new TimeOnly()))
+                .Where(e => e.Start.Date <= endDate.ToDateTime(new TimeOnly()))
+                .Where(e => e.Start.Date >= endDate.AddDays(amountOfDaysLookedAtForMaxAllowedHours - 1).ToDateTime(new TimeOnly()))
                 .ToList());
 
                 var maxhoursWithAverage = maxAllowedHours + workedHoursInTimeframe;
@@ -165,8 +180,8 @@ namespace BumboApp.Helpers
                 }
                 else
                 {
-                    maxTimeWithSchoolHours = MaxHoursWithSchoolAlmostAdult - GetSchoolHours(scheduleDate, employee) - GetWorkingHours(workingShiftsThisWeek.
-                    Where(e => e.Start.Date == scheduleDate.ToDateTime(new TimeOnly())));
+                    maxTimeWithSchoolHours = MaxHoursWithSchoolAlmostAdult - GetSchoolHours(endDate, employee) - GetWorkingHours(workingShiftsThisWeek.
+                    Where(e => e.Start.Date == endDate.ToDateTime(new TimeOnly())));
                 }
                 hours.Add(maxTimeWithSchoolHours);
                 hours.Add(maxhoursWithAverage);
@@ -181,7 +196,7 @@ namespace BumboApp.Helpers
             SchoolSchedule? schedule = employee.SchoolSchedules.FirstOrDefault(e => e.Date == scheduleDate);
             if (schedule == null) { return 0; }
 
-            return (int)Math.Ceiling(schedule.DurationInHours);
+            return (int)Math.Round(schedule.DurationInHours);
         }
     }
 }

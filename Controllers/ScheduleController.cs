@@ -107,15 +107,13 @@ namespace BumboApp.Controllers
 
             List<Department> departmentList = new List<Department> { Department.Kassa, Department.Vers, Department.Vakkenvullen };
             DateOnly endDate = startDate.AddDays(6);
-
-            /// when testing comment out the code between the comments (because there are already 2 shifts in the Db)
+ 
             if (Context.Shifts
                 .Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) &&
                 e.End.Date <= endDate.ToDateTime(new TimeOnly())).Any())
             {
                 return NotifyErrorAndRedirect("Er is al een rooster voor deze week.", "Index");
             }
-            ///so till this point
 
             foreach (Department department in departmentList)
             {
@@ -130,14 +128,16 @@ namespace BumboApp.Controllers
                 .Include(e => e.User)
                 .ToList();
             List<Employee> managers = employees.Where(e => GetUserRoleAsync(e.User.Id).Result == Role.Manager).ToList();
-            int weekNumber = new GregorianCalendar(GregorianCalendarTypes.Localized).GetWeekOfYear(startDate.ToDateTime(new TimeOnly()), CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+            int weekNumber = new GregorianCalendar(GregorianCalendarTypes.Localized)
+                .GetWeekOfYear(startDate.ToDateTime(new TimeOnly()), CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+
             foreach (Employee e in employees)
             {
                 if (managers.Contains(e)) continue;
                 if (e.ContractHours >
-                    _maxScheduleTimeCalculationHelper.GetWorkingHours(e.Shifts.Where(em => em.Start.Date >= startDate.ToDateTime(new TimeOnly())
-                    && em.End.Date <= endDate.ToDateTime(new TimeOnly())).ToList()) && 
-                    GetUserRoleAsync(e.User.Id).Result != Role.Manager)
+                    _maxScheduleTimeCalculationHelper.GetWorkingHours(e.Shifts
+                    .Where(em => em.Start.Date >= startDate.ToDateTime(new TimeOnly())
+                    && em.End.Date <= endDate.ToDateTime(new TimeOnly()))))
                 {
                     string name = e.FirstName + " " + e.LastName + " ";
                     foreach (Employee m in managers)
@@ -152,6 +152,7 @@ namespace BumboApp.Controllers
                     }
                 }
             }
+
             try
             {
                 Context.SaveChanges();
@@ -167,11 +168,17 @@ namespace BumboApp.Controllers
             {
                 return;
             }
+
             TimeOnly oTime = openingHour.OpeningTime.GetValueOrDefault();
             TimeOnly cTime = openingHour.ClosingTime.GetValueOrDefault();
+
             int startingHour = oTime.Hour;
             int closingHour = cTime.Hour;
-            if (cTime.Minute > 0) { closingHour++; }
+
+            if (cTime.Minute > 0) 
+            { 
+                closingHour++; 
+            }
 
             while (!PrognoseHoursHit(department, scheduledate))
             {
@@ -343,7 +350,7 @@ namespace BumboApp.Controllers
             else 
             {
                 maxTimeAvailable = (availability.EndTime - availability.StartTime).Hours;
-                if (maxTimeAvailable <= 0)
+                if (maxTimeAvailable > 0)
                 {
                     startingHour = availability.StartTime.Hour;
                     if (availability.StartTime.Minute > 0) { startingHour++; }
@@ -359,14 +366,18 @@ namespace BumboApp.Controllers
                 }
             }
 
-            int maxTimeCAO = _maxScheduleTimeCalculationHelper.GetMaxTimeCao(employee, department, startDate, scheduleDate, startingHour);
+            int maxTimeCAO = _maxScheduleTimeCalculationHelper.GetMaxTimeCao(employee, department, startDate, startDate.AddDays(6), startingHour);
             int maxTimePrognose = _maxScheduleTimeCalculationHelper.GetMaxTimePrognose(department, scheduleDate);
-            int maxTimeContract = _maxScheduleTimeCalculationHelper.GetMaxTimeContract(employee, startDate, scheduleDate);
+            int maxTimeContract = _maxScheduleTimeCalculationHelper.GetMaxTimeContract(employee, startDate);
             List<int> maxhours = new List<int> { maxTimeCAO, maxTimePrognose, maxTimeContract,maxTimeAvailable };
             maxhours.Sort();
 
             if (maxhours.First() > 0)
             {
+                if(maxhours.First() == 1)
+                {
+                    Console.WriteLine(" ");
+                }
                 int endTime = maxhours.First() + startingHour;
                 if(leaveRequest != null && leaveRequest.StartDate.Hour > startingHour)
                 {
@@ -396,8 +407,7 @@ namespace BumboApp.Controllers
         private bool ScheduleConcurrentShift(Department department, DateOnly scheduleDate, DateOnly startDate, Employee employee)
         {
             Availability? availability = employee.Availabilities.FirstOrDefault(e => e.Date == scheduleDate);
-            int availableFrom;
-            int availableTill;
+            int maxTimeAvailable;
             OpeningHour? openingHour = Context.OpeningHours.FirstOrDefault(e => e.WeekDay == scheduleDate.DayOfWeek);
 
             LeaveRequest? leaveRequest = Context.LeaveRequests.Where(lr => lr.Employee == employee && lr.Status == Status.Geaccepteerd)
@@ -405,46 +415,52 @@ namespace BumboApp.Controllers
 
             if (openingHour == null) { return false; }
             TimeOnly cTime = openingHour.ClosingTime.GetValueOrDefault();
+
             int startingHour = GetNextEmptySpot(department, scheduleDate);
             int closingHour = cTime.Hour;
+
             if (cTime.Minute > 0) { closingHour++; }
             if (leaveRequest != null) 
             {
-                if (startingHour > leaveRequest.StartDate.Hour) { return false; } ;
+                if (startingHour > leaveRequest.StartDate.Hour && startingHour < (leaveRequest.EndDate.Minute > 0 ? leaveRequest.EndDate.Hour+1 : leaveRequest.EndDate.Hour)) { return false; } ;
             }
 
-            if(availability != null)
+            if (availability == null)
             {
-                if ((availability.EndTime - availability.StartTime).Hours <= 0) { return false; }
-                availableFrom = availability.StartTime.Hour;
-                availableTill = availability.EndTime.Hour;
-                if (availability.StartTime.Minute > 0) { availableFrom++; }
-                if (availability.EndTime.Minute > 0) { availableTill++; }
-
-                if (!(startingHour < availableFrom && startingHour > availableTill))
+                Models.StandardAvailability? standardAvailability = Context.StandardAvailabilities.FirstOrDefault(e => e.Employee == employee);
+                if (standardAvailability == null)
                 {
-                    return false;
-                }
-            }
-            else
-            {
-                StandardAvailability? standardAvailability = Context.StandardAvailabilities.FirstOrDefault(e => e.Employee == employee && e.Day == scheduleDate.DayOfWeek);
-                if(standardAvailability != null)
-                {
-                    availableFrom = (standardAvailability.StartTime.Minute > 0 ? standardAvailability.StartTime.Hour + 1 : standardAvailability.StartTime.Hour);
-                    availableTill = standardAvailability.EndTime.Hour;
+                    maxTimeAvailable = closingHour - startingHour;
                 }
                 else
                 {
-                    availableFrom = openingHour.OpeningTime.Value.Hour; 
-                    availableTill = closingHour;
+                    maxTimeAvailable = startingHour - standardAvailability.EndTime.Minute > 0 ? standardAvailability.EndTime.Hour + 1 : standardAvailability.EndTime.Hour;
                 }
             }
 
-            int maxTimeCao = _maxScheduleTimeCalculationHelper.GetMaxTimeCao(employee, department, startDate, scheduleDate, startingHour);
+            else
+            {
+                maxTimeAvailable = availability.EndTime.Minute > 0 ? availability.EndTime.Hour + 1 : availability.EndTime.Hour - startingHour;
+            }
+
+            if (leaveRequest != null)
+            {
+                if (startingHour < leaveRequest.StartDate.Hour && startingHour + maxTimeAvailable > leaveRequest.StartDate.Hour)
+                {
+                    maxTimeAvailable = leaveRequest.StartDate.Hour - startingHour;
+                }
+
+            }
+
+            if (maxTimeAvailable < 0)
+            {
+                return false;
+            }
+
+
+            int maxTimeCao = _maxScheduleTimeCalculationHelper.GetMaxTimeCao(employee, department, startDate, startDate.AddDays(6), startingHour);
             int maxTimePrognose = _maxScheduleTimeCalculationHelper.GetMaxTimePrognose(department, scheduleDate);
-            int maxTimeContract = _maxScheduleTimeCalculationHelper.GetMaxTimeContract(employee, startDate, scheduleDate);
-            int maxTimeAvailable = availableTill - availableFrom;
+            int maxTimeContract = _maxScheduleTimeCalculationHelper.GetMaxTimeContract(employee, startDate);
             int maxTimeTillClose = closingHour - startingHour;
 
             List<int> maxhours = new List<int> { maxTimeCao, maxTimePrognose, maxTimeContract, maxTimeAvailable, maxTimeTillClose };
