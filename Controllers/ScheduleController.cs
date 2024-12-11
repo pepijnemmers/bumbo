@@ -1,10 +1,10 @@
-﻿using BumboApp.Models;
-using System.Globalization;
+﻿using BumboApp.Helpers;
+using BumboApp.Models;
 using BumboApp.ViewModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using BumboApp.Helpers;
+using System.Globalization;
 
 namespace BumboApp.Controllers
 {
@@ -41,33 +41,33 @@ namespace BumboApp.Controllers
             {
                 selectedEmployee = employeeNumber != null && int.TryParse(employeeNumber, out _) ? Context.Employees.Find(int.Parse(employeeNumber)) : null;
             }
-            
+
             // Day or week view and selected start date
             bool isDayView = selectedEmployee == null || dayView;
-            var selectedStartDate = startDate != null 
+            var selectedStartDate = startDate != null
                 ? (isDayView ? DateOnly.FromDateTime(DateTime.Parse(startDate)) : GetMondayOfWeek(DateOnly.FromDateTime(DateTime.Parse(startDate))))
                 : (isDayView ? DateOnly.FromDateTime(DateTime.Today) : GetMondayOfWeek(DateOnly.FromDateTime(DateTime.Today)));
             int weekNumber = ISOWeek.GetWeekOfYear(selectedStartDate.ToDateTime(new TimeOnly(12, 00)));
-            
+
             // Get all employees for filter
             var employees = Context.Employees.ToList();
-            
+
             // Get all shifts for selected date (based on day/week view) and selected/loggedin employee
             var shifts = Context.Shifts
                 .Where(shift => isDayView
-                    ? DateOnly.FromDateTime(shift.Start) == selectedStartDate 
-                      && (selectedEmployee == null || shift.Employee == selectedEmployee) 
+                    ? DateOnly.FromDateTime(shift.Start) == selectedStartDate
+                      && (selectedEmployee == null || shift.Employee == selectedEmployee)
                       && (LoggedInUserRole != Role.Employee || shift.IsFinal)
-                    : DateOnly.FromDateTime(shift.Start) >= selectedStartDate 
-                      && DateOnly.FromDateTime(shift.Start) < selectedStartDate.AddDays(7) 
-                      && (selectedEmployee == null || shift.Employee == selectedEmployee) 
+                    : DateOnly.FromDateTime(shift.Start) >= selectedStartDate
+                      && DateOnly.FromDateTime(shift.Start) < selectedStartDate.AddDays(7)
+                      && (selectedEmployee == null || shift.Employee == selectedEmployee)
                       && (LoggedInUserRole != Role.Employee || shift.IsFinal))
                 .OrderBy(shift => shift.Department)
                 .ToList();
-            
+
             // Check if view is concept or final
             var viewIsConcept = shifts.Any(shift => !shift.IsFinal);
-            
+
             // Create view model and return view
             var viewModel = new ScheduleViewModel()
             {
@@ -82,10 +82,10 @@ namespace BumboApp.Controllers
             };
             return View(viewModel);
         }
-        
+
         private DateOnly GetMondayOfWeek(DateOnly date)
         {
-            var dayOfWeek = (int) date.DayOfWeek;
+            var dayOfWeek = (int)date.DayOfWeek;
             var daysToMonday = dayOfWeek == 0 ? 6 : dayOfWeek - 1;
             return date.AddDays(-daysToMonday);
         }
@@ -95,19 +95,19 @@ namespace BumboApp.Controllers
             CheckPageAccess(Role.Manager);
             return View();
         }
-        
+
         [HttpPost]
         public IActionResult MakeSchedule(DateOnly startDate)
         {
             Prognosis? prognosis = Context.Prognoses.FirstOrDefault(e => e.Date == startDate);
             if (prognosis == null)
             {
-                return NotifyErrorAndRedirect("Geen prognose om het rooster te maken.", "Index","Prognoses");
+                return NotifyErrorAndRedirect("Geen prognose om het rooster te maken.", "Index", "Prognoses");
             }
 
             List<Department> departmentList = new List<Department> { Department.Kassa, Department.Vers, Department.Vakkenvullen };
             DateOnly endDate = startDate.AddDays(6);
- 
+
             if (Context.Shifts
                 .Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) &&
                 e.End.Date <= endDate.ToDateTime(new TimeOnly())).Any())
@@ -119,7 +119,7 @@ namespace BumboApp.Controllers
             {
                 for (DateOnly scheduledate = startDate; scheduledate <= endDate; scheduledate = scheduledate.AddDays(1))
                 {
-                    ScheduleDepartmentDay(department, scheduledate, startDate); 
+                    ScheduleDepartmentDay(department, scheduledate, startDate);
                     if (!PrognoseHoursHit(department, scheduledate)) { InsertEmptyShifts(department, scheduledate); }
                 }
             }
@@ -158,7 +158,7 @@ namespace BumboApp.Controllers
                 Context.SaveChanges();
             }
             catch (Exception e) { return NotifyErrorAndRedirect("Er is een probleem opgetreden.", "Index"); }
-            return RedirectToAction("Index",new {startDate = startDate.ToString()});
+            return RedirectToAction("Index", new { startDate = startDate.ToString() });
         }
 
         private void InsertEmptyShifts(Department department, DateOnly scheduledate)
@@ -175,9 +175,9 @@ namespace BumboApp.Controllers
             int startingHour = oTime.Hour;
             int closingHour = cTime.Hour;
 
-            if (cTime.Minute > 0) 
-            { 
-                closingHour++; 
+            if (cTime.Minute > 0)
+            {
+                closingHour++;
             }
 
             while (!PrognoseHoursHit(department, scheduledate))
@@ -198,7 +198,8 @@ namespace BumboApp.Controllers
                 try
                 {
                     Context.SaveChanges();
-                } catch(Exception ex) { break; }
+                }
+                catch (Exception ex) { break; }
             }
             return;
         }
@@ -218,14 +219,14 @@ namespace BumboApp.Controllers
 
             int index = 0;
             //true if not cash register or it is cash register but the whole list is looped and prognose hours not hit yet
-            bool cantFindConcurrentForRegister = department != Department.Kassa; 
+            bool cantFindConcurrentForRegister = department != Department.Kassa;
             while (true)
             {
                 if (PrognoseHoursHit(department, scheduledate)) break;
                 if (index >= employees.Count)
                 {
                     if (cantFindConcurrentForRegister) break;
-                    
+
                     cantFindConcurrentForRegister = true;
                     index = 0;
                 }
@@ -247,18 +248,18 @@ namespace BumboApp.Controllers
                 }
                 if (!cantFindConcurrentForRegister && department == Department.Kassa && OpeningInCashRegister(scheduledate))
                 {
-                    index = ScheduleConcurrentShift(department, scheduledate,startDate , employee) ? 0 : index + 1;
+                    index = ScheduleConcurrentShift(department, scheduledate, startDate, employee) ? 0 : index + 1;
                     continue;
                 }
-                    ScheduleShift(department, scheduledate, startDate, employee);
-                    index++;
+                ScheduleShift(department, scheduledate, startDate, employee);
+                index++;
             }
             return;
         }
 
         private bool PrognoseHoursHit(Department department, DateOnly scheduledate)
         {
-            Prognosis? prognosis= Context.Prognoses.FirstOrDefault(e => e.Date == scheduledate && e.Department == department);
+            Prognosis? prognosis = Context.Prognoses.FirstOrDefault(e => e.Date == scheduledate && e.Department == department);
             List<Shift> departmentDayShifts = Context.Shifts
                 .Where(e => e.Start.Date == scheduledate.ToDateTime(new TimeOnly()))
                 .Where(e => e.Department == department)
@@ -311,7 +312,7 @@ namespace BumboApp.Controllers
             {
                 return true;
             }
-            if(shifts.Last().End.Hour == closingHour)
+            if (shifts.Last().End.Hour == closingHour)
             {
                 return false;
             }
@@ -331,15 +332,15 @@ namespace BumboApp.Controllers
             if (openingHour == null) { return; }
 
             TimeOnly oTime = openingHour.OpeningTime.GetValueOrDefault();
-            TimeOnly cTime = openingHour.ClosingTime.GetValueOrDefault();
-            if (oTime.Hour == cTime.Hour) return;
+            TimeOnly closingHour = openingHour.ClosingTime.GetValueOrDefault();
+            if (oTime.Hour == closingHour.Hour) return;
             if (availability == null)
             {
                 Models.StandardAvailability? standardAvailability = Context.StandardAvailabilities.FirstOrDefault(e => e.Employee == employee);
                 if (standardAvailability == null)
                 {
                     startingHour = oTime.Hour;
-                    maxTimeAvailable = cTime.Minute > 0 ? cTime.Hour + 1 : cTime.Hour ;
+                    maxTimeAvailable = closingHour.Minute > 0 ? closingHour.Hour + 1 : closingHour.Hour;
                 }
                 else
                 {
@@ -347,7 +348,8 @@ namespace BumboApp.Controllers
                     maxTimeAvailable = standardAvailability.EndTime.Hour - startingHour;
                 }
             }
-            else 
+
+            else
             {
                 maxTimeAvailable = (availability.EndTime - availability.StartTime).Hours;
                 if (maxTimeAvailable > 0)
@@ -369,23 +371,24 @@ namespace BumboApp.Controllers
             int maxTimeCAO = _maxScheduleTimeCalculationHelper.GetMaxTimeCao(employee, department, startDate, startDate.AddDays(6), startingHour);
             int maxTimePrognose = _maxScheduleTimeCalculationHelper.GetMaxTimePrognose(department, scheduleDate);
             int maxTimeContract = _maxScheduleTimeCalculationHelper.GetMaxTimeContract(employee, startDate);
-            List<int> maxhours = new List<int> { maxTimeCAO, maxTimePrognose, maxTimeContract,maxTimeAvailable };
+            List<int> maxhours = new List<int> { maxTimeCAO, maxTimePrognose, maxTimeContract, maxTimeAvailable };
             maxhours.Sort();
 
             if (maxhours.First() > 0)
             {
-                if(maxhours.First() == 1)
-                {
-                    Console.WriteLine(" ");
-                }
                 int endTime = maxhours.First() + startingHour;
-                if(leaveRequest != null && leaveRequest.StartDate.Hour > startingHour)
+
+                if (leaveRequest != null && leaveRequest.StartDate.Hour > startingHour)
                 {
-                    if(leaveRequest.StartDate.Hour < endTime) { endTime = leaveRequest.StartDate.Hour; }
+                    if (leaveRequest.StartDate.Hour < endTime) { endTime = leaveRequest.StartDate.Hour; }
+                }
+
+                if (endTime > (closingHour.Minute > 0 ? closingHour.Hour + 1 : closingHour.Hour))
+                {
+                    endTime = closingHour.Minute > 0 ? closingHour.Hour + 1 : closingHour.Hour;
                 }
                 if (startingHour >= endTime) { return; }
-                if (endTime > 23) { endTime = 23; } //till closing or keep it like this
-                if (department == Department.Kassa && endTime > cTime.Hour + 1) { return; }
+                if (department == Department.Kassa && endTime > closingHour.Hour + 1) { return; }
                 Context.Add(
                     new Shift()
                     {
@@ -420,9 +423,9 @@ namespace BumboApp.Controllers
             int closingHour = cTime.Hour;
 
             if (cTime.Minute > 0) { closingHour++; }
-            if (leaveRequest != null) 
+            if (leaveRequest != null)
             {
-                if (startingHour > leaveRequest.StartDate.Hour && startingHour < (leaveRequest.EndDate.Minute > 0 ? leaveRequest.EndDate.Hour+1 : leaveRequest.EndDate.Hour)) { return false; } ;
+                if (startingHour > leaveRequest.StartDate.Hour && startingHour < (leaveRequest.EndDate.Minute > 0 ? leaveRequest.EndDate.Hour + 1 : leaveRequest.EndDate.Hour)) { return false; };
             }
 
             if (availability == null)
@@ -509,7 +512,7 @@ namespace BumboApp.Controllers
             if (cTime.Minute > 0) { closingHour++; }
 
             List<Shift> shifts = Context.Shifts
-                    .Where(e => e.Start.Date == scheduleDate.ToDateTime(new TimeOnly())  && e.Department == Department.Kassa)
+                    .Where(e => e.Start.Date == scheduleDate.ToDateTime(new TimeOnly()) && e.Department == Department.Kassa)
                     .OrderBy(e => e.Start.Hour)
                     .ToList();
             Shift? previous = null;
@@ -537,7 +540,7 @@ namespace BumboApp.Controllers
                 }
             }
 
-            if(previous == null) { return openingHour; }
+            if (previous == null) { return openingHour; }
 
             if (previous.End.Hour == closingHour)
             {
@@ -546,7 +549,7 @@ namespace BumboApp.Controllers
 
             return previous.End.Hour;
         }
-        
+
         public IActionResult DeleteWeek(int weekNumber, int year)
         {
             var deleteDate = new DateOnly(year, 1, 1).AddDays((weekNumber - 1) * 7);
@@ -554,7 +557,7 @@ namespace BumboApp.Controllers
                 .Where(shift => DateOnly.FromDateTime(shift.Start) >= deleteDate
                                 && DateOnly.FromDateTime(shift.Start) < deleteDate.AddDays(7))
                 .ToList();
-            
+
             if (shifts.Count == 0)
             {
                 NotifyService.Error("Er zijn geen diensten gevonden voor de week");
@@ -596,7 +599,7 @@ namespace BumboApp.Controllers
                 foreach (var shift in shifts)
                 {
                     shift.IsFinal = true;
-                    
+
                     // send notification to employee
                     if (shift.Employee != null)
                     {
@@ -611,7 +614,7 @@ namespace BumboApp.Controllers
                         });
                     }
                 }
-                
+
                 Context.SaveChanges();
                 NotifyService.Success("De concept diensten zijn gepubliceerd");
                 return RedirectToAction("Index", new { startDate = publishDate.ToString("dd/MM/yyyy") });
@@ -621,7 +624,7 @@ namespace BumboApp.Controllers
                 NotifyService.Error("Er is iets fout gegaan bij het publiceren van de diensten");
                 return RedirectToAction("Index", new { startDate = publishDate.ToString("dd/MM/yyyy") });
             }
-            
+
         }
 
     }

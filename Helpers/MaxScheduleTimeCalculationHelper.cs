@@ -44,21 +44,10 @@ namespace BumboApp.Helpers
             }
             return (int)Math.Ceiling(hours);
         }
+
         public float GetWorkingHoursNoZero(IEnumerable<Shift> shifts)
         {
-            float hours = 0;
-            foreach (Shift shift in shifts)
-            {
-                TimeSpan time = shift.End - shift.Start;
-                hours += time.Hours;
-                foreach (int breakTime in _breakTimes)
-                {
-                    if (time.Hours > breakTime)
-                    {
-                        hours -= BreakTimeHours;
-                    }
-                }
-            }
+            float hours = GetWorkingHours(shifts);
             if (hours == 0)
             {
                 return 0.1F;
@@ -71,7 +60,7 @@ namespace BumboApp.Helpers
             List<Shift> shifts = employee.Shifts
                 .Where(e => e.Start.Date >= startDate.ToDateTime(new TimeOnly()) && e.End.Date <= startDate.AddDays(6).ToDateTime(new TimeOnly()))
                 .ToList();
-            if (shifts.Count != 0) 
+            if (shifts.Count != 0)
             {
                 float calculationHours = hours - GetWorkingHours(shifts);
                 foreach (int br in _breakTimes)
