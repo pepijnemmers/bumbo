@@ -95,11 +95,11 @@ namespace BumboApp.Controllers
 
             if (viewModel.DateOfBirth <= new DateOnly(1900, 1, 1))
             {
-                NotifyService.Error($"Geboortedatum moet na 1900 zijn. DEBUG: {viewModel.DateOfBirth}");
+                NotifyService.Error($"Geboortedatum moet na 1900 zijn.");
                 return View(viewModel);
             }
 
-            int minimunAge = 15; //TODO uit CAO halen (minimunleeftijd)
+            int minimunAge = 15; //TODO replace magic number from CAO ruleset
             if (viewModel.DateOfBirth > DateOnly.FromDateTime(DateTime.Now).AddYears(-minimunAge))
             {
                 NotifyService.Error($"De minimunleeftijd bij Bumbo is {minimunAge}");
@@ -123,9 +123,7 @@ namespace BumboApp.Controllers
             var user = new User
             {
                 UserName = viewModel.Email,
-                NormalizedUserName = viewModel.Email.ToUpper(),  //Dit moet uniek zijn van Asp
-                //UserName = viewModel.FirstName,
-                //NormalizedUserName = viewModel.FirstName.ToUpper(),
+                NormalizedUserName = viewModel.Email.ToUpper(),  //This has to be unique for Asp classes to work, hence why email instead of FirstName
 
                 Email = viewModel.Email,
                 NormalizedEmail = viewModel.Email.ToUpper(),
@@ -224,11 +222,12 @@ namespace BumboApp.Controllers
                 return View(model);
             }
 
-            //Username consistent houden tussen employee en user (is nodig voor verlof en ziek)
             user.UserName = model.Email;
             user.NormalizedUserName = model.Email.ToUpper();
-            employee.FirstName = model.FirstName;
+            user.Email = model.Email;
+            user.NormalizedEmail = model.Email;
 
+            employee.FirstName = model.FirstName;
             employee.LastName = model.LastName;
             employee.DateOfBirth = model.DateOfBirth;
             employee.Zipcode = model.Zipcode;
@@ -237,8 +236,6 @@ namespace BumboApp.Controllers
             employee.LeaveHours = model.LeaveHours;
             employee.StartOfEmployment = model.StartOfEmployment;
             employee.EndOfEmployment = model.EndOfEmployment;
-            user.Email = model.Email;
-            user.NormalizedEmail = model.Email;
 
             try
             {
@@ -310,7 +307,7 @@ namespace BumboApp.Controllers
                     ViewData["CityName"] = root.GetProperty("city").GetString();
                 }
             }
-            catch (Exception e)
+            catch
             {
                 ViewData["StreetName"] = "-";
                 ViewData["CityName"] = "-";
