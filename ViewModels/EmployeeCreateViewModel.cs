@@ -6,8 +6,8 @@ namespace BumboApp.ViewModels
 {
     public class EmployeeCreateViewModel
     {
-        [Required]
-        [RegularExpression(@"^[a-zA-Z0-9.]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$",
+        [Required(ErrorMessage = "Email is verplicht")]
+        [RegularExpression(@"^[a-zA-Z0-9](?:[a-zA-Z0-9._-]*[a-zA-Z0-9])?@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})*$",
             ErrorMessage = "Vul een geldig email adres in")]
         public string Email { get; set; }
 
@@ -38,7 +38,5 @@ namespace BumboApp.ViewModels
         public string HouseNumber { get; set; }
         [Required, Range(0, 55)]
         public int ContractHours { get; set; }
-        [Required, Range(0, 120)] //TODO dit veld moet weg, berekenen van contracturen
-        public int LeaveHours { get; set; }
     }
 }

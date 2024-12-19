@@ -26,13 +26,11 @@ namespace BumboApp.ViewModels
         public string HouseNumber { get; set; }
         [Required, Range(0, 55)]
         public int ContractHours { get; set; }
-        [Required, Range(0, 120)]
-        public int LeaveHours { get; set; }
         [Required]
         public DateOnly StartOfEmployment { get; set; }
         public DateOnly? EndOfEmployment { get; set; }
         [Required]
-        [RegularExpression(@"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$",
+        [RegularExpression(@"^[a-zA-Z0-9](?:[a-zA-Z0-9._-]*[a-zA-Z0-9])?@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})*$",
             ErrorMessage = "Vul een geldig email adres in")]
         public string Email { get; set; }
         public Role Role { get; set; }

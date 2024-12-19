@@ -77,15 +77,9 @@
     <div class="table-container p-3">
         <h3>Contractgegevens</h3>
         <div class="form-group">
-            <label asp-for="@Model.ContractHours" class="control-label">Contracturen</label>
+            <label asp-for="@Model.ContractHours" class="control-label">Contracturen (per week)</label>
             <input asp-for="@Model.ContractHours" type="number" class="form-control" />
             <span asp-validation-for="@Model.ContractHours" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="@Model.LeaveHours" class="control-label">Verlofuren</label>
-            <input asp-for="@Model.LeaveHours" type="number" class="form-control" />
-            <span asp-validation-for="@Model.LeaveHours" class="text-danger"></span>
         </div>
     </div>
 

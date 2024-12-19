@@ -143,7 +143,7 @@ namespace BumboApp.Controllers
                 Zipcode = viewModel.Zipcode.ToUpper(),
                 HouseNumber = viewModel.HouseNumber,
                 ContractHours = viewModel.ContractHours,
-                LeaveHours = viewModel.LeaveHours,
+                LeaveHours = viewModel.ContractHours * 4,
                 UserId = user.Id,
                 StartOfEmployment = DateOnly.FromDateTime(DateTime.Now),
                 StandardAvailability = new List<StandardAvailability>()
@@ -185,7 +185,6 @@ namespace BumboApp.Controllers
                 Zipcode = employee.Zipcode,
                 HouseNumber = employee.HouseNumber,
                 ContractHours = employee.ContractHours,
-                LeaveHours = employee.LeaveHours,
                 StartOfEmployment = employee.StartOfEmployment,
                 Email = employee.User.Email,
                 Role = employeeRole,
@@ -233,7 +232,7 @@ namespace BumboApp.Controllers
             employee.Zipcode = model.Zipcode;
             employee.HouseNumber = model.HouseNumber;
             employee.ContractHours = model.ContractHours;
-            employee.LeaveHours = model.LeaveHours;
+            employee.LeaveHours = model.ContractHours * 4;
             employee.StartOfEmployment = model.StartOfEmployment;
             employee.EndOfEmployment = model.EndOfEmployment;
 
@@ -254,7 +253,7 @@ namespace BumboApp.Controllers
                 await _userManager.AddToRoleAsync(user, model.Role.ToString());
                 await _userManager.RemoveFromRoleAsync(user, employeerole.ToString());
             }
-
+            NotifyService.Success("De wijzigingen zijn succesvol opgeslagen");
             return RedirectToAction(nameof(Details), new { id });
         }
 
