@@ -2,7 +2,8 @@
 
 @{
     ViewData["Title"] = "Werknemer details";
-    bool displayDismissButton = !(ViewData["EmployeeRole"].Equals("Manager") || (bool)ViewData["IsOwner"]) && Model.EndOfEmployment == null;
+    bool isEmployed = Model.EndOfEmployment == null;
+    bool displayDismissButton = !ViewData["EmployeeRole"].Equals("Manager") && isEmployed;
 }
 
 @if (Model == null)
@@ -29,7 +30,10 @@ else
                 {
                     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#dismissEmployeeModal">Uit dienst zetten</button>
                 }
-                <a class="btn btn-primary" asp-action="Update" asp-route-id="@Model.EmployeeNumber">Bewerken</a>
+                @if (isEmployed)
+                {
+                    <a class="btn btn-primary" asp-action="Update" asp-route-id="@Model.EmployeeNumber">Bewerken</a>
+                }
             </div>
         </div>
     </div>

@@ -64,7 +64,8 @@ namespace BumboApp.Controllers
                 {
                     Id = employee.EmployeeNumber,
                     Name = employee.FirstName + " " + employee.LastName,
-                    Role = employeeRole.ToFriendlyString()
+                    Role = employeeRole.ToFriendlyString(),
+                    EndOfEmployment = employee.EndOfEmployment,
                 };
                 viewModels.Add(viewModel);
             }

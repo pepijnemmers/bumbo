@@ -18,6 +18,7 @@
                 <th>Personeelnummer</th>
                 <th>Naam </th>
                 <th>Rol</th>
+                <th>In dienst</th>
                 <th>Acties</th>
             </tr>
         </thead>
@@ -36,6 +37,7 @@
                         <td>@employee.Id</td>
                         <td>@employee.Name</td>
                         <td>@employee.Role</td>
+                        <td>@(employee.EndOfEmployment == null ? "In dienst" : employee.EndOfEmployment)</td>
                         <td>
                             <a asp-controller="Employees" asp-action="details" asp-route-id="@employee.Id">
                                 <img width="20px" height="auto" src="~/img/details-icon.svg" alt="Alternate Text" />
