@@ -109,14 +109,14 @@ namespace BumboApp.Controllers
 
             if (Context.Users.Where(u => u.NormalizedEmail.Equals(viewModel.Email)).Any())
             {
-                NotifyService.Error("Deze email is al in gebruik");
+                NotifyService.Error("Deze e-mail is al in gebruik");
                 return View(viewModel);
             }
 
             var roleExists = await _roleManager.RoleExistsAsync(viewModel.Role.ToString());
             if (!roleExists)
             {
-                NotifyService.Error("Er is iets mis gegaan met het maken ivm de Rol");
+                NotifyService.Error("Er is iets mis gegaan met het maken ivm de rol");
                 return View(viewModel);
             }
 
@@ -199,43 +199,49 @@ namespace BumboApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(int id, EmployeeUpdateViewModel model)
+        public async Task<IActionResult> Update(int id, EmployeeUpdateViewModel viewModel)
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(viewModel);
+            }
+
+            if (Context.Employees.Where(e => e.User.NormalizedEmail.Equals(viewModel.Email) && !e.EmployeeNumber.Equals(viewModel.EmployeeNumber)).Any())
+            {
+                NotifyService.Error("Deze e-mail is al in gebruik");
+                return View(viewModel);
             }
 
             var employee = Context.Employees
                 .Include(e => e.User)
-                .FirstOrDefault(e => e.EmployeeNumber == model.EmployeeNumber);
+                .FirstOrDefault(e => e.EmployeeNumber == viewModel.EmployeeNumber);
 
             if (employee == null)
             {
                 NotifyService.Error("Er is iets misgegaan");
-                return View(model);
+                return View(viewModel);
             }
             var user = await _userManager.FindByIdAsync(employee.User.Id);
             if (user == null)
             {
                 NotifyService.Error("Er is iets misgegaan");
-                return View(model);
+                return View(viewModel);
             }
 
-            user.UserName = model.Email;
-            user.NormalizedUserName = model.Email.ToUpper();
-            user.Email = model.Email;
-            user.NormalizedEmail = model.Email;
+            user.UserName = viewModel.Email;
+            user.NormalizedUserName = viewModel.Email.ToUpper();
+            user.Email = viewModel.Email;
+            user.NormalizedEmail = viewModel.Email.ToUpper();
 
-            employee.FirstName = model.FirstName;
-            employee.LastName = model.LastName;
-            employee.DateOfBirth = model.DateOfBirth;
-            employee.Zipcode = model.Zipcode;
-            employee.HouseNumber = model.HouseNumber;
-            employee.ContractHours = model.ContractHours;
-            employee.LeaveHours = model.ContractHours * 4;
-            employee.StartOfEmployment = model.StartOfEmployment;
-            employee.EndOfEmployment = model.EndOfEmployment;
+            employee.FirstName = viewModel.FirstName;
+            employee.LastName = viewModel.LastName;
+            employee.DateOfBirth = viewModel.DateOfBirth;
+            employee.Zipcode = viewModel.Zipcode.ToUpper();
+            employee.HouseNumber = viewModel.HouseNumber;
+            employee.ContractHours = viewModel.ContractHours;
+            employee.LeaveHours = viewModel.ContractHours * 4;
+            employee.StartOfEmployment = viewModel.StartOfEmployment;
+            employee.EndOfEmployment = viewModel.EndOfEmployment;
 
             try
             {
@@ -249,9 +255,9 @@ namespace BumboApp.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
             var employeerole = (Role)Enum.Parse(typeof(Role), roles[0]);
-            if (!employeerole.Equals(model.Role))
+            if (!employeerole.Equals(viewModel.Role))
             {
-                await _userManager.AddToRoleAsync(user, model.Role.ToString());
+                await _userManager.AddToRoleAsync(user, viewModel.Role.ToString());
                 await _userManager.RemoveFromRoleAsync(user, employeerole.ToString());
             }
             NotifyService.Success("De wijzigingen zijn succesvol opgeslagen");

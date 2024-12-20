@@ -10,6 +10,8 @@
 }
 else
 {
+    <a asp-action="Details" asp-route-id="@Model.EmployeeNumber" class="btn btn-secondary">Terug</a>
+
     <form asp-action="Update" asp-route-id="@Model.EmployeeNumber" method="post">
         <div class="table-container p-3">
             <div class="d-flex justify-content-between align-items-center">
@@ -25,6 +27,7 @@ else
             <div class="row">
                 <div class="col-md-6">
                     <input type="hidden" asp-for="EmployeeNumber" />
+                    <input type="hidden" asp-for="IsOwner" />
                     <input type="hidden" asp-for="StartOfEmployment" />
                     <div class="form-group">
                         <label asp-for="FirstName" class="form-label">Voornaam</label>
