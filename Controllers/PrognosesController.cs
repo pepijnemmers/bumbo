@@ -133,7 +133,7 @@ namespace BumboApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult Update(List<Prognosis> prognoses)
+        public IActionResult Update(List<Prognosis> prognoses, string? id)
         {
             //Validation
             if (prognoses == null || !prognoses.Any())
@@ -170,7 +170,9 @@ namespace BumboApp.Controllers
                 }
                 Context.SaveChanges();
                 transaction.Commit();
-                return NotifySuccessAndRedirect("De prognose is bijgewerkt.", "Index");
+                
+                NotifyService.Success("De prognose is bijgewerkt.");
+                return id == null ? RedirectToAction("Index") : RedirectToAction("Details", new { id = id });
             }
             catch
             {
