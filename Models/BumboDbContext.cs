@@ -171,19 +171,21 @@ public partial class BumboDbContext : IdentityDbContext<User>
                 Name = Role.Employee.ToString(),
                 NormalizedName = Role.Employee.ToString().ToUpper()
             }
-            );
+        );
 
         //Seed Users
         var user1Id = "2ab03136-c316-4b70-a7fc-4c9cb044a6be"; //Manager
         var user2Id = "12544476-38da-4113-9c40-4bc508f8c0f2"; //Employee
         var user3Id = "2667ab01-7225-451b-adbb-c99eea968d02"; //Employee
+        var user4Id = "a60c8f93-cb79-441e-8ec9-627d8a679ff3"; //Employee
+        var user5Id = "4b26e441-e63a-497e-82da-3b629212431b"; //Employee
 
         modelBuilder.Entity<User>().HasData(
                 new User
                 {
                     Id = user1Id,
-                    UserName = "John",
-                    NormalizedUserName = "JOHN",
+                    UserName = "john.doe@example.com",
+                    NormalizedUserName = "JOHN.DOE@EXAMPLE.COM",
                     Email = "john.doe@example.com",
                     NormalizedEmail = "JOHN.DOE@EXAMPLE.COM",
                     EmailConfirmed = true,
@@ -195,8 +197,8 @@ public partial class BumboDbContext : IdentityDbContext<User>
                 new User
                 {
                     Id = user2Id,
-                    UserName = "Jane",
-                    NormalizedUserName = "JANE",
+                    UserName = "jane.smith@example.com",
+                    NormalizedUserName = "JANE.SMITH@EXAMPLE.COM",
                     Email = "jane.smith@example.com",
                     NormalizedEmail = "JANE.SMITH@EXAMPLE.COM",
                     EmailConfirmed = true,
@@ -208,10 +210,36 @@ public partial class BumboDbContext : IdentityDbContext<User>
                 new User
                 {
                     Id = user3Id,
-                    UserName = "Emily",
-                    NormalizedUserName = "EMILY",
+                    UserName = "emily.jones@example.com",
+                    NormalizedUserName = "EMILY.JONES@EXAMPLE.COM",
                     Email = "emily.jones@example.com",
                     NormalizedEmail = "EMILY.JONES@EXAMPLE.COM",
+                    EmailConfirmed = true,
+                    LockoutEnabled = false,
+                    SecurityStamp = "static-security-stamp",
+                    ConcurrencyStamp = "static-concurrency-stamp",
+                    PasswordHash = "AQAAAAIAAYagAAAAEHv/0P6Xoo7fFyIXoIwA78DUHxHCFNYGaR8vPnMjmnx+QoW0Khto6+ptFaVzpYAWFw=="
+                },
+                new User
+                {
+                    Id = user4Id,
+                    UserName = "bob.square@example.com",
+                    NormalizedUserName = "BOB.SQUARE@EXAMPLE.COM",
+                    Email = "bob.square@example.com",
+                    NormalizedEmail = "BOB.SQUARE@EXAMPLE.COM",
+                    EmailConfirmed = true,
+                    LockoutEnabled = false,
+                    SecurityStamp = "static-security-stamp",
+                    ConcurrencyStamp = "static-concurrency-stamp",
+                    PasswordHash = "AQAAAAIAAYagAAAAEHv/0P6Xoo7fFyIXoIwA78DUHxHCFNYGaR8vPnMjmnx+QoW0Khto6+ptFaVzpYAWFw=="
+                },
+                new User
+                {
+                    Id = user5Id,
+                    UserName = "IkHoudVanPaul@example.com",
+                    NormalizedUserName = "IKHOUDVANPAUL@EXAMPLE.COM",
+                    Email = "IkHoudVanPaul@example.com",
+                    NormalizedEmail = "IKHOUDVANPAUL@EXAMPLE.COM",
                     EmailConfirmed = true,
                     LockoutEnabled = false,
                     SecurityStamp = "static-security-stamp",
@@ -235,6 +263,16 @@ public partial class BumboDbContext : IdentityDbContext<User>
             new IdentityUserRole<string>
             {
                 UserId = user3Id,
+                RoleId = employeeRoleId
+            },
+            new IdentityUserRole<string>
+            {
+                UserId = user4Id,
+                RoleId = employeeRoleId
+            },
+            new IdentityUserRole<string>
+            {
+                UserId = user5Id,
                 RoleId = employeeRoleId
             }
         );
@@ -275,10 +313,36 @@ public partial class BumboDbContext : IdentityDbContext<User>
                 DateOfBirth = new DateOnly(1998, 12, 5),
                 Zipcode = "5683AA",
                 HouseNumber = "1",
-                ContractHours = 35,
+                ContractHours = 20,
                 LeaveHours = 40,
-                StartOfEmployment = new DateOnly(2019, 7, 30),
+                StartOfEmployment = new DateOnly(2020, 7, 30),
                 UserId = user3Id
+            },
+            new
+            {
+                EmployeeNumber = 4,
+                FirstName = "Bob",
+                LastName = "van der Steen",
+                DateOfBirth = new DateOnly(2002, 6, 21),
+                Zipcode = "5622AX",
+                HouseNumber = "25",
+                ContractHours = 20,
+                LeaveHours = 40,
+                StartOfEmployment = new DateOnly(2020, 6, 30),
+                UserId = user4Id
+            },
+            new
+            {
+                EmployeeNumber = 5,
+                FirstName = "Paul",
+                LastName = "Bakker",
+                DateOfBirth = new DateOnly(1966, 10, 10),
+                Zipcode = "5622AX",
+                HouseNumber = "25",
+                ContractHours = 40,
+                LeaveHours = 40,
+                StartOfEmployment = new DateOnly(2010, 7, 30),
+                UserId = user5Id
             }
         );
 
@@ -329,187 +393,159 @@ public partial class BumboDbContext : IdentityDbContext<User>
         );
 
         modelBuilder.Entity<StandardAvailability>().HasData(
-            new StandardAvailability
-            {
-                Day = DayOfWeek.Monday,
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(18, 0),
-                EndTime = new TimeOnly(21, 0)
-            },
-            new StandardAvailability
-            {
-                Day = DayOfWeek.Tuesday,
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(9, 0),
-                EndTime = new TimeOnly(21, 0)
-            },
-            new StandardAvailability
-            {
-                Day = DayOfWeek.Wednesday,
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(9, 0),
-                EndTime = new TimeOnly(21, 0)
-            },
-            new StandardAvailability
-            {
-                Day = DayOfWeek.Thursday,
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(9, 0),
-                EndTime = new TimeOnly(18, 0)
-            },
-            new StandardAvailability
-            {
-                Day = DayOfWeek.Friday,
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(9, 0),
-                EndTime = new TimeOnly(21, 0)
-            },
-            new StandardAvailability
-            {
-                Day = DayOfWeek.Saturday,
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(9, 0),
-                EndTime = new TimeOnly(16, 0)
-            },
-            new StandardAvailability
-            {
-                Day = DayOfWeek.Sunday,
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(9, 0),
-                EndTime = new TimeOnly(21, 0)
-            },
+            // Employee 2
+            new StandardAvailability { Day = DayOfWeek.Monday, EmployeeNumber = 2, StartTime = new TimeOnly(18, 0), EndTime = new TimeOnly(21, 0) },
+            new StandardAvailability { Day = DayOfWeek.Tuesday, EmployeeNumber = 2, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(21, 0) },
+            new StandardAvailability { Day = DayOfWeek.Wednesday, EmployeeNumber = 2, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(21, 0) },
+            new StandardAvailability { Day = DayOfWeek.Thursday, EmployeeNumber = 2, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(18, 0) },
+            new StandardAvailability { Day = DayOfWeek.Friday, EmployeeNumber = 2, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(21, 0) },
+            new StandardAvailability { Day = DayOfWeek.Saturday, EmployeeNumber = 2, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(16, 0) },
+            new StandardAvailability { Day = DayOfWeek.Sunday, EmployeeNumber = 2, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(21, 0) },
 
-            //Employee 3
-            new StandardAvailability
-            {
-                Day = DayOfWeek.Monday,
-                EmployeeNumber = 3,
-                StartTime = new TimeOnly(8, 30),
-                EndTime = new TimeOnly(14, 30)
-            },
-            new StandardAvailability
-            {
-                Day = DayOfWeek.Tuesday,
-                EmployeeNumber = 3,
-                StartTime = new TimeOnly(13, 0),
-                EndTime = new TimeOnly(19, 0)
-            },
-            new StandardAvailability
-            {
-                Day = DayOfWeek.Wednesday,
-                EmployeeNumber = 3,
-                StartTime = new TimeOnly(9, 0),
-                EndTime = new TimeOnly(17, 0)
-            },
-            new StandardAvailability
-            {
-                Day = DayOfWeek.Thursday,
-                EmployeeNumber = 3,
-                StartTime = new TimeOnly(10, 0),
-                EndTime = new TimeOnly(16, 0)
-            },
-            new StandardAvailability
-            {
-                Day = DayOfWeek.Friday,
-                EmployeeNumber = 3,
-                StartTime = new TimeOnly(14, 0),
-                EndTime = new TimeOnly(20, 0)
-            },
-            new StandardAvailability
-            {
-                Day = DayOfWeek.Saturday,
-                EmployeeNumber = 3,
-                StartTime = new TimeOnly(11, 0),
-                EndTime = new TimeOnly(18, 0)
-            },
-            new StandardAvailability
-            {
-                Day = DayOfWeek.Sunday,
-                EmployeeNumber = 3,
-                StartTime = new TimeOnly(12, 0),
-                EndTime = new TimeOnly(16, 0)
-            }
+            // Employee 3
+            new StandardAvailability { Day = DayOfWeek.Monday, EmployeeNumber = 3, StartTime = new TimeOnly(8, 30), EndTime = new TimeOnly(14, 30) },
+            new StandardAvailability { Day = DayOfWeek.Tuesday, EmployeeNumber = 3, StartTime = new TimeOnly(13, 0), EndTime = new TimeOnly(19, 0) },
+            new StandardAvailability { Day = DayOfWeek.Wednesday, EmployeeNumber = 3, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(17, 0) },
+            new StandardAvailability { Day = DayOfWeek.Thursday, EmployeeNumber = 3, StartTime = new TimeOnly(10, 0), EndTime = new TimeOnly(16, 0) },
+            new StandardAvailability { Day = DayOfWeek.Friday, EmployeeNumber = 3, StartTime = new TimeOnly(14, 0), EndTime = new TimeOnly(20, 0) },
+            new StandardAvailability { Day = DayOfWeek.Saturday, EmployeeNumber = 3, StartTime = new TimeOnly(11, 0), EndTime = new TimeOnly(18, 0) },
+            new StandardAvailability { Day = DayOfWeek.Sunday, EmployeeNumber = 3, StartTime = new TimeOnly(12, 0), EndTime = new TimeOnly(16, 0) },
+
+            // Employee 4
+            new StandardAvailability { Day = DayOfWeek.Monday, EmployeeNumber = 4, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(17, 0) },
+            new StandardAvailability { Day = DayOfWeek.Tuesday, EmployeeNumber = 4, StartTime = new TimeOnly(11, 0), EndTime = new TimeOnly(19, 0) },
+            new StandardAvailability { Day = DayOfWeek.Wednesday, EmployeeNumber = 4, StartTime = new TimeOnly(10, 0), EndTime = new TimeOnly(18, 0) },
+            new StandardAvailability { Day = DayOfWeek.Thursday, EmployeeNumber = 4, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(17, 0) },
+            new StandardAvailability { Day = DayOfWeek.Friday, EmployeeNumber = 4, StartTime = new TimeOnly(13, 0), EndTime = new TimeOnly(21, 0) },
+            new StandardAvailability { Day = DayOfWeek.Saturday, EmployeeNumber = 4, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(16, 0) },
+            new StandardAvailability { Day = DayOfWeek.Sunday, EmployeeNumber = 4, StartTime = new TimeOnly(12, 0), EndTime = new TimeOnly(20, 0) },
+
+            // Employee 5
+            new StandardAvailability { Day = DayOfWeek.Monday, EmployeeNumber = 5, StartTime = new TimeOnly(7, 0), EndTime = new TimeOnly(15, 0) },
+            new StandardAvailability { Day = DayOfWeek.Tuesday, EmployeeNumber = 5, StartTime = new TimeOnly(8, 0), EndTime = new TimeOnly(16, 0) },
+            new StandardAvailability { Day = DayOfWeek.Wednesday, EmployeeNumber = 5, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(17, 0) },
+            new StandardAvailability { Day = DayOfWeek.Thursday, EmployeeNumber = 5, StartTime = new TimeOnly(11, 0), EndTime = new TimeOnly(19, 0) },
+            new StandardAvailability { Day = DayOfWeek.Friday, EmployeeNumber = 5, StartTime = new TimeOnly(12, 0), EndTime = new TimeOnly(20, 0) },
+            new StandardAvailability { Day = DayOfWeek.Saturday, EmployeeNumber = 5, StartTime = new TimeOnly(10, 0), EndTime = new TimeOnly(18, 0) },
+            new StandardAvailability { Day = DayOfWeek.Sunday, EmployeeNumber = 5, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(17, 0) }
         );
     }
 
     private static void SeedData(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<WeekPrognosis>().HasData(
-            new WeekPrognosis { Id = 1, StartDate = new DateOnly(2024, 10, 7) },
-            new WeekPrognosis { Id = 2, StartDate = new DateOnly(2024, 12, 9) }
+            new WeekPrognosis { Id = 1, StartDate = new DateOnly(2025, 1, 6) },
+            new WeekPrognosis { Id = 2, StartDate = new DateOnly(2025, 1, 13) },
+            new WeekPrognosis { Id = 3, StartDate = new DateOnly(2025, 1, 20) }
         );
 
         modelBuilder.Entity<Prognosis>().HasData(
-            // Week 1, Day 1 (2024-10-07)
-            new Prognosis { Id = 1, Date = new DateOnly(2024, 10, 7), Department = Department.Vers, NeededHours = 40, NeededEmployees = 5, WeekPrognosisId = 1 },
-            new Prognosis { Id = 2, Date = new DateOnly(2024, 10, 7), Department = Department.Vakkenvullen, NeededHours = 32, NeededEmployees = 4, WeekPrognosisId = 1 },
-            new Prognosis { Id = 3, Date = new DateOnly(2024, 10, 7), Department = Department.Kassa, NeededHours = 24, NeededEmployees = 3, WeekPrognosisId = 1 },
+            // Week 2, Day 1 (2024-01-06)
+            new Prognosis { Id = 1, Date = new DateOnly(2025, 1, 6), Department = Department.Vers, NeededHours = 40, NeededEmployees = 5.0f, WeekPrognosisId = 1 },
+            new Prognosis { Id = 2, Date = new DateOnly(2025, 1, 6), Department = Department.Vakkenvullen, NeededHours = 32, NeededEmployees = 4.0f, WeekPrognosisId = 1 },
+            new Prognosis { Id = 3, Date = new DateOnly(2025, 1, 6), Department = Department.Kassa, NeededHours = 24, NeededEmployees = 3.0f, WeekPrognosisId = 1 },
 
-            // Week 1, Day 2 (2024-10-08)
-            new Prognosis { Id = 4, Date = new DateOnly(2024, 10, 8), Department = Department.Vers, NeededHours = 32, NeededEmployees = 4, WeekPrognosisId = 1 },
-            new Prognosis { Id = 5, Date = new DateOnly(2024, 10, 8), Department = Department.Vakkenvullen, NeededHours = 24, NeededEmployees = 3, WeekPrognosisId = 1 },
-            new Prognosis { Id = 6, Date = new DateOnly(2024, 10, 8), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2, WeekPrognosisId = 1 },
+            // Week 2, Day 2 (2024-01-07)
+            new Prognosis { Id = 4, Date = new DateOnly(2025, 1, 7), Department = Department.Vers, NeededHours = 32, NeededEmployees = 4.0f, WeekPrognosisId = 1 },
+            new Prognosis { Id = 5, Date = new DateOnly(2025, 1, 7), Department = Department.Vakkenvullen, NeededHours = 24, NeededEmployees = 3.0f, WeekPrognosisId = 1 },
+            new Prognosis { Id = 6, Date = new DateOnly(2025, 1, 7), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2.0f, WeekPrognosisId = 1 },
 
-            // Week 1, Day 3 (2024-10-09)
-            new Prognosis { Id = 7, Date = new DateOnly(2024, 10, 9), Department = Department.Vers, NeededHours = 48, NeededEmployees = 6, WeekPrognosisId = 1 },
-            new Prognosis { Id = 8, Date = new DateOnly(2024, 10, 9), Department = Department.Vakkenvullen, NeededHours = 24, NeededEmployees = 3, WeekPrognosisId = 1 },
-            new Prognosis { Id = 9, Date = new DateOnly(2024, 10, 9), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2, WeekPrognosisId = 1 },
+            // Week 2, Day 3 (2024-01-08)
+            new Prognosis { Id = 7, Date = new DateOnly(2025, 1, 8), Department = Department.Vers, NeededHours = 48, NeededEmployees = 6.0f, WeekPrognosisId = 1 },
+            new Prognosis { Id = 8, Date = new DateOnly(2025, 1, 8), Department = Department.Vakkenvullen, NeededHours = 24, NeededEmployees = 3.0f, WeekPrognosisId = 1 },
+            new Prognosis { Id = 9, Date = new DateOnly(2025, 1, 8), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2.0f, WeekPrognosisId = 1 },
 
-            // Week 1, Day 4 (2024-10-10)
-            new Prognosis { Id = 10, Date = new DateOnly(2024, 10, 10), Department = Department.Vers, NeededHours = 48, NeededEmployees = 6, WeekPrognosisId = 1 },
-            new Prognosis { Id = 11, Date = new DateOnly(2024, 10, 10), Department = Department.Vakkenvullen, NeededHours = 24, NeededEmployees = 3, WeekPrognosisId = 1 },
-            new Prognosis { Id = 12, Date = new DateOnly(2024, 10, 10), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2, WeekPrognosisId = 1 },
+            // Week 2, Day 4 (2024-01-09)
+            new Prognosis { Id = 10, Date = new DateOnly(2025, 1, 9), Department = Department.Vers, NeededHours = 48, NeededEmployees = 6.0f, WeekPrognosisId = 1 },
+            new Prognosis { Id = 11, Date = new DateOnly(2025, 1, 9), Department = Department.Vakkenvullen, NeededHours = 24, NeededEmployees = 3.0f, WeekPrognosisId = 1 },
+            new Prognosis { Id = 12, Date = new DateOnly(2025, 1, 9), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2.0f, WeekPrognosisId = 1 },
 
-            // Week 1, Day 5 (2024-10-11)
-            new Prognosis { Id = 13, Date = new DateOnly(2024, 10, 11), Department = Department.Vers, NeededHours = 48, NeededEmployees = 6, WeekPrognosisId = 1 },
-            new Prognosis { Id = 14, Date = new DateOnly(2024, 10, 11), Department = Department.Vakkenvullen, NeededHours = 24, NeededEmployees = 3, WeekPrognosisId = 1 },
-            new Prognosis { Id = 15, Date = new DateOnly(2024, 10, 11), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2, WeekPrognosisId = 1 },
+            // Week 2, Day 5 (2024-01-10)
+            new Prognosis { Id = 13, Date = new DateOnly(2025, 1, 10), Department = Department.Vers, NeededHours = 48, NeededEmployees = 6.0f, WeekPrognosisId = 1 },
+            new Prognosis { Id = 14, Date = new DateOnly(2025, 1, 10), Department = Department.Vakkenvullen, NeededHours = 24, NeededEmployees = 3.0f, WeekPrognosisId = 1 },
+            new Prognosis { Id = 15, Date = new DateOnly(2025, 1, 10), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2.0f, WeekPrognosisId = 1 },
 
-            // Week 1, Day 6 (2024-10-12)
-            new Prognosis { Id = 16, Date = new DateOnly(2024, 10, 12), Department = Department.Vers, NeededHours = 48, NeededEmployees = 6, WeekPrognosisId = 1 },
-            new Prognosis { Id = 17, Date = new DateOnly(2024, 10, 12), Department = Department.Vakkenvullen, NeededHours = 24, NeededEmployees = 3, WeekPrognosisId = 1 },
-            new Prognosis { Id = 18, Date = new DateOnly(2024, 10, 12), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2, WeekPrognosisId = 1 },
+            // Week 2, Day 6 (2024-01-11)
+            new Prognosis { Id = 16, Date = new DateOnly(2025, 1, 11), Department = Department.Vers, NeededHours = 48, NeededEmployees = 6.0f, WeekPrognosisId = 1 },
+            new Prognosis { Id = 17, Date = new DateOnly(2025, 1, 11), Department = Department.Vakkenvullen, NeededHours = 24, NeededEmployees = 3.0f, WeekPrognosisId = 1 },
+            new Prognosis { Id = 18, Date = new DateOnly(2025, 1, 11), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2.0f, WeekPrognosisId = 1 },
 
-            // Week 1, Day 7 (2024-10-13)
-            new Prognosis { Id = 19, Date = new DateOnly(2024, 10, 13), Department = Department.Vers, NeededHours = 48, NeededEmployees = 6, WeekPrognosisId = 1 },
-            new Prognosis { Id = 20, Date = new DateOnly(2024, 10, 13), Department = Department.Vakkenvullen, NeededHours = 24, NeededEmployees = 3, WeekPrognosisId = 1 },
-            new Prognosis { Id = 21, Date = new DateOnly(2024, 10, 13), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2, WeekPrognosisId = 1 },
+            // Week 2, Day 7 (2024-01-12)
+            new Prognosis { Id = 19, Date = new DateOnly(2025, 1, 12), Department = Department.Vers, NeededHours = 48, NeededEmployees = 6.0f, WeekPrognosisId = 1 },
+            new Prognosis { Id = 20, Date = new DateOnly(2025, 1, 12), Department = Department.Vakkenvullen, NeededHours = 24, NeededEmployees = 3.0f, WeekPrognosisId = 1 },
+            new Prognosis { Id = 21, Date = new DateOnly(2025, 1, 12), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2.0f, WeekPrognosisId = 1 },
 
-            // Week 2, Day 1 (2024-12-09)
-            new Prognosis { Id = 22, Date = new DateOnly(2024, 12, 9), Department = Department.Vers, NeededHours = 40, NeededEmployees = 5.0f, WeekPrognosisId = 2 },
-            new Prognosis { Id = 23, Date = new DateOnly(2024, 12, 9), Department = Department.Vakkenvullen, NeededHours = 36, NeededEmployees = 4.5f, WeekPrognosisId = 2 },
-            new Prognosis { Id = 24, Date = new DateOnly(2024, 12, 9), Department = Department.Kassa, NeededHours = 20, NeededEmployees = 2.5f, WeekPrognosisId = 2 },
+            // Week 3, Day 1 (2024-01-13)
+            new Prognosis { Id = 22, Date = new DateOnly(2025, 1, 13), Department = Department.Vers, NeededHours = 40, NeededEmployees = 5.0f, WeekPrognosisId = 2 },
+            new Prognosis { Id = 23, Date = new DateOnly(2025, 1, 13), Department = Department.Vakkenvullen, NeededHours = 32, NeededEmployees = 4.0f, WeekPrognosisId = 2 },
+            new Prognosis { Id = 24, Date = new DateOnly(2025, 1, 13), Department = Department.Kassa, NeededHours = 24, NeededEmployees = 3.0f, WeekPrognosisId = 2 },
 
-            // Week 2, Day 2 (2024-12-10)
-            new Prognosis { Id = 25, Date = new DateOnly(2024, 12, 10), Department = Department.Vers, NeededHours = 32, NeededEmployees = 4.0f, WeekPrognosisId = 2 },
-            new Prognosis { Id = 26, Date = new DateOnly(2024, 12, 10), Department = Department.Vakkenvullen, NeededHours = 28, NeededEmployees = 3.5f, WeekPrognosisId = 2 },
-            new Prognosis { Id = 27, Date = new DateOnly(2024, 12, 10), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2.0f, WeekPrognosisId = 2 },
+            // Week 3, Day 2 (2024-01-14)
+            new Prognosis { Id = 25, Date = new DateOnly(2025, 1, 14), Department = Department.Vers, NeededHours = 32, NeededEmployees = 4.0f, WeekPrognosisId = 2 },
+            new Prognosis { Id = 26, Date = new DateOnly(2025, 1, 14), Department = Department.Vakkenvullen, NeededHours = 24, NeededEmployees = 3.0f, WeekPrognosisId = 2 },
+            new Prognosis { Id = 27, Date = new DateOnly(2025, 1, 14), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2.0f, WeekPrognosisId = 2 },
 
-            // Week 2, Day 3 (2024-12-11)
-            new Prognosis { Id = 28, Date = new DateOnly(2024, 12, 11), Department = Department.Vers, NeededHours = 40, NeededEmployees = 5.0f, WeekPrognosisId = 2 },
-            new Prognosis { Id = 29, Date = new DateOnly(2024, 12, 11), Department = Department.Vakkenvullen, NeededHours = 24, NeededEmployees = 3.0f, WeekPrognosisId = 2 },
-            new Prognosis { Id = 30, Date = new DateOnly(2024, 12, 11), Department = Department.Kassa, NeededHours = 20, NeededEmployees = 2.5f, WeekPrognosisId = 2 },
+            // Week 3, Day 3 (2024-01-15)
+            new Prognosis { Id = 28, Date = new DateOnly(2025, 1, 15), Department = Department.Vers, NeededHours = 40, NeededEmployees = 5.0f, WeekPrognosisId = 2 },
+            new Prognosis { Id = 29, Date = new DateOnly(2025, 1, 15), Department = Department.Vakkenvullen, NeededHours = 32, NeededEmployees = 4.0f, WeekPrognosisId = 2 },
+            new Prognosis { Id = 30, Date = new DateOnly(2025, 1, 15), Department = Department.Kassa, NeededHours = 24, NeededEmployees = 3.0f, WeekPrognosisId = 2 },
 
-            // Week 2, Day 4 (2024-12-12)
-            new Prognosis { Id = 31, Date = new DateOnly(2024, 12, 12), Department = Department.Vers, NeededHours = 48, NeededEmployees = 6.0f, WeekPrognosisId = 2 },
-            new Prognosis { Id = 32, Date = new DateOnly(2024, 12, 12), Department = Department.Vakkenvullen, NeededHours = 36, NeededEmployees = 4.5f, WeekPrognosisId = 2 },
-            new Prognosis { Id = 33, Date = new DateOnly(2024, 12, 12), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2.0f, WeekPrognosisId = 2 },
+            // Week 3, Day 4 (2024-01-16)
+            new Prognosis { Id = 31, Date = new DateOnly(2025, 1, 16), Department = Department.Vers, NeededHours = 48, NeededEmployees = 6.0f, WeekPrognosisId = 2 },
+            new Prognosis { Id = 32, Date = new DateOnly(2025, 1, 16), Department = Department.Vakkenvullen, NeededHours = 32, NeededEmployees = 4.0f, WeekPrognosisId = 2 },
+            new Prognosis { Id = 33, Date = new DateOnly(2025, 1, 16), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2.0f, WeekPrognosisId = 2 },
 
-            // Week 2, Day 5 (2024-12-13)
-            new Prognosis { Id = 34, Date = new DateOnly(2024, 12, 13), Department = Department.Vers, NeededHours = 40, NeededEmployees = 5.0f, WeekPrognosisId = 2 },
-            new Prognosis { Id = 35, Date = new DateOnly(2024, 12, 13), Department = Department.Vakkenvullen, NeededHours = 28, NeededEmployees = 3.5f, WeekPrognosisId = 2 },
-            new Prognosis { Id = 36, Date = new DateOnly(2024, 12, 13), Department = Department.Kassa, NeededHours = 12, NeededEmployees = 1.5f, WeekPrognosisId = 2 },
+            // Week 3, Day 5 (2024-01-17)
+            new Prognosis { Id = 34, Date = new DateOnly(2025, 1, 17), Department = Department.Vers, NeededHours = 40, NeededEmployees = 5.0f, WeekPrognosisId = 2 },
+            new Prognosis { Id = 35, Date = new DateOnly(2025, 1, 17), Department = Department.Vakkenvullen, NeededHours = 32, NeededEmployees = 4.0f, WeekPrognosisId = 2 },
+            new Prognosis { Id = 36, Date = new DateOnly(2025, 1, 17), Department = Department.Kassa, NeededHours = 24, NeededEmployees = 3.0f, WeekPrognosisId = 2 },
 
-            // Week 2, Day 6 (2024-12-14)
-            new Prognosis { Id = 37, Date = new DateOnly(2024, 12, 14), Department = Department.Vers, NeededHours = 32, NeededEmployees = 4.0f, WeekPrognosisId = 2 },
-            new Prognosis { Id = 38, Date = new DateOnly(2024, 12, 14), Department = Department.Vakkenvullen, NeededHours = 40, NeededEmployees = 5.0f, WeekPrognosisId = 2 },
-            new Prognosis { Id = 39, Date = new DateOnly(2024, 12, 14), Department = Department.Kassa, NeededHours = 24, NeededEmployees = 3.0f, WeekPrognosisId = 2 },
+            // Week 3, Day 6 (2024-01-18)
+            new Prognosis { Id = 37, Date = new DateOnly(2025, 1, 18), Department = Department.Vers, NeededHours = 32, NeededEmployees = 4.0f, WeekPrognosisId = 2 },
+            new Prognosis { Id = 38, Date = new DateOnly(2025, 1, 18), Department = Department.Vakkenvullen, NeededHours = 40, NeededEmployees = 5.0f, WeekPrognosisId = 2 },
+            new Prognosis { Id = 39, Date = new DateOnly(2025, 1, 18), Department = Department.Kassa, NeededHours = 24, NeededEmployees = 3.0f, WeekPrognosisId = 2 },
 
-            // Week 2, Day 7 (2024-12-15)
-            new Prognosis { Id = 40, Date = new DateOnly(2024, 12, 15), Department = Department.Vers, NeededHours = 48, NeededEmployees = 6.0f, WeekPrognosisId = 2 },
-            new Prognosis { Id = 41, Date = new DateOnly(2024, 12, 15), Department = Department.Vakkenvullen, NeededHours = 32, NeededEmployees = 4.0f, WeekPrognosisId = 2 },
-            new Prognosis { Id = 42, Date = new DateOnly(2024, 12, 15), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2.0f, WeekPrognosisId = 2 }
+            // Week 3, Day 7 (2024-01-19)
+            new Prognosis { Id = 40, Date = new DateOnly(2025, 1, 19), Department = Department.Vers, NeededHours = 48, NeededEmployees = 6.0f, WeekPrognosisId = 2 },
+            new Prognosis { Id = 41, Date = new DateOnly(2025, 1, 19), Department = Department.Vakkenvullen, NeededHours = 32, NeededEmployees = 4.0f, WeekPrognosisId = 2 },
+            new Prognosis { Id = 42, Date = new DateOnly(2025, 1, 19), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2.0f, WeekPrognosisId = 2 },
+
+            // Week 4, Day 1 (2024-01-20)
+            new Prognosis { Id = 43, Date = new DateOnly(2025, 1, 20), Department = Department.Vers, NeededHours = 42, NeededEmployees = 5.25f, WeekPrognosisId = 3 },
+            new Prognosis { Id = 44, Date = new DateOnly(2025, 1, 20), Department = Department.Vakkenvullen, NeededHours = 34, NeededEmployees = 4.25f, WeekPrognosisId = 3 },
+            new Prognosis { Id = 45, Date = new DateOnly(2025, 1, 20), Department = Department.Kassa, NeededHours = 22, NeededEmployees = 2.75f, WeekPrognosisId = 3 },
+
+            // Week 4, Day 2 (2024-01-21)
+            new Prognosis { Id = 46, Date = new DateOnly(2025, 1, 21), Department = Department.Vers, NeededHours = 34, NeededEmployees = 4.25f, WeekPrognosisId = 3 },
+            new Prognosis { Id = 47, Date = new DateOnly(2025, 1, 21), Department = Department.Vakkenvullen, NeededHours = 26, NeededEmployees = 3.25f, WeekPrognosisId = 3 },
+            new Prognosis { Id = 48, Date = new DateOnly(2025, 1, 21), Department = Department.Kassa, NeededHours = 18, NeededEmployees = 2.25f, WeekPrognosisId = 3 },
+
+            // Week 4, Day 3 (2024-01-22)
+            new Prognosis { Id = 49, Date = new DateOnly(2025, 1, 22), Department = Department.Vers, NeededHours = 46, NeededEmployees = 5.75f, WeekPrognosisId = 3 },
+            new Prognosis { Id = 50, Date = new DateOnly(2025, 1, 22), Department = Department.Vakkenvullen, NeededHours = 28, NeededEmployees = 3.5f, WeekPrognosisId = 3 },
+            new Prognosis { Id = 51, Date = new DateOnly(2025, 1, 22), Department = Department.Kassa, NeededHours = 24, NeededEmployees = 3.0f, WeekPrognosisId = 3 },
+
+            // Week 4, Day 4 (2024-01-23)
+            new Prognosis { Id = 52, Date = new DateOnly(2025, 1, 23), Department = Department.Vers, NeededHours = 50, NeededEmployees = 6.25f, WeekPrognosisId = 3 },
+            new Prognosis { Id = 53, Date = new DateOnly(2025, 1, 23), Department = Department.Vakkenvullen, NeededHours = 38, NeededEmployees = 4.75f, WeekPrognosisId = 3 },
+            new Prognosis { Id = 54, Date = new DateOnly(2025, 1, 23), Department = Department.Kassa, NeededHours = 18, NeededEmployees = 2.25f, WeekPrognosisId = 3 },
+
+            // Week 4, Day 5 (2024-01-24)
+            new Prognosis { Id = 55, Date = new DateOnly(2025, 1, 24), Department = Department.Vers, NeededHours = 42, NeededEmployees = 5.25f, WeekPrognosisId = 3 },
+            new Prognosis { Id = 56, Date = new DateOnly(2025, 1, 24), Department = Department.Vakkenvullen, NeededHours = 30, NeededEmployees = 3.75f, WeekPrognosisId = 3 },
+            new Prognosis { Id = 57, Date = new DateOnly(2025, 1, 24), Department = Department.Kassa, NeededHours = 14, NeededEmployees = 1.75f, WeekPrognosisId = 3 },
+
+            // Week 4, Day 6 (2024-01-24)
+            new Prognosis { Id = 58, Date = new DateOnly(2025, 1, 25), Department = Department.Vers, NeededHours = 32, NeededEmployees = 4.0f, WeekPrognosisId = 3 },
+            new Prognosis { Id = 59, Date = new DateOnly(2025, 1, 25), Department = Department.Vakkenvullen, NeededHours = 40, NeededEmployees = 5.0f, WeekPrognosisId = 3 },
+            new Prognosis { Id = 60, Date = new DateOnly(2025, 1, 25), Department = Department.Kassa, NeededHours = 24, NeededEmployees = 3.0f, WeekPrognosisId = 3 },
+
+            // Week 4, Day 7 (2024-01-24)
+            new Prognosis { Id = 61, Date = new DateOnly(2025, 1, 26), Department = Department.Vers, NeededHours = 48, NeededEmployees = 6.0f, WeekPrognosisId = 3 },
+            new Prognosis { Id = 62, Date = new DateOnly(2025, 1, 26), Department = Department.Vakkenvullen, NeededHours = 32, NeededEmployees = 4.0f, WeekPrognosisId = 3 },
+            new Prognosis { Id = 63, Date = new DateOnly(2025, 1, 26), Department = Department.Kassa, NeededHours = 16, NeededEmployees = 2.0f, WeekPrognosisId = 3 }
         );
+
 
         // Seed data for Norms
         modelBuilder.Entity<Norm>().HasData(
@@ -521,36 +557,44 @@ public partial class BumboDbContext : IdentityDbContext<User>
         );
 
         modelBuilder.Entity<Expectation>().HasData(
-            new Expectation { Id = 1, Date = new DateOnly(2024, 11, 18), ExpectedCargo = 30, ExpectedCustomers = 800 },
-            new Expectation { Id = 2, Date = new DateOnly(2024, 11, 19), ExpectedCargo = 40, ExpectedCustomers = 900 },
-            new Expectation { Id = 3, Date = new DateOnly(2024, 11, 20), ExpectedCargo = 50, ExpectedCustomers = 950 },
-            new Expectation { Id = 4, Date = new DateOnly(2024, 11, 21), ExpectedCargo = 60, ExpectedCustomers = 1000 },
-            new Expectation { Id = 5, Date = new DateOnly(2024, 11, 22), ExpectedCargo = 45, ExpectedCustomers = 850 },
-            new Expectation { Id = 6, Date = new DateOnly(2024, 11, 23), ExpectedCargo = 38, ExpectedCustomers = 780 },
-            new Expectation { Id = 7, Date = new DateOnly(2024, 11, 24), ExpectedCargo = 55, ExpectedCustomers = 960 },
-            new Expectation { Id = 8, Date = new DateOnly(2024, 11, 25), ExpectedCargo = 35, ExpectedCustomers = 810 },
-            new Expectation { Id = 9, Date = new DateOnly(2024, 11, 26), ExpectedCargo = 50, ExpectedCustomers = 900 },
-            new Expectation { Id = 10, Date = new DateOnly(2024, 11, 27), ExpectedCargo = 42, ExpectedCustomers = 850 },
-            new Expectation { Id = 11, Date = new DateOnly(2024, 11, 28), ExpectedCargo = 60, ExpectedCustomers = 1000 },
-            new Expectation { Id = 12, Date = new DateOnly(2024, 11, 29), ExpectedCargo = 37, ExpectedCustomers = 820 },
-            new Expectation { Id = 13, Date = new DateOnly(2024, 11, 30), ExpectedCargo = 53, ExpectedCustomers = 940 },
-            new Expectation { Id = 14, Date = new DateOnly(2024, 12, 01), ExpectedCargo = 50, ExpectedCustomers = 900 },
-            new Expectation { Id = 15, Date = new DateOnly(2024, 12, 02), ExpectedCargo = 36, ExpectedCustomers = 810 },
-            new Expectation { Id = 16, Date = new DateOnly(2024, 12, 03), ExpectedCargo = 47, ExpectedCustomers = 870 },
-            new Expectation { Id = 17, Date = new DateOnly(2024, 12, 04), ExpectedCargo = 38, ExpectedCustomers = 780 },
-            new Expectation { Id = 18, Date = new DateOnly(2024, 12, 05), ExpectedCargo = 55, ExpectedCustomers = 950 },
-            new Expectation { Id = 19, Date = new DateOnly(2024, 12, 06), ExpectedCargo = 45, ExpectedCustomers = 840 },
-            new Expectation { Id = 20, Date = new DateOnly(2024, 12, 07), ExpectedCargo = 60, ExpectedCustomers = 1000 },
-            new Expectation { Id = 21, Date = new DateOnly(2024, 12, 08), ExpectedCargo = 40, ExpectedCustomers = 890 },
-            new Expectation { Id = 22, Date = new DateOnly(2024, 12, 09), ExpectedCargo = 50, ExpectedCustomers = 920 },
-            new Expectation { Id = 23, Date = new DateOnly(2024, 12, 10), ExpectedCargo = 42, ExpectedCustomers = 860 },
-            new Expectation { Id = 24, Date = new DateOnly(2024, 12, 11), ExpectedCargo = 60, ExpectedCustomers = 1000 },
-            new Expectation { Id = 25, Date = new DateOnly(2024, 12, 12), ExpectedCargo = 48, ExpectedCustomers = 930 },
-            new Expectation { Id = 26, Date = new DateOnly(2024, 12, 13), ExpectedCargo = 35, ExpectedCustomers = 780 },
-            new Expectation { Id = 27, Date = new DateOnly(2024, 12, 14), ExpectedCargo = 53, ExpectedCustomers = 950 },
-            new Expectation { Id = 28, Date = new DateOnly(2024, 12, 15), ExpectedCargo = 50, ExpectedCustomers = 900 }
+            new Expectation { Id = 1, Date = new DateOnly(2025, 1, 6), ExpectedCargo = 30, ExpectedCustomers = 800 },
+            new Expectation { Id = 2, Date = new DateOnly(2025, 1, 7), ExpectedCargo = 40, ExpectedCustomers = 900 },
+            new Expectation { Id = 3, Date = new DateOnly(2025, 1, 8), ExpectedCargo = 50, ExpectedCustomers = 950 },
+            new Expectation { Id = 4, Date = new DateOnly(2025, 1, 9), ExpectedCargo = 60, ExpectedCustomers = 1000 },
+            new Expectation { Id = 5, Date = new DateOnly(2025, 1, 10), ExpectedCargo = 45, ExpectedCustomers = 850 },
+            new Expectation { Id = 6, Date = new DateOnly(2025, 1, 11), ExpectedCargo = 38, ExpectedCustomers = 780 },
+            new Expectation { Id = 7, Date = new DateOnly(2025, 1, 12), ExpectedCargo = 55, ExpectedCustomers = 960 },
+            new Expectation { Id = 8, Date = new DateOnly(2025, 1, 13), ExpectedCargo = 35, ExpectedCustomers = 810 },
+            new Expectation { Id = 9, Date = new DateOnly(2025, 1, 14), ExpectedCargo = 50, ExpectedCustomers = 900 },
+            new Expectation { Id = 10, Date = new DateOnly(2025, 1, 15), ExpectedCargo = 42, ExpectedCustomers = 850 },
+            new Expectation { Id = 11, Date = new DateOnly(2025, 1, 16), ExpectedCargo = 60, ExpectedCustomers = 1000 },
+            new Expectation { Id = 12, Date = new DateOnly(2025, 1, 17), ExpectedCargo = 37, ExpectedCustomers = 820 },
+            new Expectation { Id = 13, Date = new DateOnly(2025, 1, 18), ExpectedCargo = 53, ExpectedCustomers = 940 },
+            new Expectation { Id = 14, Date = new DateOnly(2025, 1, 19), ExpectedCargo = 50, ExpectedCustomers = 900 },
+            new Expectation { Id = 15, Date = new DateOnly(2025, 1, 20), ExpectedCargo = 36, ExpectedCustomers = 810 },
+            new Expectation { Id = 16, Date = new DateOnly(2025, 1, 21), ExpectedCargo = 47, ExpectedCustomers = 870 },
+            new Expectation { Id = 17, Date = new DateOnly(2025, 1, 22), ExpectedCargo = 38, ExpectedCustomers = 780 },
+            new Expectation { Id = 18, Date = new DateOnly(2025, 1, 23), ExpectedCargo = 55, ExpectedCustomers = 950 },
+            new Expectation { Id = 19, Date = new DateOnly(2025, 1, 24), ExpectedCargo = 45, ExpectedCustomers = 840 },
+            new Expectation { Id = 20, Date = new DateOnly(2025, 1, 25), ExpectedCargo = 60, ExpectedCustomers = 1000 },
+            new Expectation { Id = 21, Date = new DateOnly(2025, 1, 26), ExpectedCargo = 40, ExpectedCustomers = 890 },
+            new Expectation { Id = 22, Date = new DateOnly(2025, 1, 27), ExpectedCargo = 50, ExpectedCustomers = 920 },
+            new Expectation { Id = 23, Date = new DateOnly(2025, 1, 28), ExpectedCargo = 42, ExpectedCustomers = 860 },
+            new Expectation { Id = 24, Date = new DateOnly(2025, 1, 29), ExpectedCargo = 60, ExpectedCustomers = 1000 },
+            new Expectation { Id = 25, Date = new DateOnly(2025, 1, 30), ExpectedCargo = 48, ExpectedCustomers = 930 },
+            new Expectation { Id = 26, Date = new DateOnly(2025, 1, 31), ExpectedCargo = 35, ExpectedCustomers = 780 },
+            new Expectation { Id = 27, Date = new DateOnly(2025, 2, 1), ExpectedCargo = 53, ExpectedCustomers = 950 },
+            new Expectation { Id = 28, Date = new DateOnly(2025, 2, 2), ExpectedCargo = 50, ExpectedCustomers = 900 },
+            new Expectation { Id = 29, Date = new DateOnly(2025, 2, 3), ExpectedCargo = 37, ExpectedCustomers = 820 },
+            new Expectation { Id = 30, Date = new DateOnly(2025, 2, 4), ExpectedCargo = 55, ExpectedCustomers = 960 },
+            new Expectation { Id = 31, Date = new DateOnly(2025, 2, 5), ExpectedCargo = 45, ExpectedCustomers = 840 },
+            new Expectation { Id = 32, Date = new DateOnly(2025, 2, 6), ExpectedCargo = 38, ExpectedCustomers = 780 },
+            new Expectation { Id = 33, Date = new DateOnly(2025, 2, 7), ExpectedCargo = 50, ExpectedCustomers = 900 },
+            new Expectation { Id = 34, Date = new DateOnly(2025, 2, 8), ExpectedCargo = 48, ExpectedCustomers = 930 },
+            new Expectation { Id = 35, Date = new DateOnly(2025, 2, 9), ExpectedCargo = 60, ExpectedCustomers = 1000 }
         );
 
+        // UniqueDay 
         modelBuilder.Entity<UniqueDay>().HasData(
             new UniqueDay
             {
@@ -563,135 +607,135 @@ public partial class BumboDbContext : IdentityDbContext<User>
             new UniqueDay
             {
                 Id = 2,
-                Name = "VIP Shopping Day",
-                StartDate = new DateOnly(2024, 11, 29),
-                EndDate = new DateOnly(2024, 11, 29),
-                Factor = 1.5f
+                Name = "Weekend uitverkoop",
+                StartDate = new DateOnly(2025, 1, 18),
+                EndDate = new DateOnly(2025, 1, 19),
+                Factor = 1.8f
             },
             new UniqueDay
             {
                 Id = 3,
-                Name = "Weekend uitverkoop",
-                StartDate = new DateOnly(2024, 12, 7),
-                EndDate = new DateOnly(2024, 12, 8),
-                Factor = 1.8f
+                Name = "Donderende donderdag korting",
+                StartDate = new DateOnly(2025, 1, 23),
+                EndDate = new DateOnly(2025, 1, 23),
+                Factor = 1.5f
+            },
+            new UniqueDay
+            {
+                Id = 4,
+                Name = "Blauwe maandag",
+                StartDate = new DateOnly(2025, 1, 27),
+                EndDate = new DateOnly(2025, 1, 27),
+                Factor = 0.8f
             }
         );
 
+        // Availability
         modelBuilder.Entity<Availability>().HasData(
-            new
-            {
-                Date = new DateOnly(2024, 12, 2),
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(9, 0),
-                EndTime = new TimeOnly(17, 0)
-            },
-            new
-            {
-                Date = new DateOnly(2024, 12, 3),
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(10, 0),
-                EndTime = new TimeOnly(18, 0)
-            },
-            new
-            {
-                Date = new DateOnly(2024, 12, 4),
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(11, 0),
-                EndTime = new TimeOnly(15, 0)
-            },
-            new
-            {
-                Date = new DateOnly(2024, 12, 5),
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(8, 0),
-                EndTime = new TimeOnly(16, 0)
-            },
-            new
-            {
-                Date = new DateOnly(2024, 12, 6),
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(12, 0),
-                EndTime = new TimeOnly(20, 0)
-            },
-            new
-            {
-                Date = new DateOnly(2024, 12, 7),
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(9, 0),
-                EndTime = new TimeOnly(14, 0)
-            },
-            new
-            {
-                Date = new DateOnly(2024, 12, 8),
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(10, 0),
-                EndTime = new TimeOnly(16, 0)
-            },
-            new
-            {
-                Date = new DateOnly(2024, 12, 9),
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(11, 0),
-                EndTime = new TimeOnly(19, 0)
-            },
-            new
-            {
-                Date = new DateOnly(2024, 12, 10),
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(13, 0),
-                EndTime = new TimeOnly(17, 0)
-            },
-            new
-            {
-                Date = new DateOnly(2024, 12, 11),
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(9, 0),
-                EndTime = new TimeOnly(15, 0)
-            },
-            new
-            {
-                Date = new DateOnly(2024, 12, 12),
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(12, 0),
-                EndTime = new TimeOnly(20, 0)
-            },
-            new
-            {
-                Date = new DateOnly(2024, 12, 13),
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(10, 0),
-                EndTime = new TimeOnly(18, 0)
-            },
-            new
-            {
-                Date = new DateOnly(2024, 12, 14),
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(9, 0),
-                EndTime = new TimeOnly(13, 0)
-            },
-            new
-            {
-                Date = new DateOnly(2024, 12, 15),
-                EmployeeNumber = 2,
-                StartTime = new TimeOnly(11, 0),
-                EndTime = new TimeOnly(17, 0)
-            }
+            //Employee 2
+            new { Date = new DateOnly(2025, 1, 6), EmployeeNumber = 2, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(17, 0) },
+            new { Date = new DateOnly(2025, 1, 7), EmployeeNumber = 2, StartTime = new TimeOnly(10, 0), EndTime = new TimeOnly(18, 0) },
+            new { Date = new DateOnly(2025, 1, 8), EmployeeNumber = 2, StartTime = new TimeOnly(11, 0), EndTime = new TimeOnly(15, 0) },
+            new { Date = new DateOnly(2025, 1, 9), EmployeeNumber = 2, StartTime = new TimeOnly(8, 0), EndTime = new TimeOnly(16, 0) },
+            new { Date = new DateOnly(2025, 1, 10), EmployeeNumber = 2, StartTime = new TimeOnly(12, 0), EndTime = new TimeOnly(20, 0) },
+            new { Date = new DateOnly(2025, 1, 11), EmployeeNumber = 2, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(14, 0) },
+            new { Date = new DateOnly(2025, 1, 12), EmployeeNumber = 2, StartTime = new TimeOnly(10, 0), EndTime = new TimeOnly(16, 0) },
+            new { Date = new DateOnly(2025, 1, 13), EmployeeNumber = 2, StartTime = new TimeOnly(11, 0), EndTime = new TimeOnly(19, 0) },
+            new { Date = new DateOnly(2025, 1, 14), EmployeeNumber = 2, StartTime = new TimeOnly(13, 0), EndTime = new TimeOnly(17, 0) },
+            new { Date = new DateOnly(2025, 1, 15), EmployeeNumber = 2, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(15, 0) },
+            new { Date = new DateOnly(2025, 1, 16), EmployeeNumber = 2, StartTime = new TimeOnly(12, 0), EndTime = new TimeOnly(20, 0) },
+            new { Date = new DateOnly(2025, 1, 17), EmployeeNumber = 2, StartTime = new TimeOnly(10, 0), EndTime = new TimeOnly(18, 0) },
+            new { Date = new DateOnly(2025, 1, 18), EmployeeNumber = 2, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(13, 0) },
+            new { Date = new DateOnly(2025, 1, 19), EmployeeNumber = 2, StartTime = new TimeOnly(11, 0), EndTime = new TimeOnly(17, 0) },
+
+            //Employee 3
+            new { Date = new DateOnly(2025, 1, 6), EmployeeNumber = 3, StartTime = new TimeOnly(9, 30), EndTime = new TimeOnly(17, 30) },
+            new { Date = new DateOnly(2025, 1, 7), EmployeeNumber = 3, StartTime = new TimeOnly(10, 30), EndTime = new TimeOnly(18, 30) },
+            new { Date = new DateOnly(2025, 1, 8), EmployeeNumber = 3, StartTime = new TimeOnly(11, 30), EndTime = new TimeOnly(15, 30) },
+            new { Date = new DateOnly(2025, 1, 9), EmployeeNumber = 3, StartTime = new TimeOnly(8, 30), EndTime = new TimeOnly(16, 30) },
+            new { Date = new DateOnly(2025, 1, 10), EmployeeNumber = 3, StartTime = new TimeOnly(12, 30), EndTime = new TimeOnly(20, 30) },
+            new { Date = new DateOnly(2025, 1, 11), EmployeeNumber = 3, StartTime = new TimeOnly(9, 30), EndTime = new TimeOnly(14, 30) },
+            new { Date = new DateOnly(2025, 1, 12), EmployeeNumber = 3, StartTime = new TimeOnly(10, 30), EndTime = new TimeOnly(16, 30) },
+            new { Date = new DateOnly(2025, 1, 13), EmployeeNumber = 3, StartTime = new TimeOnly(11, 30), EndTime = new TimeOnly(19, 30) },
+            new { Date = new DateOnly(2025, 1, 14), EmployeeNumber = 3, StartTime = new TimeOnly(13, 30), EndTime = new TimeOnly(17, 30) },
+            new { Date = new DateOnly(2025, 1, 15), EmployeeNumber = 3, StartTime = new TimeOnly(9, 30), EndTime = new TimeOnly(15, 30) },
+            new { Date = new DateOnly(2025, 1, 16), EmployeeNumber = 3, StartTime = new TimeOnly(12, 30), EndTime = new TimeOnly(20, 30) },
+            new { Date = new DateOnly(2025, 1, 17), EmployeeNumber = 3, StartTime = new TimeOnly(10, 30), EndTime = new TimeOnly(18, 30) },
+            new { Date = new DateOnly(2025, 1, 18), EmployeeNumber = 3, StartTime = new TimeOnly(9, 30), EndTime = new TimeOnly(13, 30) },
+            new { Date = new DateOnly(2025, 1, 19), EmployeeNumber = 3, StartTime = new TimeOnly(11, 30), EndTime = new TimeOnly(17, 30) },
+
+            // Employee 4
+            new { Date = new DateOnly(2025, 1, 6), EmployeeNumber = 4, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(17, 0) },
+            new { Date = new DateOnly(2025, 1, 7), EmployeeNumber = 4, StartTime = new TimeOnly(10, 0), EndTime = new TimeOnly(18, 0) },
+            new { Date = new DateOnly(2025, 1, 8), EmployeeNumber = 4, StartTime = new TimeOnly(11, 0), EndTime = new TimeOnly(15, 0) },
+            new { Date = new DateOnly(2025, 1, 9), EmployeeNumber = 4, StartTime = new TimeOnly(8, 0), EndTime = new TimeOnly(16, 0) },
+            new { Date = new DateOnly(2025, 1, 10), EmployeeNumber = 4, StartTime = new TimeOnly(12, 0), EndTime = new TimeOnly(20, 0) },
+            new { Date = new DateOnly(2025, 1, 11), EmployeeNumber = 4, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(14, 0) },
+            new { Date = new DateOnly(2025, 1, 12), EmployeeNumber = 4, StartTime = new TimeOnly(10, 0), EndTime = new TimeOnly(16, 0) },
+            new { Date = new DateOnly(2025, 1, 13), EmployeeNumber = 4, StartTime = new TimeOnly(11, 0), EndTime = new TimeOnly(19, 0) },
+            new { Date = new DateOnly(2025, 1, 14), EmployeeNumber = 4, StartTime = new TimeOnly(13, 0), EndTime = new TimeOnly(17, 0) },
+            new { Date = new DateOnly(2025, 1, 15), EmployeeNumber = 4, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(15, 0) },
+            new { Date = new DateOnly(2025, 1, 16), EmployeeNumber = 4, StartTime = new TimeOnly(12, 0), EndTime = new TimeOnly(20, 0) },
+            new { Date = new DateOnly(2025, 1, 17), EmployeeNumber = 4, StartTime = new TimeOnly(10, 0), EndTime = new TimeOnly(18, 0) },
+            new { Date = new DateOnly(2025, 1, 18), EmployeeNumber = 4, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(13, 0) },
+            new { Date = new DateOnly(2025, 1, 19), EmployeeNumber = 4, StartTime = new TimeOnly(11, 0), EndTime = new TimeOnly(17, 0) },
+
+            // Employee 5
+            new { Date = new DateOnly(2025, 1, 6), EmployeeNumber = 5, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(17, 0) },
+            new { Date = new DateOnly(2025, 1, 7), EmployeeNumber = 5, StartTime = new TimeOnly(10, 0), EndTime = new TimeOnly(18, 0) },
+            new { Date = new DateOnly(2025, 1, 8), EmployeeNumber = 5, StartTime = new TimeOnly(11, 0), EndTime = new TimeOnly(15, 0) },
+            new { Date = new DateOnly(2025, 1, 9), EmployeeNumber = 5, StartTime = new TimeOnly(8, 0), EndTime = new TimeOnly(16, 0) },
+            new { Date = new DateOnly(2025, 1, 10), EmployeeNumber = 5, StartTime = new TimeOnly(12, 0), EndTime = new TimeOnly(20, 0) },
+            new { Date = new DateOnly(2025, 1, 11), EmployeeNumber = 5, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(14, 0) },
+            new { Date = new DateOnly(2025, 1, 12), EmployeeNumber = 5, StartTime = new TimeOnly(10, 0), EndTime = new TimeOnly(16, 0) },
+            new { Date = new DateOnly(2025, 1, 13), EmployeeNumber = 5, StartTime = new TimeOnly(11, 0), EndTime = new TimeOnly(19, 0) },
+            new { Date = new DateOnly(2025, 1, 14), EmployeeNumber = 5, StartTime = new TimeOnly(13, 0), EndTime = new TimeOnly(17, 0) },
+            new { Date = new DateOnly(2025, 1, 15), EmployeeNumber = 5, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(15, 0) },
+            new { Date = new DateOnly(2025, 1, 16), EmployeeNumber = 5, StartTime = new TimeOnly(12, 0), EndTime = new TimeOnly(20, 0) },
+            new { Date = new DateOnly(2025, 1, 17), EmployeeNumber = 5, StartTime = new TimeOnly(10, 0), EndTime = new TimeOnly(18, 0) },
+            new { Date = new DateOnly(2025, 1, 18), EmployeeNumber = 5, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(13, 0) },
+            new { Date = new DateOnly(2025, 1, 19), EmployeeNumber = 5, StartTime = new TimeOnly(11, 0), EndTime = new TimeOnly(17, 0) }
         );
 
         modelBuilder.Entity<SchoolSchedule>().HasData(
-            // Schedule for Jane (Employee 2)
-            new { EmployeeNumber = 2, Date = new DateOnly(2024, 12, 9), DurationInHours = 3.0f },
-            new { EmployeeNumber = 2, Date = new DateOnly(2024, 12, 10), DurationInHours = 3.0f },
-            new { EmployeeNumber = 2, Date = new DateOnly(2024, 12, 11), DurationInHours = 3.0f },
-            new { EmployeeNumber = 2, Date = new DateOnly(2024, 12, 12), DurationInHours = 3.0f },
-            new { EmployeeNumber = 2, Date = new DateOnly(2024, 12, 13), DurationInHours = 3.0f },
-            // Schedule for Emily (Employee 3)
-            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 9), DurationInHours = 3.0f },
-            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 10), DurationInHours = 3.0f },
-            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 11), DurationInHours = 3.0f },
-            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 12), DurationInHours = 3.0f },
-            new { EmployeeNumber = 3, Date = new DateOnly(2024, 12, 13), DurationInHours = 3.0f }
+            // Employee 2
+            new { EmployeeNumber = 2, Date = new DateOnly(2025, 1, 6), DurationInHours = 6.0f },
+            new { EmployeeNumber = 2, Date = new DateOnly(2025, 1, 7), DurationInHours = 7.0f },
+            new { EmployeeNumber = 2, Date = new DateOnly(2025, 1, 8), DurationInHours = 4.0f },
+            new { EmployeeNumber = 2, Date = new DateOnly(2025, 1, 9), DurationInHours = 3.0f },
+            new { EmployeeNumber = 2, Date = new DateOnly(2025, 1, 10), DurationInHours = 5.0f },
+
+            new { EmployeeNumber = 2, Date = new DateOnly(2025, 1, 13), DurationInHours = 6.5f },
+            new { EmployeeNumber = 2, Date = new DateOnly(2025, 1, 14), DurationInHours = 7.5f },
+            new { EmployeeNumber = 2, Date = new DateOnly(2025, 1, 15), DurationInHours = 4.5f },
+            new { EmployeeNumber = 2, Date = new DateOnly(2025, 1, 16), DurationInHours = 3.5f },
+            new { EmployeeNumber = 2, Date = new DateOnly(2025, 1, 17), DurationInHours = 5.5f },
+
+            // Employee 3
+            new { EmployeeNumber = 3, Date = new DateOnly(2025, 1, 6), DurationInHours = 6.0f },
+            new { EmployeeNumber = 3, Date = new DateOnly(2025, 1, 7), DurationInHours = 4.0f },
+            new { EmployeeNumber = 3, Date = new DateOnly(2025, 1, 8), DurationInHours = 3.0f },
+            new { EmployeeNumber = 3, Date = new DateOnly(2025, 1, 9), DurationInHours = 5.0f },
+            new { EmployeeNumber = 3, Date = new DateOnly(2025, 1, 10), DurationInHours = 7.0f },
+
+            new { EmployeeNumber = 3, Date = new DateOnly(2025, 1, 13), DurationInHours = 6.5f },
+            new { EmployeeNumber = 3, Date = new DateOnly(2025, 1, 14), DurationInHours = 4.5f },
+            new { EmployeeNumber = 3, Date = new DateOnly(2025, 1, 15), DurationInHours = 3.5f },
+            new { EmployeeNumber = 3, Date = new DateOnly(2025, 1, 16), DurationInHours = 5.5f },
+            new { EmployeeNumber = 3, Date = new DateOnly(2025, 1, 17), DurationInHours = 7.5f },
+
+            // Employee 4
+            new { EmployeeNumber = 4, Date = new DateOnly(2025, 1, 6), DurationInHours = 6.0f },
+            new { EmployeeNumber = 4, Date = new DateOnly(2025, 1, 7), DurationInHours = 7.0f },
+            new { EmployeeNumber = 4, Date = new DateOnly(2025, 1, 8), DurationInHours = 4.0f },
+            new { EmployeeNumber = 4, Date = new DateOnly(2025, 1, 9), DurationInHours = 3.0f },
+            new { EmployeeNumber = 4, Date = new DateOnly(2025, 1, 10), DurationInHours = 5.0f },
+
+            new { EmployeeNumber = 4, Date = new DateOnly(2025, 1, 13), DurationInHours = 6.5f },
+            new { EmployeeNumber = 4, Date = new DateOnly(2025, 1, 14), DurationInHours = 7.5f },
+            new { EmployeeNumber = 4, Date = new DateOnly(2025, 1, 15), DurationInHours = 4.5f },
+            new { EmployeeNumber = 4, Date = new DateOnly(2025, 1, 16), DurationInHours = 3.5f },
+            new { EmployeeNumber = 4, Date = new DateOnly(2025, 1, 17), DurationInHours = 5.5f }
         );
 
         modelBuilder.Entity<LeaveRequest>().HasData(
@@ -699,19 +743,37 @@ public partial class BumboDbContext : IdentityDbContext<User>
             {
                 Id = 1,
                 Status = Status.Geaccepteerd,
-                StartDate = new DateTime(2024, 12, 13),
-                EndDate = new DateTime(2024, 12, 14),
-                Reason = "Familiefeest",
-                EmployeeNumber = 1
+                StartDate = new DateTime(2025, 1, 21),
+                EndDate = new DateTime(2025, 1, 22),
+                Reason = "Bruiloft",
+                EmployeeNumber = 2
             },
             new
             {
                 Id = 2,
                 Status = Status.Aangevraagd,
-                StartDate = new DateTime(2024, 12, 15),
-                EndDate = new DateTime(2024, 12, 15),
-                Reason = "Doctorbezoek",
+                StartDate = new DateTime(2025, 2, 1),
+                EndDate = new DateTime(2025, 2, 2),
+                Reason = "Weekendje weg",
                 EmployeeNumber = 2
+            },
+            new
+            {
+                Id = 3,
+                Status = Status.Aangevraagd,
+                StartDate = new DateTime(2025, 1, 24),
+                EndDate = new DateTime(2025, 1, 24),
+                Reason = "Weekend vakantie",
+                EmployeeNumber = 3
+            },
+            new
+            {
+                Id = 4,
+                Status = Status.Afgewezen,
+                StartDate = new DateTime(2025, 1, 21),
+                EndDate = new DateTime(2025, 1, 22),
+                Reason = "Geen zin om te werken dan",
+                EmployeeNumber = 3
             }
         );
 
@@ -732,29 +794,73 @@ public partial class BumboDbContext : IdentityDbContext<User>
                 Title = "Nieuwe verlofaanvraag status",
                 Description = "Je verlofaanvraag is beoordeeld",
                 SentAt = new DateTime(2024, 12, 8, 15, 30, 0),
+                HasBeenRead = false
+            },
+            new
+            {
+                Id = 3,
+                EmployeeNumber = 3,
+                Title = "Nieuwe verlofaanvraag status",
+                Description = "Je verlofaanvraag is beoordeeld",
+                SentAt = new DateTime(2024, 12, 8, 15, 30, 0),
                 HasBeenRead = true
             }
         );
 
         modelBuilder.Entity<Shift>().HasData(
-            new
-            {
-                Id = 1,
-                Start = new DateTime(2024, 12, 9, 9, 0, 0),
-                End = new DateTime(2024, 12, 9, 17, 0, 0),
-                Department = Department.Kassa,
-                EmployeeNumber = 1,
-                IsFinal = false
-            },
-            new
-            {
-                Id = 2,
-                Start = new DateTime(2024, 12, 10, 13, 0, 0),
-                End = new DateTime(2024, 12, 10, 17, 0, 0),
-                Department = Department.Vakkenvullen,
-                EmployeeNumber = 2,
-                IsFinal = false
-            }
+            // Employee 2
+            new { Id = 1, Start = new DateTime(2025, 1, 6, 9, 0, 0), End = new DateTime(2025, 1, 6, 17, 0, 0), Department = Department.Kassa, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 2, Start = new DateTime(2025, 1, 7, 10, 0, 0), End = new DateTime(2025, 1, 7, 18, 0, 0), Department = Department.Vers, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 3, Start = new DateTime(2025, 1, 8, 11, 0, 0), End = new DateTime(2025, 1, 8, 15, 0, 0), Department = Department.Kassa, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 4, Start = new DateTime(2025, 1, 9, 8, 0, 0), End = new DateTime(2025, 1, 9, 16, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 5, Start = new DateTime(2025, 1, 10, 12, 0, 0), End = new DateTime(2025, 1, 10, 20, 0, 0), Department = Department.Vers, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 6, Start = new DateTime(2025, 1, 11, 9, 0, 0), End = new DateTime(2025, 1, 11, 14, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 7, Start = new DateTime(2025, 1, 12, 10, 0, 0), End = new DateTime(2025, 1, 12, 16, 0, 0), Department = Department.Kassa, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 8, Start = new DateTime(2025, 1, 13, 11, 0, 0), End = new DateTime(2025, 1, 13, 19, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 2, IsFinal = false },
+            new { Id = 9, Start = new DateTime(2025, 1, 14, 13, 0, 0), End = new DateTime(2025, 1, 14, 17, 0, 0), Department = Department.Vers, EmployeeNumber = 2, IsFinal = false },
+            new { Id = 10, Start = new DateTime(2025, 1, 15, 9, 0, 0), End = new DateTime(2025, 1, 15, 15, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 2, IsFinal = false },
+            new { Id = 11, Start = new DateTime(2025, 1, 16, 12, 0, 0), End = new DateTime(2025, 1, 16, 20, 0, 0), Department = Department.Kassa, EmployeeNumber = 2, IsFinal = false },
+            new { Id = 12, Start = new DateTime(2025, 1, 17, 10, 0, 0), End = new DateTime(2025, 1, 17, 18, 0, 0), Department = Department.Vers, EmployeeNumber = 2, IsFinal = false },
+
+            // Employee 3
+            new { Id = 13, Start = new DateTime(2025, 1, 6, 9, 0, 0), End = new DateTime(2025, 1, 6, 17, 0, 0), Department = Department.Vers, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 14, Start = new DateTime(2025, 1, 7, 10, 0, 0), End = new DateTime(2025, 1, 7, 18, 0, 0), Department = Department.Kassa, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 15, Start = new DateTime(2025, 1, 8, 11, 0, 0), End = new DateTime(2025, 1, 8, 15, 0, 0), Department = Department.Kassa, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 16, Start = new DateTime(2025, 1, 9, 8, 0, 0), End = new DateTime(2025, 1, 9, 16, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 17, Start = new DateTime(2025, 1, 10, 12, 0, 0), End = new DateTime(2025, 1, 10, 20, 0, 0), Department = Department.Kassa, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 18, Start = new DateTime(2025, 1, 11, 9, 0, 0), End = new DateTime(2025, 1, 11, 14, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 19, Start = new DateTime(2025, 1, 12, 10, 0, 0), End = new DateTime(2025, 1, 12, 16, 0, 0), Department = Department.Vers, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 20, Start = new DateTime(2025, 1, 13, 11, 0, 0), End = new DateTime(2025, 1, 13, 19, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 3, IsFinal = false },
+            new { Id = 21, Start = new DateTime(2025, 1, 14, 13, 0, 0), End = new DateTime(2025, 1, 14, 17, 0, 0), Department = Department.Kassa, EmployeeNumber = 3, IsFinal = false },
+            new { Id = 22, Start = new DateTime(2025, 1, 15, 9, 0, 0), End = new DateTime(2025, 1, 15, 15, 0, 0), Department = Department.Vers, EmployeeNumber = 3, IsFinal = false },
+            new { Id = 23, Start = new DateTime(2025, 1, 16, 12, 0, 0), End = new DateTime(2025, 1, 16, 20, 0, 0), Department = Department.Kassa, EmployeeNumber = 3, IsFinal = false },
+            new { Id = 24, Start = new DateTime(2025, 1, 17, 10, 0, 0), End = new DateTime(2025, 1, 17, 18, 0, 0), Department = Department.Kassa, EmployeeNumber = 3, IsFinal = false },
+
+            // Employee 4
+            new { Id = 25, Start = new DateTime(2025, 1, 6, 10, 0, 0), End = new DateTime(2025, 1, 6, 16, 0, 0), Department = Department.Vers, EmployeeNumber = 4, IsFinal = true },
+            new { Id = 26, Start = new DateTime(2025, 1, 7, 11, 0, 0), End = new DateTime(2025, 1, 7, 17, 0, 0), Department = Department.Kassa, EmployeeNumber = 4, IsFinal = true },
+            new { Id = 27, Start = new DateTime(2025, 1, 8, 12, 0, 0), End = new DateTime(2025, 1, 8, 18, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 4, IsFinal = true },
+            new { Id = 28, Start = new DateTime(2025, 1, 9, 10, 0, 0), End = new DateTime(2025, 1, 9, 16, 0, 0), Department = Department.Vers, EmployeeNumber = 4, IsFinal = true },
+            new { Id = 29, Start = new DateTime(2025, 1, 10, 14, 0, 0), End = new DateTime(2025, 1, 10, 20, 0, 0), Department = Department.Kassa, EmployeeNumber = 4, IsFinal = true },
+            new { Id = 30, Start = new DateTime(2025, 1, 11, 12, 0, 0), End = new DateTime(2025, 1, 11, 18, 0, 0), Department = Department.Vers, EmployeeNumber = 4, IsFinal = true },
+            new { Id = 31, Start = new DateTime(2025, 1, 12, 11, 0, 0), End = new DateTime(2025, 1, 12, 17, 0, 0), Department = Department.Kassa, EmployeeNumber = 4, IsFinal = true },
+            new { Id = 32, Start = new DateTime(2025, 1, 13, 9, 0, 0), End = new DateTime(2025, 1, 13, 15, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 4, IsFinal = false },
+            new { Id = 33, Start = new DateTime(2025, 1, 14, 13, 0, 0), End = new DateTime(2025, 1, 14, 19, 0, 0), Department = Department.Kassa, EmployeeNumber = 4, IsFinal = false },
+            new { Id = 34, Start = new DateTime(2025, 1, 15, 10, 0, 0), End = new DateTime(2025, 1, 15, 16, 0, 0), Department = Department.Vers, EmployeeNumber = 4, IsFinal = false },
+
+            // Employee 5
+            new { Id = 35, Start = new DateTime(2025, 1, 6, 13, 0, 0), End = new DateTime(2025, 1, 6, 19, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 5, IsFinal = true },
+            new { Id = 36, Start = new DateTime(2025, 1, 7, 12, 0, 0), End = new DateTime(2025, 1, 7, 18, 0, 0), Department = Department.Kassa, EmployeeNumber = 5, IsFinal = true },
+            new { Id = 37, Start = new DateTime(2025, 1, 8, 10, 0, 0), End = new DateTime(2025, 1, 8, 16, 0, 0), Department = Department.Vers, EmployeeNumber = 5, IsFinal = true },
+            new { Id = 38, Start = new DateTime(2025, 1, 9, 14, 0, 0), End = new DateTime(2025, 1, 9, 20, 0, 0), Department = Department.Kassa, EmployeeNumber = 5, IsFinal = true },
+            new { Id = 39, Start = new DateTime(2025, 1, 10, 15, 0, 0), End = new DateTime(2025, 1, 10, 21, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 5, IsFinal = true },
+            new { Id = 40, Start = new DateTime(2025, 1, 11, 13, 0, 0), End = new DateTime(2025, 1, 11, 19, 0, 0), Department = Department.Kassa, EmployeeNumber = 5, IsFinal = true },
+            new { Id = 41, Start = new DateTime(2025, 1, 12, 12, 0, 0), End = new DateTime(2025, 1, 12, 18, 0, 0), Department = Department.Vers, EmployeeNumber = 5, IsFinal = true },
+            new { Id = 42, Start = new DateTime(2025, 1, 13, 14, 0, 0), End = new DateTime(2025, 1, 13, 20, 0, 0), Department = Department.Kassa, EmployeeNumber = 5, IsFinal = false },
+            new { Id = 43, Start = new DateTime(2025, 1, 14, 15, 0, 0), End = new DateTime(2025, 1, 14, 21, 0, 0), Department = Department.Vers, EmployeeNumber = 5, IsFinal = false },
+            new { Id = 44, Start = new DateTime(2025, 1, 15, 13, 0, 0), End = new DateTime(2025, 1, 15, 19, 0, 0), Department = Department.Kassa, EmployeeNumber = 5, IsFinal = false },
+            new { Id = 45, Start = new DateTime(2025, 1, 17, 13, 0, 0), End = new DateTime(2025, 1, 17, 19, 0, 0), Department = Department.Kassa, EmployeeNumber = 5, IsFinal = false },
+            new { Id = 46, Start = new DateTime(2025, 1, 19, 13, 0, 0), End = new DateTime(2025, 1, 19, 19, 0, 0), Department = Department.Kassa, EmployeeNumber = 5, IsFinal = false }
         );
 
         modelBuilder.Entity<ShiftTakeOver>().HasData(
@@ -762,13 +868,18 @@ public partial class BumboDbContext : IdentityDbContext<User>
             {
                 ShiftId = 2,
                 EmployeeTakingOverEmployeeNumber = 3,
-                Status = Status.Aangevraagd
+                Status = Status.Aangevraagd,
             },
             new
             {
-                ShiftId = 1,
+                ShiftId = 20,
                 EmployeeTakingOverEmployeeNumber = 2,
-                Status = Status.Afgewezen
+                Status = Status.Afgewezen,
+            },
+            new
+            {
+                ShiftId = 21,
+                Status = Status.Aangevraagd,
             }
         );
     }
