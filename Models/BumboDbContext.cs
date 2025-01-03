@@ -701,7 +701,7 @@ public partial class BumboDbContext : IdentityDbContext<User>
                 Status = Status.Geaccepteerd,
                 StartDate = new DateTime(2024, 12, 13),
                 EndDate = new DateTime(2024, 12, 14),
-                Reason = "Family event",
+                Reason = "Familiefeest",
                 EmployeeNumber = 1
             },
             new
@@ -710,7 +710,7 @@ public partial class BumboDbContext : IdentityDbContext<User>
                 Status = Status.Aangevraagd,
                 StartDate = new DateTime(2024, 12, 15),
                 EndDate = new DateTime(2024, 12, 15),
-                Reason = "Medical appointment",
+                Reason = "Doctorbezoek",
                 EmployeeNumber = 2
             }
         );
