@@ -152,7 +152,7 @@ public partial class BumboDbContext : IdentityDbContext<User>
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 
-    private void EssentialSeedData(ModelBuilder modelBuilder)
+    private static void EssentialSeedData(ModelBuilder modelBuilder)
     {
         //Add roles
         var managerRoleId = "dc065cdc-e1d7-4202-936a-fbf03070c74d";
@@ -432,7 +432,7 @@ public partial class BumboDbContext : IdentityDbContext<User>
         );
     }
 
-    private void SeedData(ModelBuilder modelBuilder)
+    private static void SeedData(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<WeekPrognosis>().HasData(
             new WeekPrognosis { Id = 1, StartDate = new DateOnly(2024, 10, 7) },
@@ -555,9 +555,9 @@ public partial class BumboDbContext : IdentityDbContext<User>
             new UniqueDay
             {
                 Id = 1,
-                Name = "Customer Appreciation Day",
-                StartDate = new DateOnly(2024, 11, 22),
-                EndDate = new DateOnly(2024, 11, 22),
+                Name = "Kerstavond",
+                StartDate = new DateOnly(2024, 12, 24),
+                EndDate = new DateOnly(2024, 12, 24),
                 Factor = 1.25f
             },
             new UniqueDay
@@ -571,7 +571,7 @@ public partial class BumboDbContext : IdentityDbContext<User>
             new UniqueDay
             {
                 Id = 3,
-                Name = "Weekend Sale",
+                Name = "Weekend uitverkoop",
                 StartDate = new DateOnly(2024, 12, 7),
                 EndDate = new DateOnly(2024, 12, 8),
                 Factor = 1.8f
@@ -720,18 +720,18 @@ public partial class BumboDbContext : IdentityDbContext<User>
             {
                 Id = 1,
                 EmployeeNumber = 1,
-                Title = "Meeting Reminder",
-                Description = "Don't forget the department meeting on Dec 10.",
-                SentAt = new DateTime(2024, 12, 8, 9, 0, 0),
-                HasBeenRead = false
+                Title = "Nieuwe verlofaanvraag",
+                Description = "Er is een nieuwe verlofaanvraag om te beoordelen",
+                SentAt = new DateTime(2024, 12, 7, 9, 0, 0),
+                HasBeenRead = true
             },
             new
             {
                 Id = 2,
-                EmployeeNumber = 3,
-                Title = "Holiday Hours",
-                Description = "Check your holiday hours for December.",
-                SentAt = new DateTime(2024, 12, 7, 15, 30, 0),
+                EmployeeNumber = 2,
+                Title = "Nieuwe verlofaanvraag status",
+                Description = "Je verlofaanvraag is beoordeeld",
+                SentAt = new DateTime(2024, 12, 8, 15, 30, 0),
                 HasBeenRead = true
             }
         );
