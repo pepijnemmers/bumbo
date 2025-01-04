@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BumboApp.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    [Migration("20250103152941_SeedDataModule2Update")]
+    [Migration("20250104095459_SeedDataModule2Update")]
     partial class SeedDataModule2Update
     {
         /// <inheritdoc />
@@ -2379,6 +2379,30 @@ namespace BumboApp.Migrations
                             End = new DateTime(2025, 1, 19, 19, 0, 0, 0, DateTimeKind.Unspecified),
                             IsFinal = false,
                             Start = new DateTime(2025, 1, 19, 13, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 47,
+                            Department = 2,
+                            End = new DateTime(2025, 1, 18, 15, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsFinal = false,
+                            Start = new DateTime(2025, 1, 18, 9, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 48,
+                            Department = 2,
+                            End = new DateTime(2025, 1, 18, 21, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsFinal = false,
+                            Start = new DateTime(2025, 1, 18, 15, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 49,
+                            Department = 2,
+                            End = new DateTime(2025, 1, 19, 12, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsFinal = false,
+                            Start = new DateTime(2025, 1, 19, 9, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 

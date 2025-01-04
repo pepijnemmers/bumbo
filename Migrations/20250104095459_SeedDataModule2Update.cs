@@ -823,7 +823,10 @@ namespace BumboApp.Migrations
                     { 21, 2, 3, new DateTime(2025, 1, 14, 17, 0, 0, 0, DateTimeKind.Unspecified), false, new DateTime(2025, 1, 14, 13, 0, 0, 0, DateTimeKind.Unspecified) },
                     { 22, 0, 3, new DateTime(2025, 1, 15, 15, 0, 0, 0, DateTimeKind.Unspecified), false, new DateTime(2025, 1, 15, 9, 0, 0, 0, DateTimeKind.Unspecified) },
                     { 23, 2, 3, new DateTime(2025, 1, 16, 20, 0, 0, 0, DateTimeKind.Unspecified), false, new DateTime(2025, 1, 16, 12, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 24, 2, 3, new DateTime(2025, 1, 17, 18, 0, 0, 0, DateTimeKind.Unspecified), false, new DateTime(2025, 1, 17, 10, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 24, 2, 3, new DateTime(2025, 1, 17, 18, 0, 0, 0, DateTimeKind.Unspecified), false, new DateTime(2025, 1, 17, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 47, 2, null, new DateTime(2025, 1, 18, 15, 0, 0, 0, DateTimeKind.Unspecified), false, new DateTime(2025, 1, 18, 9, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 48, 2, null, new DateTime(2025, 1, 18, 21, 0, 0, 0, DateTimeKind.Unspecified), false, new DateTime(2025, 1, 18, 15, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 49, 2, null, new DateTime(2025, 1, 19, 12, 0, 0, 0, DateTimeKind.Unspecified), false, new DateTime(2025, 1, 19, 9, 0, 0, 0, DateTimeKind.Unspecified) }
                 });
 
             migrationBuilder.UpdateData(
@@ -1846,6 +1849,21 @@ namespace BumboApp.Migrations
                 table: "Shifts",
                 keyColumn: "Id",
                 keyValue: 46);
+
+            migrationBuilder.DeleteData(
+                table: "Shifts",
+                keyColumn: "Id",
+                keyValue: 47);
+
+            migrationBuilder.DeleteData(
+                table: "Shifts",
+                keyColumn: "Id",
+                keyValue: 48);
+
+            migrationBuilder.DeleteData(
+                table: "Shifts",
+                keyColumn: "Id",
+                keyValue: 49);
 
             migrationBuilder.DeleteData(
                 table: "StandardAvailabilities",

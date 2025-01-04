@@ -860,7 +860,11 @@ public partial class BumboDbContext : IdentityDbContext<User>
             new { Id = 43, Start = new DateTime(2025, 1, 14, 15, 0, 0), End = new DateTime(2025, 1, 14, 21, 0, 0), Department = Department.Vers, EmployeeNumber = 5, IsFinal = false },
             new { Id = 44, Start = new DateTime(2025, 1, 15, 13, 0, 0), End = new DateTime(2025, 1, 15, 19, 0, 0), Department = Department.Kassa, EmployeeNumber = 5, IsFinal = false },
             new { Id = 45, Start = new DateTime(2025, 1, 17, 13, 0, 0), End = new DateTime(2025, 1, 17, 19, 0, 0), Department = Department.Kassa, EmployeeNumber = 5, IsFinal = false },
-            new { Id = 46, Start = new DateTime(2025, 1, 19, 13, 0, 0), End = new DateTime(2025, 1, 19, 19, 0, 0), Department = Department.Kassa, EmployeeNumber = 5, IsFinal = false }
+            new { Id = 46, Start = new DateTime(2025, 1, 19, 13, 0, 0), End = new DateTime(2025, 1, 19, 19, 0, 0), Department = Department.Kassa, EmployeeNumber = 5, IsFinal = false },
+
+            new { Id = 47, Start = new DateTime(2025, 1, 18, 9, 0, 0), End = new DateTime(2025, 1, 18, 15, 0, 0), Department = Department.Kassa, IsFinal = false },
+            new { Id = 48, Start = new DateTime(2025, 1, 18, 15, 0, 0), End = new DateTime(2025, 1, 18, 21, 0, 0), Department = Department.Kassa, IsFinal = false },
+            new { Id = 49, Start = new DateTime(2025, 1, 19, 9, 0, 0), End = new DateTime(2025, 1, 19, 12, 0, 0), Department = Department.Kassa, IsFinal = false }
         );
 
         modelBuilder.Entity<ShiftTakeOver>().HasData(
