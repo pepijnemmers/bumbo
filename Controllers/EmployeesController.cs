@@ -355,5 +355,39 @@ namespace BumboApp.Controllers
             }
             return Redirect(redirect);
         }
+
+        [HttpPost]
+        public IActionResult Reemploy(int employeeNumber)
+        {
+            var employee = Context.Employees.Find(employeeNumber);
+            if (employee == null)
+            {
+                return NotifyErrorAndRedirect("Er is iets misgegaan, werknemer niet gevonden", nameof(Index));
+            }
+            if (employee.EndOfEmployment == null)
+            {
+                NotifyService.Error("De werknemer is nog in dienst");
+                return RedirectToAction(nameof(Details), employeeNumber);
+            }
+
+            employee.EndOfEmployment = null;
+
+            try
+            {
+                Context.SaveChanges();
+            }
+            catch
+            {
+                NotifyService.Error("Er is iets misgegaan met het bewerken");
+                return RedirectToAction(nameof(Details), employeeNumber);
+            }
+
+            var redirect = HttpContext.Request.Headers["Referer"];
+            if (redirect.IsNullOrEmpty())
+            {
+                return RedirectToAction(nameof(Details), employeeNumber);
+            }
+            return Redirect(redirect);
+        }
     }
 }

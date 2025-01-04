@@ -34,6 +34,13 @@ else
                 {
                     <a class="btn btn-primary" asp-action="Update" asp-route-id="@Model.EmployeeNumber">Bewerken</a>
                 }
+                else
+                {
+                    <form asp-action="Reemploy" method="post">
+                        <input type="hidden" name="employeeNumber" value="@Model.EmployeeNumber" />
+                        <button type="submit" class="btn btn-outline-primary">Terug in dienst nemen</button>
+                    </form>
+                }
             </div>
         </div>
     </div>
