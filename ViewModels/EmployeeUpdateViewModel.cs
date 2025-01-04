@@ -41,7 +41,7 @@ namespace BumboApp.ViewModels
         [RegularExpression(@"^[0-9]+[A-Za-z]*$", ErrorMessage = "Huisnummer moet beginnen met een cijfer en (optioneel) eindigen met letters")]
         public string HouseNumber { get; set; }
 
-        [DutchRequired(ErrorMessage = "contracturen"), Range(0, 55)]
+        [DutchRequired(ErrorMessage = "contracturen"), Range(0, 55, ErrorMessage = "De waarde van contracturen moet minimaal 0 en maximaal 55 zijn.")]
         public int ContractHours { get; set; }
 
         public DateOnly StartOfEmployment { get; set; }
