@@ -290,7 +290,6 @@ namespace BumboApp.Controllers
             ViewData["EmployeeRole"] = employeeRole.ToFriendlyString();
             ViewData["LeaveHourUsed"] = amountOfLeaveHours;
 
-
             //Postcode API ----------------------------
             //var apiKey = Environment.GetEnvironmentVariable("POSTCODE_API_KEY");
             var apiKey = "";
@@ -323,7 +322,7 @@ namespace BumboApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult Dismiss(int employeeNumber)
+        public IActionResult Dismiss(int employeeNumber, string? dismissDateString)
         {
             var employee = Context.Employees.Find(employeeNumber);
             if (employee == null)
@@ -335,8 +334,14 @@ namespace BumboApp.Controllers
                 NotifyService.Error("De werknemer is niet meer in dienst");
                 return RedirectToAction(nameof(Details), employeeNumber);
             }
-
-            employee.EndOfEmployment = DateOnly.FromDateTime(DateTime.Now);
+            DateOnly now = DateOnly.FromDateTime(DateTime.Now);
+            DateOnly dismissDate = dismissDateString == null ? now : DateOnly.Parse(dismissDateString);
+            if (dismissDate < now || dismissDate > now.AddDays(30))
+            {
+                NotifyService.Error("Uitdiensttredingsdatum valt buiten de toegestane marge");
+                return RedirectToAction(nameof(Details), employeeNumber);
+            }
+            employee.EndOfEmployment = dismissDate;
 
             try
             {

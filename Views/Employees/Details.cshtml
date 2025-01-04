@@ -36,10 +36,7 @@ else
                 }
                 else
                 {
-                    <form asp-action="Reemploy" method="post">
-                        <input type="hidden" name="employeeNumber" value="@Model.EmployeeNumber" />
-                        <button type="submit" class="btn btn-outline-primary">Terug in dienst nemen</button>
-                    </form>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#reemployEmployeeModal">Terug in dienst nemen</button>
                 }
             </div>
         </div>
@@ -76,22 +73,48 @@ else
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Modal uitdiensttreding -->
     <div class="modal fade" id="dismissEmployeeModal" tabindex="-1" aria-labelledby="itemDeleteModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
+                <form asp-action="Dismiss" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="itemDeleteModalLabel">Uit dienst zetting van @Model.FirstName</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label>Datum van uitdiensttreding:</label>
+                        <input type="date" name="dismissDateString" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="@DateTime.Now.AddDays(30).ToString("yyyy-MM-dd")" />
+                        <p>Weet je zeker dat je @Model.FirstName uit dienst wilt zetten?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+
+                        <input type="hidden" name="employeeNumber" value="@Model.EmployeeNumber" />
+                        <button type="submit" class="btn btn-danger">Bevestig uit dienst zetting</button>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal terug in dienst nemen -->
+    <div class="modal fade" id="reemployEmployeeModal" tabindex="-1" aria-labelledby="itemDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
                 <div class="modal-header">
-                    <h5 class="modal-title" id="itemDeleteModalLabel">Uit dienst zetting van @Model.FirstName</h5>
+                    <h5 class="modal-title" id="itemDeleteModalLabel">Terug in dienst zetting van @Model.FirstName</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Weet je zeker dat je @Model.FirstName uit dienst wil zetten? Deze actie kan niet ongedaan worden gemaakt.</p>
+                    <p>Weet je zeker dat je het ontslag van @Model.FirstName ongedaan wilt maken?</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
-                    <form asp-action="Dismiss" method="post">
+                    <form asp-action="Reemploy" method="post">
                         <input type="hidden" name="employeeNumber" value="@Model.EmployeeNumber" />
-                        <button type="submit" class="btn btn-danger">Bevestig uit dienst zetting</button>
+                        <button type="submit" class="btn btn-outline-primary">Terug in dienst nemen</button>
                     </form>
                 </div>
             </div>
