@@ -882,5 +882,77 @@ public partial class BumboDbContext : IdentityDbContext<User>
                 Status = Status.Aangevraagd,
             }
         );
+
+        modelBuilder.Entity<Shift>().HasData(
+            new { Id = 101, Start = new DateTime(2024, 12, 2, 9, 0, 0), End = new DateTime(2024, 12, 2, 17, 0, 0), Department = Department.Vers, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 102, Start = new DateTime(2024, 12, 3, 10, 0, 0), End = new DateTime(2024, 12, 3, 18, 0, 0), Department = Department.Kassa, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 103, Start = new DateTime(2024, 12, 4, 8, 0, 0), End = new DateTime(2024, 12, 4, 16, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 104, Start = new DateTime(2024, 12, 5, 11, 0, 0), End = new DateTime(2024, 12, 5, 19, 0, 0), Department = Department.Vers, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 105, Start = new DateTime(2024, 12, 6, 9, 0, 0), End = new DateTime(2024, 12, 6, 17, 0, 0), Department = Department.Kassa, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 106, Start = new DateTime(2024, 12, 2, 9, 0, 0), End = new DateTime(2024, 12, 2, 17, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 107, Start = new DateTime(2024, 12, 3, 10, 0, 0), End = new DateTime(2024, 12, 3, 18, 0, 0), Department = Department.Kassa, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 108, Start = new DateTime(2024, 12, 4, 8, 0, 0), End = new DateTime(2024, 12, 4, 16, 0, 0), Department = Department.Vers, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 109, Start = new DateTime(2024, 12, 5, 11, 0, 0), End = new DateTime(2024, 12, 5, 19, 0, 0), Department = Department.Kassa, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 110, Start = new DateTime(2024, 12, 6, 9, 0, 0), End = new DateTime(2024, 12, 6, 17, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 3, IsFinal = true },
+
+            new { Id = 111, Start = new DateTime(2024, 12, 9, 9, 0, 0), End = new DateTime(2024, 12, 9, 17, 0, 0), Department = Department.Vers, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 112, Start = new DateTime(2024, 12, 10, 10, 0, 0), End = new DateTime(2024, 12, 10, 18, 0, 0), Department = Department.Kassa, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 113, Start = new DateTime(2024, 12, 11, 8, 0, 0), End = new DateTime(2024, 12, 11, 16, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 114, Start = new DateTime(2024, 12, 12, 11, 0, 0), End = new DateTime(2024, 12, 12, 19, 0, 0), Department = Department.Vers, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 115, Start = new DateTime(2024, 12, 13, 9, 0, 0), End = new DateTime(2024, 12, 13, 17, 0, 0), Department = Department.Kassa, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 116, Start = new DateTime(2024, 12, 9, 9, 0, 0), End = new DateTime(2024, 12, 9, 17, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 117, Start = new DateTime(2024, 12, 10, 10, 0, 0), End = new DateTime(2024, 12, 10, 18, 0, 0), Department = Department.Kassa, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 118, Start = new DateTime(2024, 12, 11, 8, 0, 0), End = new DateTime(2024, 12, 11, 16, 0, 0), Department = Department.Vers, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 119, Start = new DateTime(2024, 12, 12, 11, 0, 0), End = new DateTime(2024, 12, 12, 19, 0, 0), Department = Department.Kassa, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 120, Start = new DateTime(2024, 12, 13, 9, 0, 0), End = new DateTime(2024, 12, 13, 17, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 3, IsFinal = true }
+        );
+
+        modelBuilder.Entity<WorkedHour>().HasData(
+            new { Id = 1, DateOnly = new DateOnly(2024, 12, 2), StartTime = new TimeOnly(9, 15), EndTime = new TimeOnly(17, 10), Status = HourStatus.Final, EmployeeNumber = 2 },
+            new { Id = 2, DateOnly = new DateOnly(2024, 12, 3), StartTime = new TimeOnly(10, 5), EndTime = new TimeOnly(18, 5), Status = HourStatus.Final, EmployeeNumber = 2 },
+            new { Id = 3, DateOnly = new DateOnly(2024, 12, 4), StartTime = new TimeOnly(8, 10), EndTime = new TimeOnly(16, 5), Status = HourStatus.Final, EmployeeNumber = 2 },
+            new { Id = 4, DateOnly = new DateOnly(2024, 12, 5), StartTime = new TimeOnly(11, 10), EndTime = new TimeOnly(19, 15), Status = HourStatus.Final, EmployeeNumber = 2 },
+            new { Id = 5, DateOnly = new DateOnly(2024, 12, 6), StartTime = new TimeOnly(9, 5), EndTime = new TimeOnly(17, 5), Status = HourStatus.Final, EmployeeNumber = 2 },
+            new { Id = 6, DateOnly = new DateOnly(2024, 12, 2), StartTime = new TimeOnly(9, 10), EndTime = new TimeOnly(17, 20), Status = HourStatus.Final, EmployeeNumber = 3 },
+            new { Id = 7, DateOnly = new DateOnly(2024, 12, 3), StartTime = new TimeOnly(10, 0), EndTime = new TimeOnly(18, 5), Status = HourStatus.Final, EmployeeNumber = 3 },
+            new { Id = 8, DateOnly = new DateOnly(2024, 12, 4), StartTime = new TimeOnly(8, 5), EndTime = new TimeOnly(16, 10), Status = HourStatus.Final, EmployeeNumber = 3 },
+            new { Id = 9, DateOnly = new DateOnly(2024, 12, 5), StartTime = new TimeOnly(11, 10), EndTime = new TimeOnly(19, 0), Status = HourStatus.Final, EmployeeNumber = 3 },
+            new { Id = 10, DateOnly = new DateOnly(2024, 12, 6), StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(17, 10), Status = HourStatus.Final, EmployeeNumber = 3 },
+
+            new { Id = 11, DateOnly = new DateOnly(2024, 12, 9), StartTime = new TimeOnly(9, 20), EndTime = new TimeOnly(17, 15), Status = HourStatus.Concept, EmployeeNumber = 2 },
+            new { Id = 12, DateOnly = new DateOnly(2024, 12, 10), StartTime = new TimeOnly(10, 10), EndTime = new TimeOnly(18, 10), Status = HourStatus.Concept, EmployeeNumber = 2 },
+            new { Id = 13, DateOnly = new DateOnly(2024, 12, 11), StartTime = new TimeOnly(8, 20), EndTime = new TimeOnly(16, 10), Status = HourStatus.Concept, EmployeeNumber = 2 },
+            new { Id = 14, DateOnly = new DateOnly(2024, 12, 12), StartTime = new TimeOnly(11, 15), EndTime = new TimeOnly(19, 20), Status = HourStatus.Concept, EmployeeNumber = 2 },
+            new { Id = 15, DateOnly = new DateOnly(2024, 12, 13), StartTime = new TimeOnly(9, 15), EndTime = new TimeOnly(17, 10), Status = HourStatus.Concept, EmployeeNumber = 2 },
+            new { Id = 16, DateOnly = new DateOnly(2024, 12, 9), StartTime = new TimeOnly(9, 15), EndTime = new TimeOnly(17, 20), Status = HourStatus.Concept, EmployeeNumber = 3 },
+            new { Id = 17, DateOnly = new DateOnly(2024, 12, 10), StartTime = new TimeOnly(10, 15), EndTime = new TimeOnly(18, 10), Status = HourStatus.Concept, EmployeeNumber = 3 },
+            new { Id = 18, DateOnly = new DateOnly(2024, 12, 11), StartTime = new TimeOnly(8, 10), EndTime = new TimeOnly(16, 15), Status = HourStatus.Concept, EmployeeNumber = 3 },
+            new { Id = 19, DateOnly = new DateOnly(2024, 12, 12), StartTime = new TimeOnly(11, 20), EndTime = new TimeOnly(19, 10), Status = HourStatus.Concept, EmployeeNumber = 3 },
+            new { Id = 20, DateOnly = new DateOnly(2024, 12, 13), StartTime = new TimeOnly(9, 10), EndTime = new TimeOnly(17, 20), Status = HourStatus.Concept, EmployeeNumber = 3 }
+        );
+
+        modelBuilder.Entity<Break>().HasData(
+            new { Id = 1, StartTime = new TimeOnly(12, 0), EndTime = new TimeOnly(12, 30), WorkedHourId = 1 },
+            new { Id = 2, StartTime = new TimeOnly(13, 0), EndTime = new TimeOnly(13, 30), WorkedHourId = 2 },
+            new { Id = 3, StartTime = new TimeOnly(12, 15), EndTime = new TimeOnly(12, 45), WorkedHourId = 3 },
+            new { Id = 4, StartTime = new TimeOnly(14, 30), EndTime = new TimeOnly(15, 0), WorkedHourId = 4 },
+            new { Id = 5, StartTime = new TimeOnly(12, 0), EndTime = new TimeOnly(12, 30), WorkedHourId = 5 },
+            new { Id = 6, StartTime = new TimeOnly(12, 15), EndTime = new TimeOnly(12, 45), WorkedHourId = 6 },
+            new { Id = 7, StartTime = new TimeOnly(13, 30), EndTime = new TimeOnly(14, 0), WorkedHourId = 7 },
+            new { Id = 8, StartTime = new TimeOnly(11, 45), EndTime = new TimeOnly(12, 15), WorkedHourId = 8 },
+            new { Id = 9, StartTime = new TimeOnly(14, 0), EndTime = new TimeOnly(14, 30), WorkedHourId = 9 },
+            new { Id = 10, StartTime = new TimeOnly(12, 15), EndTime = new TimeOnly(12, 45), WorkedHourId = 10 },
+
+            new { Id = 21, WorkedHourId = 11, StartTime = new TimeOnly(12, 15), EndTime = new TimeOnly(12, 45) },
+            new { Id = 22, WorkedHourId = 12, StartTime = new TimeOnly(13, 0), EndTime = new TimeOnly(13, 30) },
+            new { Id = 23, WorkedHourId = 13, StartTime = new TimeOnly(12, 30), EndTime = new TimeOnly(13, 0) },
+            new { Id = 24, WorkedHourId = 14, StartTime = new TimeOnly(14, 0), EndTime = new TimeOnly(14, 30) },
+            new { Id = 25, WorkedHourId = 15, StartTime = new TimeOnly(12, 0), EndTime = new TimeOnly(12, 30) },
+            new { Id = 26, WorkedHourId = 16, StartTime = new TimeOnly(12, 15), EndTime = new TimeOnly(12, 45) },
+            new { Id = 27, WorkedHourId = 17, StartTime = new TimeOnly(13, 15), EndTime = new TimeOnly(13, 45) },
+            new { Id = 28, WorkedHourId = 18, StartTime = new TimeOnly(11, 45), EndTime = new TimeOnly(12, 15) },
+            new { Id = 29, WorkedHourId = 19, StartTime = new TimeOnly(14, 15), EndTime = new TimeOnly(14, 45) },
+            new { Id = 30, WorkedHourId = 20, StartTime = new TimeOnly(12, 30), EndTime = new TimeOnly(13, 0) }
+        );
     }
 }
