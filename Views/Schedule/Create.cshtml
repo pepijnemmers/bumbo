@@ -1,8 +1,9 @@
 ﻿@{
-    ViewData["Title"] = "Rooster aanmaken";
+    ViewData["Title"] = "Rooster Genereren";
 }
 
-<form asp-action="MakeSchedule" asp-controller="Schedule" method="post">
+<p class="text-secondary small">Het rooster wordt automatisch gemaakt op basis van prognoses, openingstijden en de beschikbaarheid van werknemers.</p>
+<form asp-action="MakeSchedule" asp-controller="Schedule" onsubmit="openLoadingModel()" method="post">
     <div class="card p-4 create-prognosis-card">
         <div class="mb-3">
             <label for="startDate" class="form-label fw-bold">Begin Datum</label>
@@ -19,7 +20,38 @@
 
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
             <a asp-controller="Schedule" asp-action="Index" class="btn btn-outline-primary" type="button">Annuleer</a>
-            <button class="btn btn-primary me-md-2" id="prognosisCreateButton" type="submit" disabled>Berekenen Rooster</button>
+            <button class="btn btn-primary me-md-2" id="prognosisCreateButton" type="submit" disabled>Rooster Genereren</button>
         </div>
     </div>
 </form>
+
+<div class="modal fade align-content-center" id="loadingModel" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title d-flex align-items-center gap-2">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Laden...</span>
+                    </div>
+                    <span>Het rooster wordt gegenereerd...</span>
+                </h5>
+            </div>
+            <div class="modal-body">
+
+                <div>
+                    <p>Let op, dit kan enkele minuten duren.</p>
+                    <p class="text-danger">Sluit dit venster niet! Wacht tot het rooster is gegenereerd.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openLoadingModel() {
+            const loadingModel = new bootstrap.Modal(document.getElementById('loadingModel'));
+            loadingModel.show();
+        }
+    </script>
+}
