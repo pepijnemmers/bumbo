@@ -6,7 +6,7 @@ namespace BumboApp.Helpers
     {
 
         private const int MaxShiftLengthAdult = 12;
-        public const int MaxWeeklyHoursAdult = 60;
+        private const int MaxWeeklyHoursAdult = 60;
 
         private const int MaxWeeklyHoursAlmostAdult = 40;
         private const int TimeframeInWeeksMaxWeeklyHoursAlmostAdult = 4;
@@ -20,7 +20,7 @@ namespace BumboApp.Helpers
 
         private const float BreakTimeHours = (float)0.5;
         private readonly int[] _breakTimes = { 4, 8 };
-        private BumboDbContext _context;
+        readonly BumboDbContext _context;
 
         public MaxScheduleTimeCalculationHelper(BumboDbContext context)
         {
@@ -163,7 +163,7 @@ namespace BumboApp.Helpers
                 .ToList());
 
                 var maxhoursWithAverage = maxAllowedHours + workedHoursInTimeframe;
-                if (employee.SchoolSchedules.Where(e => e.Date >= startDate && e.Date <= startDate.AddDays(6)).Any())
+                if (employee.SchoolSchedules.Any(e => e.Date >= startDate && e.Date <= startDate.AddDays(6)))
                 {
                     maxTimeWithSchoolHours = MaxHoursWithSchoolAlmostAdult;
                 }
