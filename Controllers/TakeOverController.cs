@@ -183,7 +183,7 @@ namespace BumboApp.Controllers
 
             // Fetch the employee associated with the logged-in user
             var employee = Context.Employees
-                .FirstOrDefault(e => e.User.Id == userId);
+                .FirstOrDefault(e => e.User != null && e.User.Id == userId);
             if (employee == null) { return NotifyErrorAndRedirect("Kon gebruiker niet vinden", "Index", "Dashboard"); }
 
             // Retrieve the ShiftTakeOver based on the ShiftId
@@ -191,6 +191,15 @@ namespace BumboApp.Controllers
                                          .Include(st => st.Shift)
                                          .FirstOrDefault(st => st.ShiftId == shiftId);
             if (shiftTakeOver == null) { return NotifyErrorAndRedirect("Kon de shift niet vinden", "Index", "Dashboard"); }
+            
+            // Check if the employee already has a shift at the same time
+            var overlappingShift = Context.Shifts
+                .Include(s => s.Employee)
+                .FirstOrDefault(s => s.Employee != null &&
+                                     s.Employee.EmployeeNumber == employee.EmployeeNumber &&
+                                     s.Start < shiftTakeOver.Shift.End &&
+                                     s.End > shiftTakeOver.Shift.Start);
+            if (overlappingShift != null) { return NotifyErrorAndRedirect("Je hebt al een shift op dit tijdstip", "Index", "Dashboard"); }
 
             //TODO: Checken CAO regels.
 
