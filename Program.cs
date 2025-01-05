@@ -34,7 +34,7 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-var defaultCulture = new CultureInfo("en-GB");
+var defaultCulture = new CultureInfo("nl-NL");
 var localizationOptions = new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture(defaultCulture),

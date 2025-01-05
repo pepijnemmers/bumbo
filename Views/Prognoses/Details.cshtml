@@ -1,4 +1,5 @@
-﻿@using BumboApp.Views.Components
+﻿@using System.Globalization
+@using BumboApp.Views.Components
 @using Microsoft.Data.SqlClient
 @model BumboApp.ViewModels.WeekPrognosisViewModel
 
@@ -49,7 +50,7 @@ else
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (Department department in Department.GetValues(typeof(Department)))
+                    @foreach (Department department in Enum.GetValues(typeof(Department)))
                     {
                         <tr>
                             <td>@department</td>
@@ -72,7 +73,7 @@ else
         </div>
 
         <form id="form" style="display: none" asp-action="Update" method="post">
-
+            <input type="hidden" name="id" value="@Model.StartDate.ToString("dd-MM-yyyy")" />
             <table class="table">
                 <thead>
                     <tr>
@@ -84,7 +85,11 @@ else
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (Department department in Department.GetValues(typeof(Department)))
+                    @{
+                        // set localization to en-GB
+                        CultureInfo.CurrentCulture = new CultureInfo("en-GB");
+                    }
+                    @foreach (Department department in Enum.GetValues(typeof(Department)))
                     {
                         <tr>
                             <td>@department</td>
@@ -103,31 +108,43 @@ else
 
                                             <input id="@day+@department-employees"
                                                    class="form-control form-control-sm"
-                                                   name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededEmployees"
                                                    type="number"
                                                    value="@prognosis.NeededEmployees"
                                                    min="0" max="1000" step="0.125"
-                                                   oninput="updateHours('@day+@department')">
+                                                   oninput="updateHours('@day+@department'); updateEmployeesHidden('@day+@department', this)"
+                                                   onchange="updateEmployeesHidden('@day+@department', this)">
+                                            <input id="@day+@department-employeesHidden"
+                                                   name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededEmployees"
+                                                   value="@prognosis.NeededEmployees.ToString(CultureInfo.CurrentCulture).Replace('.', ',')"
+                                                   type="hidden">
 
                                             <input id="@day+@department-hours"
                                                    class="form-control form-control-sm"
-                                                   name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededHours"
                                                    type="number"
                                                    value="@prognosis.NeededHours"
                                                    min="0" max="8000" step="1"
-                                                   oninput="updateEmployees('@day+@department')">
+                                                   oninput="updateEmployees('@day+@department'); updateHoursHidden('@day+@department', this)"
+                                                    onchange="updateHoursHidden('@day+@department', this)">
+                                            <input id="@day+@department-hoursHidden"
+                                                   name="Prognoses[@Model.Prognoses.IndexOf(prognosis)].NeededHours"
+                                                   value="@prognosis.NeededHours.ToString(CultureInfo.CurrentCulture).Replace('.', ',')"
+                                                   type="hidden">
                                         </div>
                                     }
                                 </td>
                             }
                         </tr>
                     }
+                    @{
+                        // reset localization to nl-NL
+                        CultureInfo.CurrentCulture = new CultureInfo("nl-NL");
+                    }
                 </tbody>
             </table>
 
             <div class="d-flex justify-content-end m-3">
                 <div class="w-auto">
-                    <button class="btn btn-outline-danger" asp-controller="Prognoses" asp-action="Delete" asp-route-weekPrognoseId="@Model.WeekPrognoseId">Verwijderen</button>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Verwijderen</button>
                     <button type="submit" class="btn btn-primary">Opslaan</button>
                 </div>
             </div>
@@ -143,7 +160,8 @@ else
             </div>
         </div>
     </div>
-<div class="col-12 col-xl-5">
+    
+    <div class="col-12 col-xl-5">
         <div class=" table-container">
             <div class="pt-3 ps-3">
                 <h3>Speciale dagen</h3>
@@ -221,4 +239,78 @@ else
             
         </div>
     </div>
+}
+
+<div class="modal fade align-content-center" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Bevestiging verwijderen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Weet je zeker dat je deze prognose wil verwijderen?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                <form id="deleteForm" method="post" asp-action="Delete" asp-controller="Prognoses" asp-route-weekPrognoseId="@Model.WeekPrognoseId">
+                    <button type="submit" class="btn btn-danger">Verwijderen</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        //Prognoses details
+        document.getElementById('prognosisEditButton').addEventListener('click', function () {
+            const form = document.getElementById("form");
+            const overview = document.getElementById("overview");
+            const prognosisEditButton = document.getElementById("prognosisEditButton");
+
+            if (form.style.display === "none") {
+                overview.style.display = "none";
+                form.style.display = "block";
+                prognosisEditButton.textContent = "annuleren";
+            } else {
+                form.style.display = "none";
+                overview.style.display = "flex";
+                prognosisEditButton.textContent = "bewerken";
+            }
+        });
+
+        function updateHours(id) {
+            let employeesInput = document.getElementById(id + '-employees');
+            let hoursInput = document.getElementById(id + '-hours');
+
+            let employees = employeesInput.value;
+            hoursInput.value = employees * 8;
+        }
+
+        function updateEmployees(id) {
+            let hoursInput = document.getElementById(id + '-hours');
+            let employeesInput = document.getElementById(id + '-employees');
+            let hours = hoursInput.value;
+            employeesInput.value = hours / 8;
+        }
+        
+        function updateEmployeesHidden(id, element) {
+            const valueToSet = element.value;
+            document.getElementById(id + '-employeesHidden').value = normalizeNumber(valueToSet);
+            document.getElementById(id + '-hoursHidden').value = normalizeNumber(valueToSet * 8);
+        }
+        
+        function updateHoursHidden(id, element) {
+            const valueToSet = element.value;
+            document.getElementById(id + '-hoursHidden').value = normalizeNumber(valueToSet);
+            document.getElementById(id + '-employeesHidden').value = normalizeNumber(valueToSet / 8);
+        }
+        
+        function normalizeNumber(value) {
+            value = value.toString();
+            return value.includes('.') ? value.replace('.', ',') : value;
+        }
+    </script>
 }
