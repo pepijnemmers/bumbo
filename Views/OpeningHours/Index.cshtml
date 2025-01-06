@@ -30,7 +30,7 @@
                             <td>
                                 <div class="form-check form-switch">
                                     <input class="d-none form-check-input" type="checkbox" role="switch" id="opening-hours-switch-@i" onchange="toggleDay(@i, this.checked)" @(isOpen ? "checked" : "") disabled/>
-                                    <input type="hidden" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].WeekDay" value="@openingHours.WeekDay"/>
+                                    <input type="hidden" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].WeekDay" value="@openingHours.WeekDay" max="23:00"/>
                                     <p>@Model.DutchDays[(i + 1) % 7]</p>
                                 </div>
                             </td>
@@ -38,7 +38,8 @@
                                 <div class="@(isOpen ? "d-table-cell" : "d-none")" id="opening-hours-field-@i">
                                     <label for="opening-hour-@i">Vanaf</label>
                                     <div class="d-inline-block" id="opening-hour-text-@i">@openingHours.OpeningTime</div>
-                                    <input class="d-none" id="opening-hour-@i" type="time" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].OpeningTime" value="@openingHours.OpeningTime"/>
+                                    <input class="d-none" id="opening-hour-@i" type="time" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].OpeningTime" value="@openingHours.OpeningTime"
+                                    min="06:00"/>
                                 </div>
                                 <div class="@(isOpen ? "d-none" : "d-block")" id="closedText-@i">
                                     <p>Gesloten</p>
