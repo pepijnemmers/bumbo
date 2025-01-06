@@ -1,7 +1,9 @@
-﻿@model List<BumboApp.Models.Availability>
+﻿@using System.Globalization
+@model List<BumboApp.Models.Availability>
 
 @{
     ViewData["Title"] = "Beschikbaarheid bewerken";
+    CultureInfo dutchCulture = new CultureInfo("nl-NL");
 }
 
 <div class="row">
@@ -15,7 +17,7 @@
                         DayOfWeek day = (DayOfWeek)((i + 1) % 7); // Start with Monday
                         Availability? availability = Model.SingleOrDefault(a => a.Date.DayOfWeek == day);
                         <tr>
-                            <td>@day</td>
+                            <td>@dutchCulture.DateTimeFormat.GetDayName(day)</td>
                             <td>
                                 <input type="hidden" name="availabilities[@i].Date" value="@availability.Date" />
                                 <input type="hidden" name="availabilities[@i].EmployeeNumber" value="@availability.EmployeeNumber" />
@@ -33,8 +35,8 @@
                     }
                 </tbody>
             </table>
-            <div class="d-flex justify-content-end m-3">
-                <a class="btn btn-secondary" asp-action="Index" asp-route-id="@ViewData["StartDate"]">Annuleren</a>
+            <div class="d-flex justify-content-end m-3 gap-2">
+                <a class="btn btn-outline-primary" asp-action="Index" asp-route-id="@ViewData["StartDate"]">Annuleren</a>
                 <button type="submit" class="btn btn-primary">Opslaan</button>
             </div>
         </form>

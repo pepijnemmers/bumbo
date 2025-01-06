@@ -129,6 +129,7 @@ namespace BumboApp.Controllers
         {
             if (!ModelState.IsValid)
             {
+                NotifyService.Error("De eindtijd kan niet voor de starttijd zijn");
                 return View(availabilities);
             }
 
@@ -249,6 +250,7 @@ namespace BumboApp.Controllers
         {
             if (!ModelState.IsValid)
             {
+                NotifyService.Error("De eindtijd kan niet voor de starttijd zijn");
                 return View(standardAvailabilities);
             }
 
@@ -256,7 +258,6 @@ namespace BumboApp.Controllers
             {
                 if (sa.EndTime < sa.StartTime)
                 {
-                    Console.WriteLine("===========");
                     NotifyService.Error("Eindtijd moet na de starttijd zijn");
                     return View(standardAvailabilities);
                 }
@@ -272,7 +273,8 @@ namespace BumboApp.Controllers
                 NotifyService.Error("Er is iets misgegaan");
             }
 
-            return NotifySuccessAndRedirect("De standaardbeschikbaarheid is succesvol bijgewerkt", nameof(Index));
+            NotifyService.Success("De standaardbeschikbaarheid is succesvol bijgewerkt");
+            return RedirectToAction(nameof(Index));
         }
 
         public Employee? getLoggedinEmployee()
