@@ -120,7 +120,7 @@ public partial class BumboDbContext : IdentityDbContext<User>
 
         modelBuilder.Entity<SickLeave>()
             .HasOne(ss => ss.Employee)
-            .WithMany(e => e.sickLeaves)
+            .WithMany(e => e.SickLeaves)
             .HasForeignKey(ss => ss.EmployeeNumber)
             .OnDelete(DeleteBehavior.Cascade);
 

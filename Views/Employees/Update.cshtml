@@ -10,6 +10,8 @@
 }
 else
 {
+    <a asp-action="Details" asp-route-id="@Model.EmployeeNumber" class="btn btn-secondary">Terug</a>
+
     <form asp-action="Update" asp-route-id="@Model.EmployeeNumber" method="post">
         <div class="table-container p-3">
             <div class="d-flex justify-content-between align-items-center">
@@ -25,13 +27,15 @@ else
             <div class="row">
                 <div class="col-md-6">
                     <input type="hidden" asp-for="EmployeeNumber" />
+                    <input type="hidden" asp-for="IsOwner" />
+                    <input type="hidden" asp-for="StartOfEmployment" />
                     <div class="form-group">
                         <label asp-for="FirstName" class="form-label">Voornaam</label>
                         <input asp-for="FirstName" class="form-control" required />
                         <span asp-validation-for="FirstName" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="LastName" class="form-label">Achternaam</label>
+                        <label asp-for="LastName" class="form-label">Tussenvoegsel en achternaam</label>
                         <input asp-for="LastName" class="form-control" required />
                         <span asp-validation-for="LastName" class="text-danger"></span>
                     </div>
@@ -47,15 +51,27 @@ else
                         <input asp-for="DateOfBirth" class="form-control" type="date" required />
                         <span asp-validation-for="DateOfBirth" class="text-danger"></span>
                     </div>
+
+                    @if (Model.IsOwner)
+                    {
+                        <input asp-for="@Model.Role" type="hidden" value="@Model.Role" />
+                    }
+                    else
+                    {
+                        <div>
+                            <label asp-for="@Model.Role" class="control-label">Functie</label>
+                            <select class="form-select" asp-for="Role" class="form-control">
+                                <option value="@Role.Manager">Manager</option>
+                                <option value="@Role.Employee">Werknemer</option>
+                            </select>
+                            <span asp-validation-for="@Model.Role" class="text-danger"></span>
+                        </div>
+                    }
+
                     <div class="form-group">
-                        <label asp-for="ContractHours" class="form-label">Contracturen</label>
+                        <label asp-for="ContractHours" class="form-label">Contracturen (per week)</label>
                         <input asp-for="ContractHours" class="form-control" type="number" required />
                         <span asp-validation-for="ContractHours" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="LeaveHours" class="form-label">Verlofuren</label>
-                        <input asp-for="LeaveHours" class="form-control" type="number" />
-                        <span asp-validation-for="LeaveHours" class="text-danger"></span>
                     </div>
                 </div>
             </div>

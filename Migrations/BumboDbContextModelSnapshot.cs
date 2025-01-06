@@ -2793,7 +2793,7 @@ namespace BumboApp.Migrations
 
                     b.HasIndex("EmployeeNumber");
 
-                    b.ToTable("StandardAvailabilities", t =>
+                    b.ToTable("StandardAvailabilities", null, t =>
                         {
                             t.HasCheckConstraint("CK_StandardAvailability_StartTime_EndTime", "[StartTime] <= [EndTime]");
                         });

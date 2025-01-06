@@ -1,4 +1,4 @@
-﻿@model BumboApp.ViewModels.UserEmployeeViewModel
+﻿@model BumboApp.ViewModels.EmployeeCreateViewModel
 
 @{
     ViewData["Title"] = "Nieuwe werknemer aanmaken";
@@ -9,6 +9,7 @@
 <form method="post">
     <div class="table-container p-3">
         <h3>Accountgegevens</h3>
+        <p class="alert alert-info"><i class="fa-solid fa-exclamation-circle"></i> Deel de gegevens met de werknemer. Je kan het wachtwoord na creatie niet meer inzien.</p>
         <div class="form-group">
             <label asp-for="@Model.Email" class="control-label">Email</label>
             <input asp-for="@Model.Email" class="form-control" />
@@ -17,17 +18,23 @@
 
         <div class="form-group">
             <label asp-for="@Model.Password" class="control-label">Wachtwoord</label>
-            <input asp-for="@Model.Password" type="password" class="form-control" />
+            <div class="input-group">
+                <input asp-for="@Model.Password" id="password" type="password" class="form-control" />
+                <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                    <i class="fa fa-eye" aria-hidden="true"></i>
+                </button>
+            </div>
             <span asp-validation-for="@Model.Password" class="text-danger"></span>
         </div>
 
         <div>
-            <label asp-for="Role" class="control-label">Functie</label>
-            <select asp-for="Role" class="form-control">
+            <label asp-for="@Model.Role" class="control-label">Functie</label>
+            <select class="form-select" asp-for="Role" class="form-control">
+                <option value="@Role.Unknown" disabled selected>Selecteer medewerker</option>
                 <option value="@Role.Manager">Manager</option>
-                <option value="@Role.Employee">Employee</option>
+                <option value="@Role.Employee">Werknemer</option>
             </select>
-            <span asp-validation-for="Role" class="text-danger"></span>
+            <span asp-validation-for="@Model.Role" class="text-danger"></span>
         </div>
     </div>
 
@@ -40,8 +47,8 @@
         </div>
 
         <div class="form-group">
-            <label asp-for="@Model.LastName" class="control-label">Achternaam</label>
-            <input asp-for="@Model.LastName" class="form-control" placeholder="van den Bos" />
+            <label asp-for="@Model.LastName" class="control-label">Tussenvoegsel en achternaam</label>
+            <input asp-for="@Model.LastName" class="form-control" />
             <span asp-validation-for="@Model.LastName" class="text-danger"></span>
         </div>
 
@@ -70,15 +77,9 @@
     <div class="table-container p-3">
         <h3>Contractgegevens</h3>
         <div class="form-group">
-            <label asp-for="@Model.ContractHours" class="control-label">Contracturen</label>
+            <label asp-for="@Model.ContractHours" class="control-label">Contracturen (per week)</label>
             <input asp-for="@Model.ContractHours" type="number" class="form-control" />
             <span asp-validation-for="@Model.ContractHours" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="@Model.LeaveHours" class="control-label">Verlofuren</label>
-            <input asp-for="@Model.LeaveHours" type="number" class="form-control" />
-            <span asp-validation-for="@Model.LeaveHours" class="text-danger"></span>
         </div>
     </div>
 
@@ -86,3 +87,23 @@
         <button type="submit" class="btn btn-primary">Aanmaken</button>
     </div>
 </form>
+
+@section Scripts
+{
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    </script>
+}
