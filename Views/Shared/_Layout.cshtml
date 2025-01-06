@@ -146,7 +146,6 @@
                                 </a>
                                 <div class="sub-nav collapse @(hoursNavLinkActive ? "show" : "")" id="collapseNavLinkHours">
                                     <div class="d-flex flex-column">
-                                        @* TODO: linkjes *@
                                         <a class="sub-nav-link @(Context.Request.Path.StartsWithSegments("/WorkedHours") ? "active" : "")" asp-controller="WorkedHours" asp-action="Index">
                                             <i class="fa-solid fa-clock"></i>
                                             Uren beheren
