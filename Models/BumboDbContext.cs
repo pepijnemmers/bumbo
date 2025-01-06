@@ -47,6 +47,9 @@ public partial class BumboDbContext : IdentityDbContext<User>
     public virtual DbSet<ShiftTakeOver> ShiftTakeOvers { get; set; }
     public virtual DbSet<SickLeave> SickLeaves { get; set; }
     public virtual DbSet<StandardAvailability> StandardAvailabilities { get; set; }
+    //Module 3
+    public virtual DbSet<WorkedHour> WorkedHours { get; set; }
+    public virtual DbSet<Break> Breaks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
