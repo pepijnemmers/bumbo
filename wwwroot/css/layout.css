@@ -10,7 +10,7 @@ a {
 /* aside */
 .aside-nav {
     box-shadow: 5px 0 8px -3px rgba(0, 0, 0, .15);
-    z-index: 999999;
+    z-index: 999;
     position: sticky;
     height: 100vh;
     top: 0;
@@ -118,7 +118,7 @@ a {
     position: sticky;
     top: 0;
     box-shadow: 0 5px 8px -3px rgba(0, 0, 0, .15);
-    z-index: 999998;
+    z-index: 998;
 }
 
 .topbar h1 {
