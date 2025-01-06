@@ -25,11 +25,11 @@
                             </td>
                             <td>vanaf</td>
                             <td>
-                                <input type="time" name="availabilities[@i].StartTime" value="@availability.StartTime" required />
+                                <input type="time" name="availabilities[@i].StartTime" value="@availability.StartTime" min="06:00" required />
                             </td>
                             <td>tot</td>
                             <td>
-                                <input type="time" name="availabilities[@i].EndTime" value="@availability.EndTime" required />
+                                <input type="time" name="availabilities[@i].EndTime" value="@availability.EndTime" max="23:00" required />
                             </td>
                         </tr>
                     }

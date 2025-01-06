@@ -75,6 +75,8 @@ namespace BumboApp.Controllers
                 LoggedInUserRole = Enum.TryParse(User?.FindFirstValue(ClaimTypes.Role), out Role role) ? role : Role.Unknown;
             }
 
+            ViewData["LoggedInUserFirstName"] = Context.Employees.FirstOrDefault(e => e.User != null && e.User.Id == LoggedInUserId)?.FirstName;
+
             ViewData["NumberOfNotifications"] = Context.Notifications.Count(n => n.Employee.User.Id == LoggedInUserId && !n.HasBeenRead);
         }
         

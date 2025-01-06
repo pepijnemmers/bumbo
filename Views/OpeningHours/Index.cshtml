@@ -1,7 +1,6 @@
 ﻿@using BumboApp.Views.Components
 @using Microsoft.Data.SqlClient
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@using Microsoft.Data.SqlClient
 @model BumboApp.ViewModels.OpeningHoursViewModel
 @{
     ViewData["Title"] = "Openingstijden en speciale dagen";
@@ -149,58 +148,61 @@
     </div>
 </div>
 
-<script>
-    document.getElementById('opening-hours-edit-button').addEventListener('click', function () {
-        const div = document.getElementById('opening-hours-buttons');
-        div.classList.toggle('opening-hours-buttons-class');
-        const link = document.querySelector('#opening-hours-buttons a');
-        link.classList.toggle('btn-outline-primary');
-        link.classList.toggle('btn-primary');
-        link.innerHTML = link.innerHTML.toLowerCase() === 'bewerken' ? 'annuleren' : 'bewerken';
+@section Scripts
+{
+    <script>
+        document.getElementById('opening-hours-edit-button').addEventListener('click', function () {
+            const div = document.getElementById('opening-hours-buttons');
+            div.classList.toggle('opening-hours-buttons-class');
+            const link = document.querySelector('#opening-hours-buttons a');
+            link.classList.toggle('btn-outline-primary');
+            link.classList.toggle('btn-primary');
+            link.innerHTML = link.innerHTML.toLowerCase() === 'bewerken' ? 'annuleren' : 'bewerken';
 
-        for (let i = 0; i < 7; i++) {
-            const hoursSwitch = document.getElementById(`opening-hours-switch-${i}`);
-            const openingHour = document.getElementById(`opening-hour-${i}`);
-            const openingHourText = document.getElementById(`opening-hour-text-${i}`);
-            const closingHour = document.getElementById(`closing-hour-${i}`);
-            const closingHourText = document.getElementById(`closing-hour-text-${i}`);
+            for (let i = 0; i < 7; i++) {
+                const hoursSwitch = document.getElementById(`opening-hours-switch-${i}`);
+                const openingHour = document.getElementById(`opening-hour-${i}`);
+                const openingHourText = document.getElementById(`opening-hour-text-${i}`);
+                const closingHour = document.getElementById(`closing-hour-${i}`);
+                const closingHourText = document.getElementById(`closing-hour-text-${i}`);
 
-            const isEditable = !hoursSwitch.disabled;
-            toggleDisplay(openingHour, openingHourText, isEditable);
-            toggleDisplay(closingHour, closingHourText, isEditable);
+                const isEditable = !hoursSwitch.disabled;
+                toggleDisplay(openingHour, openingHourText, isEditable);
+                toggleDisplay(closingHour, closingHourText, isEditable);
 
-            hoursSwitch.disabled = isEditable;
-            hoursSwitch.classList.toggle('d-none', isEditable);
+                hoursSwitch.disabled = isEditable;
+                hoursSwitch.classList.toggle('d-none', isEditable);
+            }
+        });
+
+        function toggleDisplay(inputField, textField, isEditable) {
+            inputField.classList.toggle('d-none', isEditable);
+            textField.classList.toggle('d-none', !isEditable);
         }
-    });
 
-    function toggleDisplay(inputField, textField, isEditable) {
-        inputField.classList.toggle('d-none', isEditable);
-        textField.classList.toggle('d-none', !isEditable);
-    }
+        function toggleDay(id, isActive) {
+            const openingField = document.getElementById(`opening-hours-field-${id}`);
+            const closingField = document.getElementById(`closing-hours-field-${id}`);
+            const closedText = document.getElementById(`closedText-${id}`);
 
-    function toggleDay(id, isActive) {
-        const openingField = document.getElementById(`opening-hours-field-${id}`);
-        const closingField = document.getElementById(`closing-hours-field-${id}`);
-        const closedText = document.getElementById(`closedText-${id}`);
+            openingField.classList.toggle('d-none', !isActive);
+            closingField.classList.toggle('d-none', !isActive);
+            closedText.classList.toggle('d-none', isActive);
 
-        openingField.classList.toggle('d-none', !isActive);
-        closingField.classList.toggle('d-none', !isActive);
-        closedText.classList.toggle('d-none', isActive);
+            const openingHourElement = document.getElementById(`opening-hour-${id}`);
+            const closingHourElement = document.getElementById(`closing-hour-${id}`);
+            if (!isActive) {
+                const openingHour = openingHourElement.value = null;
+                const closingHour = closingHourElement.value = null;
+            } else {
+                const openingTime = new Date();
+                openingTime.setHours(8, 0);
+                openingHourElement.value = openingTime.toTimeString().slice(0, 5);
 
-        const openingHourElement = document.getElementById(`opening-hour-${id}`);
-        const closingHourElement = document.getElementById(`closing-hour-${id}`);
-        if (!isActive) {
-            const openingHour = openingHourElement.value = null;
-            const closingHour = closingHourElement.value = null;
-        } else {
-            const openingTime = new Date();
-            openingTime.setHours(8, 0);
-            openingHourElement.value = openingTime.toTimeString().slice(0, 5);
-
-            const closingTime = new Date();
-            closingTime.setHours(21, 0);
-            closingHourElement.value = closingTime.toTimeString().slice(0, 5);
+                const closingTime = new Date();
+                closingTime.setHours(21, 0);
+                closingHourElement.value = closingTime.toTimeString().slice(0, 5);
+            }
         }
-    }
-</script>
+    </script>
+}

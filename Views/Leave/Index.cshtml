@@ -189,19 +189,22 @@
     </div>
 </div>
 
-<script>
-    function GoToStatus(select) {
-        const url = new URL(window.location.href);
-        if (select.value.toLowerCase() === "all") {
-            url.searchParams.delete("selectedStatus");
-        } else {
-            url.searchParams.set("selectedStatus", select.value);
+@section Scripts
+{
+    <script>
+        function GoToStatus(select) {
+            const url = new URL(window.location.href);
+            if (select.value.toLowerCase() === "all") {
+                url.searchParams.delete("selectedStatus");
+            } else {
+                url.searchParams.set("selectedStatus", select.value);
+            }
+            location.href = url;
         }
-        location.href = url;
-    }
-
-    function updateEmployeeNumber() {
-        const selectedEmployeeNumber = document.getElementById('employeeSelect').value;
-        document.getElementById('EmployeeNumber').value = selectedEmployeeNumber;
-    }
-</script>
+    
+        function updateEmployeeNumber() {
+            const selectedEmployeeNumber = document.getElementById('employeeSelect').value;
+            document.getElementById('EmployeeNumber').value = selectedEmployeeNumber;
+        }
+    </script>
+}
