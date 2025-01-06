@@ -51,6 +51,11 @@
                                 <i class="fa-solid fa-calendar"></i>
                                 Rooster
                             </a>
+                            
+                            <a class="nav-link @(Context.Request.Path == "/HoursRegistration" ? "active" : "")" asp-controller="HoursRegistration" asp-action="Index">
+                                <i class="fa-solid fa-file-invoice-dollar"></i>
+                                Uren klokken
+                            </a>
                         }
 
                         @if (User.IsInRole(Role.Manager.ToString()))
@@ -125,9 +130,41 @@
                                 <i class="fa-solid fa-users"></i>
                                 Werknemers
                             </a>
+                            
+                            <div>
+                                @{ @* TODO: correct links *@
+                                    bool hoursNavLinkActive = Context.Request.Path.StartsWithSegments("/WorkedHours") ||
+                                                              Context.Request.Path.StartsWithSegments("/MonthlyHours") || 
+                                                              Context.Request.Path.StartsWithSegments("/HoursExport");
+                                }
+                                <a class="nav-link d-flex justify-content-between align-items-center collapse-link @(hoursNavLinkActive ? "active" : "")" data-bs-toggle="collapse" href="#collapseNavLinkHours">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                                        <span>Uren & Verloning</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </a>
+                                <div class="sub-nav collapse @(hoursNavLinkActive ? "show" : "")" id="collapseNavLinkHours">
+                                    <div class="d-flex flex-column">
+                                        @* TODO: linkjes *@
+                                        <a class="sub-nav-link @(Context.Request.Path.StartsWithSegments("/WorkedHours") ? "active" : "")" asp-controller="WorkedHours" asp-action="Index">
+                                            <i class="fa-solid fa-clock"></i>
+                                            Uren beheren
+                                        </a>
+                                        <a class="sub-nav-link @(Context.Request.Path.StartsWithSegments("/MonthlyHours") ? "active" : "")" asp-controller="MonthlyHours" asp-action="Index">
+                                            <i class="fa-solid fa-list-ul"></i>
+                                            Maand overzicht
+                                        </a>
+                                        <a class="sub-nav-link @(Context.Request.Path.StartsWithSegments("/HoursExport") ? "active" : "")" asp-controller="HoursExport" asp-action="Index">
+                                            <i class="fa-solid fa-download"></i>
+                                            Uren exporteren
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         }
 
-                            @if (User.IsInRole(Role.Manager.ToString()) || User.IsInRole(Role.Employee.ToString()))
+                        @if (User.IsInRole(Role.Manager.ToString()) || User.IsInRole(Role.Employee.ToString()))
                         {
                             <a class="nav-link @(Context.Request.Path == "/leave" ? "active" : "")" asp-controller="Leave" asp-action="Index">
                                 <i class="fa-solid fa-bed"></i>
@@ -135,7 +172,7 @@
                             </a>
                         }
 
-                            @if (User.IsInRole(Role.Employee.ToString()))
+                        @if (User.IsInRole(Role.Employee.ToString()))
                         {
                             <a class="nav-link @(Context.Request.Path == "/availability" ? "active" : "")" asp-controller="Availability" asp-action="Index">
                                 <i class="fa-solid fa-clock"></i>
