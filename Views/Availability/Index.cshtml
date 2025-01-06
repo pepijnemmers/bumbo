@@ -32,17 +32,21 @@
     <div class="col-12 col-xl-8">
         @if (Model.AvailabilityList.Count == 0)
         {
-            <p>Er is nog geen beschikbaarheid voor deze week opgegeven</p>
-            <form asp-action="AddAvailability" method="post">
-                <input type="hidden" name="id" value="@Model.StartDate.ToString("dd-MM-yyyy")" />
-                <input type="hidden" name="useStandard" value="true" />
-                <button type="submit" class="btn btn-secondary" @isDisabledButton>Standaard gebruiken</button>
-            </form>
-            <form asp-action="AddAvailability" method="post">
-                <input type="hidden" name="id" value="@Model.StartDate.ToString("dd-MM-yyyy")" />
-                <input type="hidden" name="useStandard" value="false" />
-                <button type="submit" class="btn btn-primary" @isDisabledButton>Toevoegen</button>
-            </form>
+            <div class="table-container">
+                <p class="py-5 text-muted d-flex justify-content-center align-content-center">Er is nog geen beschikbaarheid voor deze week opgegeven</p>
+                <div class="d-flex justify-content-end m-3 gap-2">
+                    <form asp-action="AddAvailability" method="post">
+                        <input type="hidden" name="id" value="@Model.StartDate.ToString("dd-MM-yyyy")" />
+                        <input type="hidden" name="useStandard" value="true" />
+                        <button type="submit" class="btn btn-outline-primary" @isDisabledButton>Standaard gebruiken</button>
+                    </form>
+                    <form asp-action="AddAvailability" method="post">
+                        <input type="hidden" name="id" value="@Model.StartDate.ToString("dd-MM-yyyy")" />
+                        <input type="hidden" name="useStandard" value="false" />
+                        <button type="submit" class="btn btn-primary" @isDisabledButton>Toevoegen</button>
+                    </form>
+                </div>
+            </div>
         }
         else
         {
@@ -74,7 +78,7 @@
                 {
                     <div class="d-flex justify-content-end m-3">
                         <a class="btn btn-primary" asp-action="UpdateAvailability"
-                                asp-route-id="@Model.StartDate.ToString("dd-MM-yyyy")">
+                           asp-route-id="@Model.StartDate.ToString("dd-MM-yyyy")">
                             Bewerken
                         </a>
                     </div>
@@ -99,7 +103,7 @@
             {
                 DayOfWeek day = (DayOfWeek)dayNr;
                 SchoolSchedule? schoolSchedule = Model.SchoolScheduleList.SingleOrDefault(ss => ss.Date.DayOfWeek == day);
-                <label>@day: @Model.StartDate.AddDays(dayNr).ToString("dd-MM")</label>
+                <label>@day: @Model.StartDate.AddDays(dayNr - 1).ToString("dd-MM")</label>
                 <p>
                     @(schoolSchedule != null ? schoolSchedule.DurationInHours + " uur" : "-")
                 </p>
