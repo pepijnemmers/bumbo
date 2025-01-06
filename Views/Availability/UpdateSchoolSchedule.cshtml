@@ -9,7 +9,7 @@
 
     @for (int dayNr = 0; dayNr < 5; dayNr++)
     {
-        DayOfWeek day = (DayOfWeek) dayNr + 1;
+        DayOfWeek day = (DayOfWeek)dayNr + 1;
         SchoolSchedule? schoolSchedule = Model.SingleOrDefault(ss => ss.Date.DayOfWeek == day);
         var currentDate = ((DateOnly)ViewData["StartDate"]).AddDays(dayNr);
         var employeeNumber = ViewData["EmployeeNumber"];
@@ -17,13 +17,14 @@
 
         <input type="hidden" name="Schedules[@dayNr].Date" value="@currentDate" />
         <input type="hidden" name="Schedules[@dayNr].EmployeeNumber" value="@employeeNumber" />
+        <input type="hidden" name="startDateString" value="@ViewData["StartDate"]" />
         <input type="number"
                min="0"
                max="24"
                class="form-control"
                name="Schedules[@dayNr].DurationInHours"
                value="@(schoolSchedule?.DurationInHours ?? 0)"
-               placeholder="Bijvoorbeeld: 6.5" />
+               placeholder="Bijvoorbeeld: 6" required />
     }
     <div class="d-flex justify-content-end m-3">
         <button type="submit" class="btn btn-primary">Opslaan</button>

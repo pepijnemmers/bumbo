@@ -27,15 +27,7 @@ namespace BumboApp.Controllers
                 return RedirectToAction(nameof(Index), new { id = newId });
             }
 
-            DateOnly startDate;
-            try
-            {
-                startDate = StringToDate(id);
-            }
-            catch
-            {
-                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", "Index", "Dashboard");
-            }
+            DateOnly.TryParse(id, out DateOnly startDate);
 
             if (startDate.DayOfWeek != DayOfWeek.Monday)
             {
@@ -64,15 +56,7 @@ namespace BumboApp.Controllers
         [HttpPost]
         public async Task<IActionResult> AddAvailability(string id, bool useStandard)
         {
-            DateOnly startDate;
-            try
-            {   
-                startDate = StringToDate(id);
-            }
-            catch
-            {
-                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", nameof(Index), "Dashboard");
-            }
+            DateOnly.TryParse(id, out DateOnly startDate);
 
             var employee = getLoggedinEmployee();
             if (employee == null) { return RedirectToAction(nameof(Index), new { id }); }
@@ -127,15 +111,7 @@ namespace BumboApp.Controllers
 
         public IActionResult UpdateAvailability(string id)
         {
-            DateOnly startDate;
-            try
-            {
-                startDate = StringToDate(id);
-            }
-            catch
-            {
-                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", nameof(Index), "Dashboard");
-            }
+            DateOnly.TryParse(id, out DateOnly startDate);
 
             var employee = getLoggedinEmployee();
             if (employee == null) { return View(); }
@@ -149,7 +125,7 @@ namespace BumboApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateAvailability(List<Availability> availabilities)
+        public async Task<IActionResult> UpdateAvailability(List<Availability> availabilities, string startDateString)
         {
             if (!ModelState.IsValid)
             {
@@ -174,20 +150,14 @@ namespace BumboApp.Controllers
                 NotifyService.Error("Er is iets misgegaan");
             }
 
-            return NotifySuccessAndRedirect("Wijzigingen succesvol opgeslagen", "Index");
+            NotifyService.Success("Wijzigingen succesvol opgeslagen");
+            return RedirectToAction(nameof(Index), new { Id = startDateString });
         }
 
         public async Task<IActionResult> AddSchoolSchedule(string id)
         {
-            DateOnly startDate;
-            try
-            {
-                startDate = StringToDate(id);
-            }
-            catch
-            {
-                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", nameof(Index), "Dashboard");
-            }
+            DateOnly.TryParse(id, out DateOnly startDate);
+
             if (startDate.DayOfWeek != DayOfWeek.Monday)
             {
                 return BadRequest();
@@ -225,15 +195,7 @@ namespace BumboApp.Controllers
 
         public IActionResult UpdateSchoolSchedule(string id)
         {
-            DateOnly startDate;
-            try
-            {
-                startDate = StringToDate(id);
-            }
-            catch
-            {
-                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", nameof(Index), "Dashboard");
-            }
+            DateOnly.TryParse(id, out DateOnly startDate);
 
             var employee = getLoggedinEmployee();
             if (employee == null) { return View(); }
@@ -248,13 +210,15 @@ namespace BumboApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateSchoolSchedule(List<SchoolSchedule> schedules)
+        public async Task<IActionResult> UpdateSchoolSchedule(List<SchoolSchedule> schedules, string startDateString)
         {
             if (!ModelState.IsValid)
             {
                 NotifyService.Error("Eindtijd moet na de starttijd zijn");
                 return View(schedules);
             }
+
+            DateOnly.TryParse(startDateString, out DateOnly startDate);
 
             try
             {
@@ -266,7 +230,8 @@ namespace BumboApp.Controllers
                 NotifyService.Error("Er is iets misgegaan");
             }
 
-            return NotifySuccessAndRedirect("Wijzigingen succesvol opgeslagen", "Index");
+            NotifyService.Success("Wijzigingen succesvol opgeslagen");
+            return RedirectToAction(nameof(Index), new { Id = startDateString });
         }
 
         public IActionResult UpdateDefault()
@@ -291,6 +256,7 @@ namespace BumboApp.Controllers
             {
                 if (sa.EndTime < sa.StartTime)
                 {
+                    Console.WriteLine("===========");
                     NotifyService.Error("Eindtijd moet na de starttijd zijn");
                     return View(standardAvailabilities);
                 }
@@ -307,34 +273,6 @@ namespace BumboApp.Controllers
             }
 
             return NotifySuccessAndRedirect("De standaardbeschikbaarheid is succesvol bijgewerkt", nameof(Index));
-        }
-
-        //Help methods--------------------------------
-        private DateOnly StringToDate(string id)
-        {
-            var dateParts = id.Split('-');
-            if (dateParts.Length != 3)
-            {
-                throw new Exception();
-            }
-
-            if (!int.TryParse(dateParts[0], out int day) ||
-                !int.TryParse(dateParts[1], out int month) ||
-                !int.TryParse(dateParts[2], out int year))
-            {
-                throw new Exception();
-            }
-
-            DateOnly startDate;
-            try
-            {
-                startDate = new DateOnly(year, month, day);
-            }
-            catch (ArgumentOutOfRangeException e)
-            {
-                throw new Exception();
-            }
-            return startDate;
         }
 
         public Employee? getLoggedinEmployee()

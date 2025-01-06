@@ -6,36 +6,37 @@
 
 <div class="row">
     <div class="col-12 col-xl-8">
-            <form class="table-container" asp-action="UpdateAvailability" method="post">
-                <table class="table">
-                    <tbody>
-                        @for (int i = 0; i < 7; i++)
-                        {
-                            DayOfWeek day = (DayOfWeek)((i + 1) % 7); // Start with Monday
-                            Availability? availability = Model.SingleOrDefault(a => a.Date.DayOfWeek == day);
-                            <tr>
-                                <td>@day</td>
-                                <td>
-                                    <input type="hidden" name="availabilities[@i].Date" value="@availability.Date" />
-                                    <input type="hidden" name="availabilities[@i].EmployeeNumber" value="@availability.EmployeeNumber" />
-                                    <input type="hidden" name="availabilities[@i].Employee" value="@availability.Employee" />
-                                </td>
-                                <td>vanaf</td>
-                                <td>
-                                    <input type="time" name="availabilities[@i].StartTime" value="@availability.StartTime" required />
-                                </td>
-                                <td>tot</td>
-                                <td>
-                                    <input type="time" name="availabilities[@i].EndTime" value="@availability.EndTime" required />
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-                <div class="d-flex justify-content-end m-3">
-                    <a class="btn btn-secondary" asp-action="Index" asp-route-id="@ViewData["StartDate"]">Annuleren</a>
-                    <button type="submit" class="btn btn-primary">Opslaan</button>
-                </div>
-            </form>
+        <form class="table-container" asp-action="UpdateAvailability" method="post">
+            <input type="hidden" name="startDateString" value="@ViewData["StartDate"]" />
+            <table class="table">
+                <tbody>
+                    @for (int i = 0; i < 7; i++)
+                    {
+                        DayOfWeek day = (DayOfWeek)((i + 1) % 7); // Start with Monday
+                        Availability? availability = Model.SingleOrDefault(a => a.Date.DayOfWeek == day);
+                        <tr>
+                            <td>@day</td>
+                            <td>
+                                <input type="hidden" name="availabilities[@i].Date" value="@availability.Date" />
+                                <input type="hidden" name="availabilities[@i].EmployeeNumber" value="@availability.EmployeeNumber" />
+                                <input type="hidden" name="availabilities[@i].Employee" value="@availability.Employee" />
+                            </td>
+                            <td>vanaf</td>
+                            <td>
+                                <input type="time" name="availabilities[@i].StartTime" value="@availability.StartTime" required />
+                            </td>
+                            <td>tot</td>
+                            <td>
+                                <input type="time" name="availabilities[@i].EndTime" value="@availability.EndTime" required />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-end m-3">
+                <a class="btn btn-secondary" asp-action="Index" asp-route-id="@ViewData["StartDate"]">Annuleren</a>
+                <button type="submit" class="btn btn-primary">Opslaan</button>
+            </div>
+        </form>
     </div>
 </div>
