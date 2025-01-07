@@ -321,9 +321,28 @@ label {
     padding: .3em;
     cursor: pointer;
 }
-.calendar-grid .day-col .day-hours-grid .hour.closed {
+.calendar-grid .day-col .day-hours-grid .hour.closed,
+.calendar-grid .day-col.closed .day-hours-grid .hour {
+    position: relative;
     background-color: var(--schedule-closed-color);
     cursor: auto;
+}
+.calendar-grid .day-col .day-hours-grid .hour.closed::after,
+.calendar-grid .day-col.closed .day-hours-grid .hour::after,
+.legenda .gesloten::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.4),
+            rgba(255, 255, 255, 0.4) 10px,
+            rgba(255, 255, 255, 0) 10px,
+            rgba(255, 255, 255, 0) 20px
+    );
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
 }
 .calendar-grid .day-col .day-hours-grid .hour:last-child {
     border-bottom: none;
@@ -465,6 +484,7 @@ label {
     );
 }
 .legenda .gesloten {
+    position: relative;
     background-color: var(--schedule-closed-color);
     border: 2px solid var(--border-clr);
     border-radius: 3px;
