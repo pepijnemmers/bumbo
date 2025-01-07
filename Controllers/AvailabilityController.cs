@@ -43,7 +43,7 @@ namespace BumboApp.Controllers
                 return RedirectToAction("Index", new { id = newId });
             }
 
-            var employee = getLoggedinEmployee();
+            var employee = GetLoggedInEmployee();
             if (employee == null) { return View(); }
             var employeeNumber = employee.EmployeeNumber;
 
@@ -74,7 +74,7 @@ namespace BumboApp.Controllers
                 return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", nameof(Index), "Dashboard");
             }
 
-            var employee = getLoggedinEmployee();
+            var employee = GetLoggedInEmployee();
             if (employee == null) { return RedirectToAction(nameof(Index), new { id }); }
             var employeeNumber = employee.EmployeeNumber;
 
@@ -137,7 +137,7 @@ namespace BumboApp.Controllers
                 return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", nameof(Index), "Dashboard");
             }
 
-            var employee = getLoggedinEmployee();
+            var employee = GetLoggedInEmployee();
             if (employee == null) { return View(); }
             var employeeNumber = employee.EmployeeNumber;
 
@@ -193,7 +193,7 @@ namespace BumboApp.Controllers
                 return BadRequest();
             }
 
-            var employee = getLoggedinEmployee();
+            var employee = GetLoggedInEmployee();
             if (employee == null) { return View(); }
             var employeeNumber = employee.EmployeeNumber;
 
@@ -235,7 +235,7 @@ namespace BumboApp.Controllers
                 return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", nameof(Index), "Dashboard");
             }
 
-            var employee = getLoggedinEmployee();
+            var employee = GetLoggedInEmployee();
             if (employee == null) { return View(); }
             var employeeNumber = employee.EmployeeNumber;
             ViewData["EmployeeNumber"] = employeeNumber;
@@ -271,7 +271,7 @@ namespace BumboApp.Controllers
 
         public IActionResult UpdateDefault()
         {
-            var employee = getLoggedinEmployee();
+            var employee = GetLoggedInEmployee();
             if (employee == null) { return View(); }
             ViewData["EmployeeNumber"] = employee.EmployeeNumber;
 
@@ -310,7 +310,7 @@ namespace BumboApp.Controllers
         }
 
         //Help methods--------------------------------
-        private DateOnly StringToDate(string id)
+        private static DateOnly StringToDate(string id)
         {
             var dateParts = id.Split('-');
             if (dateParts.Length != 3)
@@ -337,7 +337,7 @@ namespace BumboApp.Controllers
             return startDate;
         }
 
-        public Employee? getLoggedinEmployee()
+        public Employee? GetLoggedInEmployee()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) { return null; }

@@ -4,6 +4,7 @@ using BumboApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BumboApp.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    partial class BumboDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250106104747_DbSetAdded")]
+    partial class DbSetAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2793,7 +2796,7 @@ namespace BumboApp.Migrations
 
                     b.HasIndex("EmployeeNumber");
 
-                    b.ToTable("StandardAvailabilities", null, t =>
+                    b.ToTable("StandardAvailabilities", t =>
                         {
                             t.HasCheckConstraint("CK_StandardAvailability_StartTime_EndTime", "[StartTime] <= [EndTime]");
                         });
