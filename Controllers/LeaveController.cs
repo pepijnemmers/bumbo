@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BumboApp.Controllers
 {
@@ -299,13 +300,13 @@ namespace BumboApp.Controllers
             }
         }
 
-        private Employee GetLoggedInEmployee()
+        public Employee? GetLoggedInEmployee()
         {
-            var username = User?.Identity?.Name;
-            _loggedInEmployee = Context.Employees
-            .FirstOrDefault(e => e.FirstName.Equals(username));
-
-            return _loggedInEmployee;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) { return null; }
+            var employee = Context.Employees
+                .FirstOrDefault(e => e.User.Id == userId);
+            return employee;
         }
 
         private List<Employee> GetEmployeesInRole(string roleName)

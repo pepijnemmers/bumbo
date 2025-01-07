@@ -53,13 +53,20 @@
                     <i class="fas fa-chevron-right"></i>
                 </button>
             }
-            @if (Model.SelectedStartDate != DateOnly.FromDateTime(DateTime.Today))
-            {
-                <a class="btn btn-outline-secondary btn-sm d-lg-none ms-auto" onclick="GoToDate('@DateOnly.FromDateTime(DateTime.Today).ToString()')">
+            
+            <div class="d-lg-none ms-auto">
+                <a class="btn btn-outline-secondary btn-sm d-lg-none" onclick="GoToDate('@Model.SelectedStartDate.AddDays(-7).ToString()')">
+                    <i class="fas fa-angles-left"></i>
+                </a>
+                <a class="btn btn-outline-secondary btn-sm d-lg-none" onclick="GoToDate('@DateOnly.FromDateTime(DateTime.Today).ToString()')">
                     <i class="fas fa-calendar-day me-1"></i>
                     @(Model.IsDayView ? "Vandaag" : "Deze week")
                 </a>
-            }
+                <a class="btn btn-outline-secondary btn-sm d-lg-none" onclick="GoToDate('@Model.SelectedStartDate.AddDays(7).ToString()')">
+                    <i class="fas fa-angles-right"></i>
+                </a>
+            </div>
+            
         </div>
         <button onclick="toggleFilterBtns()" class="btn btn-dark d-block d-lg-none mt-2 w-100">
             <i class="fas fa-filter"></i>
@@ -110,13 +117,21 @@
         </div>
     </div>
     <div class="mt-2 d-flex align-items-center justify-content-between">
-        @if (Model.SelectedStartDate != DateOnly.FromDateTime(DateTime.Today))
-        {
+        <div>
+            <a class="btn btn-outline-secondary btn-sm d-none d-lg-inline-block" onclick="GoToDate('@Model.SelectedStartDate.AddDays(-7).ToString()')">
+                <i class="fas fa-angles-left me-1"></i>
+                Week
+            </a>
             <a class="btn btn-outline-secondary btn-sm d-none d-lg-inline-block" onclick="GoToDate('@DateOnly.FromDateTime(DateTime.Today).ToString()')">
                 <i class="fas fa-calendar-day me-1"></i>
                 @(Model.IsDayView ? "Vandaag" : "Deze week")
             </a>
-        }
+            <a class="btn btn-outline-secondary btn-sm d-none d-lg-inline-block" onclick="GoToDate('@Model.SelectedStartDate.AddDays(7).ToString()')">
+                Week
+                <i class="fas fa-angles-right ms-1"></i>
+            </a>
+        </div>
+        
         @if (role == Role.Manager && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
         {
             <p class="text-secondary m-0 fst-italic">
