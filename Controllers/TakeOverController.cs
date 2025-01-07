@@ -193,14 +193,14 @@ namespace BumboApp.Controllers
             if (shiftTakeOver == null) { return NotifyErrorAndRedirect("Kon de shift niet vinden", "Index", "Dashboard"); }
             
             // Check if the employee already has a shift at the same time
-            var overlappingShift = Context.Shifts
+           var overlappingShiftExists = Context.Shifts
                 .Include(s => s.Employee)
-                .FirstOrDefault(s => s.Employee != null &&
-                                     s.Employee.EmployeeNumber == employee.EmployeeNumber &&
-                                     s.Start < shiftTakeOver.Shift.End &&
-                                     s.End > shiftTakeOver.Shift.Start);
-            if (overlappingShift != null) { return NotifyErrorAndRedirect("Je hebt al een shift op dit tijdstip", "Index", "Dashboard"); }
-
+                .Any(s => s.Employee != null &&
+                          s.Employee.EmployeeNumber == employee.EmployeeNumber &&
+                          s.Start < shiftTakeOver.Shift.End &&
+                          s.End > shiftTakeOver.Shift.Start);
+            if (overlappingShiftExists) { return NotifyErrorAndRedirect("Je hebt al een shift op dit tijdstip", "Index", "Dashboard"); }
+            
             //TODO: Checken CAO regels.
 
             using var transaction = Context.Database.BeginTransaction();
