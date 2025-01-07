@@ -188,7 +188,7 @@
                     _ => string.Empty
                 };
 
-                <div class="col day-col @(openHours?.OpeningTime == null && openHours?.ClosingTime == null ? "closed" : "")">
+                <div class="col day-col @(openHours?.OpeningTime == null && openHours?.ClosingTime == null ? "closed pointer-events-none" : "")">
                     <div class="day-header">
                         <strong class="text-center d-block fs-5">@departmentName</strong>
                     </div>
@@ -197,7 +197,7 @@
                         {
                             if (role == Role.Manager && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
                             {
-                                <div class="hour @(j < openingTime || j >= closingTime ? "closed" : "")" title="@(j < openingTime || j >= closingTime ? "Gesloten" : "")"
+                                <div class="hour @(j < openingTime || j >= closingTime ? "closed pointer-events-none" : "")" title="@(j < openingTime || j >= closingTime ? "Gesloten" : "")"
                                      ondblclick="GoToCreateShift('@Model.SelectedStartDate.ToString()', @j, '@departmentName')">
                                     @if (j >= openingTime && j < closingTime)
                                     {
@@ -438,7 +438,7 @@ else
                 var openingTime = openHours?.OpeningTime?.Hour ?? 6;
                 var closingTime = openHours?.ClosingTime == new TimeOnly(23, 59) ? 24 : openHours?.ClosingTime?.Hour ?? 24;
                 
-                <div class="col day-col @(openHours?.OpeningTime == null && openHours?.ClosingTime == null ? "closed" : "") @(Model.SelectedStartDate.AddDays(i) == DateOnly.FromDateTime(DateTime.Today) ? "today" : "")">
+                <div class="col day-col @(openHours?.OpeningTime == null && openHours?.ClosingTime == null ? "closed pointer-events-none" : "") @(Model.SelectedStartDate.AddDays(i) == DateOnly.FromDateTime(DateTime.Today) ? "today" : "")">
                     <div class="day-header">
                         <span class="text-center d-block small lh-1">@Model.SelectedStartDate.AddDays(i).ToString("ddd", CultureInfo.GetCultureInfo("nl-NL"))</span>
                         <strong class="text-center d-block fs-5 lh-1">@Model.SelectedStartDate.AddDays(i).ToString("dd", CultureInfo.GetCultureInfo("nl-NL"))</strong>
@@ -448,7 +448,7 @@ else
                         {
                             if (role == Role.Manager && Model.SelectedStartDate.AddDays(i) > DateOnly.FromDateTime(DateTime.Today))
                             {
-                                <div class="hour @(j < openingTime || j >= closingTime ? "closed" : "")"
+                                <div class="hour @(j < openingTime || j >= closingTime ? "closed pointer-events-none" : "")"
                                      title="@(j < openingTime || j >= closingTime ? "Gesloten" : "")"
                                      ondblclick="GoToCreateShift('@Model.SelectedStartDate.AddDays(i).ToString()', @j)">
                                     @if (j >= openingTime && j < closingTime)

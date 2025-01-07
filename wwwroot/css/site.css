@@ -358,6 +358,7 @@ label {
 /* Schedule shift overlay */
 .calendar-container .shifts-overlay {
     position: absolute;
+    z-index: 1;
     inset: 0;
     left: var(--cdr-time-col-width);
     top: var(--cdr-header-height);

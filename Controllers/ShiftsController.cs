@@ -152,6 +152,16 @@ namespace BumboApp.Controllers
                 NotifyService.Error("De afdeling is niet geldig");
                 valid = false;
             }
+            var openingHours = Context.OpeningHours.FirstOrDefault(oh => oh.WeekDay == date!.Value.DayOfWeek);
+            if ((openingHours?.OpeningTime == null 
+                 || openingHours.ClosingTime == null
+                 || start < openingHours.OpeningTime
+                    || end > openingHours.ClosingTime
+                 ) && valid)
+            {
+                NotifyService.Error("De dienst valt buiten de openingstijden");
+                valid = false;
+            }
             
             if (valid == false)
             {
@@ -252,6 +262,15 @@ namespace BumboApp.Controllers
             if ((employeeNumber == null || employee == null) && employeeNumber != "0")
             {
                 NotifyService.Error("De werknemer kon niet worden gevonden");
+                return RedirectToAction("Update", new { id = id });
+            }
+            var openingHours = Context.OpeningHours.FirstOrDefault(oh => oh.WeekDay == date.DayOfWeek);
+            if (openingHours?.OpeningTime == null 
+                || openingHours.ClosingTime == null 
+                || TimeOnly.FromDateTime(shiftStart) < openingHours.OpeningTime 
+                || TimeOnly.FromDateTime(shiftEnd) > openingHours.ClosingTime)
+            {
+                NotifyService.Error("De dienst valt buiten de openingstijden");
                 return RedirectToAction("Update", new { id = id });
             }
             
