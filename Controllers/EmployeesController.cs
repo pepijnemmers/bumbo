@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Identity;
 using BumboApp.ViewModels;
 using BumboApp.Helpers;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BumboApp.Controllers
 {
@@ -13,7 +14,7 @@ namespace BumboApp.Controllers
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<User> _userManager;
-        private HttpClient _client = new HttpClient();
+        private readonly HttpClient _client = new HttpClient();
 
         public EmployeesController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
@@ -55,7 +56,7 @@ namespace BumboApp.Controllers
                 .Take(PageSize)
                 .ToList();
 
-            List<EmployeeIndexViewModel> viewModels = new List<EmployeeIndexViewModel>();
+            List<EmployeeIndexViewModel> viewModels = [];
             foreach (var employee in employeesForPage)
             {
                 var employeeRole = await GetUserRoleAsync(employee.User.Id);
@@ -63,7 +64,8 @@ namespace BumboApp.Controllers
                 {
                     Id = employee.EmployeeNumber,
                     Name = employee.FirstName + " " + employee.LastName,
-                    Role = employeeRole.ToFriendlyString()
+                    Role = employeeRole.ToFriendlyString(),
+                    EndOfEmployment = employee.EndOfEmployment,
                 };
                 viewModels.Add(viewModel);
             }
@@ -76,7 +78,7 @@ namespace BumboApp.Controllers
         }
         public IActionResult Create()
         {
-            var viewModel = new UserEmployeeViewModel
+            var viewModel = new EmployeeCreateViewModel
             {
                 DateOfBirth = new DateOnly(2000, 1, 1)
             };
@@ -85,32 +87,51 @@ namespace BumboApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(UserEmployeeViewModel viewModel)
+        public async Task<IActionResult> Create(EmployeeCreateViewModel viewModel)
         {
             if (!ModelState.IsValid || viewModel.Role.Equals(Role.Unknown))
             {
                 return View(viewModel);
             }
 
+            if (viewModel.DateOfBirth <= new DateOnly(1900, 1, 1))
+            {
+                NotifyService.Error($"Geboortedatum moet na 1900 zijn.");
+                return View(viewModel);
+            }
+
+            int minimunAge = 15; //TODO replace magic number from CAO ruleset
+            if (viewModel.DateOfBirth > DateOnly.FromDateTime(DateTime.Now).AddYears(-minimunAge))
+            {
+                NotifyService.Error($"De minimunleeftijd bij Bumbo is {minimunAge}");
+                return View(viewModel);
+            }
+
+            if (Context.Users.Where(u => u.NormalizedEmail.Equals(viewModel.Email)).Any())
+            {
+                NotifyService.Error("Deze e-mail is al in gebruik");
+                return View(viewModel);
+            }
+
             var roleExists = await _roleManager.RoleExistsAsync(viewModel.Role.ToString());
             if (!roleExists)
             {
-                NotifyService.Error("Er is iets mis gegaan met het maken ivm de Rol"); //Gebeurt als het goed is nooit
+                NotifyService.Error("Er is iets mis gegaan met het maken ivm de rol");
                 return View(viewModel);
             }
 
 
             var user = new User
             {
-                UserName = viewModel.FirstName,
-                NormalizedUserName = viewModel.FirstName.ToUpper(),
+                UserName = viewModel.Email,
+                NormalizedUserName = viewModel.Email.ToUpper(),  //This has to be unique for Asp classes to work, hence why email instead of FirstName
+
                 Email = viewModel.Email,
                 NormalizedEmail = viewModel.Email.ToUpper(),
                 Id = Guid.NewGuid().ToString()
             };
             var passwordHasher = new PasswordHasher<User>();
             user.PasswordHash = passwordHasher.HashPassword(user, viewModel.Password);
-
 
             await _userManager.CreateAsync(user);
             await _userManager.AddToRoleAsync(user, viewModel.Role.ToString());
@@ -120,10 +141,10 @@ namespace BumboApp.Controllers
                 FirstName = viewModel.FirstName,
                 LastName = viewModel.LastName,
                 DateOfBirth = viewModel.DateOfBirth,
-                Zipcode = viewModel.Zipcode,
+                Zipcode = viewModel.Zipcode.ToUpper(),
                 HouseNumber = viewModel.HouseNumber,
                 ContractHours = viewModel.ContractHours,
-                LeaveHours = viewModel.LeaveHours,
+                LeaveHours = viewModel.ContractHours * 4,
                 UserId = user.Id,
                 StartOfEmployment = DateOnly.FromDateTime(DateTime.Now),
                 StandardAvailability = new List<StandardAvailability>()
@@ -147,13 +168,14 @@ namespace BumboApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Update(int id)
+        public async Task<IActionResult> Update(int id)
         {
-
             var employee = Context.Employees
                 .Include(e => e.User)
-                .Include(e => e.leaveRequests)
+                .Include(e => e.LeaveRequests)
                 .SingleOrDefault(e => e.EmployeeNumber == id);
+
+            var employeeRole = await GetUserRoleAsync(employee.User.Id);
 
             var model = new EmployeeUpdateViewModel
             {
@@ -164,44 +186,81 @@ namespace BumboApp.Controllers
                 Zipcode = employee.Zipcode,
                 HouseNumber = employee.HouseNumber,
                 ContractHours = employee.ContractHours,
-                LeaveHours = employee.LeaveHours,
                 StartOfEmployment = employee.StartOfEmployment,
-                Email = employee.User.Email
+                Email = employee.User.Email,
+                Role = employeeRole,
+
+                IsOwner = LoggedInUserId == employee.User.Id
             };
+
+
 
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(int id, EmployeeUpdateViewModel model)
+        public async Task<IActionResult> Update(int id, EmployeeUpdateViewModel viewModel)
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(viewModel);
+            }
+
+            if (Context.Employees.Where(e => e.User.NormalizedEmail.Equals(viewModel.Email) && !e.EmployeeNumber.Equals(viewModel.EmployeeNumber)).Any())
+            {
+                NotifyService.Error("Deze e-mail is al in gebruik");
+                return View(viewModel);
             }
 
             var employee = Context.Employees
                 .Include(e => e.User)
-                .FirstOrDefault(e => e.EmployeeNumber == model.EmployeeNumber);
+                .FirstOrDefault(e => e.EmployeeNumber == viewModel.EmployeeNumber);
 
             if (employee == null)
             {
-                return NotFound();
+                NotifyService.Error("Er is iets misgegaan");
+                return View(viewModel);
+            }
+            var user = await _userManager.FindByIdAsync(employee.User.Id);
+            if (user == null)
+            {
+                NotifyService.Error("Er is iets misgegaan");
+                return View(viewModel);
             }
 
-            employee.FirstName = model.FirstName;
-            employee.LastName = model.LastName;
-            employee.DateOfBirth = model.DateOfBirth;
-            employee.Zipcode = model.Zipcode;
-            employee.HouseNumber = model.HouseNumber;
-            employee.ContractHours = model.ContractHours;
-            employee.LeaveHours = model.LeaveHours;
-            employee.StartOfEmployment = model.StartOfEmployment;
-            employee.EndOfEmployment = model.EndOfEmployment;
-            employee.User.Email = model.Email;
+            user.UserName = viewModel.Email;
+            user.NormalizedUserName = viewModel.Email.ToUpper();
+            user.Email = viewModel.Email;
+            user.NormalizedEmail = viewModel.Email.ToUpper();
 
-            await Context.SaveChangesAsync();
+            employee.FirstName = viewModel.FirstName;
+            employee.LastName = viewModel.LastName;
+            employee.DateOfBirth = viewModel.DateOfBirth;
+            employee.Zipcode = viewModel.Zipcode.ToUpper();
+            employee.HouseNumber = viewModel.HouseNumber;
+            employee.ContractHours = viewModel.ContractHours;
+            employee.LeaveHours = viewModel.ContractHours * 4;
+            employee.StartOfEmployment = viewModel.StartOfEmployment;
+            employee.EndOfEmployment = viewModel.EndOfEmployment;
 
+            try
+            {
+                await Context.SaveChangesAsync();
+            }
+            catch
+            {
+                NotifyService.Error("Er is iets misgegaan bij het bewerken");
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var employeerole = (Role)Enum.Parse(typeof(Role), roles[0]);
+            if (!employeerole.Equals(viewModel.Role))
+            {
+                await _userManager.AddToRoleAsync(user, viewModel.Role.ToString());
+                await _userManager.RemoveFromRoleAsync(user, employeerole.ToString());
+            }
+            NotifyService.Success("De wijzigingen zijn succesvol opgeslagen");
             return RedirectToAction(nameof(Details), new { id });
         }
 
@@ -209,7 +268,7 @@ namespace BumboApp.Controllers
         {
             var employee = Context.Employees
                 .Include(e => e.User)
-                .Include(e => e.leaveRequests)
+                .Include(e => e.LeaveRequests)
                 .SingleOrDefault(e => e.EmployeeNumber == id);
 
             if (employee == null)
@@ -217,16 +276,21 @@ namespace BumboApp.Controllers
                 return NotifyErrorAndRedirect("Werknemer niet gevonden", nameof(Index));
             }
 
-            var leaveRequests = employee.leaveRequests
+            var leaveRequests = employee.LeaveRequests
                 .Where(lr => lr.Status != Status.Afgewezen).ToList();
 
             var usedLeaveHoursThisYear = LeaveHoursCalculationHelper.CalculateLeaveHoursByYearForAllRequests(leaveRequests);
             int amountOfLeaveHours = usedLeaveHoursThisYear[DateTime.Now.Year];
 
             var employeeRole = await GetUserRoleAsync(employee.User.Id);
+
+
+
+            ViewData["IsOwner"] = LoggedInUserId == employee.User.Id;
             ViewData["EmployeeRole"] = employeeRole.ToFriendlyString();
             ViewData["LeaveHourUsed"] = amountOfLeaveHours;
 
+            //Postcode API ----------------------------
             //var apiKey = Environment.GetEnvironmentVariable("POSTCODE_API_KEY");
             var apiKey = "";
             var apiURL = $"https://json.api-postcode.nl?postcode={employee.Zipcode}&number={employee.HouseNumber}";
@@ -241,21 +305,94 @@ namespace BumboApp.Controllers
                 {
                     string jsonResponse = await response.Content.ReadAsStringAsync();
 
-                    using (JsonDocument doc = JsonDocument.Parse(jsonResponse))
-                    {
-                        JsonElement root = doc.RootElement;
+                    using JsonDocument doc = JsonDocument.Parse(jsonResponse);
+                    JsonElement root = doc.RootElement;
 
-                        ViewData["StreetName"] = root.GetProperty("street").GetString();
-                        ViewData["CityName"] = root.GetProperty("city").GetString();
-                    }
+                    ViewData["StreetName"] = root.GetProperty("street").GetString();
+                    ViewData["CityName"] = root.GetProperty("city").GetString();
                 }
             }
-            catch (Exception e)
+            catch
             {
-
+                ViewData["StreetName"] = "-";
+                ViewData["CityName"] = "-";
             }
 
             return View(employee);
+        }
+
+        [HttpPost]
+        public IActionResult Dismiss(int employeeNumber, string? dismissDateString)
+        {
+            var employee = Context.Employees.Find(employeeNumber);
+            if (employee == null)
+            {
+                return NotifyErrorAndRedirect("Er is iets misgegaan, werknemer niet gevonden", nameof(Index));
+            }
+            if (employee.EndOfEmployment != null)
+            {
+                NotifyService.Error("De werknemer is niet meer in dienst");
+                return RedirectToAction(nameof(Details), employeeNumber);
+            }
+            DateOnly now = DateOnly.FromDateTime(DateTime.Now);
+            DateOnly dismissDate = dismissDateString == null ? now : DateOnly.Parse(dismissDateString);
+            if (dismissDate < now || dismissDate > now.AddDays(30))
+            {
+                NotifyService.Error("Uitdiensttredingsdatum valt buiten de toegestane marge");
+                return RedirectToAction(nameof(Details), employeeNumber);
+            }
+            employee.EndOfEmployment = dismissDate;
+
+            try
+            {
+                Context.SaveChanges();
+            }
+            catch
+            {
+                NotifyService.Error("Er is iets misgegaan met het bewerken");
+                return RedirectToAction(nameof(Details), employeeNumber);
+            }
+
+            var redirect = HttpContext.Request.Headers["Referer"];
+            if (redirect.IsNullOrEmpty())
+            {
+                return RedirectToAction(nameof(Details), employeeNumber);
+            }
+            return Redirect(redirect);
+        }
+
+        [HttpPost]
+        public IActionResult Reemploy(int employeeNumber)
+        {
+            var employee = Context.Employees.Find(employeeNumber);
+            if (employee == null)
+            {
+                return NotifyErrorAndRedirect("Er is iets misgegaan, werknemer niet gevonden", nameof(Index));
+            }
+            if (employee.EndOfEmployment == null)
+            {
+                NotifyService.Error("De werknemer is nog in dienst");
+                return RedirectToAction(nameof(Details), employeeNumber);
+            }
+
+            employee.EndOfEmployment = null;
+
+            try
+            {
+                Context.SaveChanges();
+            }
+            catch
+            {
+                NotifyService.Error("Er is iets misgegaan met het bewerken");
+                return RedirectToAction(nameof(Details), employeeNumber);
+            }
+
+            var redirect = HttpContext.Request.Headers["Referer"];
+            if (redirect.IsNullOrEmpty())
+            {
+                return RedirectToAction(nameof(Details), employeeNumber);
+            }
+            return Redirect(redirect);
         }
     }
 }
