@@ -82,6 +82,13 @@ namespace BumboApp.Controllers
                     {
                         return NotifyErrorAndRedirect("De openingstijd en sluitingstijd moeten ingevuld zijn", "Index");
                     }
+                    
+                    if (openingHour.OpeningTime < new TimeOnly(06, 00) ||
+                        openingHour.ClosingTime > new TimeOnly(23, 59))
+                    {
+                        return NotifyErrorAndRedirect("De openingstijd moet tussen 06:00 en 23:59 zijn", "Index");
+                    }
+
                     Context.OpeningHours.Update(openingHour);
                 }
                 Context.SaveChanges();
