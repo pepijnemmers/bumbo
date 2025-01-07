@@ -197,13 +197,9 @@
                         {
                             if (role == Role.Manager && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
                             {
-                                <div class="hour @(j < openingTime || j >= closingTime ? "closed" : "")"
+                                <div class="hour @(j < openingTime || j >= closingTime ? "closed" : "")" title="@(j < openingTime || j >= closingTime ? "Gesloten" : "")"
                                      ondblclick="GoToCreateShift('@Model.SelectedStartDate.ToString()', @j, '@departmentName')">
-                                    @if (j < openingTime || j >= closingTime)
-                                    {
-                                        <span class="small text-muted">Gesloten</span>
-                                    }
-                                    else
+                                    @if (j >= openingTime && j < closingTime)
                                     {
                                         <i class="fas fa-plus"></i>
                                     }
@@ -211,12 +207,8 @@
                             }
                             else
                             {
-                                <div class="hour pointer-events-none @(j < openingTime || j >= closingTime ? "closed" : "")">
-                                    @if (j < openingTime || j >= closingTime)
-                                    {
-                                        <span class="small text-muted">Gesloten</span>
-                                    }
-                                </div>
+                                <div class="hour pointer-events-none @(j < openingTime || j >= closingTime ? "closed" : "")"
+                                     title="@(j < openingTime || j >= closingTime ? "Gesloten" : "")"></div>
                             }
                         }
                     </div>
@@ -442,6 +434,10 @@ else
             </div>
             @for (int i = 0; i < 7; i++)
             {
+                var openHours = Model.OpeningHours.Find(oh => oh.WeekDay == Model.SelectedStartDate.AddDays(i).DayOfWeek);
+                var openingTime = openHours?.OpeningTime?.Hour ?? 6;
+                var closingTime = openHours?.ClosingTime == new TimeOnly(23, 59) ? 24 : openHours?.ClosingTime?.Hour ?? 24;
+                
                 <div class="col day-col @(Model.SelectedStartDate.AddDays(i) == DateOnly.FromDateTime(DateTime.Today) ? "today" : "")">
                     <div class="day-header">
                         <span class="text-center d-block small lh-1">@Model.SelectedStartDate.AddDays(i).ToString("ddd", CultureInfo.GetCultureInfo("nl-NL"))</span>
@@ -452,11 +448,20 @@ else
                         {
                             if (role == Role.Manager && Model.SelectedStartDate.AddDays(i) > DateOnly.FromDateTime(DateTime.Today))
                             {
-                                <div class="hour" ondblclick="GoToCreateShift('@Model.SelectedStartDate.AddDays(i).ToString()', @j)"><i class="fas fa-plus"></i></div>
+                                // TODO: Show closed if full day is closed
+                                <div class="hour @(j < openingTime || j >= closingTime ? "closed" : "")"
+                                     title="@(j < openingTime || j >= closingTime ? "Gesloten" : "")"
+                                     ondblclick="GoToCreateShift('@Model.SelectedStartDate.AddDays(i).ToString()', @j)">
+                                    @if (j >= openingTime && j < closingTime)
+                                    {
+                                        <i class="fas fa-plus"></i>
+                                    }
+                                </div>
                             }
                             else
                             {
-                                <div class="hour pointer-events-none"></div>
+                                <div class="hour pointer-events-none @(j < openingTime || j >= closingTime ? "closed" : "")" 
+                                     title="@(j < openingTime || j >= closingTime ? "Gesloten" : "")"></div>
                             }
                         }
                     </div>
@@ -543,6 +548,10 @@ else
                 <span>Concept</span>
             </div>
         }
+        <div class="legenda-item">
+            <div class="legenda-color gesloten"></div>
+            <span>Gesloten</span>
+        </div>
     </div>
 </div>
 
