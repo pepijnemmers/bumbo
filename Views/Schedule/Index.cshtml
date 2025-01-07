@@ -192,7 +192,7 @@
                     <div class="day-header">
                         <strong class="px-3 d-flex align-items-center justify-content-between fs-5">
                             <span>@department.ToFriendlyString()</span>
-                            @if (Model?.WeekPrognosis?.Prognoses != null) // TODO: returns null even if there are prognoses
+                            @if (Model?.WeekPrognosis?.Prognoses != null)
                             {
                                 var prognosisForDep = Model.WeekPrognosis.Prognoses
                                     .FirstOrDefault(p => p.Department == department && p.Date == Model.SelectedStartDate);
