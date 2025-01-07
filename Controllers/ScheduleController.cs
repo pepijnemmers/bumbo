@@ -208,7 +208,7 @@ namespace BumboApp.Controllers
             List<Employee> employees = Context.Employees.Include(e => e.Shifts)
                 .Include(e => e.User)
                 .Include(e => e.SchoolSchedules)
-                .Include(e => e.leaveRequests)
+                .Include(e => e.LeaveRequests)
                 .Include(e => e.Availabilities)
                 .Where(e => e.EndOfEmployment == null)
                 .ToList();
@@ -239,7 +239,7 @@ namespace BumboApp.Controllers
                     index++;
                     continue;
                 }
-                if (employee.leaveRequests.Any(e => e.Status == Status.Geaccepteerd && e.StartDate < scheduledate.ToDateTime(new TimeOnly()) && e.EndDate > scheduledate.ToDateTime(new TimeOnly())))
+                if (employee.LeaveRequests.Any(e => e.Status == Status.Geaccepteerd && e.StartDate < scheduledate.ToDateTime(new TimeOnly()) && e.EndDate > scheduledate.ToDateTime(new TimeOnly())))
                 {
                     index++;
                     continue;
