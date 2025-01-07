@@ -320,6 +320,9 @@ label {
     padding: .3em;
     cursor: pointer;
 }
+.calendar-grid .day-col .day-hours-grid .hour.closed {
+    background-color: rgba(0,0,0,.05);
+}
 .calendar-grid .day-col .day-hours-grid .hour:last-child {
     border-bottom: none;
 }

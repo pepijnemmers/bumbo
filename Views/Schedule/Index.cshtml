@@ -163,6 +163,11 @@
     <div class="calendar-container">
 
         @* Layer 1: Base Grid *@
+        @{
+            var openHours = Model.OpeningHours.Find(oh => oh.WeekDay == Model.SelectedStartDate.DayOfWeek);
+            var openingTime = openHours?.OpeningTime?.Hour ?? 6;
+            var closingTime = openHours?.ClosingTime == new TimeOnly(23, 59) ? 24 : openHours?.ClosingTime?.Hour ?? 24;
+        }
         <div class="calendar-grid row g-0 @(role == Role.Employee ? "pointer-events-none" : "")">
             <div class="time-slots-col">
                 <div class="time-slot time-slot-header"></div>
@@ -182,7 +187,7 @@
                     2 => Department.Kassa.ToFriendlyString(),
                     _ => string.Empty
                 };
-                
+
                 <div class="col day-col">
                     <div class="day-header">
                         <strong class="text-center d-block fs-5">@departmentName</strong>
@@ -192,11 +197,26 @@
                         {
                             if (role == Role.Manager && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
                             {
-                                <div class="hour" ondblclick="GoToCreateShift('@Model.SelectedStartDate.ToString()', @j, '@departmentName')"><i class="fas fa-plus"></i></div>
+                                <div class="hour @(j < openingTime || j >= closingTime ? "closed" : "")"
+                                     ondblclick="GoToCreateShift('@Model.SelectedStartDate.ToString()', @j, '@departmentName')">
+                                    @if (j < openingTime || j >= closingTime)
+                                    {
+                                        <span class="small text-muted">Gesloten</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-plus"></i>
+                                    }
+                                </div>
                             }
                             else
                             {
-                                <div class="hour pointer-events-none"></div>
+                                <div class="hour pointer-events-none @(j < openingTime || j >= closingTime ? "closed" : "")">
+                                    @if (j < openingTime || j >= closingTime)
+                                    {
+                                        <span class="small text-muted">Gesloten</span>
+                                    }
+                                </div>
                             }
                         }
                     </div>

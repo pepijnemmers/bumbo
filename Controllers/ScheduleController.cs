@@ -47,15 +47,25 @@ namespace BumboApp.Controllers
             // Check if view is concept or final
             var viewIsConcept = shifts.Any(shift => !shift.IsFinal);
             
+            // Get week prognosis and opening hours
+            var weekPrognosis = Context.WeekPrognoses
+                .FirstOrDefault(p => p.StartDate == selectedStartDate);
+            var openingHours = Context.OpeningHours.ToList();
+            
             // Create view model and return view
             var viewModel = new ScheduleViewModel()
             {
                 Role = LoggedInUserRole,
+                
                 ViewIsConcept = viewIsConcept,
                 SelectedStartDate = selectedStartDate,
                 WeekNumber = weekNumber,
+                
+                WeekPrognosis = weekPrognosis,
+                OpeningHours = openingHours,
                 Employees = employees,
                 Shifts = shifts,
+                
                 SelectedEmployee = selectedEmployee,
                 IsDayView = isDayView
             };
