@@ -180,17 +180,44 @@
             </div>
             @for (int i = 0; i < 3; i++)
             {
-                var departmentName = i switch
+                var department = i switch
                 {
-                    0 => Department.Vers.ToFriendlyString(),
-                    1 => Department.Vakkenvullen.ToFriendlyString(),
-                    2 => Department.Kassa.ToFriendlyString(),
-                    _ => string.Empty
+                    0 => Department.Vers,
+                    1 => Department.Vakkenvullen,
+                    2 => Department.Kassa,
+                    _ => throw new ArgumentOutOfRangeException()
                 };
-
+                
                 <div class="col day-col @(openHours?.OpeningTime == null && openHours?.ClosingTime == null ? "closed pointer-events-none" : "")">
                     <div class="day-header">
-                        <strong class="text-center d-block fs-5">@departmentName</strong>
+                        <strong class="px-3 d-flex align-items-center justify-content-between fs-5">
+                            <span>@department.ToFriendlyString()</span>
+                            @if (Model?.WeekPrognosis?.Prognoses != null) // TODO: returns null even if there are prognoses
+                            {
+                                var prognosisForDep = Model.WeekPrognosis.Prognoses
+                                    .FirstOrDefault(p => p.Department == department && p.Date == Model.SelectedStartDate);
+                                var prognosisHoursForDep = prognosisForDep?.NeededHours;
+                                var scheduledHoursForDep = Model.Shifts
+                                    .Where(s => s.Department == department && DateOnly.FromDateTime(s.Start) == Model.SelectedStartDate)
+                                    .Sum(s => s.End.Hour - s.Start.Hour);
+                                var prognosisReached = scheduledHoursForDep >= prognosisHoursForDep;
+                                var prognosisReachedClass = prognosisReached ? "text-success" : "text-danger";
+                                var prognosisReachedIcon = prognosisReached ? "fa-check" : "fa-xmark";
+                                var prognosisPopoverTitle = prognosisReached ? "Prognose behaald" : "Prognose overschreden";
+                                
+                                <button class="btn p-0"
+                                        data-bs-toggle="popover"
+                                        data-bs-trigger="focus"
+                                        data-bs-html="true"
+                                        data-bs-title="<span class='@prognosisReachedClass'>@prognosisPopoverTitle</span>"
+                                        data-bs-content="Prognose uren: <strong>@prognosisHoursForDep</strong><br>
+                                                        Uren ingepland: <strong>@scheduledHoursForDep</strong><br>
+                                                        Verschil: <strong class='@prognosisReachedClass'>@(prognosisReached ? "+" : "")@(scheduledHoursForDep - prognosisHoursForDep)</strong>">
+                                    <i class="fa-solid @prognosisReachedClass @prognosisReachedIcon"></i>
+                                    <span class="small @prognosisReachedClass">Prognose</span>
+                                </button>
+                            }
+                        </strong>
                     </div>
                     <div class="day-hours-grid">
                         @for (int j = 6; j < 24; j++)
@@ -198,7 +225,7 @@
                             if (role == Role.Manager && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
                             {
                                 <div class="hour @(j < openingTime || j >= closingTime ? "closed pointer-events-none" : "")" title="@(j < openingTime || j >= closingTime ? "Gesloten" : "")"
-                                     ondblclick="GoToCreateShift('@Model.SelectedStartDate.ToString()', @j, '@departmentName')">
+                                     ondblclick="GoToCreateShift('@Model.SelectedStartDate.ToString()', @j, '@department.ToFriendlyString()')">
                                     @if (j >= openingTime && j < closingTime)
                                     {
                                         <i class="fas fa-plus"></i>
