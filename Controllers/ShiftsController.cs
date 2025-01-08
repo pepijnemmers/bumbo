@@ -21,7 +21,8 @@ namespace BumboApp.Controllers
                 
                 SelectedDate = date != null ? DateOnly.FromDateTime(DateTime.Parse(date)) : null,
                 SelectedStartHour = startHour != null ? new TimeOnly(startHour.Value, 0) : null,
-                SelectedDepartment = department != null ? Enum.Parse<Department>(department) : null
+                SelectedDepartment = department != null ? Enum.Parse<Department>(department) : null,
+                OpeningHour = date != null ? Context.OpeningHours.AsEnumerable().FirstOrDefault(oh => oh.WeekDay == DateTime.Parse(date).DayOfWeek) : null
             };
             return View(viewModel);
         }
@@ -47,7 +48,8 @@ namespace BumboApp.Controllers
                 Shift = shift,
                 Departments = Enum.GetValues<Department>().ToList(),
                 Employees = Context.Employees
-                    .ToList()
+                    .ToList(),
+                OpeningHour = Context.OpeningHours.AsEnumerable().FirstOrDefault(oh => oh.WeekDay == shift.Start.DayOfWeek)
             };
             return View(viewModel);
         }
