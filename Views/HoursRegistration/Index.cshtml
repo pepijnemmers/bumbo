@@ -1,3 +1,76 @@
 @{
     ViewData["Title"] = "Uren klokken";
 }
+
+@* Hour registration *@
+<div class="col-auto col-lg-6">
+    <div class="card p-3 mb-4">
+        <div class="d-flex align-items-center justify-content-between gap-4">
+            <h2 class="h5 m-0">Uren klokken</h2>
+            @* TODO: Status *@
+            <div class="badge rounded-pill bg-opacity-10 p-2 bg-secondary text-secondary"> @* bg&text-secondary / bg&text-success / bg&text-warning *@
+                <i class="fa-solid fa-clock me-1"></i>
+                <span>Niet ingeklokt</span> @* Niet ingeklokt / Ingeklokt / Pauze (vanaf hh:mm) *@
+            </div>
+        </div>
+        <p class="fst-italic">Je bent nog niet ingeklokt.</p> @* Je bent nog niet ingeklokt. / Je bent ingeklokt sinds hh:mm. / Je bent op pauze sinds hh:mm. *@
+        <div> 
+            <p class="m-0">
+                <span>Het is vandaag </span>
+                <strong>@DateTime.Today.ToLongDateString()</strong>
+            </p>
+            <p class="m-0"> @* Only show when ingeklokt *@
+                <span>Gestart om: </span>
+                <strong>06:00</strong>
+            </p>
+            <p> @* Only show when pauze *@
+                <span>Pauze: </span>
+                <strong>00:15</strong>
+            </p>
+        </div>
+        <div class="text-end">
+            <a class="btn btn-primary">Inklokken</a>
+            @* <a class="btn btn-outline-secondary">Start pauze</a> *@
+            @* <a class="btn btn-outline-secondary">Eindig pauze</a> *@
+            @* <a class="btn btn-primary">Uitklokken</a> *@
+        </div>
+    </div>
+</div>
+
+@* Hour registration history *@
+<div class="d-flex align-items-center w-100 w-lg-auto"> @* TODO: juiste datum + wisselen van week *@
+    <button class="unset-all text-body">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+    <span class="fw-bold px-1 text-capitalize">
+        Week 2
+    </span>
+    <button class="unset-all text-body">
+        <i class="fas fa-chevron-right"></i>
+    </button>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Datum</th>
+            <th>Gewerkte tijden</th>
+            <th>Pauze</th>
+            <th>Gewerkte uren</th>
+        </tr>
+        </thead>
+        <tbody>
+            @for (var i = 0; i < 7; i++)
+            {
+                <tr>
+                    <td>Maandag 13-12-2024</td>
+                    <td>06:00 - 08:00</td>
+                    <td>00:15</td>
+                    <td>02:00</td>
+                </tr>
+            }
+            <td colspan="4" class="text-center">Er zijn nog geen uren geregistreerd deze week.</td>
+        </tbody>
+    </table>
+</div>
