@@ -20,7 +20,12 @@
                     <i class="fas fa-trash-alt"></i>
                     Concept week verwijderen
                 </button>
-                <a asp-controller="Schedule" asp-action="PublishWeek" asp-route-weekNumber="@Model.WeekNumber" asp-route-year="@Model.SelectedStartDate.Year" class="btn btn-success d-block d-lg-inline-block mt-2 mb-3 my-lg-0">
+                <a asp-controller="Schedule" 
+                   asp-action="PublishWeek" 
+                   asp-route-weekNumber="@Model.WeekNumber" 
+                   asp-route-year="@Model.SelectedStartDate.Year" 
+                   asp-route-returnUrl="@(ViewContext.HttpContext.Request.Path + ViewContext.HttpContext.Request.QueryString)"
+                   class="btn btn-success d-block d-lg-inline-block mt-2 mb-3 my-lg-0">
                     <i class="fas fa-check"></i>
                     Week publiceren
                 </a>

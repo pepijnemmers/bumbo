@@ -115,8 +115,16 @@ namespace BumboApp.Controllers
             }
         }
 
-        public IActionResult PublishWeek(int weekNumber, int year)
+        public IActionResult PublishWeek(int weekNumber, int year, string returnUrl)
         {
+            var query = System.Web.HttpUtility.ParseQueryString(returnUrl.Split('?')[1]);
+            var redirectAction = RedirectToAction("Index", new
+            {
+                employeeNumber = query["employeeNumber"],
+                startDate = query["startDate"],
+                dayView = query["dayView"] == null || bool.Parse(query["dayView"]!)
+            });
+            
             var publishDate = new DateOnly(year, 1, 1).AddDays((weekNumber - 1) * 7);
             var shifts = Context.Shifts
                 .Where(shift => DateOnly.FromDateTime(shift.Start) >= publishDate
@@ -127,7 +135,7 @@ namespace BumboApp.Controllers
             if (shifts.Count == 0)
             {
                 NotifyService.Error("Er zijn geen concept diensten gevonden voor de week");
-                return RedirectToAction("Index", new { startDate = publishDate.ToString("dd/MM/yyyy") });
+                return redirectAction;
             }
 
             try
@@ -153,12 +161,12 @@ namespace BumboApp.Controllers
                 
                 Context.SaveChanges();
                 NotifyService.Success("De concept diensten zijn gepubliceerd");
-                return RedirectToAction("Index", new { startDate = publishDate.ToString("dd/MM/yyyy") });
+                return redirectAction;
             }
             catch (Exception e)
             {
                 NotifyService.Error("Er is iets fout gegaan bij het publiceren van de diensten");
-                return RedirectToAction("Index", new { startDate = publishDate.ToString("dd/MM/yyyy") });
+                return redirectAction;
             }
             
         }
