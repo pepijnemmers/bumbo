@@ -1,10 +1,13 @@
 @using System.Globalization
+
 @{
     ViewData["Title"] = "Maand uren exporteren";
+    int month = ViewBag.Month ?? DateTime.Now.Month;
+    int year = ViewBag.Year ?? DateTime.Now.Year;
 }
 
 <div class="d-flex gap-2">
-    <form asp-action="Download" class="col-xl-6 table-container" method="post">
+    <form asp-action="CanDownload" class="col-xl-6 table-container p-3 d-flex flex-column" method="post">
         <p>Download de gewerkte uren met bijbehorende persoonsgegevens voor de verloning.</p>
         <div class="d-flex gap-2">
             <div class="d-flex flex-column">
@@ -12,20 +15,26 @@
                 <select class="form-select" name="month" required>
                     @for (int i = 1; i <= 12; i++)
                     {
-                        <option value="@i">@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i)</option>
+                        <option value="@i" selected="@(i == month)">
+                            @CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i)
+                        </option>
                     }
                 </select>
             </div>
             <div class="d-flex flex-column">
                 <label for="year" class="form-label">Jaar</label>
-                <input class="form-control" type="number" name="year" value="@DateTime.Now.Year" min="1900" required />
+                <input class="form-control" type="number" name="year" value="@year" min="1900" required />
             </div>
         </div>
-        <button class="btn btn-primary" type="submit">download</button>
+        <div class="d-flex justify-content-end mt-auto">
+            <button class="btn btn-primary" type="submit">download</button>
+        </div>
     </form>
-    <div class="col-xl-6 table-container">
+    <div class="col-xl-6 table-container p-3 d-flex flex-column">
         <h3>Maandoverzicht bekijken</h3>
         <p>Benieuwd in hoeverre er is afgeweken van het originele rooster en op welke uren toeslagen van toepassing waren?</p>
-        <button class="btn btn-outline-primary">bekijk maandoverzicht</button>
+        <div class="d-flex justify-content-end mt-auto">
+            <a class="btn btn-outline-primary" asp-controller="MonthlyHours" asp-action="Index">bekijk maandoverzicht</a>
+        </div>
     </div>
 </div>
