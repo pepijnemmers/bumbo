@@ -188,12 +188,13 @@
                     2 => Department.Kassa,
                     _ => throw new ArgumentOutOfRangeException()
                 };
+                var prognoseExistsAndManager = Model?.WeekPrognosis?.Prognoses != null && role == Role.Manager;
                 
-                <div class="col day-col @(openHours?.OpeningTime == null && openHours?.ClosingTime == null ? "closed pointer-events-none" : "")">
+                <div class="col day-col @(openHours?.OpeningTime == null && openHours?.ClosingTime == null ? "closed" : "")">
                     <div class="day-header">
-                        <strong class="px-3 d-flex align-items-center justify-content-between fs-5">
+                        <strong class="px-3 d-flex align-items-center justify-content-@(prognoseExistsAndManager ? "between" : "center") fs-5">
                             <span>@department.ToFriendlyString()</span>
-                            @if (Model?.WeekPrognosis?.Prognoses != null)
+                            @if (prognoseExistsAndManager)
                             {
                                 var prognosisForDep = Model.WeekPrognosis.Prognoses
                                     .FirstOrDefault(p => p.Department == department && p.Date == Model.SelectedStartDate);
@@ -220,7 +221,7 @@
                             }
                         </strong>
                     </div>
-                    <div class="day-hours-grid">
+                    <div class="day-hours-grid @(openHours?.OpeningTime == null && openHours?.ClosingTime == null ? "pointer-events-none" : "")">
                         @for (int j = 6; j < 24; j++)
                         {
                             if (role == Role.Manager && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
