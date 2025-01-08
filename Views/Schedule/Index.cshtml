@@ -1,4 +1,5 @@
 ﻿@using System.Globalization
+@using BumboApp.Helpers
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 
 @model BumboApp.ViewModels.ScheduleViewModel
@@ -286,6 +287,9 @@
                     var startHour = shift.Start.Hour;
                     var endHour = shift.End.Hour;
                     var gridSpanCol = endHour - startHour;
+                    
+                    var breakDuration = BreakCalculationHelper.CalculateRequiredBreak(shift.Start, shift.End).TotalMinutes;
+                    var breakText = breakDuration == 0 ? "Geen pauze" : $"{breakDuration} min. pauze";
 
                     <button
                         class="unset-all shift-container 
@@ -308,6 +312,7 @@
                         data-bs-content="
                             <div>
                                 <p class='text-secondary m-0'>@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                                <p class='text-secondary m-0'>@breakText</p>
                                 @if (shift.Employee != null) {
                                     <p class='fw-500 mb-1'><i class='fas fa-user me-1'></i>@shift.Employee?.FirstName @shift.Employee?.LastName</p> 
                                 } else {
@@ -315,7 +320,14 @@
                                 }
                             </div>">
                         <div class="shift">
-                            <p class="text-secondary m-0">@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                            <p class="text-secondary m-0">
+                                <i class="fa-solid fa-clock me-1"></i>
+                                @shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()
+                            </p>
+                            <p class="text-secondary m-0">
+                                <i class="fa-solid fa-mug-hot me-1"></i>
+                                @breakText
+                            </p>
                             @if (shift.Employee != null)
                             {
                                 <p class="fw-500">@shift.Employee.FirstName @shift.Employee.LastName</p>
@@ -368,8 +380,12 @@
                         data-bs-content="
                             @foreach (var timeGroup in group.GroupBy(shift => new { shift.Start, shift.End }))
                             {
-                                <div class='mb-2'>
+                                var breakDuration = BreakCalculationHelper.CalculateRequiredBreak(timeGroup.Key.Start, timeGroup.Key.End).TotalMinutes;
+                                var breakText = breakDuration == 0 ? "Geen pauze" : $"{breakDuration} min. pauze";
+                                
+                                <div class='mb-3'>
                                     <p class='text-secondary m-0'>@timeGroup.Key.Start.ToShortTimeString() - @timeGroup.Key.End.ToShortTimeString()</p>
+                                    <p class='text-secondary m-0'>@breakText</p>
 
                                     @foreach (var shiftContent in timeGroup)
                                     {
@@ -400,9 +416,19 @@
                         <div class="shift">
                             @foreach (var timeGroup in group.GroupBy(shift => new { shift.Start, shift.End }))
                             {
-                                <div class="mb-2">
-                                    <p class="text-secondary m-0">@timeGroup.Key.Start.ToShortTimeString() - @timeGroup.Key.End.ToShortTimeString()</p>
-
+                                <div class="mb-3">
+                                    <p class="text-secondary m-0">
+                                        <i class="fa-solid fa-clock"></i>
+                                        @timeGroup.Key.Start.ToShortTimeString() - @timeGroup.Key.End.ToShortTimeString()
+                                    </p>
+                                    <p class="text-secondary m-0">
+                                        @{
+                                            var breakDuration = BreakCalculationHelper.CalculateRequiredBreak(timeGroup.Key.Start, timeGroup.Key.End).TotalMinutes;
+                                            var breakText = breakDuration == 0 ? "Geen pauze" : $"{breakDuration} min. pauze";
+                                        }
+                                        <i class="fa-solid fa-mug-hot me-1"></i>
+                                        @breakText
+                                    </p>
                                     @foreach (var shiftContent in timeGroup)
                                     {
                                         if (shiftContent.Employee != null)
@@ -503,6 +529,9 @@ else
                 var startHour = shift.Start.Hour;
                 var endHour = shift.End.Hour;
                 var gridSpan = endHour - startHour;
+                
+                var breakDuration = BreakCalculationHelper.CalculateRequiredBreak(shift.Start, shift.End).TotalMinutes;
+                var breakText = breakDuration == 0 ? "Geen pauze" : $"{breakDuration} min. pauze";
 
                 <button
                     class="unset-all shift-container 
@@ -525,10 +554,18 @@ else
                     data-bs-content="
                         <div>
                             <p class='text-secondary m-0'>@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                            <p class='text-secondary m-0'>@breakText</p>
                             @if (shift.Employee != null) { <p class='fw-500 mb-1'><i class='fas fa-user me-1'></i>@shift.Employee?.FirstName @shift.Employee?.LastName</p> }else { <p class='fw-500 text-danger mb-1'><i class='fas fa-user-slash me-1'></i>Zoek intern vervanging en pas de dienst aan of zoek extern.</p> }
                         </div>">
                     <div class="shift">
-                        <p class="text-secondary m-0">@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                        <p class="text-secondary m-0">
+                            <i class="fa-solid fa-clock"></i>
+                            @shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()
+                        </p>
+                        <p class="text-secondary m-0">
+                            <i class="fa-solid fa-mug-hot me-1"></i>
+                            @breakText
+                        </p>
                         @if (shift.Employee != null)
                         {
                             <p class="fw-500">@shift.Employee?.FirstName @shift.Employee?.LastName</p>
