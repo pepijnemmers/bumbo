@@ -18,12 +18,12 @@ public class MonthlyHoursController : MainController
     {
         if (selectedMonth > 11 || selectedMonth == null)
         {
-            selectedMonth = DateTime.Now.Month - 1; // current month
+            selectedMonth = DateTime.Now.Month - 1;
         }
 
         if (selectedYear > DateTime.Now.Year || selectedYear == null)
         {
-            selectedYear = DateTime.Now.Year; // current year
+            selectedYear = DateTime.Now.Year;
         }
 
         var plannedShifts = Context.Shifts.Where(s => s.Start.Month == selectedMonth + 1 && s.Start.Year == selectedYear).ToList();
