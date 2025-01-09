@@ -32,6 +32,11 @@ public class WorkedHoursController : MainController
             .OrderBy(e => e.DateOnly)
             .ToList();
 
+        var takenBreakDuration = workedHours
+            ?.SelectMany(w => w.Breaks)
+            ?.Where(b => b.EndTime != null)
+            .Sum(b => (b.EndTime - b.StartTime)?.Ticks ?? 0);
+
         // Combine worked hours and planned shifts
         var combinedHours = plannedShifts
             .Select(shift => new
@@ -46,17 +51,11 @@ public class WorkedHoursController : MainController
                 Employee = x.Shift.Employee,
                 StartTime = x.WorkedHour?.StartTime ?? null,
                 EndTime = x.WorkedHour?.EndTime ?? null,
-                //Breaks = x.WorkedHour?.Breaks != null && x.WorkedHour.Breaks.Any()
-                //    ? x.WorkedHour.Breaks.Select(b => $"{b.StartTime} - {b.EndTime}").ToList()
-                //    : new List<string> { "-" },
-                //BreaksDuration = x.WorkedHour?.Breaks != null && x.WorkedHour.Breaks.Any()
-                //    ? TimeSpan.FromTicks(x.WorkedHour.Breaks
-                //    .Sum(b => (b.EndTime - b.StartTime).Ticks))  // Sum the durations in minutes
-                //    : 0,
-                BreaksDuration = x.WorkedHour?.Breaks != null && x.WorkedHour.Breaks.Any()
-                    ? TimeSpan.FromTicks(x.WorkedHour.Breaks
-                    .Sum(b => (b.EndTime.ToTimeSpan() - b.StartTime.ToTimeSpan()).Ticks))  // Sum the ticks for all breaks
-                    : TimeSpan.Zero,
+                BreaksDuration = x.WorkedHour?.Breaks
+                    ?.Where(b => b.EndTime != null)
+                    .Sum(b => (b.EndTime - b.StartTime)?.Ticks ?? 0) is long ticks && ticks > 0
+                    ? TimeSpan.FromTicks(ticks)
+                    : null,
                 Status = x.WorkedHour != null ? "Registered" : "Not Registered",
                 PlannedShift = x.Shift,
                 IsFuture = DateOnly.FromDateTime(x.Shift.Start) > DateOnly.FromDateTime(DateTime.Now)

@@ -50,9 +50,13 @@
                         </td>
                         <td>@workedHour.StartTime - @workedHour.EndTime</td>
                         <td>
-                            @foreach (var breakItem in workedHour.Breaks)
+                            @if (workedHour.BreaksDuration.HasValue)
                             {
-                                <div>@breakItem</div>
+                                <div>@workedHour.BreaksDuration.Value.ToString(@"hh\:mm")</div>
+                            }
+                            else
+                            {
+                                <div>-</div>
                             }
                         </td>
                         <td>90</td>
