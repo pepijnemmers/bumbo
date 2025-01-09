@@ -1,3 +1,93 @@
 @{
     ViewData["Title"] = "Maand overzicht";
+    // Define the list of months in Dutch
+    var months = new[] { "Januari", "Februari", "Maart", "April", "Mei", "Juni", "Juli", "Augustus", "September", "Oktober", "November", "December" };
+    // Get the current month index (0-based) to set the default selection
+    int selectedMonth = DateTime.Now.Month - 1;
+    int verschil = 0;
 }
+<div class="row align-items-center mb-3">
+    <div class="col">
+        <h3>Januari 2025</h3>
+    </div>
+
+    <div class="col-auto d-flex ms-auto">
+        <div class="d-flex justify-content-end gap-2">
+            <!-- Month Dropdown -->
+            <select class="form-select w-auto">
+                @for (int i = 0; i < months.Length; i++)
+                {
+                    <!option value="@months[i]" @(i == selectedMonth ? "selected" : "")>@months[i]</!option>
+                }
+            </select>
+
+            <!-- Year Dropdown -->
+            <select class="form-select w-auto">
+                <option value="@DateTime.Now.Year">@DateTime.Now.Year</option>
+                <option value="@(DateTime.Now.Year - 1)">@(DateTime.Now.Year - 1)</option>
+                <option value="@(DateTime.Now.Year - 1)">@(DateTime.Now.Year - 2)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-7 mb-4">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>Afgeweken van rooster</h5>
+                <p>Hoever is er afgeweken van het originele rooster?</p>
+
+                <div class="row g-3">
+                    <!-- Ingeplande uren -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <p class="card-text mb-1">Ingeplande uren</p>
+                                <h3 class="fw-bold">1 uur</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gewerkte uren -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <p class="card-text mb-1">Gewerkte uren</p>
+                                <h3 class="fw-bold">1 uur</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Verschil -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <p class="card-text mb-1">Verschil</p>
+                                <h3 class="fw-bold @(verschil == 0 ? "" : "text-danger")">
+                                    @(verschil > 0 ? "+" : "")@verschil uur
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <a asp-controller="MonthlyHours" asp-action="Differing" class="btn btn-primary" type="button">Overzicht van afwijkende diensten</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="card p-3">
+            <h5>Verloning (uren export)</h5>
+            <p>Wil je de gewerkte uren met bijbehorende persoonsgegevens downloaden voor de verloning?</p>
+
+            <div class="d-flex justify-content-end mt-4">
+                <a asp-controller="HoursExport" asp-action="Index" class="btn btn-outline-primary mx-2" type="button">Uren exporteren</a>
+            </div>
+        </div>
+    </div>
+</div>
