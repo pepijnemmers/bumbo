@@ -147,7 +147,8 @@ namespace BumboApp.Controllers
                             SentAt = DateTime.Now,
                             Title = name + "heeft te weinig uren in week " + weekNumber + ".",
                             Description = name + "heeft minder dan " + e.ContractHours + " uren in week " + weekNumber + ".",
-                            Employee = m
+                            Employee = m,
+                            ActionUrl = "~/Schedule/index?=" + startDate.ToString("dd-MM-yyyy")
                         });
                     }
                 }
