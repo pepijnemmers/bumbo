@@ -230,6 +230,23 @@ public class HoursRegistrationController : MainController
             return RedirectToAction("Index", new {date = returnDate});
         }
         
+        // Check if break is not too short
+        if (TimeOnly.FromDateTime(DateTime.Now) - currentBreak.StartTime < TimeSpan.FromMinutes(1))
+        {
+            NotifyService.Error("Let op! De pauze is niet opgeslagen! Je kan geen pauze van minder dan 1 minuut nemen.");
+
+            try
+            {
+                Context.Breaks.Remove(currentBreak);
+                Context.SaveChanges();
+            }
+            catch
+            {
+                NotifyService.Error("Er is iets mis gegaan");
+            }
+            return RedirectToAction("Index", new {date = returnDate});
+        }
+        
         // Start the pause
         try
         {
