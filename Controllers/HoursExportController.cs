@@ -63,9 +63,14 @@ public class HoursExportController : MainController
             string userId = workedHour.Employee.UserId;
             string name = workedHour.Employee.FirstName;
             string workedTime = (workedHour.EndTime - workedHour.StartTime).ToString();
-            double bonusPercent = Math.Round((CalculateBonus(workedHour) * 100) - 100, 1);
+            double bonusPercent = Math.Round(CalculateBonusPercent(workedHour), 1);
 
-            string dataString = $"{userId};{name};{workedTime};{bonusPercent}%";
+            //data voor testn
+            string date = workedHour.DateOnly.ToString();
+            string startTime = workedHour.StartTime.ToString();
+            string endTime = workedHour.EndTime.ToString();
+
+            string dataString = $"{userId};{name};{workedTime};{bonusPercent}%;{date};{startTime};{endTime}";
             dataList.Add(dataString);
         }
 
@@ -74,7 +79,7 @@ public class HoursExportController : MainController
         return File(excelStream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
 
-    private double CalculateBonus(WorkedHour workedHour)
+    private double CalculateBonusPercent(WorkedHour workedHour)
     {
         var intervals = GetWorkedIntervals(workedHour);
         var bonusPeriods = GetBonusPeriods(workedHour.DateOnly.DayNumber);
@@ -89,7 +94,8 @@ public class HoursExportController : MainController
                 totalWeightedBonus += CalculateWeightedTime(interval, bonusPeriod);
             }
         }
-        return totalWeightedBonus / totalWorkedTime;
+        double bonus = ((totalWeightedBonus / totalWorkedTime) - 1) * 100;
+        return bonus;
     }
 
     private List<(TimeOnly Start, TimeOnly End)> GetWorkedIntervals(WorkedHour workedHour)
@@ -97,7 +103,6 @@ public class HoursExportController : MainController
         List<Break> breaks = workedHour.Breaks ?? new();
         var intervals = new List<(TimeOnly Start, TimeOnly End)>();
         TimeOnly currentStart = workedHour.StartTime;
-
         foreach (var brk in breaks.OrderBy(b => b.StartTime))
         {
             if (brk != null && brk.EndTime.HasValue)
@@ -126,7 +131,6 @@ public class HoursExportController : MainController
         var overlapStart = Math.Max(period.Start.ToTimeSpan().TotalSeconds, bonusPeriod.StartTime.ToTimeSpan().TotalSeconds);
         var overlapEnd = Math.Min(period.End.ToTimeSpan().TotalSeconds, bonusPeriod.EndTime.ToTimeSpan().TotalSeconds);
 
-        //Console.WriteLine(overlapStart + "-" + overlapEnd + "*" + bonusPeriod.Multiplier
         return (overlapEnd - overlapStart) * bonusPeriod.Multiplier;
     }
 
@@ -181,7 +185,8 @@ public class HoursExportController : MainController
                 {
                     StartTime = new TimeOnly(20, 0),
                     EndTime = new TimeOnly(21, 0),
-                    Multiplier = 4d / 3d
+                    //Multiplier = 4d / 3d,
+                    Multiplier = 1.333d, //TODO
                 });
                 result.Add(new BonusPeriod
                 {
@@ -204,6 +209,9 @@ public class HoursExportController : MainController
             worksheet.Cells[1, 2].Value = "Naam";
             worksheet.Cells[1, 3].Value = "Gewerkte uren";
             worksheet.Cells[1, 4].Value = "Toeslag";
+            worksheet.Cells[1, 5].Value = "Testkolommen";
+            worksheet.Cells[1, 6].Value = "Shiftstart";
+            worksheet.Cells[1, 7].Value = "Eind";
 
             int row = 2;
             foreach (var line in inputData)
