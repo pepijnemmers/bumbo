@@ -10,15 +10,15 @@
     <div class="col-auto d-flex ms-auto">
         <div class="d-flex justify-content-end gap-2">
             <!-- Month Dropdown -->
-            <select class="form-select w-auto">
+            <select class="form-select w-auto" onchange="GoToMonth(this)">
                 @for (int i = 0; i < Model.Months.Length; i++)
                 {
-                    <!option value="@Model.Months[i]" @(i == Model.SelectedMonth ? "selected" : "")>@Model.Months[i]</!option>
+                    <!option value="@i" @(i == Model.SelectedMonth ? "selected" : "")>@Model.Months[i]</!option>
                 }
             </select>
 
             <!-- Year Dropdown -->
-            <select class="form-select w-auto">
+            <select class="form-select w-auto" onchange="GoToYear(this)">
                 @for (int i = 0; i < 3; i++)
                 {
                     <!option value="@(DateTime.Now.Year - i)" @(DateTime.Now.Year - i == Model.SelectedYear ? "selected" : "")>@(DateTime.Now.Year - i)</!option>
@@ -83,8 +83,25 @@
             <p>Wil je de gewerkte uren met bijbehorende persoonsgegevens downloaden voor de verloning?</p>
 
             <div class="d-flex justify-content-end mt-4">
-                <a asp-controller="HoursExport" asp-action="Index" class="btn btn-outline-primary mx-2" type="button">Uren exporteren</a>
+                <a asp-controller="HoursExport" asp-action="Index" class="btn btn-outline-primary mx-2" type="button"><i class="fa-solid fa-download"></i> Uren exporteren</a>
             </div>
         </div>
     </div>
 </div>
+
+
+@section Scripts
+{
+    <script>
+        function GoToMonth(select) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("selectedMonth", select.value);
+            location.href = url;
+        }
+        function GoToYear(select) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("selectedYear", select.value);
+            location.href = url;
+        }
+    </script>
+}
