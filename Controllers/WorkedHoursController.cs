@@ -177,4 +177,26 @@ public class WorkedHoursController : MainController
         }
         return RedirectToAction("Index", new { startDate = workedHour.DateOnly });
     }
+
+    [HttpPost]
+    public IActionResult Delete(int id)
+    {
+        try
+        {
+            var workedHour = Context.WorkedHours
+                .Include(wh => wh.Employee)
+                .Include(wh => wh.Breaks)
+                .FirstOrDefault(wh => wh.Id == id);
+            if (workedHour == null) throw new Exception();
+            
+            Context.WorkedHours.Remove(workedHour);
+            Context.SaveChanges();
+            NotifyService.Success("Gewerkte uren zijn succesvol verwijderd");
+        }
+        catch
+        {
+            NotifyService.Error("Er is iets misgegaan bij het verwijderen van de gewerkte uren");
+        }
+        return RedirectToAction("Index", new { startDate = DateOnly.FromDateTime(DateTime.Today) });
+    }
 }

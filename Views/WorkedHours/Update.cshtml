@@ -38,11 +38,32 @@
                 </div>
             </div>
             <div class="d-flex flex-wrap gap-2">
-                <button type="button" class="btn btn-danger" asp-action="Delete">Verwijderen</button>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Verwijderen</button>
                 <a class="btn btn-outline-secondary ms-auto" asp-action="Index">Annuleren</a>
                 <button type="submit" class="btn btn-primary" asp-action="Update">Opslaan</button>
             </div>
         </form>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Gewerkte uren verwijderen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Weet je zeker dat je deze gewerkte uren wilt verwijderen?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                <form method="post" asp-action="Delete">
+                    <input type="hidden" name="Id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-danger">Verwijderen</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
