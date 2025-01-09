@@ -32,11 +32,6 @@ public class WorkedHoursController : MainController
             .OrderBy(e => e.DateOnly)
             .ToList();
 
-        var takenBreakDuration = workedHours
-            ?.SelectMany(w => w.Breaks)
-            ?.Where(b => b.EndTime != null)
-            .Sum(b => (b.EndTime - b.StartTime)?.Ticks ?? 0);
-
         // Combine worked hours and planned shifts
         var combinedHours = plannedShifts
             .Select(shift => new
@@ -46,21 +41,33 @@ public class WorkedHoursController : MainController
                 (shift.Employee != null && wh.Employee.EmployeeNumber == shift.Employee.EmployeeNumber) &&
                 wh.DateOnly == DateOnly.FromDateTime(shift.Start))
             })
-            .Select(x => new WorkedHourViewModel
+            .Select(x =>
             {
-                Employee = x.Shift.Employee,
-                StartTime = x.WorkedHour?.StartTime ?? null,
-                EndTime = x.WorkedHour?.EndTime ?? null,
-                BreaksDuration = x.WorkedHour?.Breaks
+                // Calculate breaks duration 
+                var breakDuration = x.WorkedHour?.Breaks
                     ?.Where(b => b.EndTime != null)
                     .Sum(b => (b.EndTime - b.StartTime)?.Ticks ?? 0) is long ticks && ticks > 0
                     ? TimeSpan.FromTicks(ticks)
-                    : null,
-                Status = x.WorkedHour != null ? "Registered" : "Not Registered",
-                PlannedShift = x.Shift,
-                IsFuture = DateOnly.FromDateTime(x.Shift.Start) > DateOnly.FromDateTime(DateTime.Now)
+                    : TimeSpan.Zero;
+
+                // Calculate total worked time 
+                var totalWorkedTime = (x.WorkedHour?.StartTime != null && x.WorkedHour?.EndTime != null)
+                    ? x.WorkedHour.EndTime - x.WorkedHour.StartTime - breakDuration
+                    : (TimeSpan?)null;
+
+                return new WorkedHourViewModel
+                {
+                    Employee = x.Shift.Employee,
+                    StartTime = x.WorkedHour?.StartTime, 
+                    EndTime = x.WorkedHour?.EndTime,     
+                    BreaksDuration = breakDuration,
+                    TotalWorkedTime = totalWorkedTime,
+                    Status = x.WorkedHour?.Status.ToString(),
+                    PlannedShift = x.Shift.Start.ToString("HH:mm") + " - " + x.Shift.End.ToString("HH:mm"),
+                    IsFuture = DateOnly.FromDateTime(x.Shift.Start) > DateOnly.FromDateTime(DateTime.Now)
+                };
             })
-            .OrderBy(e => e.PlannedShift.Start)
+            .OrderBy(e => e.StartTime)
             .ToList();
 
         //// Apply additional filters

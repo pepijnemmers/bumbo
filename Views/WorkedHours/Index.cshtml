@@ -56,25 +56,43 @@
                             }
                             else
                             {
-                                <div>-</div>
+                                <span>-</span>
                             }
                         </td>
-                        <td>90</td>
                         <td>
-                            @if (workedHour.Employee != null)
+                            @if (workedHour.TotalWorkedTime.HasValue)
                             {
-                                @workedHour.Employee.Shifts.Count()
+                                @workedHour.TotalWorkedTime.Value.ToString(@"hh\:mm")
                             }
                             else
                             {
-                                @:Geen werknemer
+                                <span>-</span>
                             }
                         </td>
-                        <td>@workedHour.Status</td>
+                        <td>
+                            @if (workedHour.PlannedShift != null)
+                            {
+                                @workedHour.PlannedShift
+                            }
+                            else
+                            {
+                                <span>Niet ingepland</span>
+                            }
+                        </td>
+                        <td>
+                            @if (workedHour.Status != null)
+                            {
+                                @workedHour.Status
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
                         <td>
                             @if (workedHour.IsFuture)
                             {
-                                <a asp-action="Edit" asp-route-id="@workedHour.PlannedShift.Id">
+                                <a asp-action="Edit" asp-route-id="">
                                     <img width="20px" src="~/img/update-icon.svg" alt="edit" />
                                 </a>
                             }
