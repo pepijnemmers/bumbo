@@ -62,15 +62,10 @@ public class HoursExportController : MainController
 
             string userId = workedHour.Employee.UserId;
             string name = workedHour.Employee.FirstName;
-            string workedTime = (workedHour.EndTime - workedHour.StartTime).ToString();
-            double bonusPercent = Math.Round(CalculateBonusPercent(workedHour), 1);
+            string workedTime = (workedHour.EndTime - workedHour.StartTime).Value.ToString();
+            double bonusPercent = CalculateBonusPercent(workedHour);
 
-            //data voor testn
-            string date = workedHour.DateOnly.ToString();
-            string startTime = workedHour.StartTime.ToString();
-            string endTime = workedHour.EndTime.ToString();
-
-            string dataString = $"{userId};{name};{workedTime};{bonusPercent}%;{date};{startTime};{endTime}";
+            string dataString = $"{userId};{name};{workedTime};{bonusPercent}%";
             dataList.Add(dataString);
         }
 
@@ -79,10 +74,11 @@ public class HoursExportController : MainController
         return File(excelStream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
 
+    //Calculate the average bonus of a workedHour
     private double CalculateBonusPercent(WorkedHour workedHour)
     {
         var intervals = GetWorkedIntervals(workedHour);
-        var bonusPeriods = GetBonusPeriods(workedHour.DateOnly.DayNumber);
+        var bonusPeriods = GetBonusPeriods(workedHour.DateOnly.DayOfWeek);
 
         double totalWorkedTime = 0;
         double totalWeightedBonus = 0;
@@ -95,9 +91,10 @@ public class HoursExportController : MainController
             }
         }
         double bonus = ((totalWeightedBonus / totalWorkedTime) - 1) * 100;
-        return bonus;
+        return Math.Round(bonus, 1);
     }
 
+    //Splits a workedHour into a list of intervals based on the breaks
     private List<(TimeOnly Start, TimeOnly End)> GetWorkedIntervals(WorkedHour workedHour)
     {
         List<Break> breaks = workedHour.Breaks ?? new();
@@ -134,13 +131,13 @@ public class HoursExportController : MainController
         return (overlapEnd - overlapStart) * bonusPeriod.Multiplier;
     }
 
-    //TODO uit json halen? dit hangt af van het CAO
-    private List<BonusPeriod> GetBonusPeriods(int dayNumber)
+    //Should be retrieved from JSON, currently still here
+    private static List<BonusPeriod> GetBonusPeriods(DayOfWeek dayNumber)
     {
         var result = new List<BonusPeriod>();
         switch (dayNumber)
         {
-            case 0:
+            case DayOfWeek.Sunday:
                 result.Add(new BonusPeriod
                 {
                     StartTime = new TimeOnly(0, 0),
@@ -148,7 +145,7 @@ public class HoursExportController : MainController
                     Multiplier = 2d
                 });
                 break;
-            case 6:
+            case DayOfWeek.Saturday:
                 result.Add(new BonusPeriod
                 {
                     StartTime = new TimeOnly(0, 0),
@@ -209,9 +206,6 @@ public class HoursExportController : MainController
             worksheet.Cells[1, 2].Value = "Naam";
             worksheet.Cells[1, 3].Value = "Gewerkte uren";
             worksheet.Cells[1, 4].Value = "Toeslag";
-            worksheet.Cells[1, 5].Value = "Testkolommen";
-            worksheet.Cells[1, 6].Value = "Shiftstart";
-            worksheet.Cells[1, 7].Value = "Eind";
 
             int row = 2;
             foreach (var line in inputData)
