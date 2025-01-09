@@ -1,23 +1,19 @@
+@model BumboApp.ViewModels.MonthlyHoursViewModel
 @{
     ViewData["Title"] = "Maand overzicht";
-    // Define the list of months in Dutch
-    var months = new[] { "Januari", "Februari", "Maart", "April", "Mei", "Juni", "Juli", "Augustus", "September", "Oktober", "November", "December" };
-    // Get the current month index (0-based) to set the default selection
-    int selectedMonth = DateTime.Now.Month - 1;
-    int verschil = 0;
 }
 <div class="row align-items-center mb-3">
     <div class="col">
-        <h3>Januari 2025</h3>
+        <h3>@Model.Months[Model.SelectedMonth] @Model.SelectedYear</h3>
     </div>
 
     <div class="col-auto d-flex ms-auto">
         <div class="d-flex justify-content-end gap-2">
             <!-- Month Dropdown -->
             <select class="form-select w-auto">
-                @for (int i = 0; i < months.Length; i++)
+                @for (int i = 0; i < Model.Months.Length; i++)
                 {
-                    <!option value="@months[i]" @(i == selectedMonth ? "selected" : "")>@months[i]</!option>
+                    <!option value="@Model.Months[i]" @(i == Model.SelectedMonth ? "selected" : "")>@Model.Months[i]</!option>
                 }
             </select>
 
@@ -45,7 +41,7 @@
                         <div class="card">
                             <div class="card-body text-center">
                                 <p class="card-text mb-1">Ingeplande uren</p>
-                                <h3 class="fw-bold">1 uur</h3>
+                                <h3 class="fw-bold">@Model.PlannedHours uur</h3>
                             </div>
                         </div>
                     </div>
@@ -55,7 +51,7 @@
                         <div class="card">
                             <div class="card-body text-center">
                                 <p class="card-text mb-1">Gewerkte uren</p>
-                                <h3 class="fw-bold">1 uur</h3>
+                                <h3 class="fw-bold">@Model.WorkedHours uur</h3>
                             </div>
                         </div>
                     </div>
@@ -65,8 +61,8 @@
                         <div class="card">
                             <div class="card-body text-center">
                                 <p class="card-text mb-1">Verschil</p>
-                                <h3 class="fw-bold @(verschil == 0 ? "" : "text-danger")">
-                                    @(verschil > 0 ? "+" : "")@verschil uur
+                                <h3 class="fw-bold @(Model.Difference == 0 ? "" : "text-danger")">
+                                    @(Model.Difference > 0 ? "+" : "")@Model.Difference uur
                                 </h3>
                             </div>
                         </div>
