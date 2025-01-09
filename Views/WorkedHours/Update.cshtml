@@ -1,3 +1,72 @@
+@model BumboApp.ViewModels.WorkedHoursUpdateViewModel
 @{
     ViewData["Title"] = "Gewerkte uren bewerken";
+}
+
+<div class="col-auto col-lg-8">
+    <div class="card p-3">
+        <form method="post" onchange="updateWorkedHours()">
+            <input type="hidden" name="Id" value="@Model.Id" />
+            <div class="row mb-3">
+                <div class="form-group col-12 col-md-6">
+                    <label>Datum</label>
+                    <p class="m-0">@Model.Date</p>
+                </div>
+                <div class="form-group col-12 col-md-6">
+                    <label>Werknemer</label>
+                    <p class="m-0">@Model.Employee.FirstName @Model.Employee.LastName</p>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="form-group col-12 col-md-6">
+                    <label for="startTime">Starttijd</label>
+                    <input type="time" id="startTime" name="StartTime" class="form-control" value="@Model.StartTime">
+                </div>
+                <div class="form-group col-12 col-md-6">
+                    <label for="endTime">Eindtijd</label>
+                    <input type="time" id="endTime" name="EndTime" class="form-control" value="@Model.EndTime">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="form-group col-12 col-md-6">
+                    <label for="breakTime">Pauzetijd</label>
+                    <input type="time" id="breakTime" name="BreakTime" class="form-control" value="@Model.BreakDuration.ToString("hh\\:mm")">
+                </div>
+                <div class="form-group col-12 col-md-6">
+                    <label>Gewerkte uren</label>
+                    <p id="workedHours">@Model.WorkDuration.ToString("hh\\:mm")</p>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-danger" asp-action="Delete">Verwijderen</button>
+                <a class="btn btn-outline-secondary ms-auto" asp-action="Index">Annuleren</a>
+                <button type="submit" class="btn btn-primary" asp-action="Update">Opslaan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        function updateWorkedHours() {
+            const startTime = document.getElementById("startTime").value;
+            const endTime = document.getElementById("endTime").value;
+            const breakTime = document.getElementById("breakTime").value;
+            const workedHoursLabel = document.getElementById("workedHours");
+
+            const start = new Date(`2000-01-01T${startTime}:00`);
+            const end = new Date(`2000-01-01T${endTime}:00`);
+            const breakDuration = new Date(`2000-01-01T${breakTime}:00`);
+
+            const workedMilliseconds = end - start - (breakDuration.getHours() * 60 * 60 * 1000 + breakDuration.getMinutes() * 60 * 1000);
+            const workedHours = Math.floor(workedMilliseconds / (1000 * 60 * 60));
+            const workedMinutes = Math.floor((workedMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
+
+            const hours = String(workedHours).padStart(2, '0');
+            const minutes = String(workedMinutes).padStart(2, '0');
+
+            workedHoursLabel.textContent = `${hours}:${minutes}`;
+        }
+    </script>
 }
