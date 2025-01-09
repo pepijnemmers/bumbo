@@ -48,7 +48,23 @@
                                 ? $"{workedHour.Employee.FirstName} {workedHour.Employee.LastName}"
                                 : "Geen werknemer")
                         </td>
-                        <td>@workedHour.StartTime - @workedHour.EndTime</td>
+                        <td>
+                            @if(workedHour.StartTime != null)
+                            {
+                                @if(workedHour.EndTime != null)
+                                {
+                                    @workedHour.StartTime <span> - </span> @workedHour.EndTime
+                                }
+                                else
+                                {
+                                    @workedHour.StartTime <span> - ...</span>
+                                }
+                            }
+                            else
+                            {
+                                <span>Niet ingeklokt</span>
+                            }
+                        </td>
                         <td>
                             @if (workedHour.BreaksDuration.HasValue)
                             {
@@ -92,7 +108,7 @@
                         <td>
                             @if (workedHour.IsFuture)
                             {
-                                <a asp-action="Edit" asp-route-id="">
+                                <a asp-action="Update" asp-route-id="">
                                     <img width="20px" src="~/img/update-icon.svg" alt="edit" />
                                 </a>
                             }

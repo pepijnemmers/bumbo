@@ -64,26 +64,11 @@ public class WorkedHoursController : MainController
                     TotalWorkedTime = totalWorkedTime,
                     Status = x.WorkedHour?.Status.ToString(),
                     PlannedShift = x.Shift.Start.ToString("HH:mm") + " - " + x.Shift.End.ToString("HH:mm"),
-                    IsFuture = DateOnly.FromDateTime(x.Shift.Start) > DateOnly.FromDateTime(DateTime.Now)
+                    IsFuture = DateOnly.FromDateTime(x.Shift.Start) <= DateOnly.FromDateTime(DateTime.Now) && DateOnly.FromDateTime(x.Shift.Start).Month == DateOnly.FromDateTime(DateTime.Now).Month,
                 };
             })
             .OrderBy(e => e.StartTime)
             .ToList();
-
-        //// Apply additional filters
-        //if (!string.IsNullOrEmpty(employee))
-        //{
-        //    combinedHours = combinedHours
-        //        .Where(wh => $"{wh.Employee.FirstName} {wh.Employee.LastName}".Contains(employee, StringComparison.OrdinalIgnoreCase))
-        //        .ToList();
-        //}
-
-        //if (!string.IsNullOrEmpty(hours))
-        //{
-        //    combinedHours = combinedHours
-        //        //.Where(wh => wh.Status.Equals(status, StringComparison.OrdinalIgnoreCase))
-        //        .ToList();
-        //}
 
         //Pagination
         int currentPageNumber = page ?? DefaultPage;
