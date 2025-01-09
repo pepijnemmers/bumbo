@@ -8,6 +8,7 @@ namespace BumboApp.Controllers
 {
     public class ScheduleController : MainController
     {
+        private readonly String _actionUrl = "~/Schedule?startDate="; //day will be added while making the Notification
         public IActionResult Index(string? employeeNumber, string? startDate, bool dayView = true)
         {
             // Selected employee filter or logged in employee
@@ -135,7 +136,7 @@ namespace BumboApp.Controllers
                             Description = $"Er is een dienst voor jou toegevoegd op {shift.Start.ToString("dd-MM-yyyy")}",
                             SentAt = DateTime.Now,
                             HasBeenRead = false,
-                            ActionUrl = $"/Schedule?startDate={shift.Start.ToString("dd/MM/yyyy")}"
+                            ActionUrl = _actionUrl + shift.Start.ToString("dd/MM/yyyy")
                         });
                     }
                 }
