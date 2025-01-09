@@ -1,19 +1,19 @@
 @using BumboApp.ViewModels
 @using BumboApp.Views.Components
 @using System.Globalization
-@model List<WorkedHourViewModel>
+@model BumboApp.ViewModels.WorkedHoursPageViewModel
 @{
     ViewData["Title"] = "Gewerkte uren";
 }
 
 <div class="d-flex align-items-center w-100 w-lg-auto">
-    <a class="unset-all text-body" asp-action="Index" asp-route-startDate="@Model.FirstOrDefault().SelectedStartDate.AddDays(-1)">
+    <a class="unset-all text-body" asp-action="Index" asp-route-page="1" asp-route-startDate="@Model.SelectedStartDate.AddDays(-1).ToString("yyyy-MM-dd")">
         <i class="fas fa-chevron-left"></i>
     </a>
     <span class="fw-bold px-1 text-capitalize">
-        @Model.FirstOrDefault().SelectedStartDate.ToString("ddd dd-MM-yyyy", CultureInfo.GetCultureInfo("nl-NL"))
+        @Model.SelectedStartDate.ToString("ddd dd-MM-yyyy", CultureInfo.GetCultureInfo("nl-NL"))
     </span>
-    <a class="unset-all text-body" asp-action="Index" asp-route-startDate="@Model.FirstOrDefault().SelectedStartDate.AddDays(1)">
+    <a class="unset-all text-body" asp-action="Index" asp-route-page="1" asp-route-startDate="@Model.SelectedStartDate.AddDays(1).ToString("yyyy-MM-dd")">
         <i class="fas fa-chevron-right"></i>
     </a>
 </div>
@@ -32,7 +32,7 @@
             </tr>
         </thead>
         <tbody>
-            @if (!Model.Any())
+            @if (!Model.WorkedHours.Any())
             {
                 <tr>
                     <td colspan="100%" class="text-center py-4">Er zijn nog geen gewerkte uren</td>
@@ -40,14 +40,32 @@
             }
             else
             {
-                @foreach (var workedHour in Model)
+                @foreach (var workedHour in Model.WorkedHours)
                 {
                     <tr>
-                        <td>@workedHour.Employee.FirstName @workedHour.Employee.LastName</td>
+                        <td>
+                            @(workedHour.Employee != null
+                                ? $"{workedHour.Employee.FirstName} {workedHour.Employee.LastName}"
+                                : "Geen werknemer")
+                        </td>
                         <td>@workedHour.StartTime - @workedHour.EndTime</td>
-                        <td>@workedHour.Breaks</td>
+                        <td>
+                            @foreach (var breakItem in workedHour.Breaks)
+                            {
+                                <div>@breakItem</div>
+                            }
+                        </td>
                         <td>90</td>
-                        <td>@workedHour.Employee.Shifts</td>
+                        <td>
+                            @if (workedHour.Employee != null)
+                            {
+                                @workedHour.Employee.Shifts.Count()
+                            }
+                            else
+                            {
+                                @:Geen werknemer
+                            }
+                        </td>
                         <td>@workedHour.Status</td>
                         <td>
                             @if (workedHour.IsFuture)
