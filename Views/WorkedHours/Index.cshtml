@@ -1,3 +1,77 @@
+@using BumboApp.ViewModels
+@using BumboApp.Views.Components
+@using System.Globalization
+@model List<WorkedHourViewModel>
 @{
     ViewData["Title"] = "Gewerkte uren";
 }
+
+<div class="d-flex align-items-center w-100 w-lg-auto">
+    <a class="unset-all text-body" asp-action="Index" asp-route-startDate="@Model.FirstOrDefault().SelectedStartDate.AddDays(-1)">
+        <i class="fas fa-chevron-left"></i>
+    </a>
+    <span class="fw-bold px-1 text-capitalize">
+        @Model.FirstOrDefault().SelectedStartDate.ToString("ddd dd-MM-yyyy", CultureInfo.GetCultureInfo("nl-NL"))
+    </span>
+    <a class="unset-all text-body" asp-action="Index" asp-route-startDate="@Model.FirstOrDefault().SelectedStartDate.AddDays(1)">
+        <i class="fas fa-chevron-right"></i>
+    </a>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Werknemer</th>
+                <th>Gewerkte tijden</th>
+                <th>Pauze</th>
+                <th>Gewerkte uren</th>
+                <th>Ingepland rooster</th>
+                <th>Status</th>
+                <th>Acties</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="100%" class="text-center py-4">Er zijn nog geen gewerkte uren</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var workedHour in Model)
+                {
+                    <tr>
+                        <td>@workedHour.Employee.FirstName @workedHour.Employee.LastName</td>
+                        <td>@workedHour.StartTime - @workedHour.EndTime</td>
+                        <td>@workedHour.Breaks</td>
+                        <td>90</td>
+                        <td>@workedHour.Employee.Shifts</td>
+                        <td>@workedHour.Status</td>
+                        <td>
+                            @if (workedHour.IsFuture)
+                            {
+                                <a asp-action="Edit" asp-route-id="@workedHour.PlannedShift.Id">
+                                    <img width="20px" src="~/img/update-icon.svg" alt="edit" />
+                                </a>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    @if (ViewBag.MaxPages > 1)
+    {
+        <Component type="typeof(Pagination)"
+                   render-mode="ServerPrerendered"
+                   param-PageNumber="ViewBag.PageNumber"
+                   param-MaxPages="ViewBag.MaxPages" />
+    }
+</div>
