@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BumboApp.Migrations
 {
     /// <inheritdoc />
-    public partial class FullSeedDataExport : Migration
+    public partial class ExportHoursSeedData : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,7 +25,7 @@ namespace BumboApp.Migrations
                     { 125, 2, 2, new DateTime(2024, 11, 8, 14, 30, 0, 0, DateTimeKind.Unspecified), true, new DateTime(2024, 11, 8, 6, 30, 0, 0, DateTimeKind.Unspecified) },
                     { 126, 1, 3, new DateTime(2024, 11, 4, 16, 0, 0, 0, DateTimeKind.Unspecified), true, new DateTime(2024, 11, 4, 8, 0, 0, 0, DateTimeKind.Unspecified) },
                     { 127, 2, 3, new DateTime(2024, 11, 5, 22, 0, 0, 0, DateTimeKind.Unspecified), true, new DateTime(2024, 11, 5, 14, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 128, 0, 3, new DateTime(2024, 11, 11, 14, 30, 0, 0, DateTimeKind.Unspecified), true, new DateTime(2024, 11, 11, 6, 30, 0, 0, DateTimeKind.Unspecified) },
+                    { 128, 0, 3, new DateTime(2024, 11, 11, 14, 30, 0, 0, DateTimeKind.Unspecified), true, new DateTime(2024, 11, 9, 6, 30, 0, 0, DateTimeKind.Unspecified) },
                     { 129, 2, 3, new DateTime(2024, 11, 7, 21, 0, 0, 0, DateTimeKind.Unspecified), true, new DateTime(2024, 11, 7, 13, 0, 0, 0, DateTimeKind.Unspecified) },
                     { 130, 1, 3, new DateTime(2024, 11, 8, 18, 0, 0, 0, DateTimeKind.Unspecified), true, new DateTime(2024, 11, 8, 10, 0, 0, 0, DateTimeKind.Unspecified) },
                     { 131, 0, 2, new DateTime(2024, 11, 11, 23, 0, 0, 0, DateTimeKind.Unspecified), true, new DateTime(2024, 11, 11, 17, 0, 0, 0, DateTimeKind.Unspecified) },
@@ -52,7 +52,7 @@ namespace BumboApp.Migrations
                     { 25, new DateOnly(2024, 11, 8), 2, new TimeOnly(14, 35, 0), new TimeOnly(6, 35, 0), 1 },
                     { 26, new DateOnly(2024, 11, 4), 3, new TimeOnly(16, 20, 0), new TimeOnly(8, 10, 0), 1 },
                     { 27, new DateOnly(2024, 11, 5), 3, new TimeOnly(22, 15, 0), new TimeOnly(14, 10, 0), 1 },
-                    { 28, new DateOnly(2024, 11, 11), 3, new TimeOnly(14, 40, 0), new TimeOnly(6, 35, 0), 1 },
+                    { 28, new DateOnly(2024, 11, 9), 3, new TimeOnly(14, 40, 0), new TimeOnly(6, 35, 0), 1 },
                     { 29, new DateOnly(2024, 11, 7), 3, new TimeOnly(21, 5, 0), new TimeOnly(13, 10, 0), 1 },
                     { 30, new DateOnly(2024, 11, 8), 3, new TimeOnly(18, 15, 0), new TimeOnly(10, 10, 0), 1 },
                     { 31, new DateOnly(2024, 11, 11), 2, new TimeOnly(23, 0, 0), new TimeOnly(17, 15, 0), 1 },

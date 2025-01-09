@@ -899,7 +899,7 @@ public partial class BumboDbContext : IdentityDbContext<User>
             new { Id = 125, Start = new DateTime(2024, 11, 8, 6, 30, 0), End = new DateTime(2024, 11, 8, 14, 30, 0), Department = Department.Kassa, EmployeeNumber = 2, IsFinal = true },
             new { Id = 126, Start = new DateTime(2024, 11, 4, 8, 0, 0), End = new DateTime(2024, 11, 4, 16, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 3, IsFinal = true },
             new { Id = 127, Start = new DateTime(2024, 11, 5, 14, 0, 0), End = new DateTime(2024, 11, 5, 22, 0, 0), Department = Department.Kassa, EmployeeNumber = 3, IsFinal = true },
-            new { Id = 128, Start = new DateTime(2024, 11, 11, 6, 30, 0), End = new DateTime(2024, 11, 11, 14, 30, 0), Department = Department.Vers, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 128, Start = new DateTime(2024, 11, 9, 6, 30, 0), End = new DateTime(2024, 11, 11, 14, 30, 0), Department = Department.Vers, EmployeeNumber = 3, IsFinal = true },
             new { Id = 129, Start = new DateTime(2024, 11, 7, 13, 0, 0), End = new DateTime(2024, 11, 7, 21, 0, 0), Department = Department.Kassa, EmployeeNumber = 3, IsFinal = true },
             new { Id = 130, Start = new DateTime(2024, 11, 8, 10, 0, 0), End = new DateTime(2024, 11, 8, 18, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 3, IsFinal = true },
 
@@ -947,7 +947,7 @@ public partial class BumboDbContext : IdentityDbContext<User>
             new { Id = 25, DateOnly = new DateOnly(2024, 11, 8), StartTime = new TimeOnly(6, 35), EndTime = new TimeOnly(14, 35), Status = HourStatus.Final, EmployeeNumber = 2 },
             new { Id = 26, DateOnly = new DateOnly(2024, 11, 4), StartTime = new TimeOnly(8, 10), EndTime = new TimeOnly(16, 20), Status = HourStatus.Final, EmployeeNumber = 3 },
             new { Id = 27, DateOnly = new DateOnly(2024, 11, 5), StartTime = new TimeOnly(14, 10), EndTime = new TimeOnly(22, 15), Status = HourStatus.Final, EmployeeNumber = 3 },
-            new { Id = 28, DateOnly = new DateOnly(2024, 11, 11), StartTime = new TimeOnly(6, 35), EndTime = new TimeOnly(14, 40), Status = HourStatus.Final, EmployeeNumber = 3 },
+            new { Id = 28, DateOnly = new DateOnly(2024, 11, 9), StartTime = new TimeOnly(6, 35), EndTime = new TimeOnly(14, 40), Status = HourStatus.Final, EmployeeNumber = 3 },
             new { Id = 29, DateOnly = new DateOnly(2024, 11, 7), StartTime = new TimeOnly(13, 10), EndTime = new TimeOnly(21, 5), Status = HourStatus.Final, EmployeeNumber = 3 },
             new { Id = 30, DateOnly = new DateOnly(2024, 11, 8), StartTime = new TimeOnly(10, 10), EndTime = new TimeOnly(18, 15), Status = HourStatus.Final, EmployeeNumber = 3 },
 

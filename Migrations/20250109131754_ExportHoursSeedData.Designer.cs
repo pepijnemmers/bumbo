@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BumboApp.Migrations
 {
     [DbContext(typeof(BumboDbContext))]
-    [Migration("20250109122145_FullSeedDataExport")]
-    partial class FullSeedDataExport
+    [Migration("20250109131754_ExportHoursSeedData")]
+    partial class ExportHoursSeedData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -2756,7 +2756,7 @@ namespace BumboApp.Migrations
                             EmployeeNumber = 3,
                             End = new DateTime(2024, 11, 11, 14, 30, 0, 0, DateTimeKind.Unspecified),
                             IsFinal = true,
-                            Start = new DateTime(2024, 11, 11, 6, 30, 0, 0, DateTimeKind.Unspecified)
+                            Start = new DateTime(2024, 11, 9, 6, 30, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
@@ -3663,7 +3663,7 @@ namespace BumboApp.Migrations
                         new
                         {
                             Id = 28,
-                            DateOnly = new DateOnly(2024, 11, 11),
+                            DateOnly = new DateOnly(2024, 11, 9),
                             EmployeeNumber = 3,
                             EndTime = new TimeOnly(14, 40, 0),
                             StartTime = new TimeOnly(6, 35, 0),
