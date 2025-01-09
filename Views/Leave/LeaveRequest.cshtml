@@ -18,12 +18,20 @@
             <div class="card p-4 create-prognosis-card">
                 <div class="mb-3">
                     <label for="startDate" class="form-label fw-bold">Begin Datum</label>
-                    <input type="datetime-local" class="form-control" id="startDate" name="StartDate" placeholder="Begindatum" onchange="checkDate()" required>
+                    <input type="datetime-local" class="form-control" id="startDate" name="StartDate" placeholder="Begindatum" 
+                           min="@DateTime.Now.ToString("yyyy-MM-ddTHH:00")"
+                           step="3600"
+                           onchange="setEndDateMin()" 
+                           required>
+                    <p class="form-text mb-0">Verlof kan alleen worden aangevraagd voor hele uren</p>
                 </div>
 
-                <div class="mb-2">
+                <div class="mb-3">
                     <label for="endDate" class="form-label fw-bold">Eind Datum</label>
-                    <input type="datetime-local" class="form-control" id="endDate" name="EndDate" placeholder="Einddatum" onchange="checkDate()" required>
+                    <input type="datetime-local" class="form-control" id="endDate" name="EndDate" placeholder="Einddatum"
+                           step="3600"
+                           required>
+                    <p class="form-text mb-0">Minimale duur van een verlof aanvraag is 1 uur</p>
                 </div>
 
                 <div class="mb-3">
@@ -50,22 +58,45 @@ else if (User.IsInRole(Role.Manager.ToString()))
     <div class="d-flex flex-column flex-lg-row align-items-start gap-3">
         <div class="card p-4 create-prognosis-card">
             <div class="mb-3">
-                <label for="employeeName" class="form-label fw-bold">Werknemer</label>
+                <label class="form-label fw-bold">Werknemer</label>
                 <p>@Model.LeaveRequest.Employee.FirstName @Model.LeaveRequest.Employee.LastName</p>
             </div>
             <div class="mb-3">
-                <label for="startDate" class="form-label fw-bold">Begin Datum</label>
-                <p>@Model.LeaveRequest.StartDate</p>
-            </div>
-
-            <div class="mb-2">
-                <label for="endDate" class="form-label fw-bold">Eind Datum</label>
-                <p>@Model.LeaveRequest.EndDate</p>
+                <label class="form-label fw-bold">Begin Datum</label>
+                <p>@Model.LeaveRequest.StartDate.ToString("dd-MM-yyyy HH:mm")</p>
             </div>
 
             <div class="mb-3">
-                <label for="reason" class="form-label fw-bold">Reden</label>
+                <label class="form-label fw-bold">Eind Datum</label>
+                <p>@Model.LeaveRequest.EndDate.ToString("dd-MM-yyyy HH:mm")</p>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Reden</label>
                 <p>@Model.LeaveRequest.Reason</p>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold d-block">Huidige status</label>
+                @switch (Model.LeaveRequest.Status)
+                {
+                    case Status.Afgewezen:
+                        <p class="badge rounded-pill bg-danger bg-opacity-10 text-danger">
+                            @Model.LeaveRequest.Status
+                        </p>
+                        break;
+                    case Status.Geaccepteerd:
+                        <p class="badge rounded-pill bg-success bg-opacity-10 text-success">
+                            @Model.LeaveRequest.Status
+                        </p>
+                        break;
+                    case Status.Aangevraagd:
+                    default:
+                        <p class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary">
+                            @Model.LeaveRequest.Status
+                        </p>
+                        break;
+                }
             </div>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -79,28 +110,10 @@ else if (User.IsInRole(Role.Manager.ToString()))
 @section Scripts
 {
     <script>
+        // Function to set the minimum value of endDate based on startDate
         const startDateInput = document.getElementById('startDate');
         const endDateInput = document.getElementById('endDate');
     
-        
-        function getLocalDateTime() {
-            const now = new Date();
-    
-            // Get components of the local date and time
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-    
-            // Combine them into the required format
-            return `${year}-${month}-${day}T${hours}:${minutes}`;
-        }
-    
-        // Set the min startDate
-        startDateInput.min = getLocalDateTime();
-    
-        // Function to set the minimum value of endDate based on startDate
         function setEndDateMin() {
             const startDateValue = startDateInput.value;
             if (startDateValue) {

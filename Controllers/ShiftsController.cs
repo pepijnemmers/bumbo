@@ -21,7 +21,8 @@ namespace BumboApp.Controllers
                 
                 SelectedDate = date != null ? DateOnly.FromDateTime(DateTime.Parse(date)) : null,
                 SelectedStartHour = startHour != null ? new TimeOnly(startHour.Value, 0) : null,
-                SelectedDepartment = department != null ? Enum.Parse<Department>(department) : null
+                SelectedDepartment = department != null ? Enum.Parse<Department>(department) : null,
+                OpeningHour = date != null ? Context.OpeningHours.AsEnumerable().FirstOrDefault(oh => oh.WeekDay == DateTime.Parse(date).DayOfWeek) : null
             };
             return View(viewModel);
         }
@@ -47,7 +48,8 @@ namespace BumboApp.Controllers
                 Shift = shift,
                 Departments = Enum.GetValues<Department>().ToList(),
                 Employees = Context.Employees
-                    .ToList()
+                    .ToList(),
+                OpeningHour = Context.OpeningHours.AsEnumerable().FirstOrDefault(oh => oh.WeekDay == shift.Start.DayOfWeek)
             };
             return View(viewModel);
         }
@@ -152,6 +154,17 @@ namespace BumboApp.Controllers
                 NotifyService.Error("De afdeling is niet geldig");
                 valid = false;
             }
+            var openingHour = Context.OpeningHours.AsEnumerable().FirstOrDefault(oh => oh.WeekDay == date!.Value.DayOfWeek);
+            if (openingHour != null && openingHour.OpeningTime > start && valid)
+            {
+                NotifyService.Error("De dienst kan niet voor openingstijd beginnen");
+                valid = false;
+            }
+            if (openingHour != null && openingHour.ClosingTime < end && valid)
+            {
+                NotifyService.Error("De dienst kan niet na sluitingstijd eindigen");
+                valid = false;
+            }
             
             if (valid == false)
             {
@@ -252,6 +265,17 @@ namespace BumboApp.Controllers
             if ((employeeNumber == null || employee == null) && employeeNumber != "0")
             {
                 NotifyService.Error("De werknemer kon niet worden gevonden");
+                return RedirectToAction("Update", new { id = id });
+            }
+            var openingHour = Context.OpeningHours.AsEnumerable().FirstOrDefault(oh => oh.WeekDay == date.DayOfWeek);
+            if (openingHour != null && openingHour.OpeningTime > start)
+            {
+                NotifyService.Error("De dienst kan niet voor openingstijd beginnen");
+                return RedirectToAction("Update", new { id = id });
+            }
+            if (openingHour != null && openingHour.ClosingTime < end)
+            {
+                NotifyService.Error("De dienst kan niet na sluitingstijd eindigen");
                 return RedirectToAction("Update", new { id = id });
             }
             
