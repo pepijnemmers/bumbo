@@ -19,9 +19,10 @@
 
             <!-- Year Dropdown -->
             <select class="form-select w-auto">
-                <option value="@DateTime.Now.Year">@DateTime.Now.Year</option>
-                <option value="@(DateTime.Now.Year - 1)">@(DateTime.Now.Year - 1)</option>
-                <option value="@(DateTime.Now.Year - 1)">@(DateTime.Now.Year - 2)</option>
+                @for (int i = 0; i < 3; i++)
+                {
+                    <!option value="@(DateTime.Now.Year - i)" @(DateTime.Now.Year - i == Model.SelectedYear ? "selected" : "")>@(DateTime.Now.Year - i)</!option>
+                }
             </select>
         </div>
     </div>

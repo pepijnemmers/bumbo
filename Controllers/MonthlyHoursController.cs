@@ -25,11 +25,29 @@ public class MonthlyHoursController : MainController
         {
             selectedYear = DateTime.Now.Year; // current year
         }
-        var plannedShifts = Context.Shifts.Where(s => s.Start.Month == selectedMonth && s.Start.Year == selectedYear).ToList();
-        var workedHours = Context.WorkedHours.Where(wh => wh.DateOnly.Month == selectedMonth && wh.DateOnly.Year == selectedYear).ToList();
 
-        var amountOfPlannedHours = 0;
-        var amountOfWorkedHours = 0;
+        var plannedShifts = Context.Shifts.Where(s => s.Start.Month == selectedMonth + 1 && s.Start.Year == selectedYear).ToList();
+        var workedHours = Context.WorkedHours.Where(wh => wh.DateOnly.Month == selectedMonth + 1 && wh.DateOnly.Year == selectedYear).ToList();
+
+        double amountOfPlannedHours = 0;
+        double amountOfWorkedHours = 0;
+
+        foreach (var shift in plannedShifts)
+        {
+            var timespan = shift.End - shift.Start;
+            amountOfPlannedHours += timespan.TotalHours;
+        }
+
+        foreach (var workedHour in workedHours)
+        {
+            if (workedHour.EndTime != null)
+            {
+                var timespan = workedHour.EndTime.Value - workedHour.StartTime;
+                amountOfWorkedHours += timespan.TotalHours;
+            }
+        }
+        amountOfPlannedHours = Math.Round(amountOfPlannedHours, 2);
+        amountOfWorkedHours = Math.Round(amountOfWorkedHours, 2);
 
         var viewModel = new MonthlyHoursViewModel
         {
@@ -37,7 +55,7 @@ public class MonthlyHoursController : MainController
             SelectedYear = (int)selectedYear,
             PlannedHours = amountOfPlannedHours,
             WorkedHours = amountOfWorkedHours,
-            Difference = amountOfWorkedHours - amountOfPlannedHours
+            Difference = Math.Round(amountOfWorkedHours - amountOfPlannedHours, 2)
         };
         return View(viewModel);
     }
