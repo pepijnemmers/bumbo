@@ -1,5 +1,10 @@
+@using System.Globalization
+@model BumboApp.ViewModels.HourRegistrationViewModel
 @{
     ViewData["Title"] = "Uren klokken";
+    
+    var clockedIn = Model.ClockInStart != null;
+    var onBreak = Model.BreakStart != null;
 }
 
 @* Hour registration *@
@@ -7,47 +12,76 @@
     <div class="card p-3 mb-4">
         <div class="d-flex align-items-center justify-content-between gap-4">
             <h2 class="h5 m-0">Uren klokken</h2>
-            @* TODO: Status *@
-            <div class="badge rounded-pill bg-opacity-10 p-2 bg-secondary text-secondary"> @* bg&text-secondary / bg&text-success / bg&text-warning *@
+            @{
+                var badgeClass = clockedIn ? onBreak ? "bg-warning text-warning" : "bg-success text-success" : "bg-secondary text-secondary";
+            }
+            <div class="badge rounded-pill bg-opacity-10 p-2 @badgeClass">
                 <i class="fa-solid fa-clock me-1"></i>
-                <span>Niet ingeklokt</span> @* Niet ingeklokt / Ingeklokt / Pauze (vanaf hh:mm) *@
+                <span>
+                    @(clockedIn ? onBreak ? $"Pauze (vanaf {Model.BreakStart})" : "Ingeklokt" : "Niet ingeklokt")
+                </span>
             </div>
         </div>
-        <p class="fst-italic">Je bent nog niet ingeklokt.</p> @* Je bent nog niet ingeklokt. / Je bent ingeklokt sinds hh:mm. / Je bent op pauze sinds hh:mm. *@
+        <p class="fst-italic">
+            @(clockedIn ? onBreak ? "Je hebt pauze vanaf " + Model.BreakStart : "Je bent ingeklokt vanaf " + Model.ClockInStart : "Je bent nog niet ingeklokt.")
+        </p>
         <div> 
             <p class="m-0">
                 <span>Het is vandaag </span>
                 <strong>@DateTime.Today.ToLongDateString()</strong>
             </p>
-            <p class="m-0"> @* Only show when ingeklokt *@
-                <span>Gestart om: </span>
-                <strong>06:00</strong>
-            </p>
-            <p> @* Only show when pauze *@
-                <span>Pauze: </span>
-                <strong>00:15</strong>
-            </p>
+            @if (clockedIn)
+            {
+                <p class="m-0">
+                    <span>Gestart om: </span>
+                    <strong>@Model.ClockInStart</strong>
+                </p>
+            }
+            @if (Model.TakenBreakDuration != null && Model.TakenBreakDuration > TimeSpan.Zero)
+            {
+                <p>
+                    <span>Pauze: </span>
+                    <strong>@Model.TakenBreakDuration</strong>
+                </p>
+            }
         </div>
-        <div class="text-end">
-            <a class="btn btn-primary">Inklokken</a>
-            @* <a class="btn btn-outline-secondary">Start pauze</a> *@
-            @* <a class="btn btn-outline-secondary">Eindig pauze</a> *@
-            @* <a class="btn btn-primary">Uitklokken</a> *@
-        </div>
+        <form method="post" asp-controller="HoursRegistration" class="text-end">
+            <input type="hidden" name="returnDate" value="@Model.SelectedDate" />
+            @if (!clockedIn)
+            {
+                <button type="submit" asp-action="StartClock" class="btn btn-primary">Inklokken</button>
+            }
+            else
+            {
+                if (onBreak)
+                {
+                    <button type="submit" asp-action="EndPause" class="btn btn-outline-secondary">Eindig pauze</button>
+                }
+                else
+                {
+                    <button type="submit" asp-action="StartPause" class="btn btn-outline-secondary">Start pauze</button>
+                }
+                <button type="submit" asp-action="EndClock" class="btn btn-primary">Uitklokken</button>
+            }
+        </form>
     </div>
 </div>
 
 @* Hour registration history *@
-<div class="d-flex align-items-center w-100 w-lg-auto"> @* TODO: juiste datum + wisselen van week *@
-    <button class="unset-all text-body">
+<div class="d-flex align-items-center">
+    <a class="text-body" asp-controller="HoursRegistration" asp-action="Index" asp-route-date="@Model.SelectedDate.AddDays(-7).ToString("yyyy-MM-dd")">
         <i class="fas fa-chevron-left"></i>
-    </button>
+    </a>
     <span class="fw-bold px-1 text-capitalize">
-        Week 2
+        Week @ISOWeek.GetWeekOfYear(Model.SelectedDate.ToDateTime(new TimeOnly())) (@ISOWeek.GetYear(Model.SelectedDate.ToDateTime(new TimeOnly())))
     </span>
-    <button class="unset-all text-body">
+    <a class="text-body" asp-controller="HoursRegistration" asp-action="Index" asp-route-date="@Model.SelectedDate.AddDays(7).ToString("yyyy-MM-dd")">
         <i class="fas fa-chevron-right"></i>
-    </button>
+    </a>
+    <a class="btn btn-outline-secondary btn-sm ms-auto" asp-controller="HoursRegistration" asp-action="Index" asp-route-date="@DateTime.Now.ToString("yyyy-MM-dd")">
+        <i class="fas fa-calendar-day me-1"></i>
+        Vandaag
+    </a>
 </div>
 
 <div class="table-container">
@@ -61,16 +95,28 @@
         </tr>
         </thead>
         <tbody>
-            @for (var i = 0; i < 7; i++)
+            @if (Model.WeekWorkedHours == null || !Model.WeekWorkedHours.Any())
             {
-                <tr>
-                    <td>Maandag 13-12-2024</td>
-                    <td>06:00 - 08:00</td>
-                    <td>00:15</td>
-                    <td>02:00</td>
-                </tr>
+                <td colspan="4" class="text-center">Er zijn nog geen uren geregistreerd deze week.</td>
             }
-            <td colspan="4" class="text-center">Er zijn nog geen uren geregistreerd deze week.</td>
+            else
+            {
+                foreach (var workedHour in Model.WeekWorkedHours)
+                {
+                    var breakDuration = workedHour.Breaks
+                        ?.Where(b => b.EndTime != null)
+                        .Sum(b => (b.EndTime - b.StartTime)?.Ticks ?? 0);
+                    var takenBreakDuration = breakDuration.HasValue ? TimeSpan.FromTicks(breakDuration.Value) : TimeSpan.Zero;
+                    var workDuration = workedHour.EndTime - workedHour.StartTime - takenBreakDuration ?? TimeSpan.Zero;
+                    
+                    <tr>
+                        <td class="text-capitalize">@workedHour.DateOnly.ToString("dddd dd-MM-yyyy")</td>
+                        <td>@workedHour.StartTime - @workedHour.EndTime</td>
+                        <td>@takenBreakDuration.ToString("hh\\:mm")</td>
+                        <td>@workDuration.ToString("hh\\:mm")</td>
+                    </tr>
+                }
+            }
         </tbody>
     </table>
 </div>

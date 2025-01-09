@@ -1,5 +1,6 @@
 ﻿using BumboApp.Models;
 using System.Globalization;
+using BumboApp.Helpers;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,8 +25,8 @@ namespace BumboApp.Controllers
             // Day or week view and selected start date
             bool isDayView = selectedEmployee == null || dayView;
             var selectedStartDate = startDate != null 
-                ? (isDayView ? DateOnly.FromDateTime(DateTime.Parse(startDate)) : GetMondayOfWeek(DateOnly.FromDateTime(DateTime.Parse(startDate))))
-                : (isDayView ? DateOnly.FromDateTime(DateTime.Today) : GetMondayOfWeek(DateOnly.FromDateTime(DateTime.Today)));
+                ? (isDayView ? DateOnly.FromDateTime(DateTime.Parse(startDate)) : DateConvertorHelper.GetMondayOfWeek(DateOnly.FromDateTime(DateTime.Parse(startDate))))
+                : (isDayView ? DateOnly.FromDateTime(DateTime.Today) : DateConvertorHelper.GetMondayOfWeek(DateOnly.FromDateTime(DateTime.Today)));
             int weekNumber = ISOWeek.GetWeekOfYear(selectedStartDate.ToDateTime(new TimeOnly(12, 00)));
             
             // Get all employees for filter
@@ -60,13 +61,6 @@ namespace BumboApp.Controllers
                 IsDayView = isDayView
             };
             return View(viewModel);
-        }
-        
-        private DateOnly GetMondayOfWeek(DateOnly date)
-        {
-            var dayOfWeek = (int) date.DayOfWeek;
-            var daysToMonday = dayOfWeek == 0 ? 6 : dayOfWeek - 1;
-            return date.AddDays(-daysToMonday);
         }
 
         public IActionResult Create()
