@@ -2,6 +2,7 @@ using BumboApp.Models;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 
 namespace BumboApp.Controllers;
 
@@ -27,7 +28,7 @@ public class MonthlyHoursController : MainController
         }
 
         var plannedShifts = Context.Shifts.Where(s => s.Start.Month == selectedMonth + 1 && s.Start.Year == selectedYear).ToList();
-        var workedHours = Context.WorkedHours.Where(wh => wh.DateOnly.Month == selectedMonth + 1 && wh.DateOnly.Year == selectedYear).ToList();
+        var workedHours = Context.WorkedHours.Include(wh => wh.Breaks).Where(wh => wh.DateOnly.Month == selectedMonth + 1 && wh.DateOnly.Year == selectedYear).ToList();
 
         double amountOfPlannedHours = 0;
         double amountOfWorkedHours = 0;
@@ -35,7 +36,9 @@ public class MonthlyHoursController : MainController
         foreach (var shift in plannedShifts)
         {
             var timespan = shift.End - shift.Start;
+            // add breakcalculation here
             amountOfPlannedHours += timespan.TotalHours;
+            
         }
 
         foreach (var workedHour in workedHours)
@@ -43,7 +46,13 @@ public class MonthlyHoursController : MainController
             if (workedHour.EndTime != null)
             {
                 var timespan = workedHour.EndTime.Value - workedHour.StartTime;
+                var breakDuration = workedHour?.Breaks
+                    ?.Where(b => b.EndTime != null)
+                    .Sum(b => (b.EndTime - b.StartTime)?.Ticks ?? 0) is long ticks && ticks > 0
+                    ? TimeSpan.FromTicks(ticks)
+                    : TimeSpan.Zero;
                 amountOfWorkedHours += timespan.TotalHours;
+                amountOfWorkedHours -= breakDuration.TotalHours;
             }
         }
         amountOfPlannedHours = Math.Round(amountOfPlannedHours, 2);
