@@ -19,7 +19,7 @@ public class MonthlyHoursController : MainController
     }
     
     [HttpGet]
-    public IActionResult Differing()
+    public IActionResult Differing(int? page, int? selectedMonth, int? selectedYear, int? selectedEmployee)
     {
         return View();
     }
