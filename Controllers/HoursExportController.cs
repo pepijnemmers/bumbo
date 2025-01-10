@@ -50,7 +50,7 @@ public class HoursExportController : MainController
         bool isConcept = false;
         foreach (var workedHour in workedHours)
         {
-            if (workedHour.EndTime == null)
+            if (workedHour.EndTime == null || workedHour.Status.Equals(HourStatus.Concept))
             {
                 continue;
             }
