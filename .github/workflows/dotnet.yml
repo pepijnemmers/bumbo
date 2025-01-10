@@ -4,8 +4,6 @@
 name: .NET
 
 on: [push]
-env: 
-  POSTCODE_API_KEY: ${{ secrets.POSTCODE_API_KEY }}
 jobs:
   build:
 
