@@ -1,19 +1,19 @@
 @using BumboApp.ViewModels
 @using BumboApp.Views.Components
 @using System.Globalization
-@model List<WorkedHourViewModel>
+@model BumboApp.ViewModels.WorkedHoursPageViewModel
 @{
     ViewData["Title"] = "Gewerkte uren";
 }
 
 <div class="d-flex align-items-center w-100 w-lg-auto">
-    <a class="unset-all text-body" asp-action="Index" asp-route-startDate="@Model.FirstOrDefault().SelectedStartDate.AddDays(-1)">
+    <a class="unset-all text-body" asp-action="Index" asp-route-page="1" asp-route-startDate="@Model.SelectedStartDate.AddDays(-1).ToString("yyyy-MM-dd")">
         <i class="fas fa-chevron-left"></i>
     </a>
     <span class="fw-bold px-1 text-capitalize">
-        @Model.FirstOrDefault().SelectedStartDate.ToString("ddd dd-MM-yyyy", CultureInfo.GetCultureInfo("nl-NL"))
+        @Model.SelectedStartDate.ToString("ddd dd-MM-yyyy", CultureInfo.GetCultureInfo("nl-NL"))
     </span>
-    <a class="unset-all text-body" asp-action="Index" asp-route-startDate="@Model.FirstOrDefault().SelectedStartDate.AddDays(1)">
+    <a class="unset-all text-body" asp-action="Index" asp-route-page="1" asp-route-startDate="@Model.SelectedStartDate.AddDays(1).ToString("yyyy-MM-dd")">
         <i class="fas fa-chevron-right"></i>
     </a>
 </div>
@@ -32,7 +32,7 @@
             </tr>
         </thead>
         <tbody>
-            @if (!Model.Any())
+            @if (!Model.WorkedHours.Any())
             {
                 <tr>
                     <td colspan="100%" class="text-center py-4">Er zijn nog geen gewerkte uren</td>
@@ -40,19 +40,75 @@
             }
             else
             {
-                @foreach (var workedHour in Model)
+                @foreach (var workedHour in Model.WorkedHours)
                 {
                     <tr>
-                        <td>@workedHour.Employee.FirstName @workedHour.Employee.LastName</td>
-                        <td>@workedHour.StartTime - @workedHour.EndTime</td>
-                        <td>@workedHour.Breaks</td>
-                        <td>90</td>
-                        <td>@workedHour.Employee.Shifts</td>
-                        <td>@workedHour.Status</td>
+                        <td>
+                            @(workedHour.Employee != null
+                                ? $"{workedHour.Employee.FirstName} {workedHour.Employee.LastName}"
+                                : "Geen werknemer")
+                        </td>
+                        <td>
+                            @if(workedHour.StartTime != null)
+                            {
+                                @if(workedHour.EndTime != null)
+                                {
+                                    @workedHour.StartTime <span> - </span> @workedHour.EndTime
+                                }
+                                else
+                                {
+                                    @workedHour.StartTime <span> - ...</span>
+                                }
+                            }
+                            else
+                            {
+                                <span>Niet ingeklokt</span>
+                            }
+                        </td>
+                        <td>
+                            @if (workedHour.BreaksDuration.HasValue)
+                            {
+                                <div>@workedHour.BreaksDuration.Value.ToString(@"hh\:mm")</div>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td>
+                            @if (workedHour.TotalWorkedTime.HasValue)
+                            {
+                                @workedHour.TotalWorkedTime.Value.ToString(@"hh\:mm")
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td>
+                            @if (workedHour.PlannedShift != null)
+                            {
+                                @workedHour.PlannedShift
+                            }
+                            else
+                            {
+                                <span>Niet ingepland</span>
+                            }
+                        </td>
+                        <td>
+                            @if (workedHour.Status != null)
+                            {
+                                @workedHour.Status
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
                         <td>
                             @if (workedHour.IsFuture)
                             {
-                                <a asp-action="Edit" asp-route-id="@workedHour.PlannedShift.Id">
+                                <a asp-action="Update" asp-route-id="">
                                     <img width="20px" src="~/img/update-icon.svg" alt="edit" />
                                 </a>
                             }
