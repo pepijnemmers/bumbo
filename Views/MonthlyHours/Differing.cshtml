@@ -1,3 +1,92 @@
 @{
     ViewData["Title"] = "Afwijkende uren";
 }
+<div class="row align-items-center mb-3">
+
+    <div class="col-auto d-flex ms-auto">
+        <div class="d-flex justify-content-end gap-2">
+            <!-- Month Dropdown -->
+            <select class="form-select w-auto" onchange="GoToMonth(this)">
+                @for (int i = 0; i < Model.Months.Length; i++)
+                {
+                    <!option value="@i" @(i == Model.SelectedMonth ? "selected" : "")>@Model.Months[i]</!option>
+                }
+            </select>
+
+            <!-- Year Dropdown -->
+            <select class="form-select w-auto" onchange="GoToYear(this)">
+                @for (int i = 0; i < 3; i++)
+                {
+                    <!option value="@(DateTime.Now.Year - i)" @(DateTime.Now.Year - i == Model.SelectedYear ? "selected" : "")>@(DateTime.Now.Year - i)</!option>
+                }
+            </select>
+
+            <!-- Employee Dropdown -->
+            <select class="form-select w-auto" onchange="GoToEmployee(this)">
+                @for (int i = 0; i < 3; i++)
+                {
+                    <!option value="">Alle werknemers</!option>
+                }
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Werknemer</th>
+                <th>Datum</th>
+                <th>Gewerkte tijden</th>
+                <th>Pauze</th>
+                <th>Gewerkte uren</th>
+                <th>Ingepland rooster</th>
+                <th>Afwijkend</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="100" class="text-center">Er zijn geen afwijkende diensten deze maand</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var shift in Model)
+                {
+                    <tr>
+                        <td>naam werknemer</td>
+                        <td>datum shift</td>
+                        <td>starttijd & eindtijd</td>
+                        <td>pauzetijden</td>
+                        <td>gewerkte aantal uren</td>
+                        <td>geroosterde start en eindtijd</td>
+                        <td>hoeveelheid afwijkende tijd</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+@section Scripts
+{
+    <script>
+        function GoToMonth(select) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("selectedMonth", select.value);
+            location.href = url;
+        }
+        function GoToYear(select) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("selectedYear", select.value);
+            location.href = url;
+        }
+            function GoToEmployee(select) {
+                const url = new URL(window.location.href);
+                url.searchParams.set("selectedEmployee", select.value);
+                location.href = url;
+            }
+    </script>
+}
