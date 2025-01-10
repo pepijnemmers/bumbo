@@ -131,6 +131,23 @@ public class HoursRegistrationController : MainController
             return RedirectToAction("Index", new {date = returnDate});
         }
         
+        // Check if hours are not too short
+        if (TimeOnly.FromDateTime(DateTime.Now) - currentWorkedHour.StartTime < TimeSpan.FromMinutes(1))
+        {
+            NotifyService.Error("Let op! De uren zijn niet opgeslagen! Je kan geen uren van minder dan 1 minuut maken.");
+
+            try
+            {
+                Context.WorkedHours.Remove(currentWorkedHour);
+                Context.SaveChanges();
+            }
+            catch
+            {
+                NotifyService.Error("Er is iets mis gegaan");
+            }
+            return RedirectToAction("Index", new {date = returnDate});
+        }
+        
         // Clock the employee out
         try
         {
