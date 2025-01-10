@@ -98,8 +98,128 @@ public class WorkedHoursController : MainController
     }
 
     [HttpGet]
-    public IActionResult Update()
+    public IActionResult Update(int id)
     {
-        return View();
+        // Get worked hour by id
+        var workedHour = Context.WorkedHours
+            .Include(wh => wh.Employee)
+            .Include(wh => wh.Breaks)
+            .FirstOrDefault(wh => wh.Id == id);
+        if (workedHour == null)
+            return NotifyErrorAndRedirect("Gewerkte uren niet gevonden", "Index");
+        
+        // Validate
+        if (workedHour.EndTime == null || (workedHour.Breaks != null && workedHour.Breaks.Any(b => b.EndTime == null)))
+            return NotifyErrorAndRedirect("Gewerkte uren/pauzes zijn nog bezig", "Index");
+        
+        // Get break duration
+        var breakDuration = workedHour.Breaks
+        ?.Where(b => b.EndTime != null)
+        .Sum(b => (b.EndTime - b.StartTime)?.Ticks ?? 0);
+        var breakDurationAsTime = breakDuration.HasValue ? TimeSpan.FromTicks(breakDuration.Value) : TimeSpan.Zero;
+        
+        // Get worked hours
+        var workDuration = workedHour.EndTime - workedHour.StartTime - breakDurationAsTime;
+
+        var viewModel = new WorkedHoursUpdateViewModel()
+        {
+            Id = workedHour.Id,
+            Date = workedHour.DateOnly,
+            Employee = workedHour.Employee,
+            StartTime = workedHour.StartTime,
+            EndTime = workedHour.EndTime,
+            BreakDuration = breakDurationAsTime,
+            WorkDuration = workDuration ?? TimeSpan.Zero
+        };
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    public IActionResult Update(int id, TimeOnly startTime, TimeOnly endTime, TimeSpan breakTime)
+    {
+        // Get worked hour by id
+        var workedHour = Context.WorkedHours
+            .Include(wh => wh.Employee)
+            .Include(wh => wh.Breaks)
+            .FirstOrDefault(wh => wh.Id == id);
+        
+        // Validation
+        if (!ModelState.IsValid)
+            return NotifyErrorAndRedirect("Er is iets misgegaan bij het updaten van de gewerkte uren", "Index");
+        if (workedHour == null)
+            return NotifyErrorAndRedirect("Gewerkte uren niet gevonden", "Index");
+        if (endTime < startTime)
+            return NotifyErrorAndRedirect("Eindtijd kan niet voor de starttijd liggen", "Index");
+        if (endTime - startTime - breakTime < new TimeSpan(0, 1, 0))
+            return NotifyErrorAndRedirect("Gewerkte uren kunnen niet korter zijn dan 1 minuut", "Index");
+        
+        
+        // Get break duration
+        var breakDuration = workedHour!.Breaks
+            ?.Where(b => b.EndTime != null)
+            .Sum(b => (b.EndTime - b.StartTime)?.Ticks ?? 0);
+        var breakDurationAsTime = breakDuration.HasValue ? TimeSpan.FromTicks(breakDuration.Value) : TimeSpan.Zero;
+        
+        // Check if break is changed and update
+        if (breakDurationAsTime != breakTime)
+        {
+            try
+            {
+                if (workedHour.Breaks == null) throw new Exception();
+                    
+                Context.Breaks.RemoveRange(
+                    workedHour.Breaks
+                        .Where(b => b.WorkedHour == workedHour));
+                
+                Context.Breaks.Add(new Break()
+                {
+                    StartTime = workedHour.StartTime,
+                    EndTime = workedHour.StartTime.Add(breakTime),
+                    WorkedHour = workedHour
+                });
+            }
+            catch
+            {
+                NotifyService.Error("Er is iets misgegaan bij het updaten van de pauze");
+                return RedirectToAction("Index", new { startDate = workedHour.DateOnly });
+            }
+        }
+        
+        // Update worked hour
+        try
+        {
+            workedHour.StartTime = startTime;
+            workedHour.EndTime = endTime;
+            Context.WorkedHours.Update(workedHour);
+            Context.SaveChanges();
+            NotifyService.Success("Gewerkte uren zijn succesvol geüpdatet");
+        }
+        catch
+        {
+            NotifyService.Error("Er is iets misgegaan bij het updaten van de gewerkte uren");
+        }
+        return RedirectToAction("Index", new { startDate = workedHour.DateOnly });
+    }
+
+    [HttpPost]
+    public IActionResult Delete(int id)
+    {
+        try
+        {
+            var workedHour = Context.WorkedHours
+                .Include(wh => wh.Employee)
+                .Include(wh => wh.Breaks)
+                .FirstOrDefault(wh => wh.Id == id);
+            if (workedHour == null) throw new Exception();
+            
+            Context.WorkedHours.Remove(workedHour);
+            Context.SaveChanges();
+            NotifyService.Success("Gewerkte uren zijn succesvol verwijderd");
+        }
+        catch
+        {
+            NotifyService.Error("Er is iets misgegaan bij het verwijderen van de gewerkte uren");
+        }
+        return RedirectToAction("Index", new { startDate = DateOnly.FromDateTime(DateTime.Today) });
     }
 }
