@@ -9,7 +9,6 @@ env:
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
   WORKING_DIRECTORY: .
-  POSTCODE_API_KEY: ${{ secrets.POSTCODE_API_KEY }}
 jobs:
   build:
     runs-on: windows-latest
