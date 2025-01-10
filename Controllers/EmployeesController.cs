@@ -283,24 +283,21 @@ namespace BumboApp.Controllers
             int amountOfLeaveHours = usedLeaveHoursThisYear[DateTime.Now.Year];
 
             var employeeRole = await GetUserRoleAsync(employee.User.Id);
-
-
-
+            
             ViewData["IsOwner"] = LoggedInUserId == employee.User.Id;
             ViewData["EmployeeRole"] = employeeRole.ToFriendlyString();
             ViewData["LeaveHourUsed"] = amountOfLeaveHours;
 
             //Postcode API ----------------------------
-            //var apiKey = Environment.GetEnvironmentVariable("POSTCODE_API_KEY");
-            var apiKey = "";
-            var apiURL = $"https://json.api-postcode.nl?postcode={employee.Zipcode}&number={employee.HouseNumber}";
+            const string postcodeApiKey = "669869e4-b372-430b-9b87-d41c72fcfc91";
+            var apiUrl = $"https://json.api-postcode.nl?postcode={employee.Zipcode}&number={employee.HouseNumber}";
 
             _client.DefaultRequestHeaders.Clear();
-            _client.DefaultRequestHeaders.Add("token", apiKey);
+            _client.DefaultRequestHeaders.Add("token", postcodeApiKey);
 
             try
             {
-                var response = await _client.GetAsync(apiURL);
+                var response = await _client.GetAsync(apiUrl);
                 if (response.IsSuccessStatusCode)
                 {
                     string jsonResponse = await response.Content.ReadAsStringAsync();
