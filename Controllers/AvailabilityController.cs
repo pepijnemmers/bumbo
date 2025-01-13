@@ -234,7 +234,7 @@ namespace BumboApp.Controllers
                 return View(schedules);
             }
 
-            if (!DateOnly.TryParse(id, out DateOnly startDate))
+            if (!DateOnly.TryParse(startDateString, out DateOnly startDate))
             {
                 return NotifyErrorAndRedirect("Datum niet gevonden", nameof(Index));
             }
@@ -256,7 +256,10 @@ namespace BumboApp.Controllers
         public IActionResult UpdateDefault()
         {
             var employee = GetLoggedInEmployee();
-            if (employee == null) { return View(); }
+            if (employee == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
             ViewData["EmployeeNumber"] = employee.EmployeeNumber;
 
             var standardAvailabilities = Context.StandardAvailabilities.Where(sa => sa.EmployeeNumber == employee.EmployeeNumber).ToList();
