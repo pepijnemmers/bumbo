@@ -11,7 +11,7 @@
             <select class="form-select w-auto" onchange="GoToMonth(this)">
                 @for (int i = 0; i < Model.Months.Length; i++)
                 {
-                    <option value="@i" selected=@(i == Model.SelectedMonth ? "selected" : "")>@Model.Months[i]</option>
+                    <option value="@i" selected="@(i == Model.SelectedMonth)">@Model.Months[i]</option>
                 }
             </select>
 
@@ -19,14 +19,14 @@
             <select class="form-select w-auto" onchange="GoToYear(this)">
                 @for (int i = 0; i < 3; i++)
                 {
-                    <option value="@(DateTime.Now.Year - i)" selected=@(DateTime.Now.Year - i == Model.SelectedYear ? "selected" : "")>@(DateTime.Now.Year - i)</option>
+                    <option value="@(DateTime.Now.Year - i)" selected="@(DateTime.Now.Year - i == Model.SelectedYear)">@(DateTime.Now.Year - i)</option>
                 }
             </select>
 
             <!-- Employee Dropdown -->
             <select class="form-select w-100 w-lg-auto" onchange="GoToEmployee(this)">
                 <optgroup label="Toon alle werknemers">
-                    <option value="all" selected="@(Model.Employee == null)">Alle werknemers</option>
+                    <option value="" selected="@(Model.Employee == null)">Alle werknemers</option>
                 </optgroup>
                 <optgroup label="Toon één werknemer">
                     @foreach (var employee in ViewBag.AllEmployees)
@@ -149,7 +149,11 @@
         }
         function GoToEmployee(select) {
             const url = new URL(window.location.href);
-            url.searchParams.set("selectedEmployee", select.value);
+            if (select.value.toLowerCase() === "") {
+                url.searchParams.delete("selectedEmployee");
+            } else {
+                url.searchParams.set("selectedEmployee", select.value);
+            }
             location.href = url;
         }
     </script>
