@@ -16,6 +16,7 @@ namespace BumboApp.ViewModels
         public string? PlannedShift { get; set; }
         public bool IsFuture { get; set; }
 
-        public bool HasHourDifference { get; set; }   
+        public bool HasHourDifference { get; set; }
+        public TimeSpan? HourDifference { get; set; }
     }
 }

@@ -21,5 +21,13 @@ namespace BumboApp.Helpers
             // Check if there is a difference
             return actualWorkedDuration != plannedDuration;
         }
+
+        public TimeSpan? HourDifference(TimeOnly? startTime, TimeOnly? endTime, TimeOnly? plannedStart, TimeOnly? plannedEnd, TimeSpan? breakDuration)
+        {
+            var plannedDuration = plannedEnd - plannedStart - BreakCalculationHelper.CalculateRequiredBreak(plannedStart.Value, plannedEnd.Value);
+            var actualWorkedDuration = endTime - startTime - breakDuration;
+
+            return actualWorkedDuration - plannedDuration;
+        }
     }
 }

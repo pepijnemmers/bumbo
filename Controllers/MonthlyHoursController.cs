@@ -131,6 +131,7 @@ public class MonthlyHoursController : MainController
                 TimeOnly? plannedStart = TimeOnly.Parse(x.Shift.Start.ToString("HH:mm"));
                 TimeOnly? plannedEnd = TimeOnly.Parse(x.Shift.End.ToString("HH:mm"));
                 bool hasHourDifference = workedHoursHelper.HasHourDifference(x.WorkedHour?.StartTime, x.WorkedHour?.EndTime, plannedStart, plannedEnd, breakDuration);
+                TimeSpan? hourDifference = workedHoursHelper.HourDifference(x.WorkedHour?.StartTime, x.WorkedHour?.EndTime, plannedStart, plannedEnd, breakDuration);
 
                 return new WorkedHourViewModel
                 {
@@ -144,7 +145,8 @@ public class MonthlyHoursController : MainController
                     Status = x.WorkedHour?.Status,
                     PlannedShift = x.Shift.Start.ToString("HH:mm") + " - " + x.Shift.End.ToString("HH:mm"),
                     IsFuture = DateOnly.FromDateTime(x.Shift.Start) <= DateOnly.FromDateTime(DateTime.Now) && DateOnly.FromDateTime(x.Shift.Start).Month == DateOnly.FromDateTime(DateTime.Now).Month,
-                    HasHourDifference = hasHourDifference
+                    HasHourDifference = hasHourDifference,
+                    HourDifference = hourDifference
                 };
             })
             .OrderBy(e => e.Date)
