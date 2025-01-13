@@ -71,7 +71,7 @@ namespace BumboApp.Controllers
             // Get week prognosis and opening hours
             var weekPrognosis = Context.WeekPrognoses
                 .Include(p => p.Prognoses)
-                .FirstOrDefault(p => p.StartDate == GetMondayOfWeek(selectedStartDate));
+                .FirstOrDefault(p => p.StartDate == DateConvertorHelper.GetMondayOfWeek(selectedStartDate));
             var openingHours = Context.OpeningHours.ToList();
             
             // Create view model and return view
