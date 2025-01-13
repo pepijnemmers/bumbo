@@ -12,6 +12,11 @@ namespace BumboApp.Helpers
                 return true;
             }
 
+            if (plannedStart != startTime || plannedEnd != endTime)
+            {
+                return true;
+            }
+
             // Calculate the planned shift duration
             var plannedDuration = plannedEnd - plannedStart - BreakCalculationHelper.CalculateRequiredBreak(plannedStart.Value, plannedEnd.Value);
 

@@ -182,7 +182,7 @@ public class MonthlyHoursController : MainController
 
         //Pagination
         int currentPageNumber = page ?? DefaultPage;
-        int maxPages = (int)(Math.Ceiling((decimal)workedHours.Count / PageSize));
+        int maxPages = (int)(Math.Ceiling((decimal)combinedHours.Count / PageSize));
         if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
         if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
 
