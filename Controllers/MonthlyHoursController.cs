@@ -1,3 +1,4 @@
+using BumboApp.Helpers;
 using BumboApp.Models;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -36,8 +37,9 @@ public class MonthlyHoursController : MainController
         foreach (var shift in plannedShifts)
         {
             var timespan = shift.End - shift.Start;
-            // add breakcalculation here
+            var breakTime = BreakCalculationHelper.CalculateRequiredBreak(shift.Start, shift.End);
             amountOfPlannedHours += timespan.TotalHours;
+            amountOfPlannedHours -= breakTime.TotalHours;
             
         }
 
