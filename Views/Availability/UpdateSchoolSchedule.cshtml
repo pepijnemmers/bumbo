@@ -1,31 +1,37 @@
-﻿@model List<BumboApp.Models.SchoolSchedule>
+﻿@using System.Globalization
+@model List<BumboApp.Models.SchoolSchedule>
 
 @{
+    CultureInfo dutchCulture = new CultureInfo("nl-NL");
 }
 
-<form class="col-12 col-xl-4 table-container" asp-action="UpdateSchoolSchedule" method="post">
-    <h3>Schooluren</h3>
-    <p>Laat leeg als je geen schooluren hebt</p>
+<div class="d-flex justify-content-end">
+    <form class="col-12 col-xl-4 table-container p-3" asp-action="UpdateSchoolSchedule" method="post">
+        <h3>Schooluren</h3>
+        <p>Laat leeg als je geen schooluren hebt</p>
 
-    @for (int dayNr = 0; dayNr < 5; dayNr++)
-    {
-        DayOfWeek day = (DayOfWeek) dayNr + 1;
-        SchoolSchedule? schoolSchedule = Model.SingleOrDefault(ss => ss.Date.DayOfWeek == day);
-        var currentDate = ((DateOnly)ViewData["StartDate"]).AddDays(dayNr);
-        var employeeNumber = ViewData["EmployeeNumber"];
-        <label>@day: @currentDate.ToString("dd-MM")</label>
+        @for (int dayNr = 0; dayNr < 5; dayNr++)
+        {
+            DayOfWeek day = (DayOfWeek)dayNr + 1;
+            SchoolSchedule? schoolSchedule = Model.SingleOrDefault(ss => ss.Date.DayOfWeek == day);
+            var currentDate = ((DateOnly)ViewData["StartDate"]).AddDays(dayNr);
+            var employeeNumber = ViewData["EmployeeNumber"];
+            <label>@dutchCulture.DateTimeFormat.GetDayName(day): @currentDate.ToString("dd-MM")</label>
 
-        <input type="hidden" name="Schedules[@dayNr].Date" value="@currentDate" />
-        <input type="hidden" name="Schedules[@dayNr].EmployeeNumber" value="@employeeNumber" />
-        <input type="number"
-               min="0"
-               max="24"
-               class="form-control"
-               name="Schedules[@dayNr].DurationInHours"
-               value="@(schoolSchedule?.DurationInHours ?? 0)"
-               placeholder="Bijvoorbeeld: 6.5" />
-    }
-    <div class="d-flex justify-content-end m-3">
-        <button type="submit" class="btn btn-primary">Opslaan</button>
-    </div>
-</form>
+            <input type="hidden" name="Schedules[@dayNr].Date" value="@currentDate" />
+            <input type="hidden" name="Schedules[@dayNr].EmployeeNumber" value="@employeeNumber" />
+            <input type="hidden" name="startDateString" value="@ViewData["StartDate"]" />
+            <input type="number"
+                   min="0"
+                   max="24"
+                   class="form-control"
+                   name="Schedules[@dayNr].DurationInHours"
+                   value="@(schoolSchedule?.DurationInHours ?? 0)"
+                   placeholder="Bijvoorbeeld: 6" required />
+        }
+        <div class="d-flex justify-content-end mt-3 gap-2">
+            <a class="btn btn-outline-primary" asp-action="Index" asp-route-id="@ViewData["StartDate"]">Annuleren</a>
+            <button type="submit" class="btn btn-primary">Opslaan</button>
+        </div>
+    </form>
+</div>
