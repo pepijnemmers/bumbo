@@ -1,10 +1,10 @@
 using BumboApp.Helpers;
 using BumboApp.Models;
-using System.Globalization;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace BumboApp.Controllers
 {
@@ -41,17 +41,17 @@ namespace BumboApp.Controllers
             {
                 selectedEmployee = employeeNumber != null && int.TryParse(employeeNumber, out _) ? Context.Employees.Find(int.Parse(employeeNumber)) : null;
             }
-
+            
             // Day or week view and selected start date
             bool isDayView = selectedEmployee == null || dayView;
             var selectedStartDate = startDate != null 
                 ? (isDayView ? DateOnly.FromDateTime(DateTime.Parse(startDate)) : DateConvertorHelper.GetMondayOfWeek(DateOnly.FromDateTime(DateTime.Parse(startDate))))
                 : (isDayView ? DateOnly.FromDateTime(DateTime.Today) : DateConvertorHelper.GetMondayOfWeek(DateOnly.FromDateTime(DateTime.Today)));
             int weekNumber = ISOWeek.GetWeekOfYear(selectedStartDate.ToDateTime(new TimeOnly(12, 00)));
-
+            
             // Get all employees for filter
             var employees = Context.Employees.ToList();
-
+            
             // Get all shifts for selected date (based on day/week view) and selected/loggedin employee
             var shifts = Context.Shifts
                 .Where(shift => isDayView
@@ -68,15 +68,26 @@ namespace BumboApp.Controllers
             // Check if view is concept or final
             var viewIsConcept = shifts.Any(shift => !shift.IsFinal);
             
+            // Get week prognosis and opening hours
+            var weekPrognosis = Context.WeekPrognoses
+                .Include(p => p.Prognoses)
+                .FirstOrDefault(p => p.StartDate == GetMondayOfWeek(selectedStartDate));
+            var openingHours = Context.OpeningHours.ToList();
+            
             // Create view model and return view
             var viewModel = new ScheduleViewModel()
             {
                 Role = LoggedInUserRole,
+                
                 ViewIsConcept = viewIsConcept,
                 SelectedStartDate = selectedStartDate,
                 WeekNumber = weekNumber,
+                
+                WeekPrognosis = weekPrognosis,
+                OpeningHours = openingHours,
                 Employees = employees,
                 Shifts = shifts,
+                
                 SelectedEmployee = selectedEmployee,
                 IsDayView = isDayView
             };
