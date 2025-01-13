@@ -155,7 +155,7 @@
                         <td>
                             @if (workedHour.IsFuture)
                             {
-                                <a asp-action="Update" asp-route-id="@workedHour.Id">
+                                <a asp-action="Update" asp-route-id="@workedHour.Id" asp-route-date="@ViewBag.SelectedDay.ToString("yyyy-MM-dd")" asp-route-employeeId="@workedHour.Employee.EmployeeNumber">
                                     <img width="20px" src="~/img/update-icon.svg" alt="edit" />
                                 </a>
                             }

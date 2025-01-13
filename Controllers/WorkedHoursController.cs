@@ -5,6 +5,7 @@ using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BumboApp.Controllers;
 
@@ -144,6 +145,7 @@ public class WorkedHoursController : MainController
         };
 
         ViewBag.AllEmployees = allEmployees;
+        ViewBag.SelectedDay = selectedStartDate;
 
         return View(pageViewModel);
     }
@@ -179,21 +181,61 @@ public class WorkedHoursController : MainController
         return RedirectToAction("Index", new { startDate = date });
     }
 
-[HttpGet]
-    public IActionResult Update(int id)
+    [HttpGet]
+    public IActionResult Update(int id, DateOnly date, int employeeId)
     {
-        // Get worked hour by id
-        var workedHour = Context.WorkedHours
-            .Include(wh => wh.Employee)
-            .Include(wh => wh.Breaks)
-            .FirstOrDefault(wh => wh.Id == id);
-        if (workedHour == null)
-            return NotifyErrorAndRedirect("Gewerkte uren niet gevonden", "Index");
-        
+        WorkedHour? workedHour;
+        Console.WriteLine(date);
+        Console.WriteLine(employeeId);
+
+        Employee? employee = Context.Employees
+            .FirstOrDefault(e => e.EmployeeNumber == employeeId);
+        if (employee == null) { return NotifyErrorAndRedirect("Werknemer niet gevonden", "Index"); }
+
+        if (id == 0) 
+        {
+            // Create a new WorkedHour
+            workedHour = new WorkedHour
+            {
+                DateOnly = date,
+                StartTime = TimeOnly.MinValue,
+                EndTime = TimeOnly.MaxValue,
+                Status = HourStatus.Concept,
+                Employee = employee
+            };
+
+            // Add the new WorkedHour to the database
+            Context.WorkedHours.Add(workedHour);
+            try
+            {
+                Context.SaveChanges();
+            }
+            catch 
+            {
+                return NotifyErrorAndRedirect("Er is een fout opgetreden bij het opslaan van de nieuwe gewerkte uren", "Index");
+            }
+
+        }
+        else
+        {
+            // Get worked hour by id
+            workedHour = Context.WorkedHours
+                .Include(wh => wh.Employee)
+                .Include(wh => wh.Breaks)
+                .FirstOrDefault(wh => wh.Id == id);
+            if (workedHour == null)
+                return NotifyErrorAndRedirect("Gewerkte uren niet gevonden", "Index");
+        }
+
+        if (workedHour.EndTime == null)
+        {
+            workedHour.EndTime = TimeOnly.MaxValue;
+        }
+
         // Validate
-        if (workedHour.EndTime == null || (workedHour.Breaks != null && workedHour.Breaks.Any(b => b.EndTime == null)))
+        if (workedHour.Breaks != null && workedHour.Breaks.Any(b => b.EndTime == null))
             return NotifyErrorAndRedirect("Gewerkte uren/pauzes zijn nog bezig", "Index");
-        
+
         // Get break duration
         var breakDuration = workedHour.Breaks
         ?.Where(b => b.EndTime != null)
@@ -224,7 +266,7 @@ public class WorkedHoursController : MainController
             .Include(wh => wh.Employee)
             .Include(wh => wh.Breaks)
             .FirstOrDefault(wh => wh.Id == id);
-        
+
         // Validation
         if (!ModelState.IsValid)
             return NotifyErrorAndRedirect("Er is iets misgegaan bij het updaten van de gewerkte uren", "Index");
