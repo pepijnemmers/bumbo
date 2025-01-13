@@ -4,6 +4,7 @@ using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using System.Runtime.Intrinsics.Arm;
 using System.Security.Claims;
 
 namespace BumboApp.Controllers
@@ -299,7 +300,17 @@ namespace BumboApp.Controllers
                 NotifyService.Error("Deze werknemer heeft al een dienst op dat moment");
                 return RedirectToAction("Update", new { id = id });
             }
-            
+            Employee? emp = Context.Employees.Include(e => e.Shifts).Include(e => e.SchoolSchedules).FirstOrDefault(e => e == employee);
+            if (emp != null)
+            {
+                int maxHours = new MaxScheduleTimeCalculationHelper(Context).GetMaxTimeCao(emp, department, (DateOnly)date, start.Hour);
+                if (maxHours < (end - start).Hours)
+                {
+                    NotifyService.Error("aantal uren voldoet niet aan het maximum volgens de CAO.");
+                    return RedirectToAction("Update", new { id = id });
+                }
+            }
+
             // update in database
             try
             {
