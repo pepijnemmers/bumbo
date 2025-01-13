@@ -105,6 +105,12 @@ public class WorkedHoursController : MainController
             combinedHours = combinedHours
                 .Where(wh =>
                 {
+                    // Exclude worked hours with a "final" status
+                    if (wh.Status == HourStatus.Final)
+                    {
+                        return false;
+                    }
+
                     TimeOnly? plannedStart = null;
                     TimeOnly? plannedEnd = null;
 
