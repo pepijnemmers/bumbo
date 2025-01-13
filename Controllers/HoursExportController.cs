@@ -52,12 +52,8 @@ public class HoursExportController : MainController
         {
             if (workedHour.EndTime == null || workedHour.Status.Equals(HourStatus.Concept))
             {
-                continue;
-            }
-
-            if (workedHour.Status.Equals(HourStatus.Concept))
-            {
                 isConcept = true;
+                continue;
             }
 
             string userId = workedHour.Employee.UserId;
