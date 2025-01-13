@@ -3,14 +3,14 @@
     ViewData["Title"] = "Dienst bewerken";
 }
 
-@if (Model?.Shift != null && Model.Shift.Start > DateTime.Now)
+@if (Model.Shift != null && Model.Shift.Start >= DateTime.Today)
 {
 <div class="table-container p-3">
     <form asp-action="Update" asp-controller="Shifts" method="post">
         <input type="hidden" name="id" value="@Model.Shift.Id">
         <div class="form-group mb-2">
             <label for="date" class="form-label fw-bold">Datum</label>
-            <input type="date" class="form-control" id="date" name="date" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" value="@Model.Shift.Start.Date.ToString("yyyy-MM-dd")" required>
+            <input type="date" class="form-control" id="date" name="date" min="@DateTime.Today.ToString("yyyy-MM-dd")" value="@Model.Shift.Start.Date.ToString("yyyy-MM-dd")" required>
         </div>
         <div class="row">
             <div class="form-group mb-2 col">
