@@ -1,7 +1,9 @@
-﻿using BumboApp.Models;
+﻿using BumboApp.Helpers;
+using BumboApp.Models;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.Security.Claims;
 
 namespace BumboApp.Controllers
@@ -153,6 +155,16 @@ namespace BumboApp.Controllers
             {
                 NotifyService.Error("De afdeling is niet geldig");
                 valid = false;
+            }
+            Employee? emp = Context.Employees.Include(e => e.Shifts).Include(e => e.SchoolSchedules).FirstOrDefault(e => e.EmployeeNumber == employee);
+            if (emp != null && valid)
+            {
+                int maxHours = new MaxScheduleTimeCalculationHelper(Context).GetMaxTimeCao(emp, dep, (DateOnly)date, start.Value.Hour);
+                if (valid && maxHours < (end - start).Value.Hours)
+                {
+                    NotifyService.Error("aantal uren voldoet niet aan het maximum volgens de CAO.");
+                    valid = false;
+                }
             }
             var openingHours = Context.OpeningHours.FirstOrDefault(oh => oh.WeekDay == date!.Value.DayOfWeek);
             if ((openingHours?.OpeningTime == null 
