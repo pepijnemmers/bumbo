@@ -135,7 +135,7 @@ namespace BumboApp.Controllers
         [HttpPost]
         public IActionResult Create(DateOnly? date, TimeOnly? start, TimeOnly? end, Department? department, int? employee, bool? isFinal)
         {
-            // validation (TODO: check if is allowed cao)
+            // validation 
             bool valid = true;
             if (date == null || start == null || end == null || department == null || employee == null || isFinal == null)
             {

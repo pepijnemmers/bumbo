@@ -205,7 +205,6 @@ namespace BumboApp.Controllers
                           s.End > shiftTakeOver.Shift.Start);
             if (overlappingShiftExists) { return NotifyErrorAndRedirect("Je hebt al een shift op dit tijdstip", "Index", "Dashboard"); }
 
-            //TODO: Checken CAO regels.
             int maxHours = new MaxScheduleTimeCalculationHelper(Context).GetMaxTimeCao(employee, shiftTakeOver.Shift.Department, DateOnly.FromDateTime(shiftTakeOver.Shift.Start), shiftTakeOver.Shift.Start.Hour);
             if (maxHours < (shiftTakeOver.Shift.End.Hour - shiftTakeOver.Shift.Start.Hour))
             {
