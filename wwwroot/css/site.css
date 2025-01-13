@@ -90,6 +90,15 @@
     border-radius: 0.2rem;
 }
 
+/* Input */
+input[type="datetime-local"][step="3600"]::-webkit-inner-spin-button,
+input[type="datetime-local"][step="3600"]::-webkit-calendar-picker-indicator,
+input[type="time"][step="3600"]::-webkit-inner-spin-button,
+input[type="time"][step="3600"]::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+}
+
 /* Site */
 html {
     font-size: 14px;

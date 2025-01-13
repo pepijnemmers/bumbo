@@ -188,7 +188,7 @@
                                                         <strong>Verlof verzoek - @leaveRequest.Employee.FirstName @leaveRequest.Employee.LastName</strong>
                                                     </h6>
                                                     <p class="card-text">
-                                                        @leaveRequest.StartDate.ToString("dd-MM-yyyy") - @leaveRequest.EndDate.ToString("dd-MM-yyyy")
+                                                        @leaveRequest.StartDate.ToString("dd-MM-yyyy hh:mm") - @leaveRequest.EndDate.ToString("dd-MM-yyyy hh:mm")
                                                     </p>
                                                 </div>
                                                 <a asp-controller="Leave" asp-action="LeaveRequest" asp-route-id="@leaveRequest.Id" class="btn btn-outline-dark align-self-center" type="button">Beoordelen</a>
