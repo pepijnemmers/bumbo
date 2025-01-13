@@ -28,16 +28,28 @@
 <div class="table-container">
     <table class="table">
         <thead>
-            <tr>
-                <th><a asp-controller="Leave" asp-action="Index" asp-route-OrderBy="@(ViewBag.OrderBy == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending)" class="text-dark">
+        <tr>
+            @if (User.IsInRole(Role.Manager.ToString()))
+            {
+                <th>Werknemer</th>
+            }
+            <th>
+                <a asp-controller="Leave" asp-action="Index" asp-route-OrderBy="@(ViewBag.OrderBy == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending)" class="text-dark">
                     Begin datum
-                    <img width="20px" src="~/img/chevron-@(ViewBag.OrderBy == SortOrder.Ascending ? "down" : "up").svg" alt="Arrow" />
+                    <img width="20px" src="~/img/chevron-@(ViewBag.OrderBy == SortOrder.Ascending ? "down" : "up").svg" alt="Arrow"/>
                 </a>
-                </th>
-                <th>Eind datum</th>
-                <th class="leaveRequestReason">Reden</th>
-                <th>Status</th>
-            </tr>
+            </th>
+            <th>Eind datum</th>
+            @if (User.IsInRole(Role.Employee.ToString()))
+            {
+                <th>Reden</th>
+            }
+            <th>Status</th>
+            @if (User.IsInRole(Role.Manager.ToString()))
+            {
+                <th>Acties</th>
+            }
+        </tr>
         </thead>
         <tbody>
             @if (Model.LeaveRequestsForPage.Count > 0)
@@ -45,9 +57,16 @@
                 foreach (var request in Model.LeaveRequestsForPage)
                 {
                     <tr>
-                        <td>@request.StartDate</td>
-                        <td>@request.EndDate</td>
-                        <td class="leaveRequestReason">@request.Reason</td>
+                        @if (User.IsInRole(Role.Manager.ToString()))
+                        {
+                            <td>@request.Employee.FirstName @request.Employee.LastName</td>
+                        }
+                        <td>@request.StartDate.ToString("dd-MM-yyyy HH:mm")</td>
+                        <td>@request.EndDate.ToString("dd-MM-yyyy HH:mm")</td>
+                        @if (User.IsInRole(Role.Employee.ToString()))
+                        {
+                            <td>@request.Reason</td>
+                        }
                         <td>
                             @switch (request.Status)
                             {
@@ -61,28 +80,32 @@
                                         @request.Status
                                     </span>
                                     break;
+                                case Status.Aangevraagd:
                                 default:
                                     <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary d-inline-flex align-items-center">
                                         @request.Status
                                     </span>
                                     break;
                             }
-                            @if (User.IsInRole(Role.Manager.ToString()))
-                            {
-                                if (request.Status == Status.Aangevraagd)
+                        </td>
+
+                        @if (User.IsInRole(Role.Manager.ToString()))
+                        {
+                            <td>
+                                @if (request.Status == Status.Aangevraagd)
                                 {
                                     <a asp-controller="Leave" asp-action="LeaveRequest" asp-route-id="@(request.Id)">
-                                        <img width="20px" height="auto" src="~/img/details-icon.svg" alt="Alternate Text" />
+                                        <img width="20px" height="auto" src="~/img/details-icon.svg" alt="Alternate Text"/>
                                     </a>
                                 }
                                 else
                                 {
                                     <a asp-controller="Leave" asp-action="LeaveRequest" asp-route-id="@(request.Id)">
-                                        <img width="20px" src="~/img/update-icon.svg" alt="Alternate Text" />
+                                        <img width="20px" src="~/img/update-icon.svg" alt="Alternate Text"/>
                                     </a>
                                 }
-                            }
-                        </td>
+                            </td>
+                        }
                     </tr>
                 }
             }
@@ -103,15 +126,13 @@
     }
 </div>
 
-<div class="row align-items-center mb-3">
+<div class="row align-items-center mt-5">
     <div class="col">
         <h3>Ziekmeldingen</h3>
     </div>
-
     <div class="col-auto">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sickLeaveModal">Nieuwe ziekmelding</button>
     </div>
-
 </div>
 
 <div class="table-container">
@@ -120,18 +141,31 @@
             <tr>
                 <th>Werknemer</th>
                 <th>Datum</th>
+                <th>Acties</th>
             </tr>
         </thead>
         <tbody>
-            @if (Model != null)
+            @foreach (var sickLeave in Model.SickLeaves)
             {
-                foreach (var sickLeave in Model.SickLeaves)
-                {
-                    <tr>
-                        <td>@sickLeave.Employee.FirstName @sickLeave.Employee.LastName</td>
-                        <td>@sickLeave.Date</td>
-                    </tr>
-                }
+                <tr>
+                    <td>@sickLeave.Employee.FirstName @sickLeave.Employee.LastName</td>
+                    <td>@sickLeave.Date</td>
+                    @if (sickLeave.Date >= DateOnly.FromDateTime(DateTime.Now))
+                    {
+                        <td>
+                            <button class="unset-all me-2" onclick="updateSickLeave(@sickLeave.Employee.EmployeeNumber, '@sickLeave.Date.ToString("yyyy-MM-dd")')">
+                                <img width="20px" src="~/img/update-icon.svg" alt="update"/>
+                            </button>
+                            <button class="unset-all me-2" onclick="deleteSickLeave(@sickLeave.Employee.EmployeeNumber, '@sickLeave.Date.ToString("yyyy-MM-dd")')">
+                                <img width="18px" src="~/img/delete-icon.svg" alt="delete"/>
+                            </button>
+                        </td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+                </tr>
             }
         </tbody>
     </table>
@@ -144,17 +178,18 @@
     }
 </div>
 
+@* Create sick leave modal *@
 <div class="modal fade align-content-center" id="sickLeaveModal" tabindex="-1" aria-labelledby="sickLeave" aria-hidden="true">
     <div class="modal-dialog">
         <form asp-action="CreateSickLeave" asp-controller="Leave" method="post">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="newSickLeave">Nieuwe ziekmelding</h1>
-            </div>
-            <div class="modal-body">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="newSickLeave">Nieuwe ziekmelding</h1>
+                </div>
+                <div class="modal-body">
                     <div class="mb-3">
                         <label for="date" class="col-form-label">Datum</label>
-                        <input type="date" class="form-control" id="date" name="date" placeholder="Datum" onchange="checkDate()" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" required>
+                        <input type="date" class="form-control" id="date" name="date" placeholder="Datum" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" required>
                     </div>
                     @if (User.IsInRole(Role.Manager.ToString()))
                     {
@@ -179,12 +214,61 @@
                         <input type="hidden" name="EmployeeNumber" value="@Model.LoggedInEmployee.EmployeeNumber"/>
                     }
 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Annuleren</button>
+                    <button type="submit" id="sickLeaveCreateButton" class="btn btn-primary">Ziekmelden</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* Update sick leave modal *@
+<div class="modal fade align-content-center" id="sickLeaveUpdateModal" tabindex="-1" aria-labelledby="sickLeave" aria-hidden="true">
+    <div class="modal-dialog modal-content">
+        <div class="modal-header">
+            <h1 class="modal-title fs-5">Ziekmelding bewerken</h1>
+        </div>
+        <form method="post" id="updateSickLeaveForm">
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="updateDate" class="col-form-label">Datum</label>
+                    <input type="date" class="form-control" id="updateDate" name="newDate" placeholder="Datum" 
+                           min="@DateTime.Now.ToString("yyyy-MM-dd")" max="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" required>
+                </div>
+                <div class="mb-3">
+                    <label for="updateEmployeeSelect" class="col-form-label">Werknemer</label>
+                    <select class="form-select" id="updateEmployeeSelect" aria-label="Employee" name="newEmployee" required>
+                        <option value="" disabled selected>Selecteer werknemer</option>
+
+                        @foreach (var employee in Model.AllEmployees)
+                        {
+                            <option value="@employee.EmployeeNumber">@employee.FirstName @employee.LastName</option>
+                        }
+                    </select>
+                </div>
             </div>
             <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" id="sickLeaveCreateButton" class="btn btn-primary">Ziekmelden</button>
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Annuleren</button>
+                <button type="submit" class="btn btn-primary">Opslaan</button>
             </div>
+        </form>
+    </div>
+</div>
+
+@* Confirm delete sick leave modal *@
+<div class="modal fade align-content-center" id="sickLeaveDeleteModal" tabindex="-1" aria-labelledby="sickLeave" aria-hidden="true">
+    <div class="modal-dialog modal-content">
+        <div class="modal-header">
+            <h1 class="modal-title fs-5">Bevestig verwijdering</h1>
         </div>
+        <div class="modal-body">
+            Weet je zeker dat je deze ziekmelding wilt verwijderen?
+        </div>
+        <form method="post" class="modal-footer" id="deleteSickLeaveForm">
+            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Annuleren</button>
+            <button type="submit" class="btn btn-danger">Verwijderen</button>
         </form>
     </div>
 </div>
@@ -203,8 +287,28 @@
         }
     
         function updateEmployeeNumber() {
-            const selectedEmployeeNumber = document.getElementById('employeeSelect').value;
-            document.getElementById('EmployeeNumber').value = selectedEmployeeNumber;
+            document.getElementById('EmployeeNumber').value = document.getElementById('employeeSelect').value;
+        }
+        
+        function deleteSickLeave(employeeNumber, date) {
+            const modal = new bootstrap.Modal(document.getElementById('sickLeaveDeleteModal'));
+            const form = document.getElementById('deleteSickLeaveForm');
+            form.action = `/Leave/DeleteSickLeave?employeeNumber=${employeeNumber}&date=${date}`;
+            modal.show();
+        }
+        
+        function updateSickLeave(employeeNumber, date) {
+            const dateInput = document.getElementById('updateDate');
+            dateInput.value = date;
+            
+            const employeeSelect = document.getElementById('updateEmployeeSelect');
+            employeeSelect.value = employeeNumber;
+            
+            const form = document.getElementById('updateSickLeaveForm');
+            form.action = `/Leave/UpdateSickLeave?employeeNumber=${employeeNumber}&date=${date}`;
+            
+            const modal = new bootstrap.Modal(document.getElementById('sickLeaveUpdateModal'));
+            modal.show();
         }
     </script>
 }

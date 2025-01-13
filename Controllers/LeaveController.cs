@@ -11,7 +11,7 @@ namespace BumboApp.Controllers
 {
     public class LeaveController : MainController
     {
-        private Employee _loggedInEmployee;
+        private Employee? _loggedInEmployee;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
@@ -83,7 +83,7 @@ namespace BumboApp.Controllers
         {
             _loggedInEmployee = GetLoggedInEmployee();
 
-            LeaveRequest leaveRequest;
+            LeaveRequest? leaveRequest;
             int amountOfLeaveHours = 0;
             if (id == null)
             {
@@ -97,7 +97,6 @@ namespace BumboApp.Controllers
                     var usedLeaveHoursThisYear = LeaveHoursCalculationHelper.CalculateLeaveHoursByYearForAllRequests(leaveRequests);
                     amountOfLeaveHours = usedLeaveHoursThisYear[DateTime.Now.Year];
                 }
-
             }
             else
             {
@@ -138,11 +137,22 @@ namespace BumboApp.Controllers
             {
                 return NotifyErrorAndRedirect("Je kunt geen verlofaanvraag in het verleden doen.", "Index");
             }
-            if (request.StartDate > request.EndDate)
+            if (request.StartDate > request.EndDate || request.EndDate < request.StartDate)
             {
-                return NotifyErrorAndRedirect("De startdatum moet voor of op de einddatum vallen.", "LeaveRequest");
+                return NotifyErrorAndRedirect("De einddatum moet na de startdatum zijn.", "LeaveRequest");
             }
-
+            if (request.StartDate.Minute != 0 || request.EndDate.Minute != 0)
+            {
+                return NotifyErrorAndRedirect("De start- en einddatum moeten afgerond zijn op hele uren.", "LeaveRequest");
+            }
+            if ((request.EndDate - request.StartDate).TotalHours < 1)
+            {
+                return NotifyErrorAndRedirect("De minimale duur van een verlofaanvraag is 1 uur.", "LeaveRequest");
+            }
+            if (_loggedInEmployee == null)
+            {
+                return NotifyErrorAndRedirect("Er is iets misgegaan bij het ophalen van de werknemer", "Index");
+            }
             if (_loggedInEmployee.LeaveHours < startYearHours || _loggedInEmployee.LeaveHours < endYearHours)
             {
                 return NotifyErrorAndRedirect("Je hebt niet genoeg verlofuren om een verlofaanvraag te doen.", "Index");
@@ -195,39 +205,38 @@ namespace BumboApp.Controllers
 
         public IActionResult AssessLeaveRequest(Status status, int leaveRequestId)
         {
-            if (leaveRequestId != null && LoggedInUserRole == Role.Manager)
+            if (LoggedInUserRole != Role.Manager) return NotifyErrorAndRedirect("Je hebt niet de juiste rechten om deze actie te doen", "Index");
+            
+            using var transaction = Context.Database.BeginTransaction();
+            try
             {
-                using var transaction = Context.Database.BeginTransaction();
-                try
-                {
-                    var leaveRequest = Context.LeaveRequests
-                                  .Include(lr => lr.Employee)
-                                  .FirstOrDefault(lr => lr.Id == leaveRequestId);
-                    var leaveRequestEmployee = Context.Employees.Find(leaveRequest.Employee.EmployeeNumber);
-                    leaveRequest.Status = status;
-
-                    var notification = new Notification
-                    {
-                        Employee = leaveRequestEmployee,
-                        Title = "Nieuwe verlofaanvraag status",
-                        Description = "Je verlofaanvraag is beoordeeld",
-                        SentAt = DateTime.Now,
-                        HasBeenRead = false
-                    };
-                    Context.Notifications.Add(notification);
-
-                    Context.SaveChanges();
-                    transaction.Commit();
-                    return NotifySuccessAndRedirect("De nieuwe verlofaanvraag status is opgeslagen.", "Index");
-                }
-                catch
-                {
-                    transaction.Rollback();
+                var leaveRequest = Context.LeaveRequests
+                    .Include(lr => lr.Employee)
+                    .FirstOrDefault(lr => lr.Id == leaveRequestId);
+                    
+                var leaveRequestEmployee = Context.Employees.Find(leaveRequest?.Employee?.EmployeeNumber);
+                if (leaveRequestEmployee == null || leaveRequest == null) 
                     return NotifyErrorAndRedirect("Er is iets misgegaan", "Index");
-                }
+                    
+                leaveRequest.Status = status;
+
+                var notification = new Notification
+                {
+                    Employee = leaveRequestEmployee,
+                    Title = "Nieuwe verlofaanvraag status",
+                    Description = "Je verlofaanvraag is beoordeeld",
+                    SentAt = DateTime.Now,
+                    HasBeenRead = false
+                };
+                Context.Notifications.Add(notification);
+
+                Context.SaveChanges();
+                transaction.Commit();
+                return NotifySuccessAndRedirect("De nieuwe verlofaanvraag status is opgeslagen.", "Index");
             }
-            else
+            catch
             {
+                transaction.Rollback();
                 return NotifyErrorAndRedirect("Er is iets misgegaan", "Index");
             }
         }
@@ -255,13 +264,17 @@ namespace BumboApp.Controllers
 
             if (hasOverlappingSickLeave)
             {
-                return NotifyErrorAndRedirect("Werknemer is al ziekgemeld op deze dag", "Index");
+                return NotifyErrorAndRedirect("Werknemer is al ziek gemeld op deze dag", "Index");
             }
 
-            Employee employee = Context.Employees.FirstOrDefault(e => e.EmployeeNumber == sickLeave.EmployeeNumber);
+            var employee = Context.Employees.FirstOrDefault(e => e.EmployeeNumber == sickLeave.EmployeeNumber);
+            if (employee == null)
+            {
+                return NotifyErrorAndRedirect("Er is iets misgegaan bij het ophalen van de werknemer", "Index");
+            }
             sickLeave.Employee = employee;
 
-            List<Shift> EmployeeShifts = Context.Shifts
+            var employeeShifts = Context.Shifts
                                     .Where(s => s.Employee != null &&
                                                 s.Employee.EmployeeNumber == sickLeave.EmployeeNumber &&
                                                 s.Start.Date == sickLeave.Date.ToDateTime(TimeOnly.MinValue).Date) // checks if the shift starts on the sick leave date
@@ -272,9 +285,9 @@ namespace BumboApp.Controllers
             try
             {
                 Context.SickLeaves.Add(sickLeave);
-                foreach (Shift shift in EmployeeShifts)
+                foreach (var shift in employeeShifts)
                 {
-                    ShiftTakeOver existingShiftTakeOver = Context.ShiftTakeOvers.FirstOrDefault(st => st.ShiftId == shift.Id);
+                    var existingShiftTakeOver = Context.ShiftTakeOvers.FirstOrDefault(st => st.ShiftId == shift.Id);
                     if (existingShiftTakeOver == null)
                     {
                         var shiftTakeOver = new ShiftTakeOver
@@ -297,6 +310,60 @@ namespace BumboApp.Controllers
             {
                 transaction.Rollback();
                 return NotifyErrorAndRedirect("Er is iets mis gegaan bij het toevoegen van de ziekmelding", "Index");
+            }
+        }
+        
+        [HttpPost]
+        public IActionResult UpdateSickLeave(int employeeNumber, DateOnly date, DateOnly newDate, int newEmployee)
+        {
+            try
+            {
+                if (!ModelState.IsValid) throw new Exception();
+                
+                var sickLeave = Context.SickLeaves
+                    .FirstOrDefault(sl => sl.EmployeeNumber == employeeNumber && sl.Date == date);
+                if (sickLeave == null) throw new Exception();
+
+                Context.SickLeaves.Remove(sickLeave);
+                
+                var employee = Context.Employees.FirstOrDefault(e => e.EmployeeNumber == newEmployee);
+                if (employee == null) throw new Exception();
+
+                sickLeave = new SickLeave()
+                {
+                    Date = newDate,
+                    Employee = employee,
+                    EmployeeNumber = newEmployee
+                };
+                Context.SickLeaves.Add(sickLeave);
+                
+                Context.SaveChanges();
+                return NotifySuccessAndRedirect("De ziekmelding is bewerkt.", "Index");
+            }
+            catch
+            {
+                return NotifyErrorAndRedirect("Er is iets fout gegaan bij het bewerken van de ziekmelding.", "Index");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult DeleteSickLeave(int employeeNumber, DateOnly date)
+        {
+            try
+            {
+                if (!ModelState.IsValid) throw new Exception();
+            
+                var sickLeave = Context.SickLeaves
+                    .FirstOrDefault(sl => sl.EmployeeNumber == employeeNumber && sl.Date == date);
+                if (sickLeave == null) throw new Exception();
+                
+                Context.SickLeaves.Remove(sickLeave);
+                Context.SaveChanges();
+                return NotifySuccessAndRedirect("De ziekmelding is verwijderd.", "Index");
+            }
+            catch
+            {
+                return NotifyErrorAndRedirect("Er is iets fout gegaan bij het verwijderen van de ziekmelding.", "Index");
             }
         }
 
