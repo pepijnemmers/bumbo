@@ -27,7 +27,10 @@ namespace BumboApp.Controllers
                 return RedirectToAction(nameof(Index), new { id = newId });
             }
 
-            DateOnly.TryParse(id, out DateOnly startDate);
+            if (!DateOnly.TryParse(id, out DateOnly startDate))
+            {
+                return NotifyErrorAndRedirect("Datum niet gevonden", nameof(Index));
+            }
 
             if (startDate.DayOfWeek != DayOfWeek.Monday)
             {
@@ -56,7 +59,10 @@ namespace BumboApp.Controllers
         [HttpPost]
         public async Task<IActionResult> AddAvailability(string id, bool useStandard)
         {
-            DateOnly.TryParse(id, out DateOnly startDate);
+            if (!DateOnly.TryParse(id, out DateOnly startDate))
+            {
+                return NotifyErrorAndRedirect("Datum niet gevonden", nameof(Index));
+            }
 
             var employee = GetLoggedInEmployee();
             if (employee == null) { return RedirectToAction(nameof(Index), new { id }); }
@@ -111,7 +117,10 @@ namespace BumboApp.Controllers
 
         public IActionResult UpdateAvailability(string id)
         {
-            DateOnly.TryParse(id, out DateOnly startDate);
+            if (!DateOnly.TryParse(id, out DateOnly startDate))
+            {
+                return NotifyErrorAndRedirect("Datum niet gevonden", nameof(Index));
+            }
 
             var employee = GetLoggedInEmployee();
             if (employee == null) { return View(); }
@@ -145,19 +154,22 @@ namespace BumboApp.Controllers
             {
                 Context.Availabilities.UpdateRange(availabilities);
                 await Context.SaveChangesAsync();
+                NotifyService.Success("Wijzigingen succesvol opgeslagen");
             }
             catch
             {
                 NotifyService.Error("Er is iets misgegaan");
             }
 
-            NotifyService.Success("Wijzigingen succesvol opgeslagen");
             return RedirectToAction(nameof(Index), new { Id = startDateString });
         }
 
         public async Task<IActionResult> AddSchoolSchedule(string id)
         {
-            DateOnly.TryParse(id, out DateOnly startDate);
+            if (!DateOnly.TryParse(id, out DateOnly startDate))
+            {
+                return NotifyErrorAndRedirect("Datum niet gevonden", nameof(Index));
+            }
 
             if (startDate.DayOfWeek != DayOfWeek.Monday)
             {
@@ -196,7 +208,10 @@ namespace BumboApp.Controllers
 
         public IActionResult UpdateSchoolSchedule(string id)
         {
-            DateOnly.TryParse(id, out DateOnly startDate);
+            if (!DateOnly.TryParse(id, out DateOnly startDate))
+            {
+                return NotifyErrorAndRedirect("Datum niet gevonden", nameof(Index));
+            }
 
             var employee = GetLoggedInEmployee();
             if (employee == null) { return View(); }
@@ -219,19 +234,22 @@ namespace BumboApp.Controllers
                 return View(schedules);
             }
 
-            DateOnly.TryParse(startDateString, out DateOnly startDate);
+            if (!DateOnly.TryParse(id, out DateOnly startDate))
+            {
+                return NotifyErrorAndRedirect("Datum niet gevonden", nameof(Index));
+            }
 
             try
             {
                 Context.SchoolSchedules.UpdateRange(schedules);
                 await Context.SaveChangesAsync();
+                NotifyService.Success("Wijzigingen succesvol opgeslagen");
             }
             catch
             {
                 NotifyService.Error("Er is iets misgegaan");
             }
 
-            NotifyService.Success("Wijzigingen succesvol opgeslagen");
             return RedirectToAction(nameof(Index), new { Id = startDateString });
         }
 
@@ -267,13 +285,13 @@ namespace BumboApp.Controllers
             {
                 Context.StandardAvailabilities.UpdateRange(standardAvailabilities);
                 Context.SaveChanges();
+                NotifyService.Success("De standaardbeschikbaarheid is succesvol bijgewerkt");
             }
             catch
             {
                 NotifyService.Error("Er is iets misgegaan");
             }
 
-            NotifyService.Success("De standaardbeschikbaarheid is succesvol bijgewerkt");
             return RedirectToAction(nameof(Index));
         }
 
