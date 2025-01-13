@@ -6,9 +6,19 @@ namespace BumboApp.Helpers;
  */
 public static class BreakCalculationHelper
 {
+    private static TimeSpan CalculateBreak(TimeSpan shiftDuration)
+    {
+        return TimeSpan.FromMinutes((int)(shiftDuration.TotalHours / 4.5) * 30);
+    }
+
     public static TimeSpan CalculateRequiredBreak(DateTime start, DateTime end)
     {
-        var shiftDuration = end - start;
-        return TimeSpan.FromMinutes((int)(shiftDuration.TotalHours / 4.5) * 30);
+        return CalculateBreak(end - start);
+    }
+
+    public static TimeSpan CalculateRequiredBreak(TimeOnly start, TimeOnly end)
+    {
+        TimeSpan shiftDuration = end.ToTimeSpan() - start.ToTimeSpan();
+        return CalculateBreak(shiftDuration);
     }
 }

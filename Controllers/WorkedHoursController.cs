@@ -72,7 +72,7 @@ public class WorkedHoursController : MainController
                 // Determine if there's a difference
                 TimeOnly? plannedStart = TimeOnly.Parse(x.Shift.Start.ToString("HH:mm"));
                 TimeOnly? plannedEnd = TimeOnly.Parse(x.Shift.End.ToString("HH:mm"));
-                bool hasHourDifference = workedHoursHelper.HasHourDifference(x.WorkedHour?.StartTime, x.WorkedHour?.EndTime, plannedStart, plannedEnd);
+                bool hasHourDifference = workedHoursHelper.HasHourDifference(x.WorkedHour?.StartTime, x.WorkedHour?.EndTime, plannedStart, plannedEnd, breakDuration);
 
                 return new WorkedHourViewModel
                 {
@@ -121,7 +121,9 @@ public class WorkedHoursController : MainController
                         plannedEnd = TimeOnly.Parse(plannedTimes[1]);
                     }
 
-                    return workedHoursHelper.HasHourDifference(wh.StartTime, wh.EndTime, plannedStart, plannedEnd) == true;
+                    var breaksDuration = wh.BreaksDuration;
+
+                    return workedHoursHelper.HasHourDifference(wh.StartTime, wh.EndTime, plannedStart, plannedEnd, breaksDuration) == true;
                 })
                 .ToList();
         }
