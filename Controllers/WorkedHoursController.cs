@@ -99,7 +99,6 @@ public class WorkedHoursController : MainController
         // Apply hour difference filter
         if (hours != null)
         {
-            //var workedHoursHelper = new WorkedHoursHelper();
             combinedHours = combinedHours
                 .Where(wh =>
                 {

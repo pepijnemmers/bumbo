@@ -72,7 +72,8 @@
             {
                 @foreach (var workedHour in Model.WorkedHours)
                 {
-                    var rowClass = workedHour.HasHourDifference ? "text-danger" : "";
+                    @* var rowClass = workedHour.HasHourDifference ? "text-danger" : ""; *@
+                    var rowClass = workedHour.HasHourDifference && workedHour.Status != HourStatus.Final ? "text-danger" : "";
                     <tr>
                         <td class="@rowClass">
                             @(workedHour.Employee != null
