@@ -163,7 +163,7 @@ namespace BumboApp.Controllers
                 int maxHours = new MaxScheduleTimeCalculationHelper(Context).GetMaxTimeCao(emp, dep, (DateOnly)date, start.Value.Hour);
                 if (valid && maxHours < (end - start).Value.Hours)
                 {
-                    NotifyService.Error("aantal uren voldoet niet aan het maximum volgens de CAO.");
+                    NotifyService.Error("aantal uren voldoet niet aan het maximum volgens de CAO. Het maximum aantal uren is " + maxHours);
                     valid = false;
                 }
             }
@@ -306,7 +306,7 @@ namespace BumboApp.Controllers
                 int maxHours = new MaxScheduleTimeCalculationHelper(Context).GetMaxTimeCao(emp, department, (DateOnly)date, start.Hour);
                 if (maxHours < (end - start).Hours)
                 {
-                    NotifyService.Error("aantal uren voldoet niet aan het maximum volgens de CAO.");
+                    NotifyService.Error("aantal uren voldoet niet aan het maximum volgens de CAO. Het maximum aantal uren is " + maxHours);
                     return RedirectToAction("Update", new { id = id });
                 }
             }
