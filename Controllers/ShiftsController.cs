@@ -154,15 +154,14 @@ namespace BumboApp.Controllers
                 NotifyService.Error("De afdeling is niet geldig");
                 valid = false;
             }
-            var openingHour = Context.OpeningHours.AsEnumerable().FirstOrDefault(oh => oh.WeekDay == date!.Value.DayOfWeek);
-            if (openingHour != null && openingHour.OpeningTime > start && valid)
+            var openingHours = Context.OpeningHours.FirstOrDefault(oh => oh.WeekDay == date!.Value.DayOfWeek);
+            if ((openingHours?.OpeningTime == null 
+                 || openingHours.ClosingTime == null
+                 || start < openingHours.OpeningTime
+                    || end > openingHours.ClosingTime
+                 ) && valid)
             {
-                NotifyService.Error("De dienst kan niet voor openingstijd beginnen");
-                valid = false;
-            }
-            if (openingHour != null && openingHour.ClosingTime < end && valid)
-            {
-                NotifyService.Error("De dienst kan niet na sluitingstijd eindigen");
+                NotifyService.Error("De dienst valt buiten de openingstijden");
                 valid = false;
             }
             
@@ -267,15 +266,13 @@ namespace BumboApp.Controllers
                 NotifyService.Error("De werknemer kon niet worden gevonden");
                 return RedirectToAction("Update", new { id = id });
             }
-            var openingHour = Context.OpeningHours.AsEnumerable().FirstOrDefault(oh => oh.WeekDay == date.DayOfWeek);
-            if (openingHour != null && openingHour.OpeningTime > start)
+            var openingHours = Context.OpeningHours.FirstOrDefault(oh => oh.WeekDay == date.DayOfWeek);
+            if (openingHours?.OpeningTime == null 
+                || openingHours.ClosingTime == null 
+                || TimeOnly.FromDateTime(shiftStart) < openingHours.OpeningTime 
+                || TimeOnly.FromDateTime(shiftEnd) > openingHours.ClosingTime)
             {
-                NotifyService.Error("De dienst kan niet voor openingstijd beginnen");
-                return RedirectToAction("Update", new { id = id });
-            }
-            if (openingHour != null && openingHour.ClosingTime < end)
-            {
-                NotifyService.Error("De dienst kan niet na sluitingstijd eindigen");
+                NotifyService.Error("De dienst valt buiten de openingstijden");
                 return RedirectToAction("Update", new { id = id });
             }
             
