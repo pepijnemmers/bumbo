@@ -21,6 +21,12 @@
     </div>
 
     <div class="d-flex gap-2">
+        <!-- Make worked hours final -->
+        <form asp-action="MakeFinal" method="post">
+            <input type="hidden" name="date" value="@Model.SelectedStartDate.ToString("yyyy-MM-dd")" />
+            <button type="submit" class="btn btn-success me-2">Uren definitief maken</button>
+        </form>
+
         <!-- Hours filter -->
         <div>
             <select class="form-select w-100 w-lg-auto" onchange="GoToHours(this)">
@@ -72,7 +78,6 @@
             {
                 @foreach (var workedHour in Model.WorkedHours)
                 {
-                    @* var rowClass = workedHour.HasHourDifference ? "text-danger" : ""; *@
                     var rowClass = workedHour.HasHourDifference && workedHour.Status != HourStatus.Final ? "text-danger" : "";
                     <tr>
                         <td class="@rowClass">
@@ -150,7 +155,7 @@
                         <td>
                             @if (workedHour.IsFuture)
                             {
-                                <a asp-action="Update" asp-route-id="">
+                                <a asp-action="Update" asp-route-id="@workedHour.Id">
                                     <img width="20px" src="~/img/update-icon.svg" alt="edit" />
                                 </a>
                             }

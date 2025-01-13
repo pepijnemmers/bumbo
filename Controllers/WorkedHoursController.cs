@@ -1,3 +1,4 @@
+using AspNetCoreHero.ToastNotification.Notyf;
 using BumboApp.Helpers;
 using BumboApp.Models;
 using BumboApp.ViewModels;
@@ -74,6 +75,7 @@ public class WorkedHoursController : MainController
 
                 return new WorkedHourViewModel
                 {
+                    Id = x.WorkedHour?.Id,
                     Employee = x.Shift.Employee,
                     StartTime = x.WorkedHour?.StartTime, 
                     EndTime = x.WorkedHour?.EndTime,     
@@ -146,7 +148,38 @@ public class WorkedHoursController : MainController
         return View(pageViewModel);
     }
 
-    [HttpGet]
+    [HttpPost]
+    public IActionResult MakeFinal(DateOnly date)
+    {
+        List<WorkedHour> workedHours = Context.WorkedHours
+            .Where(e => e.DateOnly == date)
+           .ToList();
+
+        try
+        {
+            foreach (var workedHour in workedHours)
+            {
+                if (workedHour.EndTime == null)
+                {
+                    NotifyService.Error("Niet alle uren zijn volledig");
+                    return RedirectToAction("Index", new { startDate = date });
+                }
+
+                workedHour.Status = HourStatus.Final;
+            }
+
+            Context.SaveChanges();
+            NotifyService.Success("De uren zijn definitief gemaakt");
+        }
+        catch
+        {
+            NotifyService.Error("Er is iets fout gegaan.");
+        }
+
+        return RedirectToAction("Index", new { startDate = date });
+    }
+
+[HttpGet]
     public IActionResult Update(int id)
     {
         // Get worked hour by id

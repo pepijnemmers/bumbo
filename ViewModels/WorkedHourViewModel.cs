@@ -5,6 +5,7 @@ namespace BumboApp.ViewModels
 {
     public class WorkedHourViewModel
     {
+        public int? Id { get; set; }
         public Employee? Employee { get; set; }
         public TimeOnly? StartTime { get; set; }
         public TimeOnly? EndTime { get; set; }
