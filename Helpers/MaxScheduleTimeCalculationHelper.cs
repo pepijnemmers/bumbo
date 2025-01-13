@@ -20,7 +20,7 @@ namespace BumboApp.Helpers
 
         private const float BreakTimeHours = (float)0.5;
         private readonly int[] _breakTimes = { 4, 8 };
-        readonly BumboDbContext _context;
+        private readonly BumboDbContext _context;
 
         public MaxScheduleTimeCalculationHelper(BumboDbContext context)
         {
