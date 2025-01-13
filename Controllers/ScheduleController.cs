@@ -557,7 +557,7 @@ namespace BumboApp.Controllers
 
         public IActionResult DeleteWeek(DateOnly startDate)
         {
-            var weekFirstDay = GetMondayOfWeek(startDate);
+            var weekFirstDay = DateConvertorHelper.GetMondayOfWeek(startDate);
             var weekLastDay = weekFirstDay.AddDays(6);
             
             var shifts = Context.Shifts
@@ -608,7 +608,7 @@ namespace BumboApp.Controllers
 
         public IActionResult PublishWeek(DateOnly startDate)
         {
-            var weekFirstDay = GetMondayOfWeek(startDate);
+            var weekFirstDay = DateConvertorHelper.GetMondayOfWeek(startDate);
             var weekLastDay = weekFirstDay.AddDays(6);
             
             var shifts = Context.Shifts
