@@ -658,7 +658,7 @@ else
                         @{
                             var weekPrognosisReached = Model.WeekPrognosis?.Prognoses.All(p => Model.Shifts
                                 .Where(s => s.Department == p.Department && DateOnly.FromDateTime(s.Start) == p.Date)
-                                .Sum(s => s.End.Hour - s.Start.Hour) >= p.NeededHours); // TODO test or remove
+                                .Sum(s => s.End.Hour - s.Start.Hour) >= p.NeededHours);
                         }
                         Prognose van week @Model.WeekNumber - 
                         <span class="small @(weekPrognosisReached == null ? "" : (bool)weekPrognosisReached ? "text-success" : "text-danger")">
