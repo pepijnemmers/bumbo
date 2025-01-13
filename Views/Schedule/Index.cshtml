@@ -1,4 +1,5 @@
 ﻿@using System.Globalization
+@using BumboApp.Helpers
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 
 @model BumboApp.ViewModels.ScheduleViewModel
@@ -163,6 +164,11 @@
     <div class="calendar-container">
 
         @* Layer 1: Base Grid *@
+        @{
+            var openHours = Model.OpeningHours.Find(oh => oh.WeekDay == Model.SelectedStartDate.DayOfWeek);
+            var openingTime = openHours?.OpeningTime?.Hour ?? 6;
+            var closingTime = openHours?.ClosingTime == new TimeOnly(23, 59) ? 24 : openHours?.ClosingTime?.Hour ?? 24;
+        }
         <div class="calendar-grid row g-0 @(role == Role.Employee ? "pointer-events-none" : "")">
             <div class="time-slots-col">
                 <div class="time-slot time-slot-header"></div>
@@ -175,28 +181,63 @@
             </div>
             @for (int i = 0; i < 3; i++)
             {
-                var departmentName = i switch
+                var department = i switch
                 {
-                    0 => Department.Vers.ToFriendlyString(),
-                    1 => Department.Vakkenvullen.ToFriendlyString(),
-                    2 => Department.Kassa.ToFriendlyString(),
-                    _ => string.Empty
+                    0 => Department.Vers,
+                    1 => Department.Vakkenvullen,
+                    2 => Department.Kassa,
+                    _ => throw new ArgumentOutOfRangeException()
                 };
+                var prognoseExistsAndManager = Model?.WeekPrognosis?.Prognoses != null && role == Role.Manager;
                 
-                <div class="col day-col">
+                <div class="col day-col @(openHours?.OpeningTime == null && openHours?.ClosingTime == null ? "closed" : "")">
                     <div class="day-header">
-                        <strong class="text-center d-block fs-5">@departmentName</strong>
+                        <strong class="px-3 d-flex align-items-center justify-content-@(prognoseExistsAndManager ? "between" : "center") fs-5">
+                            <span>@department.ToFriendlyString()</span>
+                            @if (prognoseExistsAndManager)
+                            {
+                                var prognosisForDep = Model.WeekPrognosis.Prognoses
+                                    .FirstOrDefault(p => p.Department == department && p.Date == Model.SelectedStartDate);
+                                var prognosisHoursForDep = prognosisForDep?.NeededHours;
+                                var scheduledHoursForDep = Model.Shifts
+                                    .Where(s => s.Department == department && DateOnly.FromDateTime(s.Start) == Model.SelectedStartDate)
+                                    .Sum(s => s.End.Hour - s.Start.Hour);
+                                var prognosisReached = scheduledHoursForDep >= prognosisHoursForDep;
+                                var prognosisReachedClass = prognosisReached ? "text-success" : "text-danger";
+                                var prognosisReachedIcon = prognosisReached ? "fa-check" : "fa-xmark";
+                                var prognosisPopoverTitle = prognosisReached ? "Prognose behaald" : "Prognose overschreden";
+                                
+                                <button class="btn p-0"
+                                        data-bs-toggle="popover"
+                                        data-bs-trigger="focus"
+                                        data-bs-html="true"
+                                        data-bs-title="<span class='@prognosisReachedClass'>@prognosisPopoverTitle</span>"
+                                        data-bs-content="Prognose uren: <strong>@prognosisHoursForDep</strong><br>
+                                                        Uren ingepland: <strong>@scheduledHoursForDep</strong><br>
+                                                        Verschil: <strong class='@prognosisReachedClass'>@(prognosisReached ? "+" : "")@(scheduledHoursForDep - prognosisHoursForDep)</strong>">
+                                    <i class="fa-solid @prognosisReachedClass @prognosisReachedIcon"></i>
+                                    <span class="small @prognosisReachedClass">Prognose</span>
+                                </button>
+                            }
+                        </strong>
                     </div>
-                    <div class="day-hours-grid">
+                    <div class="day-hours-grid @(openHours?.OpeningTime == null && openHours?.ClosingTime == null ? "pointer-events-none" : "")">
                         @for (int j = 6; j < 24; j++)
                         {
                             if (role == Role.Manager && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
                             {
-                                <div class="hour" ondblclick="GoToCreateShift('@Model.SelectedStartDate.ToString()', @j, '@departmentName')"><i class="fas fa-plus"></i></div>
+                                <div class="hour @(j < openingTime || j >= closingTime ? "closed pointer-events-none" : "")" title="@(j < openingTime || j >= closingTime ? "Gesloten" : "")"
+                                     ondblclick="GoToCreateShift('@Model.SelectedStartDate.ToString()', @j, '@department.ToFriendlyString()')">
+                                    @if (j >= openingTime && j < closingTime)
+                                    {
+                                        <i class="fas fa-plus"></i>
+                                    }
+                                </div>
                             }
                             else
                             {
-                                <div class="hour pointer-events-none"></div>
+                                <div class="hour pointer-events-none @(j < openingTime || j >= closingTime ? "closed" : "")"
+                                     title="@(j < openingTime || j >= closingTime ? "Gesloten" : "")"></div>
                             }
                         }
                     </div>
@@ -218,7 +259,7 @@
         
                     if (overlappingGroup == null)
                     {
-                        groups.Add(new List<Shift> { shift });
+                        groups.Add([shift]);
                     }
                     else
                     {
@@ -247,6 +288,9 @@
                     var startHour = shift.Start.Hour;
                     var endHour = shift.End.Hour;
                     var gridSpanCol = endHour - startHour;
+                    
+                    var breakDuration = BreakCalculationHelper.CalculateRequiredBreak(shift.Start, shift.End).TotalMinutes;
+                    var breakText = breakDuration == 0 ? "Geen pauze" : $"{breakDuration} min. pauze";
 
                     <button
                         class="unset-all shift-container 
@@ -269,6 +313,7 @@
                         data-bs-content="
                             <div>
                                 <p class='text-secondary m-0'>@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                                <p class='text-secondary m-0'>@breakText</p>
                                 @if (shift.Employee != null) {
                                     <p class='fw-500 mb-1'><i class='fas fa-user me-1'></i>@shift.Employee?.FirstName @shift.Employee?.LastName</p> 
                                 } else {
@@ -276,7 +321,14 @@
                                 }
                             </div>">
                         <div class="shift">
-                            <p class="text-secondary m-0">@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                            <p class="text-secondary m-0">
+                                <i class="fa-solid fa-clock me-1"></i>
+                                @shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()
+                            </p>
+                            <p class="text-secondary m-0">
+                                <i class="fa-solid fa-mug-hot me-1"></i>
+                                @breakText
+                            </p>
                             @if (shift.Employee != null)
                             {
                                 <p class="fw-500">@shift.Employee.FirstName @shift.Employee.LastName</p>
@@ -329,8 +381,12 @@
                         data-bs-content="
                             @foreach (var timeGroup in group.GroupBy(shift => new { shift.Start, shift.End }))
                             {
-                                <div class='mb-2'>
+                                var breakDuration = BreakCalculationHelper.CalculateRequiredBreak(timeGroup.Key.Start, timeGroup.Key.End).TotalMinutes;
+                                var breakText = breakDuration == 0 ? "Geen pauze" : $"{breakDuration} min. pauze";
+                                
+                                <div class='mb-3'>
                                     <p class='text-secondary m-0'>@timeGroup.Key.Start.ToShortTimeString() - @timeGroup.Key.End.ToShortTimeString()</p>
+                                    <p class='text-secondary m-0'>@breakText</p>
 
                                     @foreach (var shiftContent in timeGroup)
                                     {
@@ -361,9 +417,19 @@
                         <div class="shift">
                             @foreach (var timeGroup in group.GroupBy(shift => new { shift.Start, shift.End }))
                             {
-                                <div class="mb-2">
-                                    <p class="text-secondary m-0">@timeGroup.Key.Start.ToShortTimeString() - @timeGroup.Key.End.ToShortTimeString()</p>
-
+                                <div class="mb-3">
+                                    <p class="text-secondary m-0">
+                                        <i class="fa-solid fa-clock"></i>
+                                        @timeGroup.Key.Start.ToShortTimeString() - @timeGroup.Key.End.ToShortTimeString()
+                                    </p>
+                                    <p class="text-secondary m-0">
+                                        @{
+                                            var breakDuration = BreakCalculationHelper.CalculateRequiredBreak(timeGroup.Key.Start, timeGroup.Key.End).TotalMinutes;
+                                            var breakText = breakDuration == 0 ? "Geen pauze" : $"{breakDuration} min. pauze";
+                                        }
+                                        <i class="fa-solid fa-mug-hot me-1"></i>
+                                        @breakText
+                                    </p>
                                     @foreach (var shiftContent in timeGroup)
                                     {
                                         if (shiftContent.Employee != null)
@@ -422,7 +488,11 @@ else
             </div>
             @for (int i = 0; i < 7; i++)
             {
-                <div class="col day-col @(Model.SelectedStartDate.AddDays(i) == DateOnly.FromDateTime(DateTime.Today) ? "today" : "")">
+                var openHours = Model.OpeningHours.Find(oh => oh.WeekDay == Model.SelectedStartDate.AddDays(i).DayOfWeek);
+                var openingTime = openHours?.OpeningTime?.Hour ?? 6;
+                var closingTime = openHours?.ClosingTime == new TimeOnly(23, 59) ? 24 : openHours?.ClosingTime?.Hour ?? 24;
+                
+                <div class="col day-col @(openHours?.OpeningTime == null && openHours?.ClosingTime == null ? "closed pointer-events-none" : "") @(Model.SelectedStartDate.AddDays(i) == DateOnly.FromDateTime(DateTime.Today) ? "today" : "")">
                     <div class="day-header">
                         <span class="text-center d-block small lh-1">@Model.SelectedStartDate.AddDays(i).ToString("ddd", CultureInfo.GetCultureInfo("nl-NL"))</span>
                         <strong class="text-center d-block fs-5 lh-1">@Model.SelectedStartDate.AddDays(i).ToString("dd", CultureInfo.GetCultureInfo("nl-NL"))</strong>
@@ -432,11 +502,19 @@ else
                         {
                             if (role == Role.Manager && Model.SelectedStartDate.AddDays(i) > DateOnly.FromDateTime(DateTime.Today))
                             {
-                                <div class="hour" ondblclick="GoToCreateShift('@Model.SelectedStartDate.AddDays(i).ToString()', @j)"><i class="fas fa-plus"></i></div>
+                                <div class="hour @(j < openingTime || j >= closingTime ? "closed pointer-events-none" : "")"
+                                     title="@(j < openingTime || j >= closingTime ? "Gesloten" : "")"
+                                     ondblclick="GoToCreateShift('@Model.SelectedStartDate.AddDays(i).ToString()', @j)">
+                                    @if (j >= openingTime && j < closingTime)
+                                    {
+                                        <i class="fas fa-plus"></i>
+                                    }
+                                </div>
                             }
                             else
                             {
-                                <div class="hour pointer-events-none"></div>
+                                <div class="hour pointer-events-none @(j < openingTime || j >= closingTime ? "closed" : "")" 
+                                     title="@(j < openingTime || j >= closingTime ? "Gesloten" : "")"></div>
                             }
                         }
                     </div>
@@ -452,6 +530,9 @@ else
                 var startHour = shift.Start.Hour;
                 var endHour = shift.End.Hour;
                 var gridSpan = endHour - startHour;
+                
+                var breakDuration = BreakCalculationHelper.CalculateRequiredBreak(shift.Start, shift.End).TotalMinutes;
+                var breakText = breakDuration == 0 ? "Geen pauze" : $"{breakDuration} min. pauze";
 
                 <button
                     class="unset-all shift-container 
@@ -474,10 +555,18 @@ else
                     data-bs-content="
                         <div>
                             <p class='text-secondary m-0'>@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                            <p class='text-secondary m-0'>@breakText</p>
                             @if (shift.Employee != null) { <p class='fw-500 mb-1'><i class='fas fa-user me-1'></i>@shift.Employee?.FirstName @shift.Employee?.LastName</p> }else { <p class='fw-500 text-danger mb-1'><i class='fas fa-user-slash me-1'></i>Zoek intern vervanging en pas de dienst aan of zoek extern.</p> }
                         </div>">
                     <div class="shift">
-                        <p class="text-secondary m-0">@shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()</p>
+                        <p class="text-secondary m-0">
+                            <i class="fa-solid fa-clock"></i>
+                            @shift.Start.ToShortTimeString() - @shift.End.ToShortTimeString()
+                        </p>
+                        <p class="text-secondary m-0">
+                            <i class="fa-solid fa-mug-hot me-1"></i>
+                            @breakText
+                        </p>
                         @if (shift.Employee != null)
                         {
                             <p class="fw-500">@shift.Employee?.FirstName @shift.Employee?.LastName</p>
@@ -523,6 +612,10 @@ else
                 <span>Concept</span>
             </div>
         }
+        <div class="legenda-item">
+            <div class="legenda-color gesloten"></div>
+            <span>Gesloten</span>
+        </div>
     </div>
 </div>
 
