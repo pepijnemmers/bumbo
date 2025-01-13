@@ -4,7 +4,6 @@ using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Localization;
 using System.Globalization;
 
 namespace BumboApp.Controllers
@@ -42,51 +41,62 @@ namespace BumboApp.Controllers
             {
                 selectedEmployee = employeeNumber != null && int.TryParse(employeeNumber, out _) ? Context.Employees.Find(int.Parse(employeeNumber)) : null;
             }
-
+            
             // Day or week view and selected start date
             bool isDayView = selectedEmployee == null || dayView;
-            var selectedStartDate = startDate != null
+            var selectedStartDate = startDate != null 
                 ? (isDayView ? DateOnly.FromDateTime(DateTime.Parse(startDate)) : GetMondayOfWeek(DateOnly.FromDateTime(DateTime.Parse(startDate))))
                 : (isDayView ? DateOnly.FromDateTime(DateTime.Today) : GetMondayOfWeek(DateOnly.FromDateTime(DateTime.Today)));
             int weekNumber = ISOWeek.GetWeekOfYear(selectedStartDate.ToDateTime(new TimeOnly(12, 00)));
-
+            
             // Get all employees for filter
             var employees = Context.Employees.ToList();
-
+            
             // Get all shifts for selected date (based on day/week view) and selected/loggedin employee
             var shifts = Context.Shifts
                 .Where(shift => isDayView
-                    ? DateOnly.FromDateTime(shift.Start) == selectedStartDate
-                      && (selectedEmployee == null || shift.Employee == selectedEmployee)
+                    ? DateOnly.FromDateTime(shift.Start) == selectedStartDate 
+                      && (selectedEmployee == null || shift.Employee == selectedEmployee) 
                       && (LoggedInUserRole != Role.Employee || shift.IsFinal)
-                    : DateOnly.FromDateTime(shift.Start) >= selectedStartDate
-                      && DateOnly.FromDateTime(shift.Start) < selectedStartDate.AddDays(7)
-                      && (selectedEmployee == null || shift.Employee == selectedEmployee)
+                    : DateOnly.FromDateTime(shift.Start) >= selectedStartDate 
+                      && DateOnly.FromDateTime(shift.Start) < selectedStartDate.AddDays(7) 
+                      && (selectedEmployee == null || shift.Employee == selectedEmployee) 
                       && (LoggedInUserRole != Role.Employee || shift.IsFinal))
                 .OrderBy(shift => shift.Department)
                 .ToList();
-
+            
             // Check if view is concept or final
             var viewIsConcept = shifts.Any(shift => !shift.IsFinal);
-
+            
+            // Get week prognosis and opening hours
+            var weekPrognosis = Context.WeekPrognoses
+                .Include(p => p.Prognoses)
+                .FirstOrDefault(p => p.StartDate == GetMondayOfWeek(selectedStartDate));
+            var openingHours = Context.OpeningHours.ToList();
+            
             // Create view model and return view
             var viewModel = new ScheduleViewModel()
             {
                 Role = LoggedInUserRole,
+                
                 ViewIsConcept = viewIsConcept,
                 SelectedStartDate = selectedStartDate,
                 WeekNumber = weekNumber,
+                
+                WeekPrognosis = weekPrognosis,
+                OpeningHours = openingHours,
                 Employees = employees,
                 Shifts = shifts,
+                
                 SelectedEmployee = selectedEmployee,
                 IsDayView = isDayView
             };
             return View(viewModel);
         }
-
+        
         private DateOnly GetMondayOfWeek(DateOnly date)
         {
-            var dayOfWeek = (int)date.DayOfWeek;
+            var dayOfWeek = (int) date.DayOfWeek;
             var daysToMonday = dayOfWeek == 0 ? 6 : dayOfWeek - 1;
             return date.AddDays(-daysToMonday);
         }
@@ -559,7 +569,7 @@ namespace BumboApp.Controllers
                 .Where(shift => DateOnly.FromDateTime(shift.Start) >= deleteDate
                                 && DateOnly.FromDateTime(shift.Start) < deleteDate.AddDays(7))
                 .ToList();
-
+            
             if (shifts.Count == 0)
             {
                 NotifyService.Error("Er zijn geen diensten gevonden voor de week");
@@ -601,7 +611,7 @@ namespace BumboApp.Controllers
                 foreach (var shift in shifts)
                 {
                     shift.IsFinal = true;
-
+                    
                     // send notification to employee
                     if (shift.Employee != null)
                     {
@@ -616,7 +626,7 @@ namespace BumboApp.Controllers
                         });
                     }
                 }
-
+                
                 Context.SaveChanges();
                 NotifyService.Success("De concept diensten zijn gepubliceerd");
                 return RedirectToAction("Index", new { startDate = publishDate.ToString("dd/MM/yyyy") });
@@ -626,8 +636,7 @@ namespace BumboApp.Controllers
                 NotifyService.Error("Er is iets fout gegaan bij het publiceren van de diensten");
                 return RedirectToAction("Index", new { startDate = publishDate.ToString("dd/MM/yyyy") });
             }
-
+            
         }
-
     }
 }
