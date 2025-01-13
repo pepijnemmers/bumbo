@@ -39,7 +39,11 @@ namespace BumboApp.Controllers
             }
 
             var employee = GetLoggedInEmployee();
-            if (employee == null) { return View(); }
+            if (employee == null)
+            {
+                NotifyService.Error("Fout met het ophalen van gegevens");
+                return RedirectToAction("Index", "DashBoard");
+            }
             var employeeNumber = employee.EmployeeNumber;
 
             List<Availability> availabilityList = Context.Availabilities.Where(a => a.EmployeeNumber == employeeNumber && a.Date >= startDate && a.Date < startDate.AddDays(7)).ToList();
@@ -65,7 +69,10 @@ namespace BumboApp.Controllers
             }
 
             var employee = GetLoggedInEmployee();
-            if (employee == null) { return RedirectToAction(nameof(Index), new { id }); }
+            if (employee == null)
+            {
+                return RedirectToAction(nameof(Index), new { id });
+            }
             var employeeNumber = employee.EmployeeNumber;
 
             List<Availability> availabilities = [];
@@ -123,7 +130,10 @@ namespace BumboApp.Controllers
             }
 
             var employee = GetLoggedInEmployee();
-            if (employee == null) { return View(); }
+            if (employee == null)
+            {
+                return RedirectToAction(nameof(Index), new { id });
+            }
             var employeeNumber = employee.EmployeeNumber;
 
             ViewData["StartDate"] = startDate.ToString("dd-MM-yyyy");
@@ -177,7 +187,7 @@ namespace BumboApp.Controllers
             }
 
             var employee = GetLoggedInEmployee();
-            if (employee == null) { return View(); }
+            if (employee == null) { return RedirectToAction(nameof(Index), new { id }); }
             var employeeNumber = employee.EmployeeNumber;
 
             List<SchoolSchedule> schoolSchedules = [];
@@ -214,7 +224,7 @@ namespace BumboApp.Controllers
             }
 
             var employee = GetLoggedInEmployee();
-            if (employee == null) { return View(); }
+            if (employee == null) { return RedirectToAction(nameof(Index), new { id }); }
             var employeeNumber = employee.EmployeeNumber;
             ViewData["EmployeeNumber"] = employeeNumber;
             ViewData["StartDate"] = startDate;
