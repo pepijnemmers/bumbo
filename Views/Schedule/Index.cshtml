@@ -205,7 +205,7 @@
                                 var prognosisForDep = Model.WeekPrognosis.Prognoses
                                     .FirstOrDefault(p => p.Department == department && p.Date == Model.SelectedStartDate);
                                 var prognosisHoursForDep = prognosisForDep?.NeededHours;
-                                var scheduledHoursForDep = Model.Shifts
+                                var scheduledHoursForDep = Model.ShiftsOfFullWeek
                                     .Where(s => s.Department == department && DateOnly.FromDateTime(s.Start) == Model.SelectedStartDate)
                                     .Sum(s => s.End.Hour - s.Start.Hour);
                                 var prognosisReached = scheduledHoursForDep >= prognosisHoursForDep;
@@ -656,7 +656,7 @@ else
                 <div class="modal-header">
                     <h5 class="modal-title">
                         @{
-                            var weekPrognosisReached = Model.WeekPrognosis?.Prognoses.All(p => Model.Shifts
+                            var weekPrognosisReached = Model.WeekPrognosis?.Prognoses.All(p => Model.ShiftsOfFullWeek
                                 .Where(s => s.Department == p.Department && DateOnly.FromDateTime(s.Start) == p.Date)
                                 .Sum(s => s.End.Hour - s.Start.Hour) >= p.NeededHours);
                         }
@@ -687,7 +687,7 @@ else
                                     <h3 class="h5 col-3">@weekDay.Value</h3>
                                     @foreach (var prognosis in Model.WeekPrognosis.Prognoses.Where(p => p.Date.DayOfWeek == weekDay.Key))
                                     {
-                                        var plannedHours = Model.Shifts
+                                        var plannedHours = Model.ShiftsOfFullWeek
                                             .Where(s => s.Department == prognosis.Department
                                                         && DateOnly.FromDateTime(s.Start) == prognosis.Date)
                                             .Sum(s => s.End.Hour - s.Start.Hour);

@@ -65,6 +65,12 @@ namespace BumboApp.Controllers
                 .OrderBy(shift => shift.Department)
                 .ToList();
             
+            var shiftOfFullWeek = Context.Shifts
+                .Where(shift => DateOnly.FromDateTime(shift.Start) >= selectedStartDate 
+                                && DateOnly.FromDateTime(shift.Start) < selectedStartDate.AddDays(7))
+                .OrderBy(shift => shift.Department)
+                .ToList();
+            
             // Check if view is concept or final
             var viewIsConcept = shifts.Any(shift => !shift.IsFinal);
             
@@ -87,6 +93,7 @@ namespace BumboApp.Controllers
                 OpeningHours = openingHours,
                 Employees = employees,
                 Shifts = shifts,
+                ShiftsOfFullWeek = shiftOfFullWeek,
                 
                 SelectedEmployee = selectedEmployee,
                 IsDayView = isDayView
