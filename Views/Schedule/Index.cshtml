@@ -107,7 +107,7 @@
                     <optgroup label="Toon alle werknemers">
                         <option value="all" selected="@(Model.SelectedEmployee == null)">Alle werknemers</option>
                     </optgroup>
-                    <optgroup label="Toon één werknemer">
+                    <optgroup label="Toon &eacute;&eacute;n werknemer">
                         @foreach (Employee employee in Model.Employees)
                         {
                             <option value="@employee.EmployeeNumber" selected="@(employee == Model.SelectedEmployee)">@employee.FirstName @employee.LastName</option>

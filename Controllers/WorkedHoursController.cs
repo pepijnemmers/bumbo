@@ -191,8 +191,6 @@ public class WorkedHoursController : MainController
     public IActionResult Update(int id, DateOnly date, int employeeId)
     {
         WorkedHour? workedHour;
-        Console.WriteLine(date);
-        Console.WriteLine(employeeId);
 
         Employee? employee = Context.Employees
             .FirstOrDefault(e => e.EmployeeNumber == employeeId);
@@ -233,10 +231,7 @@ public class WorkedHoursController : MainController
                 return NotifyErrorAndRedirect("Gewerkte uren niet gevonden", "Index");
         }
 
-        if (workedHour.EndTime == null)
-        {
-            workedHour.EndTime = TimeOnly.MaxValue;
-        }
+        workedHour.EndTime ??= TimeOnly.MaxValue;
 
         // Validate
         if (workedHour.Breaks != null && workedHour.Breaks.Any(b => b.EndTime == null))
