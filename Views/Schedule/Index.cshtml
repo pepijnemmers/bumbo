@@ -83,6 +83,12 @@
             }
             @if (role == Role.Manager)
             {
+                if (Model.WeekPrognosis?.Prognoses != null) {
+                    <button class="btn btn-outline-secondary w-100 w-lg-auto" data-bs-toggle="modal" data-bs-target="#prognosis-modal">
+                        <i class="fa-solid fa-chart-simple"></i>
+                        Prognose bekijken
+                    </button>
+                }
                 <a class="btn btn-primary w-100 w-lg-auto" asp-controller="Shifts" asp-action="Create">
                     <i class="fas fa-plus"></i>
                     Dienst toevoegen
@@ -622,6 +628,7 @@ else
 @* Modals *@
 @if (role == Role.Manager)
 {
+    // Delete week modal
     <div class="modal fade" id="delete-week-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -637,6 +644,76 @@ else
                     <a class="btn btn-danger" asp-controller="Schedule" asp-action="DeleteWeek" asp-route-startDate="@Model.SelectedStartDate.ToString("yyyy-MM-dd")">
                         Verwijderen
                     </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    // Week Prognosis modal
+    <div class="modal fade" id="prognosis-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Prognose van week @Model.WeekNumber</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if (Model.WeekPrognosis?.Prognoses != null)
+                    {
+                            // TODO: scroll en per dag laten zien totaal gehaald of niet
+                            
+                            var weekDays = new Dictionary<DayOfWeek, string>
+                            {
+                                { DayOfWeek.Monday, "Maandag" },
+                                { DayOfWeek.Tuesday, "Dinsdag" },
+                                { DayOfWeek.Wednesday, "Woensdag" },
+                                { DayOfWeek.Thursday, "Donderdag" },
+                                { DayOfWeek.Friday, "Vrijdag" },
+                                { DayOfWeek.Saturday, "Zaterdag" },
+                                { DayOfWeek.Sunday, "Zondag" }
+                            };
+
+                            foreach (var weekDay in weekDays)
+                            {
+                                <div>
+                                    <h4>@weekDay.Value</h4>
+                                    <ul>
+                                        @foreach (var prognosis in Model.WeekPrognosis.Prognoses.Where(p => p.Date.DayOfWeek == weekDay.Key))
+                                        {
+                                            var plannedHours = Model.Shifts
+                                                .Where(s => s.Department == prognosis.Department
+                                                            && DateOnly.FromDateTime(s.Start) == prognosis.Date)
+                                                .Sum(s => s.End.Hour - s.Start.Hour);
+
+                                            <li>
+                                                <h5>
+                                                    @prognosis.Department.ToFriendlyString() -
+                                                    <span class="small @(plannedHours - prognosis.NeededHours >= 0 ? "text-success" : "text-danger")">
+                                                    @(plannedHours - prognosis.NeededHours >= 0 ? "Prognose behaald" : "Prognose overschreden")
+                                                </span>
+                                                </h5>
+                                                <ul>
+                                                    <li>Prognose uren: <strong>@prognosis.NeededHours</strong></li>
+                                                    <li>
+                                                        Uren ingepland: <strong>@plannedHours</strong>
+                                                    </li>
+                                                    <li>
+                                                        Verschil: <strong class="@(plannedHours - prognosis.NeededHours >= 0 ? "text-success" : "text-danger")">@(plannedHours - prognosis.NeededHours)</strong>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                    }
+                    else
+                    {
+                        <p>Er is geen prognose beschikbaar voor deze week.</p>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Sluiten</button>
                 </div>
             </div>
         </div>
