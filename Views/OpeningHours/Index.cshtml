@@ -37,7 +37,7 @@
                                 <div class="@(isOpen ? "d-table-cell" : "d-none")" id="opening-hours-field-@i">
                                     <label for="opening-hour-@i">Vanaf</label>
                                     <div class="d-inline-block" id="opening-hour-text-@i">@openingHours.OpeningTime</div>
-                                    <input class="d-none" id="opening-hour-@i" type="time" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].OpeningTime" value="@openingHours.OpeningTime"/>
+                                    <input class="d-none" id="opening-hour-@i" type="time" min="06:00" max="23:00" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].OpeningTime" value="@openingHours.OpeningTime"/>
                                 </div>
                                 <div class="@(isOpen ? "d-none" : "d-block")" id="closedText-@i">
                                     <p>Gesloten</p>
@@ -47,7 +47,7 @@
                                 <div class="@(isOpen ? "d-table-cell" : "d-none")" id="closing-hours-field-@i">
                                     <label for="closingHour-@i">tot</label>
                                     <div class="d-inline-block" id="closing-hour-text-@i">@openingHours.ClosingTime</div>
-                                    <input class="d-none" id="closing-hour-@i" type="time" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].ClosingTime" value="@openingHours.ClosingTime"/>
+                                    <input class="d-none" id="closing-hour-@i" type="time" min="06:00" max="23:00" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].ClosingTime" value="@openingHours.ClosingTime"/>
                                 </div>
                             </td>
                         </tr>
