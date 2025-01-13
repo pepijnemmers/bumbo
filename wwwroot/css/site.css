@@ -91,8 +91,10 @@
 }
 
 /* Input */
-input[type="datetime-local"]::-webkit-inner-spin-button,
-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+input[type="datetime-local"][step="3600"]::-webkit-inner-spin-button,
+input[type="datetime-local"][step="3600"]::-webkit-calendar-picker-indicator,
+input[type="time"][step="3600"]::-webkit-inner-spin-button,
+input[type="time"][step="3600"]::-webkit-calendar-picker-indicator {
     display: none;
     -webkit-appearance: none;
 }
