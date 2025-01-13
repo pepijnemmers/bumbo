@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BumboApp.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BumboApp.ViewModels
 {
@@ -6,7 +7,7 @@ namespace BumboApp.ViewModels
     {
         // Filters
         public DateOnly SelectedStartDate { get; set; }
-        public string? Employee { get; set; }
+        public Employee? Employee { get; set; }
         public string? Hours { get; set; }
 
         // List of Worked Hours

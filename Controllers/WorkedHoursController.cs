@@ -17,6 +17,15 @@ public class WorkedHoursController : MainController
     [HttpGet]
     public IActionResult Index(int? page, DateOnly? startDate, string? employee, string? hours)
     {
+        Employee? selectedEmployee = null;
+        if (!string.IsNullOrEmpty(employee) && int.TryParse(employee, out int employeeNumber))
+        {
+            selectedEmployee = Context.Employees.Find(employeeNumber);
+        }
+
+        // Get all employees for the dropdown
+        var allEmployees = Context.Employees.ToList();
+
         DateOnly selectedStartDate = startDate ?? DateOnly.FromDateTime(DateTime.Today);
 
         List <Shift> plannedShifts = Context.Shifts
@@ -70,6 +79,14 @@ public class WorkedHoursController : MainController
             .OrderBy(e => e.StartTime)
             .ToList();
 
+        // Apply employee filter
+        if (selectedEmployee != null)
+        {
+            combinedHours = combinedHours
+                .Where(wh => wh.Employee != null && wh.Employee.EmployeeNumber == selectedEmployee.EmployeeNumber)
+                .ToList();
+        }
+
         //Pagination
         int currentPageNumber = page ?? DefaultPage;
         int maxPages = (int)(Math.Ceiling((decimal)workedHours.Count / PageSize));
@@ -89,10 +106,12 @@ public class WorkedHoursController : MainController
         var pageViewModel = new WorkedHoursPageViewModel()
         {
             SelectedStartDate = selectedStartDate,
-            Employee = employee,
+            Employee = selectedEmployee,
             Hours = hours,
             WorkedHours = workedHoursForPage
         };
+
+        ViewBag.AllEmployees = allEmployees;
 
         return View(pageViewModel);
     }
