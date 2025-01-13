@@ -10,8 +10,10 @@ namespace BumboApp.ViewModels
         public TimeOnly? EndTime { get; set; }
         public TimeSpan? BreaksDuration { get; set; }
         public TimeSpan? TotalWorkedTime { get; set; }
-        public string? Status { get; set; }
+        public HourStatus? Status { get; set; }
         public string? PlannedShift { get; set; }
         public bool IsFuture { get; set; }
+
+        public bool HasHourDifference { get; set; }
     }
 }

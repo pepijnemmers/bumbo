@@ -18,6 +18,8 @@ public class WorkedHoursController : MainController
     [HttpGet]
     public IActionResult Index(int? page, DateOnly? startDate, string? employee, string? hours)
     {
+        var workedHoursHelper = new WorkedHoursHelper();
+
         Employee? selectedEmployee = null;
         if (!string.IsNullOrEmpty(employee) && int.TryParse(employee, out int employeeNumber))
         {
@@ -65,6 +67,11 @@ public class WorkedHoursController : MainController
                     ? x.WorkedHour.EndTime - x.WorkedHour.StartTime - breakDuration
                     : (TimeSpan?)null;
 
+                // Determine if there's a difference
+                TimeOnly? plannedStart = TimeOnly.Parse(x.Shift.Start.ToString("HH:mm"));
+                TimeOnly? plannedEnd = TimeOnly.Parse(x.Shift.End.ToString("HH:mm"));
+                bool hasHourDifference = workedHoursHelper.HasHourDifference(x.WorkedHour?.StartTime, x.WorkedHour?.EndTime, plannedStart, plannedEnd);
+
                 return new WorkedHourViewModel
                 {
                     Employee = x.Shift.Employee,
@@ -72,9 +79,10 @@ public class WorkedHoursController : MainController
                     EndTime = x.WorkedHour?.EndTime,     
                     BreaksDuration = breakDuration,
                     TotalWorkedTime = totalWorkedTime,
-                    Status = x.WorkedHour?.Status.ToString(),
+                    Status = x.WorkedHour?.Status,
                     PlannedShift = x.Shift.Start.ToString("HH:mm") + " - " + x.Shift.End.ToString("HH:mm"),
                     IsFuture = DateOnly.FromDateTime(x.Shift.Start) <= DateOnly.FromDateTime(DateTime.Now) && DateOnly.FromDateTime(x.Shift.Start).Month == DateOnly.FromDateTime(DateTime.Now).Month,
+                    HasHourDifference = hasHourDifference
                 };
             })
             .OrderBy(e => e.StartTime)
@@ -91,7 +99,7 @@ public class WorkedHoursController : MainController
         // Apply hour difference filter
         if (hours != null)
         {
-            var workedHoursHelper = new WorkedHoursHelper();
+            //var workedHoursHelper = new WorkedHoursHelper();
             combinedHours = combinedHours
                 .Where(wh =>
                 {

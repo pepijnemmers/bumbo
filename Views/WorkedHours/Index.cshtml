@@ -72,13 +72,14 @@
             {
                 @foreach (var workedHour in Model.WorkedHours)
                 {
+                    var rowClass = workedHour.HasHourDifference ? "text-danger" : "";
                     <tr>
-                        <td>
+                        <td class="@rowClass">
                             @(workedHour.Employee != null
                                 ? $"{workedHour.Employee.FirstName} {workedHour.Employee.LastName}"
                                 : "Geen werknemer")
                         </td>
-                        <td>
+                        <td class="@rowClass">
                             @if(workedHour.StartTime != null)
                             {
                                 @if(workedHour.EndTime != null)
@@ -95,7 +96,7 @@
                                 <span>Niet ingeklokt</span>
                             }
                         </td>
-                        <td>
+                        <td class="@rowClass">
                             @if (workedHour.BreaksDuration.HasValue)
                             {
                                 <div>@workedHour.BreaksDuration.Value.ToString(@"hh\:mm")</div>
@@ -105,7 +106,7 @@
                                 <span>-</span>
                             }
                         </td>
-                        <td>
+                        <td class="@rowClass">
                             @if (workedHour.TotalWorkedTime.HasValue)
                             {
                                 @workedHour.TotalWorkedTime.Value.ToString(@"hh\:mm")
@@ -115,7 +116,7 @@
                                 <span>-</span>
                             }
                         </td>
-                        <td>
+                        <td class="@rowClass">
                             @if (workedHour.PlannedShift != null)
                             {
                                 @workedHour.PlannedShift
@@ -126,13 +127,23 @@
                             }
                         </td>
                         <td>
-                            @if (workedHour.Status != null)
+                            @switch (workedHour.Status)
                             {
-                                @workedHour.Status
-                            }
-                            else
-                            {
-                                <span>-</span>
+                                case HourStatus.Final:
+                                    <span class="badge rounded-pill bg-success bg-opacity-10 text-success d-inline-flex align-items-center">
+                                        Definitief
+                                    </span>
+                                    break;
+                                case HourStatus.Concept:
+                                    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary d-inline-flex align-items-center">
+                                        Concept
+                                    </span>
+                                    break;
+                                default:
+                                    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary d-inline-flex align-items-center">
+                                        Concept
+                                    </span>
+                                    break;
                             }
                         </td>
                         <td>
