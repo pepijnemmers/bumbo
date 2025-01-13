@@ -7,7 +7,7 @@
     <form asp-action="Create" asp-controller="Shifts" method="post">
         <div class="form-group mb-2">
             <label for="date" class="form-label fw-bold">Datum</label>
-            <input type="date" class="form-control" id="date" name="date" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" value="@(Model.SelectedDate.HasValue ? Model.SelectedDate.Value.ToString("yyyy-MM-dd") : String.Empty)" required>
+            <input type="date" class="form-control" id="date" name="date" min="@DateTime.Today.ToString("yyyy-MM-dd")" value="@(Model.SelectedDate.HasValue ? Model.SelectedDate.Value.ToString("yyyy-MM-dd") : String.Empty)" required>
         </div>
         <div class="row">
             <div class="form-group mb-2 col">

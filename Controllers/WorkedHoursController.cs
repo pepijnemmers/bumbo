@@ -72,7 +72,7 @@ public class WorkedHoursController : MainController
                 // Determine if there's a difference
                 TimeOnly? plannedStart = TimeOnly.Parse(x.Shift.Start.ToString("HH:mm"));
                 TimeOnly? plannedEnd = TimeOnly.Parse(x.Shift.End.ToString("HH:mm"));
-                bool hasHourDifference = workedHoursHelper.HasHourDifference(x.WorkedHour?.StartTime, x.WorkedHour?.EndTime, plannedStart, plannedEnd);
+                bool hasHourDifference = workedHoursHelper.HasHourDifference(x.WorkedHour?.StartTime, x.WorkedHour?.EndTime, plannedStart, plannedEnd, breakDuration);
 
                 return new WorkedHourViewModel
                 {
@@ -121,7 +121,9 @@ public class WorkedHoursController : MainController
                         plannedEnd = TimeOnly.Parse(plannedTimes[1]);
                     }
 
-                    return workedHoursHelper.HasHourDifference(wh.StartTime, wh.EndTime, plannedStart, plannedEnd) == true;
+                    var breaksDuration = wh.BreaksDuration;
+
+                    return workedHoursHelper.HasHourDifference(wh.StartTime, wh.EndTime, plannedStart, plannedEnd, breaksDuration) == true;
                 })
                 .ToList();
         }
@@ -191,8 +193,6 @@ public class WorkedHoursController : MainController
     public IActionResult Update(int id, DateOnly date, int employeeId)
     {
         WorkedHour? workedHour;
-        Console.WriteLine(date);
-        Console.WriteLine(employeeId);
 
         Employee? employee = Context.Employees
             .FirstOrDefault(e => e.EmployeeNumber == employeeId);
@@ -233,10 +233,7 @@ public class WorkedHoursController : MainController
                 return NotifyErrorAndRedirect("Gewerkte uren niet gevonden", "Index");
         }
 
-        if (workedHour.EndTime == null)
-        {
-            workedHour.EndTime = TimeOnly.MaxValue;
-        }
+        workedHour.EndTime ??= TimeOnly.MaxValue;
 
         // Validate
         if (workedHour.Breaks != null && workedHour.Breaks.Any(b => b.EndTime == null))

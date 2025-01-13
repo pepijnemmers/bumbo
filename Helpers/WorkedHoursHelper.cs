@@ -4,7 +4,7 @@ namespace BumboApp.Helpers
 {
     public class WorkedHoursHelper
     {
-        public bool HasHourDifference(TimeOnly? startTime, TimeOnly? endTime, TimeOnly? plannedStart, TimeOnly? plannedEnd)
+        public bool HasHourDifference(TimeOnly? startTime, TimeOnly? endTime, TimeOnly? plannedStart, TimeOnly? plannedEnd, TimeSpan? breakDuration)
         {
             if (startTime == null || endTime == null || plannedStart == null || plannedEnd == null)
             {
@@ -13,10 +13,10 @@ namespace BumboApp.Helpers
             }
 
             // Calculate the planned shift duration
-            var plannedDuration = plannedEnd - plannedStart;
+            var plannedDuration = plannedEnd - plannedStart - BreakCalculationHelper.CalculateRequiredBreak(plannedStart.Value, plannedEnd.Value);
 
             // Calculate the actual worked duration
-            var actualWorkedDuration = endTime - startTime;
+            var actualWorkedDuration = endTime - startTime - breakDuration;
 
             // Check if there is a difference
             return actualWorkedDuration != plannedDuration;

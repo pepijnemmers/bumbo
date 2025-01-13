@@ -9,13 +9,13 @@
 <div class="d-flex align-items-center justify-content-between">
     <!-- Date Navigation -->
     <div class="d-flex align-items-center w-100 w-lg-auto">
-        <a class="unset-all text-body" asp-action="Index" asp-route-page="1" asp-route-startDate="@Model.SelectedStartDate.AddDays(-1).ToString("yyyy-MM-dd")" asp-route-employee="@(Model.Employee?.EmployeeNumber.ToString() ?? "")" asp-route-hours="@Model.Hours">
+        <a class="text-body" asp-action="Index" asp-route-page="1" asp-route-startDate="@Model.SelectedStartDate.AddDays(-1).ToString("yyyy-MM-dd")" asp-route-employee="@(Model.Employee?.EmployeeNumber.ToString() ?? "")" asp-route-hours="@Model.Hours">
             <i class="fas fa-chevron-left"></i>
         </a>
         <span class="fw-bold px-1 text-capitalize">
             @Model.SelectedStartDate.ToString("ddd dd-MM-yyyy", CultureInfo.GetCultureInfo("nl-NL"))
         </span>
-        <a class="unset-all text-body" asp-action="Index" asp-route-page="1" asp-route-startDate="@Model.SelectedStartDate.AddDays(1).ToString("yyyy-MM-dd")" asp-route-employee="@(Model.Employee?.EmployeeNumber.ToString() ?? "")" asp-route-hours="@Model.Hours">
+        <a class="text-body" asp-action="Index" asp-route-page="1" asp-route-startDate="@Model.SelectedStartDate.AddDays(1).ToString("yyyy-MM-dd")" asp-route-employee="@(Model.Employee?.EmployeeNumber.ToString() ?? "")" asp-route-hours="@Model.Hours">
             <i class="fas fa-chevron-right"></i>
         </a>    
     </div>
@@ -41,7 +41,7 @@
                 <optgroup label="Toon alle werknemers">
                     <option value="all" selected="@(Model.Employee == null)">Alle werknemers</option>
                 </optgroup>
-                <optgroup label="Toon één werknemer">
+                <optgroup label="Toon &eacute;&eacute;n werknemer">
                     @foreach (var employee in ViewBag.AllEmployees)
                     {
                         <option value="@employee.EmployeeNumber" selected="@(employee == Model.Employee)">
