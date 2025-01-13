@@ -211,7 +211,7 @@
                                 var prognosisReached = scheduledHoursForDep >= prognosisHoursForDep;
                                 var prognosisReachedClass = prognosisReached ? "text-success" : "text-danger";
                                 var prognosisReachedIcon = prognosisReached ? "fa-check" : "fa-xmark";
-                                var prognosisPopoverTitle = prognosisReached ? "Prognose behaald" : "Prognose overschreden";
+                                var prognosisPopoverTitle = prognosisReached ? "Prognose behaald" : "Prognose niet gehaald/overschreden";
                                 
                                 <button class="btn p-0"
                                         data-bs-toggle="popover"
@@ -651,17 +651,25 @@ else
     
     // Week Prognosis modal
     <div class="modal fade" id="prognosis-modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Prognose van week @Model.WeekNumber</h5>
+                    <h5 class="modal-title">
+                        @{
+                            var weekPrognosisReached = Model.WeekPrognosis?.Prognoses.All(p => Model.Shifts
+                                .Where(s => s.Department == p.Department && DateOnly.FromDateTime(s.Start) == p.Date)
+                                .Sum(s => s.End.Hour - s.Start.Hour) >= p.NeededHours); // TODO test or remove
+                        }
+                        Prognose van week @Model.WeekNumber - 
+                        <span class="small @(weekPrognosisReached == null ? "" : (bool)weekPrognosisReached ? "text-success" : "text-danger")">
+                            @(weekPrognosisReached == null ? "" : (bool)weekPrognosisReached ? "Prognose deze week behaald" : "Prognose deze week niet gehaald/overschreden")
+                        </span>
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     @if (Model.WeekPrognosis?.Prognoses != null)
                     {
-                            // TODO: scroll en per dag laten zien totaal gehaald of niet
-                            
                             var weekDays = new Dictionary<DayOfWeek, string>
                             {
                                 { DayOfWeek.Monday, "Maandag" },
@@ -675,35 +683,39 @@ else
 
                             foreach (var weekDay in weekDays)
                             {
-                                <div>
-                                    <h4>@weekDay.Value</h4>
-                                    <ul>
-                                        @foreach (var prognosis in Model.WeekPrognosis.Prognoses.Where(p => p.Date.DayOfWeek == weekDay.Key))
-                                        {
-                                            var plannedHours = Model.Shifts
-                                                .Where(s => s.Department == prognosis.Department
-                                                            && DateOnly.FromDateTime(s.Start) == prognosis.Date)
-                                                .Sum(s => s.End.Hour - s.Start.Hour);
+                                <div class="row border-bottom mb-2">
+                                    <h3 class="h5 col-3">@weekDay.Value</h3>
+                                    @foreach (var prognosis in Model.WeekPrognosis.Prognoses.Where(p => p.Date.DayOfWeek == weekDay.Key))
+                                    {
+                                        var plannedHours = Model.Shifts
+                                            .Where(s => s.Department == prognosis.Department
+                                                        && DateOnly.FromDateTime(s.Start) == prognosis.Date)
+                                            .Sum(s => s.End.Hour - s.Start.Hour);
+                                        var prognosisReached = prognosis.NeededHours - plannedHours == 0;
+                                        var prognosisReachedIcon = prognosisReached ? "fa-check" : "fa-xmark";
 
-                                            <li>
-                                                <h5>
-                                                    @prognosis.Department.ToFriendlyString() -
-                                                    <span class="small @(plannedHours - prognosis.NeededHours >= 0 ? "text-success" : "text-danger")">
-                                                    @(plannedHours - prognosis.NeededHours >= 0 ? "Prognose behaald" : "Prognose overschreden")
+
+                                        <div class="col-3">
+                                            <h4 class="h5">
+                                                @prognosis.Department.ToFriendlyString()
+                                                <span class="fs-6 ms-1 @(plannedHours - prognosis.NeededHours >= 0 ? "text-success" : "text-danger")"
+                                                      title="@(prognosisReached ? "Prognose behaald" : "Prognose niet gehaald/overschreden")">
+                                                    <i class="fa-solid @prognosisReachedIcon"></i>
                                                 </span>
-                                                </h5>
-                                                <ul>
-                                                    <li>Prognose uren: <strong>@prognosis.NeededHours</strong></li>
-                                                    <li>
-                                                        Uren ingepland: <strong>@plannedHours</strong>
-                                                    </li>
-                                                    <li>
-                                                        Verschil: <strong class="@(plannedHours - prognosis.NeededHours >= 0 ? "text-success" : "text-danger")">@(plannedHours - prognosis.NeededHours)</strong>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                        }
-                                    </ul>
+                                            </h4>
+                                            <ul>
+                                                <li>Prognose uren: <strong>@prognosis.NeededHours</strong></li>
+                                                <li>
+                                                    Uren ingepland: <strong>@plannedHours</strong>
+                                                </li>
+                                                <li>
+                                                    Verschil: <strong class="@(plannedHours - prognosis.NeededHours >= 0 ? "text-success" : "text-danger")">@(plannedHours - prognosis.NeededHours)</strong>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    }
+
+
                                 </div>
                             }
                     }
