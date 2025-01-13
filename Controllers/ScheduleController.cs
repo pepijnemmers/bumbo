@@ -1,13 +1,10 @@
 using BumboApp.Helpers;
 using BumboApp.Models;
 using System.Globalization;
-using BumboApp.Helpers;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Localization;
-using System.Globalization;
 
 namespace BumboApp.Controllers
 {
