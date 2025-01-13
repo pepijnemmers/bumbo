@@ -16,6 +16,6 @@ namespace BumboApp.Models
         [StringLength(255)]
         public string Reason { get; set; }
         [Required]
-        public Employee Employee { get; set; }
+        public Employee? Employee { get; set; }
     }
 }

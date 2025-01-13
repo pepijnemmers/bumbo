@@ -11,6 +11,7 @@ namespace BumboApp.ViewModels
         public DateOnly? SelectedDate { get; set; }
         public TimeOnly? SelectedStartHour { get; set; }
         public Department? SelectedDepartment { get; set; }
+        public OpeningHour? OpeningHour { get; set; }
     }
 
 }
