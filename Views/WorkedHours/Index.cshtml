@@ -9,40 +9,42 @@
 <div class="d-flex align-items-center justify-content-between">
     <!-- Date Navigation -->
     <div class="d-flex align-items-center w-100 w-lg-auto">
-        <a class="unset-all text-body" asp-action="Index" asp-route-page="1" asp-route-startDate="@Model.SelectedStartDate.AddDays(-1).ToString("yyyy-MM-dd")" asp-route-employee="@(Model.Employee?.EmployeeNumber.ToString() ?? "")">
+        <a class="unset-all text-body" asp-action="Index" asp-route-page="1" asp-route-startDate="@Model.SelectedStartDate.AddDays(-1).ToString("yyyy-MM-dd")" asp-route-employee="@(Model.Employee?.EmployeeNumber.ToString() ?? "")" asp-route-hours="@Model.Hours">
             <i class="fas fa-chevron-left"></i>
         </a>
         <span class="fw-bold px-1 text-capitalize">
             @Model.SelectedStartDate.ToString("ddd dd-MM-yyyy", CultureInfo.GetCultureInfo("nl-NL"))
         </span>
-        <a class="unset-all text-body" asp-action="Index" asp-route-page="1" asp-route-startDate="@Model.SelectedStartDate.AddDays(1).ToString("yyyy-MM-dd")" asp-route-employee="@(Model.Employee?.EmployeeNumber.ToString() ?? "")">
+        <a class="unset-all text-body" asp-action="Index" asp-route-page="1" asp-route-startDate="@Model.SelectedStartDate.AddDays(1).ToString("yyyy-MM-dd")" asp-route-employee="@(Model.Employee?.EmployeeNumber.ToString() ?? "")" asp-route-hours="@Model.Hours">
             <i class="fas fa-chevron-right"></i>
         </a>    
     </div>
 
-    @* <!-- Hours filter -->
-    <div>
-        <select class="form-select w-100 w-lg-auto" onchange="GoToHours(this)">
-                <option value="all" selected="@(Model.Employee == null)">Alle uren</option>
-                <option value="different" selected="@(Model.Employee == null)">Alle uren</option>
-        </select>
-    </div> *@
+    <div class="d-flex gap-2">
+        <!-- Hours filter -->
+        <div>
+            <select class="form-select w-100 w-lg-auto" onchange="GoToHours(this)">
+                    <option value="all" selected="@(Model.Hours == null)">Alle uren</option>
+                    <option value="different" selected="@(Model.Hours == "different")">Afwijkend</option>
+            </select>
+        </div> 
 
-    <!-- Employee filter -->
-    <div>
-        <select class="form-select w-100 w-lg-auto" onchange="GoToEmployee(this)">
-            <optgroup label="Toon alle werknemers">
-                <option value="all" selected="@(Model.Employee == null)">Alle werknemers</option>
-            </optgroup>
-            <optgroup label="Toon één werknemer">
-                @foreach (var employee in ViewBag.AllEmployees)
-                {
-                    <option value="@employee.EmployeeNumber" selected="@(employee == Model.Employee)">
-                        @employee.FirstName @employee.LastName
-                    </option>
-                }
-            </optgroup>
-        </select>
+        <!-- Employee filter -->
+        <div>
+            <select class="form-select w-100 w-lg-auto" onchange="GoToEmployee(this)">
+                <optgroup label="Toon alle werknemers">
+                    <option value="all" selected="@(Model.Employee == null)">Alle werknemers</option>
+                </optgroup>
+                <optgroup label="Toon één werknemer">
+                    @foreach (var employee in ViewBag.AllEmployees)
+                    {
+                        <option value="@employee.EmployeeNumber" selected="@(employee == Model.Employee)">
+                            @employee.FirstName @employee.LastName
+                        </option>
+                    }
+                </optgroup>
+            </select>
+        </div>
     </div>
 </div>
 
@@ -173,14 +175,14 @@
             location.href = url;
         }
 
-        // function GoToEmployee(select) {
-        //     const url = new URL(window.location.href);
-        //     if (select.value.toLowerCase() === "all") {
-        //         url.searchParams.delete("employee");
-        //     } else {
-        //         url.searchParams.set("employee", select.value);
-        //     }
-        //     location.href = url;
-        // }
+        function GoToHours(select) {
+            const url = new URL(window.location.href);
+            if (select.value.toLowerCase() === "all") {
+                url.searchParams.delete("hours");
+            } else {
+                url.searchParams.set("hours", select.value);
+            }
+            location.href = url;
+        }
     </script>
 }

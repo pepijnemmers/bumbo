@@ -1,3 +1,4 @@
+using BumboApp.Helpers;
 using BumboApp.Models;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -84,6 +85,28 @@ public class WorkedHoursController : MainController
         {
             combinedHours = combinedHours
                 .Where(wh => wh.Employee != null && wh.Employee.EmployeeNumber == selectedEmployee.EmployeeNumber)
+                .ToList();
+        }
+
+        // Apply hour difference filter
+        if (hours != null)
+        {
+            var workedHoursHelper = new WorkedHoursHelper();
+            combinedHours = combinedHours
+                .Where(wh =>
+                {
+                    TimeOnly? plannedStart = null;
+                    TimeOnly? plannedEnd = null;
+
+                    if (wh.PlannedShift != null)
+                    {
+                        var plannedTimes = wh.PlannedShift.Split(" - ");
+                        plannedStart = TimeOnly.Parse(plannedTimes[0]);
+                        plannedEnd = TimeOnly.Parse(plannedTimes[1]);
+                    }
+
+                    return workedHoursHelper.HasHourDifference(wh.StartTime, wh.EndTime, plannedStart, plannedEnd) == true;
+                })
                 .ToList();
         }
 
