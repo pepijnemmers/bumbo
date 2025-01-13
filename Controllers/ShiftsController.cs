@@ -8,7 +8,7 @@ namespace BumboApp.Controllers
 {
     public class ShiftsController : MainController
     {
-        private readonly String _actionUrl = "~/Schedule?startDate="; //day will be added while making the Notification
+        private const string ActionUrl = "~/Schedule?startDate="; //day will be added while making the Notification
         [HttpGet]
         public IActionResult Create(string? date, int? startHour, string? department)
         {
@@ -227,7 +227,7 @@ namespace BumboApp.Controllers
                         Description = $"Er is een dienst voor jou toegevoegd op {startToInsert.ToString("dd-MM-yyyy")}",
                         SentAt = DateTime.Now,
                         HasBeenRead = false,
-                        ActionUrl = _actionUrl + startToInsert.ToString("dd-MM-yyyy")
+                        ActionUrl = ActionUrl + startToInsert.ToString("dd-MM-yyyy")
                     });
                 }
                 Context.SaveChanges();
@@ -324,7 +324,7 @@ namespace BumboApp.Controllers
                                 $"Er is een dienst voor jou toegevoegd op {shift.Start.ToString("dd/MM/yyyy")}.",
                             SentAt = DateTime.Now,
                             HasBeenRead = false,
-                            ActionUrl = _actionUrl + shift.Start.ToString("dd/MM/yyyy")
+                            ActionUrl = ActionUrl + shift.Start.ToString("dd/MM/yyyy")
                         });
                     }
                     else
@@ -338,7 +338,7 @@ namespace BumboApp.Controllers
                                 $"Je dienst op {shift.Start.ToString("dd/MM/yyyy")} van {shift.Start.ToString("HH:mm")} tot {shift.End.ToString("HH:mm")} is gewijzigd.",
                             SentAt = DateTime.Now,
                             HasBeenRead = false,
-                            ActionUrl = _actionUrl + shift.Start.ToString("dd/MM/yyyy")
+                            ActionUrl = ActionUrl + shift.Start.ToString("dd/MM/yyyy")
                         });
                     }
                 }
@@ -384,7 +384,7 @@ namespace BumboApp.Controllers
                             $"Je dienst op {shiftToDelete.Start.ToString("dd/MM/yyyy")} van {shiftToDelete.Start.ToString("HH:mm")} tot {shiftToDelete.End.ToString("HH:mm")} is verwijderd.",
                         SentAt = DateTime.Now,
                         HasBeenRead = false,
-                        ActionUrl = _actionUrl + shiftToDelete.Start.ToString("dd/MM/yyyy")
+                        ActionUrl = ActionUrl + shiftToDelete.Start.ToString("dd/MM/yyyy")
                     });   
                 }
                 
