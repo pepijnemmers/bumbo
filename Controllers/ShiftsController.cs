@@ -258,7 +258,7 @@ namespace BumboApp.Controllers
             var shiftStart = new DateTime(date, start);
             var shiftEnd = new DateTime(date, end);
             
-            // validation (TODO: check if is allowed cao)
+            // validation 
             if (ModelState.IsValid == false)
             {
                 NotifyService.Error("Niet alle velden zijn ingevuld");
