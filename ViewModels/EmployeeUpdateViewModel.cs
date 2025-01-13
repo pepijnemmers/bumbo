@@ -18,12 +18,12 @@ namespace BumboApp.ViewModels
 
         [DutchRequired(ErrorMessage = "voornaam")]
         [StringLength(20)]
-        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Gebruik alleen letters")]
+        [RegularExpression(@"^\p{L}+$", ErrorMessage = "Gebruik alleen letters")]
         public string FirstName { get; set; }
 
         [DutchRequired(ErrorMessage = "achternaam")]
         [StringLength(20)]
-        [RegularExpression(@"^[a-zA-Z]+(?: [a-zA-Z]+)*$", ErrorMessage = "Gebruik alleen letters, en geen dubbele spaties")]
+        [RegularExpression(@"^\p{L}+(?: \p{L}+)*$", ErrorMessage = "Gebruik alleen letters, en geen dubbele spaties")]
         public string LastName { get; set; }
 
         [DateAfter(1900, 1, 1)]

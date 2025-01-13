@@ -14,6 +14,7 @@ public class ScheduleViewModel
     public required List<OpeningHour> OpeningHours { get; set; }
     public required List<Employee> Employees { get; set; }
     public required List<Shift> Shifts { get; set; }
+    public required List<Shift> ShiftsOfFullWeek { get; set; }
     
     public required Employee? SelectedEmployee { get; set; }
     public required bool IsDayView { get; set; }

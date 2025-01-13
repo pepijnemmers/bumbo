@@ -65,6 +65,12 @@ namespace BumboApp.Controllers
                 .OrderBy(shift => shift.Department)
                 .ToList();
             
+            var shiftOfFullWeek = Context.Shifts
+                .Where(shift => DateOnly.FromDateTime(shift.Start) >= selectedStartDate 
+                                && DateOnly.FromDateTime(shift.Start) < selectedStartDate.AddDays(7))
+                .OrderBy(shift => shift.Department)
+                .ToList();
+            
             // Check if view is concept or final
             var viewIsConcept = shifts.Any(shift => !shift.IsFinal);
             
@@ -87,6 +93,7 @@ namespace BumboApp.Controllers
                 OpeningHours = openingHours,
                 Employees = employees,
                 Shifts = shifts,
+                ShiftsOfFullWeek = shiftOfFullWeek,
                 
                 SelectedEmployee = selectedEmployee,
                 IsDayView = isDayView
@@ -555,48 +562,72 @@ namespace BumboApp.Controllers
             return previous.End.Hour;
         }
 
-        public IActionResult DeleteWeek(int weekNumber, int year)
+        public IActionResult DeleteWeek(DateOnly startDate)
         {
-            var deleteDate = new DateOnly(year, 1, 1).AddDays((weekNumber - 1) * 7);
+            var weekFirstDay = DateConvertorHelper.GetMondayOfWeek(startDate);
+            var weekLastDay = weekFirstDay.AddDays(6);
+            
             var shifts = Context.Shifts
-                .Where(shift => DateOnly.FromDateTime(shift.Start) >= deleteDate
-                                && DateOnly.FromDateTime(shift.Start) < deleteDate.AddDays(7))
+                .Where(shift => DateOnly.FromDateTime(shift.Start) >= weekFirstDay
+                                && DateOnly.FromDateTime(shift.Start) <= weekLastDay)
+                .Include(shift => shift.Employee)
                 .ToList();
             
             if (shifts.Count == 0)
             {
                 NotifyService.Error("Er zijn geen diensten gevonden voor de week");
-                return RedirectToAction("Index", new { startDate = deleteDate.ToString("dd/MM/yyyy") });
+                return RedirectToAction("Index", new { startDate = weekFirstDay.ToString("dd/MM/yyyy") });
             }
 
             try
             {
+                // send notification to employees
+                foreach (var shift in shifts)
+                {
+                    if (shift.Employee != null && shift.IsFinal)
+                    {
+                        Context.Notifications.Add(new Notification
+                        {
+                            Employee = shift.Employee,
+                            Title = $"Dienst verwijderd - {shift.Start.ToString("dd-MM-yyyy")}",
+                            Description = $"Er is een dienst van jou verwijderd op {shift.Start.ToString("dd-MM-yyyy")}",
+                            SentAt = DateTime.Now,
+                            HasBeenRead = false,
+                            ActionUrl = $"/Schedule?startDate={shift.Start.ToString("dd/MM/yyyy")}"
+                        });
+                    }
+                }
+                
+                // delete shifts
                 Context.ShiftTakeOvers.RemoveRange(Context.ShiftTakeOvers.Where(takeOver => shifts.Contains(takeOver.Shift)));
                 Context.Shifts.RemoveRange(shifts);
+                
                 Context.SaveChanges();
                 NotifyService.Success("De shifts van de week zijn verwijderd");
-                return RedirectToAction("Index", new { startDate = deleteDate.ToString("dd/MM/yyyy") });
+                return RedirectToAction("Index", new { startDate = weekFirstDay.ToString("dd/MM/yyyy") });
             }
             catch
             {
                 NotifyService.Error("Er is iets fout gegaan bij het verwijderen van de shifts");
-                return RedirectToAction("Index", new { startDate = deleteDate.ToString("dd/MM/yyyy") });
+                return RedirectToAction("Index", new { startDate = weekFirstDay.ToString("dd/MM/yyyy") });
             }
         }
 
-        public IActionResult PublishWeek(int weekNumber, int year)
+        public IActionResult PublishWeek(DateOnly startDate)
         {
-            var publishDate = new DateOnly(year, 1, 1).AddDays((weekNumber - 1) * 7);
+            var weekFirstDay = DateConvertorHelper.GetMondayOfWeek(startDate);
+            var weekLastDay = weekFirstDay.AddDays(6);
+            
             var shifts = Context.Shifts
-                .Where(shift => DateOnly.FromDateTime(shift.Start) >= publishDate
-                                && DateOnly.FromDateTime(shift.Start) < publishDate.AddDays(7)
+                .Where(shift => DateOnly.FromDateTime(shift.Start) >= weekFirstDay
+                                && DateOnly.FromDateTime(shift.Start) <= weekLastDay
                                 && !shift.IsFinal).Include(shift => shift.Employee)
                 .ToList();
 
             if (shifts.Count == 0)
             {
                 NotifyService.Error("Er zijn geen concept diensten gevonden voor de week");
-                return RedirectToAction("Index", new { startDate = publishDate.ToString("dd/MM/yyyy") });
+                return RedirectToAction("Index", new { startDate = weekFirstDay.ToString("dd/MM/yyyy") });
             }
 
             try
@@ -622,12 +653,12 @@ namespace BumboApp.Controllers
                 
                 Context.SaveChanges();
                 NotifyService.Success("De concept diensten zijn gepubliceerd");
-                return RedirectToAction("Index", new { startDate = publishDate.ToString("dd/MM/yyyy") });
+                return RedirectToAction("Index", new { startDate = weekFirstDay.ToString("dd/MM/yyyy") });
             }
             catch
             {
                 NotifyService.Error("Er is iets fout gegaan bij het publiceren van de diensten");
-                return RedirectToAction("Index", new { startDate = publishDate.ToString("dd/MM/yyyy") });
+                return RedirectToAction("Index", new { startDate = weekFirstDay.ToString("dd/MM/yyyy") });
             }
             
         }
