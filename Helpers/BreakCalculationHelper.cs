@@ -18,7 +18,6 @@ public static class BreakCalculationHelper
 
     public static TimeSpan CalculateRequiredBreak(TimeOnly start, TimeOnly end)
     {
-        TimeSpan shiftDuration = end.ToTimeSpan() - start.ToTimeSpan();
-        return CalculateBreak(shiftDuration);
+        return CalculateBreak(end - start);
     }
 }
