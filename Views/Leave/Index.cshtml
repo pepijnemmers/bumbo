@@ -117,12 +117,14 @@
             }
         </tbody>
     </table>
-    @if (ViewBag.MaxPages > 1)
+    @if (ViewBag.MaxPagesLeave > 1)
     {
+        string queryName = "pageLeave";
         <Component type="typeof(Pagination)"
             render-mode="ServerPrerendered"
-            param-PageNumber="ViewBag.PageNumber"
-            param-MaxPages="ViewBag.MaxPages" />
+            param-PageNumber="ViewBag.PageNumberLeave"
+            param-MaxPages="ViewBag.MaxPagesLeave"
+            param-QueryName="queryName" />
     }
 </div>
 
@@ -169,12 +171,14 @@
             }
         </tbody>
     </table>
-    @if (ViewBag.MaxPages > 1)
+    @if (ViewBag.MaxPagesSickness > 1)
     {
+        string queryName = "pageSickness";
         <Component type="typeof(Pagination)"
                    render-mode="ServerPrerendered"
-                   param-PageNumber="ViewBag.PageNumber"
-                   param-MaxPages="ViewBag.MaxPages" />
+                   param-PageNumber="ViewBag.PageNumberSickness"
+                   param-MaxPages="ViewBag.MaxPagesSickness"
+                   param-QueryName="queryName" />
     }
 </div>
 
