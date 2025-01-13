@@ -18,9 +18,9 @@
             <div class="buttons">
                 <button class="btn btn-outline-danger d-block d-lg-inline-block mt-2 mt-lg-0" data-bs-toggle="modal" data-bs-target="#delete-week-modal">
                     <i class="fas fa-trash-alt"></i>
-                    Concept week verwijderen
+                    Week verwijderen
                 </button>
-                <a asp-controller="Schedule" asp-action="PublishWeek" asp-route-weekNumber="@Model.WeekNumber" asp-route-year="@Model.SelectedStartDate.Year" class="btn btn-success d-block d-lg-inline-block mt-2 mb-3 my-lg-0">
+                <a asp-controller="Schedule" asp-action="PublishWeek" asp-route-startDate="@Model.SelectedStartDate.ToString("yyyy-MM-dd")" class="btn btn-success d-block d-lg-inline-block mt-2 mb-3 my-lg-0">
                     <i class="fas fa-check"></i>
                     Week publiceren
                 </a>
@@ -630,11 +630,11 @@ else
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Door op "Verwijderen" te klikken worden alle diensten van deze week verwijderd. Dit kan niet ongedaan worden gemaakt.
+                    Door op "Verwijderen" te klikken worden alle diensten van deze week verwijderd (zowel concept, als gepubliceerde diensten). Dit kan niet ongedaan worden gemaakt.
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuleren</button>
-                    <a class="btn btn-danger" asp-controller="Schedule" asp-action="DeleteWeek" asp-route-weekNumber="@Model.WeekNumber" asp-route-year="@Model.SelectedStartDate.Year">
+                    <a class="btn btn-danger" asp-controller="Schedule" asp-action="DeleteWeek" asp-route-startDate="@Model.SelectedStartDate.ToString("yyyy-MM-dd")">
                         Verwijderen
                     </a>
                 </div>
