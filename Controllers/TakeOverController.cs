@@ -1,9 +1,11 @@
-﻿using BumboApp.Models;
+﻿using BumboApp.Helpers;
+using BumboApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BumboApp.Controllers
 {
@@ -186,6 +188,8 @@ namespace BumboApp.Controllers
 
             // Fetch the employee associated with the logged-in user
             var employee = Context.Employees
+                .Include(e => e.Shifts)
+                .Include(e => e.SchoolSchedules)
                 .FirstOrDefault(e => e.User != null && e.User.Id == userId);
             if (employee == null) { return NotifyErrorAndRedirect("Kon gebruiker niet vinden", "Index", "Dashboard"); }
 
@@ -203,8 +207,13 @@ namespace BumboApp.Controllers
                           s.Start < shiftTakeOver.Shift.End &&
                           s.End > shiftTakeOver.Shift.Start);
             if (overlappingShiftExists) { return NotifyErrorAndRedirect("Je hebt al een shift op dit tijdstip", "Index", "Dashboard"); }
-            
-            //TODO: Checken CAO regels.
+
+            int maxHours = new MaxScheduleTimeCalculationHelper(Context).GetMaxTimeCao(employee, shiftTakeOver.Shift.Department, DateOnly.FromDateTime(shiftTakeOver.Shift.Start), shiftTakeOver.Shift.Start.Hour);
+            if (maxHours < (shiftTakeOver.Shift.End.Hour - shiftTakeOver.Shift.Start.Hour))
+            {
+                if(maxHours < 0) { maxHours = 0; }
+                return NotifyErrorAndRedirect("aantal uren voldoet niet aan het maximum volgens de CAO. Het maximum aantal uren is " + maxHours, "Index", "Dashboard");
+            }
 
             using var transaction = Context.Database.BeginTransaction();
             try

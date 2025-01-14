@@ -381,7 +381,7 @@ namespace BumboApp.Controllers
                 }
             }
 
-            int maxTimeCAO = _maxScheduleTimeCalculationHelper.GetMaxTimeCao(employee, department, startDate, startDate.AddDays(6), startingHour);
+            int maxTimeCAO = _maxScheduleTimeCalculationHelper.GetMaxTimeCao(employee, department, scheduleDate, startingHour);
             int maxTimePrognose = _maxScheduleTimeCalculationHelper.GetMaxTimePrognose(department, scheduleDate);
             int maxTimeContract = _maxScheduleTimeCalculationHelper.GetMaxTimeContract(employee, startDate);
             List<int> maxhours = new List<int> { maxTimeCAO, maxTimePrognose, maxTimeContract, maxTimeAvailable };
@@ -473,7 +473,7 @@ namespace BumboApp.Controllers
             }
 
 
-            int maxTimeCao = _maxScheduleTimeCalculationHelper.GetMaxTimeCao(employee, department, startDate, startDate.AddDays(6), startingHour);
+            int maxTimeCao = _maxScheduleTimeCalculationHelper.GetMaxTimeCao(employee, department,scheduleDate , startingHour);
             int maxTimePrognose = _maxScheduleTimeCalculationHelper.GetMaxTimePrognose(department, scheduleDate);
             int maxTimeContract = _maxScheduleTimeCalculationHelper.GetMaxTimeContract(employee, startDate);
             int maxTimeTillClose = closingHour - startingHour;
