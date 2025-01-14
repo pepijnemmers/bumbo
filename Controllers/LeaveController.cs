@@ -14,6 +14,7 @@ namespace BumboApp.Controllers
         private Employee? _loggedInEmployee;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private const string ActionUrl = "~/Leave";
 
         public LeaveController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
@@ -21,7 +22,7 @@ namespace BumboApp.Controllers
             _roleManager = roleManager;
         }
 
-        public IActionResult Index(int? page, SortOrder? orderBy = SortOrder.Ascending, Status? selectedStatus = null)
+        public IActionResult Index(int? pageLeave, int? pageSickness, SortOrder? orderBy = SortOrder.Ascending, Status? selectedStatus = null)
         {
             _loggedInEmployee = GetLoggedInEmployee();
 
@@ -50,26 +51,38 @@ namespace BumboApp.Controllers
                 leaveRequests.Reverse();
             }
 
-            int currentPageNumber = page ?? DefaultPage;
+            // pagination for leave requests
+            int currentPageNumberLeave = pageLeave ?? DefaultPage;
             int maxPages = (int)(Math.Ceiling((decimal)leaveRequests.Count / PageSize));
 
-            if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
-            if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
+            if (currentPageNumberLeave <= 0) { currentPageNumberLeave = DefaultPage; }
+            if (currentPageNumberLeave > maxPages) { currentPageNumberLeave = maxPages; }
 
-            ViewBag.PageNumber = currentPageNumber;
-            ViewBag.PageSize = PageSize;
-            ViewBag.MaxPages = maxPages;
+            ViewBag.PageNumberLeave = currentPageNumberLeave;
+            ViewBag.PageSizeLeave = PageSize;
+            ViewBag.MaxPagesLeave = maxPages;
+            
+            // pagination for sick leaves
+            int currentPageNumberSickness = pageSickness ?? DefaultPage;
+            int maxPagesSickness = (int)(Math.Ceiling((decimal)sickLeaves.Count / PageSize));
+            
+            if (currentPageNumberSickness <= 0) { currentPageNumberSickness = DefaultPage; }
+            if (currentPageNumberSickness > maxPagesSickness) { currentPageNumberSickness = maxPagesSickness; }
+            
+            ViewBag.PageNumberSickness = currentPageNumberSickness;
+            ViewBag.PageSizeSickness = PageSize;
+            ViewBag.MaxPagesSickness = maxPagesSickness;
 
             ViewBag.OrderBy = orderBy ?? SortOrder.Ascending;
 
             var viewModel = new LeaveRequestViewModel
             {
                 LeaveRequestsForPage = leaveRequests
-                    .Skip((currentPageNumber - 1) * PageSize)
+                    .Skip((currentPageNumberLeave - 1) * PageSize)
                     .Take(PageSize)
                     .ToList(),
                 SelectedStatus = selectedStatus,
-                SickLeaves = sickLeaves.Skip((currentPageNumber - 1) * PageSize)
+                SickLeaves = sickLeaves.Skip((currentPageNumberSickness - 1) * PageSize)
                     .Take(PageSize)
                     .ToList(),
                 LoggedInEmployee = _loggedInEmployee,
@@ -187,6 +200,7 @@ namespace BumboApp.Controllers
                         Employee = manager,
                         Title = "Nieuwe verlofaanvraag",
                         Description = "Er is een nieuwe verlofaanvraag om te beoordelen",
+                        ActionUrl = ActionUrl,
                         SentAt = DateTime.Now,
                         HasBeenRead = false
                     };
@@ -226,7 +240,8 @@ namespace BumboApp.Controllers
                     Title = "Nieuwe verlofaanvraag status",
                     Description = "Je verlofaanvraag is beoordeeld",
                     SentAt = DateTime.Now,
-                    HasBeenRead = false
+                    HasBeenRead = false,
+                    ActionUrl = ActionUrl,
                 };
                 Context.Notifications.Add(notification);
 

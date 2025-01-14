@@ -23,6 +23,7 @@
     --department-vakkenvullen-border: #dca97d;
     --department-kassa-color: #E6F3E0;
     --department-kassa-border: #97bf93;
+    --schedule-closed-color: #f2f2f2;
 }
 
 :not(body, html)::-webkit-scrollbar {
@@ -87,6 +88,15 @@
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;
     border-radius: 0.2rem;
+}
+
+/* Input */
+input[type="datetime-local"][step="3600"]::-webkit-inner-spin-button,
+input[type="datetime-local"][step="3600"]::-webkit-calendar-picker-indicator,
+input[type="time"][step="3600"]::-webkit-inner-spin-button,
+input[type="time"][step="3600"]::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
 }
 
 /* Site */
@@ -320,6 +330,29 @@ label {
     padding: .3em;
     cursor: pointer;
 }
+.calendar-grid .day-col .day-hours-grid .hour.closed,
+.calendar-grid .day-col.closed .day-hours-grid .hour {
+    position: relative;
+    background-color: var(--schedule-closed-color);
+    cursor: auto;
+}
+.calendar-grid .day-col .day-hours-grid .hour.closed::after,
+.calendar-grid .day-col.closed .day-hours-grid .hour::after,
+.legenda .gesloten::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.4),
+            rgba(255, 255, 255, 0.4) 10px,
+            rgba(255, 255, 255, 0) 10px,
+            rgba(255, 255, 255, 0) 20px
+    );
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+}
 .calendar-grid .day-col .day-hours-grid .hour:last-child {
     border-bottom: none;
 }
@@ -334,6 +367,7 @@ label {
 /* Schedule shift overlay */
 .calendar-container .shifts-overlay {
     position: absolute;
+    z-index: 1;
     inset: 0;
     left: var(--cdr-time-col-width);
     top: var(--cdr-header-height);
@@ -458,6 +492,12 @@ label {
             rgba(255, 255, 255, 0) 5px,
             rgba(255, 255, 255, 0) 10px
     );
+}
+.legenda .gesloten {
+    position: relative;
+    background-color: var(--schedule-closed-color);
+    border: 2px solid var(--border-clr);
+    border-radius: 3px;
 }
 
 @media (min-width: 992px) {

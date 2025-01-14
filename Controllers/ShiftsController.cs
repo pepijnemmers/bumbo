@@ -8,6 +8,7 @@ namespace BumboApp.Controllers
 {
     public class ShiftsController : MainController
     {
+        private const string ActionUrl = "~/Schedule?startDate="; //day will be added while making the Notification
         [HttpGet]
         public IActionResult Create(string? date, int? startHour, string? department)
         {
@@ -154,15 +155,14 @@ namespace BumboApp.Controllers
                 NotifyService.Error("De afdeling is niet geldig");
                 valid = false;
             }
-            var openingHour = Context.OpeningHours.AsEnumerable().FirstOrDefault(oh => oh.WeekDay == date!.Value.DayOfWeek);
-            if (openingHour != null && openingHour.OpeningTime > start && valid)
+            var openingHours = Context.OpeningHours.FirstOrDefault(oh => oh.WeekDay == date!.Value.DayOfWeek);
+            if ((openingHours?.OpeningTime == null 
+                 || openingHours.ClosingTime == null
+                 || start < openingHours.OpeningTime
+                    || end > openingHours.ClosingTime
+                 ) && valid)
             {
-                NotifyService.Error("De dienst kan niet voor openingstijd beginnen");
-                valid = false;
-            }
-            if (openingHour != null && openingHour.ClosingTime < end && valid)
-            {
-                NotifyService.Error("De dienst kan niet na sluitingstijd eindigen");
+                NotifyService.Error("De dienst valt buiten de openingstijden");
                 valid = false;
             }
             
@@ -226,7 +226,7 @@ namespace BumboApp.Controllers
                         Description = $"Er is een dienst voor jou toegevoegd op {startToInsert.ToString("dd-MM-yyyy")}",
                         SentAt = DateTime.Now,
                         HasBeenRead = false,
-                        ActionUrl = $"/Schedule?startDate={startToInsert.ToString("dd/MM/yyyy")}"
+                        ActionUrl = ActionUrl + startToInsert.ToString("dd-MM-yyyy")
                     });
                 }
                 Context.SaveChanges();
@@ -267,15 +267,13 @@ namespace BumboApp.Controllers
                 NotifyService.Error("De werknemer kon niet worden gevonden");
                 return RedirectToAction("Update", new { id = id });
             }
-            var openingHour = Context.OpeningHours.AsEnumerable().FirstOrDefault(oh => oh.WeekDay == date.DayOfWeek);
-            if (openingHour != null && openingHour.OpeningTime > start)
+            var openingHours = Context.OpeningHours.FirstOrDefault(oh => oh.WeekDay == date.DayOfWeek);
+            if (openingHours?.OpeningTime == null 
+                || openingHours.ClosingTime == null 
+                || TimeOnly.FromDateTime(shiftStart) < openingHours.OpeningTime 
+                || TimeOnly.FromDateTime(shiftEnd) > openingHours.ClosingTime)
             {
-                NotifyService.Error("De dienst kan niet voor openingstijd beginnen");
-                return RedirectToAction("Update", new { id = id });
-            }
-            if (openingHour != null && openingHour.ClosingTime < end)
-            {
-                NotifyService.Error("De dienst kan niet na sluitingstijd eindigen");
+                NotifyService.Error("De dienst valt buiten de openingstijden");
                 return RedirectToAction("Update", new { id = id });
             }
             
@@ -323,7 +321,7 @@ namespace BumboApp.Controllers
                                 $"Er is een dienst voor jou toegevoegd op {shift.Start.ToString("dd/MM/yyyy")}.",
                             SentAt = DateTime.Now,
                             HasBeenRead = false,
-                            ActionUrl = $"/Schedule?startDate={shift.Start.ToString("dd/MM/yyyy")}"
+                            ActionUrl = ActionUrl + shift.Start.ToString("dd/MM/yyyy")
                         });
                     }
                     else
@@ -337,7 +335,7 @@ namespace BumboApp.Controllers
                                 $"Je dienst op {shift.Start.ToString("dd/MM/yyyy")} van {shift.Start.ToString("HH:mm")} tot {shift.End.ToString("HH:mm")} is gewijzigd.",
                             SentAt = DateTime.Now,
                             HasBeenRead = false,
-                            ActionUrl = $"/Schedule?startDate={shift.Start.ToString("dd/MM/yyyy")}"
+                            ActionUrl = ActionUrl + shift.Start.ToString("dd/MM/yyyy")
                         });
                     }
                 }
@@ -383,7 +381,7 @@ namespace BumboApp.Controllers
                             $"Je dienst op {shiftToDelete.Start.ToString("dd/MM/yyyy")} van {shiftToDelete.Start.ToString("HH:mm")} tot {shiftToDelete.End.ToString("HH:mm")} is verwijderd.",
                         SentAt = DateTime.Now,
                         HasBeenRead = false,
-                        ActionUrl = $"/Schedule?startDate={shiftToDelete.Start.ToString("dd/MM/yyyy")}"
+                        ActionUrl = ActionUrl + shiftToDelete.Start.ToString("dd/MM/yyyy")
                     });   
                 }
                 

@@ -3,10 +3,13 @@
 
 @code {
     [Parameter]
-    public int PageNumber { get; set; }
+    public required int PageNumber { get; set; }
 
     [Parameter]
-    public int MaxPages { get; set; }
+    public required int MaxPages { get; set; }
+    
+    [Parameter]
+    public string QueryName { get; set; } = "page";
 
     private string GenerateUrl(int page)
     {
@@ -14,7 +17,7 @@
         var query = QueryHelpers.ParseQuery(uri.Query);
 
         var queryParams = query.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToString());
-        queryParams["page"] = page.ToString();
+        queryParams[QueryName] = page.ToString();
         var newQuery = string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={kvp.Value}"));
 
         return $"?{newQuery}";
