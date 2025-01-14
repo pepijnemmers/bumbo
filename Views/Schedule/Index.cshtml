@@ -18,9 +18,9 @@
             <div class="buttons">
                 <button class="btn btn-outline-danger d-block d-lg-inline-block mt-2 mt-lg-0" data-bs-toggle="modal" data-bs-target="#delete-week-modal">
                     <i class="fas fa-trash-alt"></i>
-                    Concept week verwijderen
+                    Week verwijderen
                 </button>
-                <a asp-controller="Schedule" asp-action="PublishWeek" asp-route-weekNumber="@Model.WeekNumber" asp-route-year="@Model.SelectedStartDate.Year" class="btn btn-success d-block d-lg-inline-block mt-2 mb-3 my-lg-0">
+                <a asp-controller="Schedule" asp-action="PublishWeek" asp-route-startDate="@Model.SelectedStartDate.ToString("yyyy-MM-dd")" class="btn btn-success d-block d-lg-inline-block mt-2 mb-3 my-lg-0">
                     <i class="fas fa-check"></i>
                     Week publiceren
                 </a>
@@ -83,6 +83,12 @@
             }
             @if (role == Role.Manager)
             {
+                if (Model.WeekPrognosis?.Prognoses != null) {
+                    <button class="btn btn-outline-secondary w-100 w-lg-auto" data-bs-toggle="modal" data-bs-target="#prognosis-modal">
+                        <i class="fa-solid fa-chart-simple"></i>
+                        Prognose bekijken
+                    </button>
+                }
                 <a class="btn btn-primary w-100 w-lg-auto" asp-controller="Shifts" asp-action="Create">
                     <i class="fas fa-plus"></i>
                     Dienst toevoegen
@@ -107,7 +113,7 @@
                     <optgroup label="Toon alle werknemers">
                         <option value="all" selected="@(Model.SelectedEmployee == null)">Alle werknemers</option>
                     </optgroup>
-                    <optgroup label="Toon één werknemer">
+                    <optgroup label="Toon &eacute;&eacute;n werknemer">
                         @foreach (Employee employee in Model.Employees)
                         {
                             <option value="@employee.EmployeeNumber" selected="@(employee == Model.SelectedEmployee)">@employee.FirstName @employee.LastName</option>
@@ -199,13 +205,13 @@
                                 var prognosisForDep = Model.WeekPrognosis.Prognoses
                                     .FirstOrDefault(p => p.Department == department && p.Date == Model.SelectedStartDate);
                                 var prognosisHoursForDep = prognosisForDep?.NeededHours;
-                                var scheduledHoursForDep = Model.Shifts
+                                var scheduledHoursForDep = Model.ShiftsOfFullWeek
                                     .Where(s => s.Department == department && DateOnly.FromDateTime(s.Start) == Model.SelectedStartDate)
                                     .Sum(s => s.End.Hour - s.Start.Hour);
                                 var prognosisReached = scheduledHoursForDep >= prognosisHoursForDep;
                                 var prognosisReachedClass = prognosisReached ? "text-success" : "text-danger";
                                 var prognosisReachedIcon = prognosisReached ? "fa-check" : "fa-xmark";
-                                var prognosisPopoverTitle = prognosisReached ? "Prognose behaald" : "Prognose overschreden";
+                                var prognosisPopoverTitle = prognosisReached ? "Prognose behaald" : "Prognose niet gehaald/overschreden";
                                 
                                 <button class="btn p-0"
                                         data-bs-toggle="popover"
@@ -224,7 +230,7 @@
                     <div class="day-hours-grid @(openHours?.OpeningTime == null && openHours?.ClosingTime == null ? "pointer-events-none" : "")">
                         @for (int j = 6; j < 24; j++)
                         {
-                            if (role == Role.Manager && Model.SelectedStartDate > DateOnly.FromDateTime(DateTime.Today))
+                            if (role == Role.Manager && Model!.SelectedStartDate >= DateOnly.FromDateTime(DateTime.Today))
                             {
                                 <div class="hour @(j < openingTime || j >= closingTime ? "closed pointer-events-none" : "")" title="@(j < openingTime || j >= closingTime ? "Gesloten" : "")"
                                      ondblclick="GoToCreateShift('@Model.SelectedStartDate.ToString()', @j, '@department.ToFriendlyString()')">
@@ -307,7 +313,7 @@
                             @if (!shift.IsFinal) { <span class='text-secondary small fst-italic'>Concept</span> }
                             <div class='d-flex justify-content-between align-items-center gap-3'>
                                 <span class='fw-500' style='min-width: 3em'>@shift.Department</span>
-                                @if (shift.Start.Date > DateTime.Today.Date && role == Role.Manager) { <a href='/shifts/update?id=@shift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
+                                @if (shift.Start.Date >= DateTime.Today.Date && role == Role.Manager) { <a href='/shifts/update?id=@shift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
                             </div>
                             "
                         data-bs-content="
@@ -394,7 +400,7 @@
                                         {
                                             <div class='d-flex justify-content-between align-items-center gap-3'>
                                                 <p class='fw-500 mb-1'><i class='fas fa-user me-1'></i>@shiftContent.Employee?.FirstName @shiftContent.Employee?.LastName</p>
-                                                @if (shiftContent.Start.Date > DateTime.Today.Date && role == Role.Manager)
+                                                @if (shiftContent.Start.Date >= DateTime.Today.Date && role == Role.Manager)
                                                 {
                                                     <a href='/shifts/update?id=@shiftContent.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a>
                                                 }
@@ -404,7 +410,7 @@
                                         {
                                             <div class='d-flex justify-content-between align-items-center gap-3'>
                                             <p class='fw-500 text-danger mb-1'><i class='fas fa-user-slash me-1'></i>Zoek intern vervanging en pas de dienst aan of zoek extern.</p>
-                                                @if (shiftContent.Start.Date > DateTime.Today.Date && role == Role.Manager)
+                                                @if (shiftContent.Start.Date >= DateTime.Today.Date && role == Role.Manager)
                                                 {
                                                     <a href='/shifts/update?id=@shiftContent.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a>
                                                 }
@@ -500,7 +506,7 @@ else
                     <div class="day-hours-grid">
                         @for (int j = 6; j < 24; j++)
                         {
-                            if (role == Role.Manager && Model.SelectedStartDate.AddDays(i) > DateOnly.FromDateTime(DateTime.Today))
+                            if (role == Role.Manager && Model.SelectedStartDate.AddDays(i) >= DateOnly.FromDateTime(DateTime.Today))
                             {
                                 <div class="hour @(j < openingTime || j >= closingTime ? "closed pointer-events-none" : "")"
                                      title="@(j < openingTime || j >= closingTime ? "Gesloten" : "")"
@@ -549,7 +555,7 @@ else
                         @if (!shift.IsFinal) { <span class='text-secondary small fst-italic'>Concept</span> }
                         <div class='d-flex justify-content-between align-items-center gap-3'>
                             <span class='fw-500' style='min-width: 3em'>@shift.Department</span>
-                            @if (shift.Start.Date > DateTime.Today.Date && role == Role.Manager) { <a href='/shifts/update?id=@shift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
+                            @if (shift.Start.Date >= DateTime.Today.Date && role == Role.Manager) { <a href='/shifts/update?id=@shift.Id' title='Dienst bewerken'><img src='/img/update-icon.svg' height='22px' alt='Bewerk'></a> }
                         </div>
                         "
                     data-bs-content="
@@ -622,6 +628,7 @@ else
 @* Modals *@
 @if (role == Role.Manager)
 {
+    // Delete week modal
     <div class="modal fade" id="delete-week-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -630,13 +637,95 @@ else
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Door op "Verwijderen" te klikken worden alle diensten van deze week verwijderd. Dit kan niet ongedaan worden gemaakt.
+                    Door op "Verwijderen" te klikken worden alle diensten van deze week verwijderd (zowel concept, als gepubliceerde diensten). Dit kan niet ongedaan worden gemaakt.
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuleren</button>
-                    <a class="btn btn-danger" asp-controller="Schedule" asp-action="DeleteWeek" asp-route-weekNumber="@Model.WeekNumber" asp-route-year="@Model.SelectedStartDate.Year">
+                    <a class="btn btn-danger" asp-controller="Schedule" asp-action="DeleteWeek" asp-route-startDate="@Model.SelectedStartDate.ToString("yyyy-MM-dd")">
                         Verwijderen
                     </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    // Week Prognosis modal
+    <div class="modal fade" id="prognosis-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @{
+                            var weekPrognosisReached = Model.WeekPrognosis?.Prognoses.All(p => Model.ShiftsOfFullWeek
+                                .Where(s => s.Department == p.Department && DateOnly.FromDateTime(s.Start) == p.Date)
+                                .Sum(s => s.End.Hour - s.Start.Hour) >= p.NeededHours);
+                        }
+                        Prognose van week @Model.WeekNumber - 
+                        <span class="small @(weekPrognosisReached == null ? "" : (bool)weekPrognosisReached ? "text-success" : "text-danger")">
+                            @(weekPrognosisReached == null ? "" : (bool)weekPrognosisReached ? "Prognose deze week behaald" : "Prognose deze week niet gehaald/overschreden")
+                        </span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if (Model.WeekPrognosis?.Prognoses != null)
+                    {
+                            var weekDays = new Dictionary<DayOfWeek, string>
+                            {
+                                { DayOfWeek.Monday, "Maandag" },
+                                { DayOfWeek.Tuesday, "Dinsdag" },
+                                { DayOfWeek.Wednesday, "Woensdag" },
+                                { DayOfWeek.Thursday, "Donderdag" },
+                                { DayOfWeek.Friday, "Vrijdag" },
+                                { DayOfWeek.Saturday, "Zaterdag" },
+                                { DayOfWeek.Sunday, "Zondag" }
+                            };
+
+                            foreach (var weekDay in weekDays)
+                            {
+                                <div class="row border-bottom mb-2">
+                                    <h3 class="h5 col-3">@weekDay.Value</h3>
+                                    @foreach (var prognosis in Model.WeekPrognosis.Prognoses.Where(p => p.Date.DayOfWeek == weekDay.Key))
+                                    {
+                                        var plannedHours = Model.ShiftsOfFullWeek
+                                            .Where(s => s.Department == prognosis.Department
+                                                        && DateOnly.FromDateTime(s.Start) == prognosis.Date)
+                                            .Sum(s => s.End.Hour - s.Start.Hour);
+                                        var prognosisReached = prognosis.NeededHours - plannedHours == 0;
+                                        var prognosisReachedIcon = prognosisReached ? "fa-check" : "fa-xmark";
+
+
+                                        <div class="col-3">
+                                            <h4 class="h5">
+                                                @prognosis.Department.ToFriendlyString()
+                                                <span class="fs-6 ms-1 @(plannedHours - prognosis.NeededHours >= 0 ? "text-success" : "text-danger")"
+                                                      title="@(prognosisReached ? "Prognose behaald" : "Prognose niet gehaald/overschreden")">
+                                                    <i class="fa-solid @prognosisReachedIcon"></i>
+                                                </span>
+                                            </h4>
+                                            <ul>
+                                                <li>Prognose uren: <strong>@prognosis.NeededHours</strong></li>
+                                                <li>
+                                                    Uren ingepland: <strong>@plannedHours</strong>
+                                                </li>
+                                                <li>
+                                                    Verschil: <strong class="@(plannedHours - prognosis.NeededHours >= 0 ? "text-success" : "text-danger")">@(plannedHours - prognosis.NeededHours)</strong>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    }
+
+
+                                </div>
+                            }
+                    }
+                    else
+                    {
+                        <p>Er is geen prognose beschikbaar voor deze week.</p>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Sluiten</button>
                 </div>
             </div>
         </div>

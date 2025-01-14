@@ -44,13 +44,13 @@
                             <i class="fa-solid fa-house"></i>
                             Dashboard
                         </a>
-
+                        <a class="nav-link @(Context.Request.Path == "/schedule" ? "active" : "")" asp-controller="Schedule" asp-action="Index">
+                            <i class="fa-solid fa-calendar"></i>
+                            Rooster
+                        </a>
+                        
                         @if (User.IsInRole(Role.Employee.ToString()))
                         {
-                            <a class="nav-link @(Context.Request.Path == "/schedule" ? "active" : "")" asp-controller="Schedule" asp-action="Index">
-                                <i class="fa-solid fa-calendar"></i>
-                                Rooster
-                            </a>
                             
                             <a class="nav-link @(Context.Request.Path == "/HoursRegistration" ? "active" : "")" asp-controller="HoursRegistration" asp-action="Index">
                                 <i class="fa-solid fa-file-invoice-dollar"></i>
@@ -60,31 +60,10 @@
 
                         @if (User.IsInRole(Role.Manager.ToString()))
                         {
-                            <div>
-                                @{
-                                    bool roosterNavLinkActive = Context.Request.Path.StartsWithSegments("/schedule") ||
-                                                                    Context.Request.Path.StartsWithSegments("/schedule/create");
-                                }
-                                <a class="nav-link d-flex justify-content-between align-items-center collapse-link @(roosterNavLinkActive ? "active" : "")" data-bs-toggle="collapse" href="#collapseNavLinkSchedule">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fa-solid fa-calendar-days"></i>
-                                        <span>Rooster</span>
-                                    </div>
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </a>
-                                <div class="sub-nav collapse @(roosterNavLinkActive ? "show" : "")" id="collapseNavLinkSchedule">
-                                    <div class="d-flex flex-column">
-                                        <a class="sub-nav-link @(Context.Request.Path == "/schedule" ? "active" : "")" asp-controller="Schedule" asp-action="Index">
-                                            <i class="fa-solid fa-calendar-day"></i>
-                                            Rooster bekijken
-                                        </a>
-                                        <a class="sub-nav-link @(Context.Request.Path == "/schedule/create" ? "active" : "")" asp-controller="Schedule" asp-action="Create">
-                                            <i class="fa-solid fa-calendar-plus"></i>
-                                            Nieuw rooster
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+                            <a class="nav-link @(Context.Request.Path == "/schedule/create" ? "active" : "")" asp-controller="Schedule" asp-action="Create">
+                                <i class="fa-solid fa-calendar-plus"></i>
+                                Nieuw Rooster
+                            </a>
 
                             <div>
                                 @{

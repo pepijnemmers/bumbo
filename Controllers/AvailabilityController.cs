@@ -27,14 +27,9 @@ namespace BumboApp.Controllers
                 return RedirectToAction(nameof(Index), new { id = newId });
             }
 
-            DateOnly startDate;
-            try
+            if (!DateOnly.TryParse(id, out DateOnly startDate))
             {
-                startDate = StringToDate(id);
-            }
-            catch
-            {
-                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", "Index", "Dashboard");
+                return NotifyErrorAndRedirect("Datum niet gevonden", nameof(Index));
             }
 
             if (startDate.DayOfWeek != DayOfWeek.Monday)
@@ -44,7 +39,11 @@ namespace BumboApp.Controllers
             }
 
             var employee = GetLoggedInEmployee();
-            if (employee == null) { return View(); }
+            if (employee == null)
+            {
+                NotifyService.Error("Fout met het ophalen van gegevens");
+                return RedirectToAction("Index", "DashBoard");
+            }
             var employeeNumber = employee.EmployeeNumber;
 
             List<Availability> availabilityList = Context.Availabilities.Where(a => a.EmployeeNumber == employeeNumber && a.Date >= startDate && a.Date < startDate.AddDays(7)).ToList();
@@ -64,18 +63,16 @@ namespace BumboApp.Controllers
         [HttpPost]
         public async Task<IActionResult> AddAvailability(string id, bool useStandard)
         {
-            DateOnly startDate;
-            try
-            {   
-                startDate = StringToDate(id);
-            }
-            catch
+            if (!DateOnly.TryParse(id, out DateOnly startDate))
             {
-                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", nameof(Index), "Dashboard");
+                return NotifyErrorAndRedirect("Datum niet gevonden", nameof(Index));
             }
 
             var employee = GetLoggedInEmployee();
-            if (employee == null) { return RedirectToAction(nameof(Index), new { id }); }
+            if (employee == null)
+            {
+                return RedirectToAction(nameof(Index), new { id });
+            }
             var employeeNumber = employee.EmployeeNumber;
 
             List<Availability> availabilities = [];
@@ -127,18 +124,16 @@ namespace BumboApp.Controllers
 
         public IActionResult UpdateAvailability(string id)
         {
-            DateOnly startDate;
-            try
+            if (!DateOnly.TryParse(id, out DateOnly startDate))
             {
-                startDate = StringToDate(id);
-            }
-            catch
-            {
-                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", nameof(Index), "Dashboard");
+                return NotifyErrorAndRedirect("Datum niet gevonden", nameof(Index));
             }
 
             var employee = GetLoggedInEmployee();
-            if (employee == null) { return View(); }
+            if (employee == null)
+            {
+                return RedirectToAction(nameof(Index), new { id });
+            }
             var employeeNumber = employee.EmployeeNumber;
 
             ViewData["StartDate"] = startDate.ToString("dd-MM-yyyy");
@@ -149,10 +144,11 @@ namespace BumboApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateAvailability(List<Availability> availabilities)
+        public async Task<IActionResult> UpdateAvailability(List<Availability> availabilities, string startDateString)
         {
             if (!ModelState.IsValid)
             {
+                NotifyService.Error("De eindtijd kan niet voor de starttijd zijn");
                 return View(availabilities);
             }
 
@@ -168,33 +164,30 @@ namespace BumboApp.Controllers
             {
                 Context.Availabilities.UpdateRange(availabilities);
                 await Context.SaveChangesAsync();
+                NotifyService.Success("Wijzigingen succesvol opgeslagen");
             }
             catch
             {
                 NotifyService.Error("Er is iets misgegaan");
             }
 
-            return NotifySuccessAndRedirect("Wijzigingen succesvol opgeslagen", "Index");
+            return RedirectToAction(nameof(Index), new { Id = startDateString });
         }
 
         public async Task<IActionResult> AddSchoolSchedule(string id)
         {
-            DateOnly startDate;
-            try
+            if (!DateOnly.TryParse(id, out DateOnly startDate))
             {
-                startDate = StringToDate(id);
+                return NotifyErrorAndRedirect("Datum niet gevonden", nameof(Index));
             }
-            catch
-            {
-                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", nameof(Index), "Dashboard");
-            }
+
             if (startDate.DayOfWeek != DayOfWeek.Monday)
             {
                 return BadRequest();
             }
 
             var employee = GetLoggedInEmployee();
-            if (employee == null) { return View(); }
+            if (employee == null) { return RedirectToAction(nameof(Index), new { id }); }
             var employeeNumber = employee.EmployeeNumber;
 
             List<SchoolSchedule> schoolSchedules = [];
@@ -225,18 +218,13 @@ namespace BumboApp.Controllers
 
         public IActionResult UpdateSchoolSchedule(string id)
         {
-            DateOnly startDate;
-            try
+            if (!DateOnly.TryParse(id, out DateOnly startDate))
             {
-                startDate = StringToDate(id);
-            }
-            catch
-            {
-                return NotifyErrorAndRedirect("Ongeldige link: dd-MM-yyyy verwacht", nameof(Index), "Dashboard");
+                return NotifyErrorAndRedirect("Datum niet gevonden", nameof(Index));
             }
 
             var employee = GetLoggedInEmployee();
-            if (employee == null) { return View(); }
+            if (employee == null) { return RedirectToAction(nameof(Index), new { id }); }
             var employeeNumber = employee.EmployeeNumber;
             ViewData["EmployeeNumber"] = employeeNumber;
             ViewData["StartDate"] = startDate;
@@ -248,7 +236,7 @@ namespace BumboApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateSchoolSchedule(List<SchoolSchedule> schedules)
+        public async Task<IActionResult> UpdateSchoolSchedule(List<SchoolSchedule> schedules, string startDateString)
         {
             if (!ModelState.IsValid)
             {
@@ -256,23 +244,32 @@ namespace BumboApp.Controllers
                 return View(schedules);
             }
 
+            if (!DateOnly.TryParse(startDateString, out DateOnly startDate))
+            {
+                return NotifyErrorAndRedirect("Datum niet gevonden", nameof(Index));
+            }
+
             try
             {
                 Context.SchoolSchedules.UpdateRange(schedules);
                 await Context.SaveChangesAsync();
+                NotifyService.Success("Wijzigingen succesvol opgeslagen");
             }
             catch
             {
                 NotifyService.Error("Er is iets misgegaan");
             }
 
-            return NotifySuccessAndRedirect("Wijzigingen succesvol opgeslagen", "Index");
+            return RedirectToAction(nameof(Index), new { Id = startDateString });
         }
 
         public IActionResult UpdateDefault()
         {
             var employee = GetLoggedInEmployee();
-            if (employee == null) { return View(); }
+            if (employee == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
             ViewData["EmployeeNumber"] = employee.EmployeeNumber;
 
             var standardAvailabilities = Context.StandardAvailabilities.Where(sa => sa.EmployeeNumber == employee.EmployeeNumber).ToList();
@@ -284,6 +281,7 @@ namespace BumboApp.Controllers
         {
             if (!ModelState.IsValid)
             {
+                NotifyService.Error("De eindtijd kan niet voor de starttijd zijn");
                 return View(standardAvailabilities);
             }
 
@@ -300,41 +298,14 @@ namespace BumboApp.Controllers
             {
                 Context.StandardAvailabilities.UpdateRange(standardAvailabilities);
                 Context.SaveChanges();
+                NotifyService.Success("De standaardbeschikbaarheid is succesvol bijgewerkt");
             }
             catch
             {
                 NotifyService.Error("Er is iets misgegaan");
             }
 
-            return NotifySuccessAndRedirect("De standaardbeschikbaarheid is succesvol bijgewerkt", nameof(Index));
-        }
-
-        //Help methods--------------------------------
-        private static DateOnly StringToDate(string id)
-        {
-            var dateParts = id.Split('-');
-            if (dateParts.Length != 3)
-            {
-                throw new Exception();
-            }
-
-            if (!int.TryParse(dateParts[0], out int day) ||
-                !int.TryParse(dateParts[1], out int month) ||
-                !int.TryParse(dateParts[2], out int year))
-            {
-                throw new Exception();
-            }
-
-            DateOnly startDate;
-            try
-            {
-                startDate = new DateOnly(year, month, day);
-            }
-            catch (ArgumentOutOfRangeException e)
-            {
-                throw new Exception();
-            }
-            return startDate;
+            return RedirectToAction(nameof(Index));
         }
 
         public Employee? GetLoggedInEmployee()
