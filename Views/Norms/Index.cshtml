@@ -231,16 +231,18 @@
 </div>
 
 
-
-<script>
-    function showEditForm() {
-        document.getElementById('viewTable').style.display = 'none';
-        document.getElementById('editForm').style.display = 'block';
-    }
-
-    function cancelEdit() {
-        document.getElementById('viewTable').style.display = 'block';
-        document.getElementById('editForm').style.display = 'none';
-        location.reload();
-    }
-</script>
+@section Scripts
+{
+    <script>
+        function showEditForm() {
+            document.getElementById('viewTable').style.display = 'none';
+            document.getElementById('editForm').style.display = 'block';
+        }
+    
+        function cancelEdit() {
+            document.getElementById('viewTable').style.display = 'block';
+            document.getElementById('editForm').style.display = 'none';
+            location.reload();
+        }
+    </script>
+}

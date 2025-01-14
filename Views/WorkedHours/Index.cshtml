@@ -1,0 +1,209 @@
+@using BumboApp.ViewModels
+@using BumboApp.Views.Components
+@using System.Globalization
+@model BumboApp.ViewModels.WorkedHoursPageViewModel
+@{
+    ViewData["Title"] = "Gewerkte uren";
+}
+
+<div class="d-flex align-items-center justify-content-between">
+    <!-- Date Navigation -->
+    <div class="d-flex align-items-center w-100 w-lg-auto">
+        <a class="text-body" asp-action="Index" asp-route-page="1" asp-route-startDate="@Model.SelectedStartDate.AddDays(-1).ToString("yyyy-MM-dd")" asp-route-employee="@(Model.Employee?.EmployeeNumber.ToString() ?? "")" asp-route-hours="@Model.Hours">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+        <span class="fw-bold px-1 text-capitalize">
+            @Model.SelectedStartDate.ToString("ddd dd-MM-yyyy", CultureInfo.GetCultureInfo("nl-NL"))
+        </span>
+        <a class="text-body" asp-action="Index" asp-route-page="1" asp-route-startDate="@Model.SelectedStartDate.AddDays(1).ToString("yyyy-MM-dd")" asp-route-employee="@(Model.Employee?.EmployeeNumber.ToString() ?? "")" asp-route-hours="@Model.Hours">
+            <i class="fas fa-chevron-right"></i>
+        </a>    
+    </div>
+
+    <div class="d-flex gap-2">
+        <!-- Make worked hours final -->
+        <form asp-action="MakeFinal" method="post">
+            <input type="hidden" name="date" value="@Model.SelectedStartDate.ToString("yyyy-MM-dd")" />
+            <button type="submit" class="btn btn-success me-2">Uren definitief maken</button>
+        </form>
+
+        <!-- Hours filter -->
+        <div>
+            <select class="form-select w-100 w-lg-auto" onchange="GoToHours(this)">
+                    <option value="all" selected="@(Model.Hours == null)">Alle uren</option>
+                    <option value="different" selected="@(Model.Hours == "different")">Afwijkend</option>
+            </select>
+        </div> 
+
+        <!-- Employee filter -->
+        <div>
+            <select class="form-select w-100 w-lg-auto" onchange="GoToEmployee(this)">
+                <optgroup label="Toon alle werknemers">
+                    <option value="all" selected="@(Model.Employee == null)">Alle werknemers</option>
+                </optgroup>
+                <optgroup label="Toon &eacute;&eacute;n werknemer">
+                    @foreach (var employee in ViewBag.AllEmployees)
+                    {
+                        <option value="@employee.EmployeeNumber" selected="@(employee == Model.Employee)">
+                            @employee.FirstName @employee.LastName
+                        </option>
+                    }
+                </optgroup>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Werknemer</th>
+                <th>Gewerkte tijden</th>
+                <th>Pauze</th>
+                <th>Gewerkte uren</th>
+                <th>Ingepland rooster</th>
+                <th>Status</th>
+                <th>Acties</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.WorkedHours.Any())
+            {
+                <tr>
+                    <td colspan="100%" class="text-center py-4">Er zijn nog geen gewerkte uren</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var workedHour in Model.WorkedHours)
+                {
+                    var rowClass = workedHour.HasHourDifference && workedHour.Status != HourStatus.Final ? "text-danger" : "";
+                    <tr>
+                        <td class="@rowClass">
+                            @(workedHour.Employee != null
+                                ? $"{workedHour.Employee.FirstName} {workedHour.Employee.LastName}"
+                                : "Geen werknemer")
+                        </td>
+                        <td class="@rowClass">
+                            @if(workedHour.StartTime != null)
+                            {
+                                @if(workedHour.EndTime != null)
+                                {
+                                    @workedHour.StartTime <span> - </span> @workedHour.EndTime
+                                }
+                                else
+                                {
+                                    @workedHour.StartTime <span> - ...</span>
+                                }
+                            }
+                            else
+                            {
+                                <span>Niet ingeklokt</span>
+                            }
+                        </td>
+                        <td class="@rowClass">
+                            @if (workedHour.BreaksDuration.HasValue)
+                            {
+                                <div>@workedHour.BreaksDuration.Value.ToString(@"hh\:mm")</div>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td class="@rowClass">
+                            @if (workedHour.TotalWorkedTime.HasValue)
+                            {
+                                @workedHour.TotalWorkedTime.Value.ToString(@"hh\:mm")
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td class="@rowClass">
+                            @if (workedHour.PlannedShift != null)
+                            {
+                                @workedHour.PlannedShift
+                            }
+                            else
+                            {
+                                <span>Niet ingepland</span>
+                            }
+                        </td>
+                        <td>
+                            @switch (workedHour.Status)
+                            {
+                                case HourStatus.Final:
+                                    <span class="badge rounded-pill bg-success bg-opacity-10 text-success d-inline-flex align-items-center">
+                                        Definitief
+                                    </span>
+                                    break;
+                                case HourStatus.Concept:
+                                    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary d-inline-flex align-items-center">
+                                        Concept
+                                    </span>
+                                    break;
+                                default:
+                                    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary d-inline-flex align-items-center">
+                                        Concept
+                                    </span>
+                                    break;
+                            }
+                        </td>
+                        <td>
+                            @if (workedHour.IsFuture)
+                            {
+                                @if (workedHour.Employee != null)
+                                {
+                                    <a asp-action="Update" asp-route-id="@workedHour.Id" asp-route-date="@ViewBag.SelectedDay.ToString("yyyy-MM-dd")" asp-route-employeeId="@workedHour.Employee.EmployeeNumber">
+                                        <img width="20px" src="~/img/update-icon.svg" alt="edit" />
+                                    </a>
+                                    
+                                }
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    @if (ViewBag.MaxPages > 1)
+    {
+        <Component type="typeof(Pagination)"
+                   render-mode="ServerPrerendered"
+                   param-PageNumber="ViewBag.PageNumber"
+                   param-MaxPages="ViewBag.MaxPages" />
+    }
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        function GoToEmployee(select) {
+            const url = new URL(window.location.href);
+            if (select.value.toLowerCase() === "all") {
+                url.searchParams.delete("employee");
+            } else {
+                url.searchParams.set("employee", select.value);
+            }
+            location.href = url;
+        }
+
+        function GoToHours(select) {
+            const url = new URL(window.location.href);
+            if (select.value.toLowerCase() === "all") {
+                url.searchParams.delete("hours");
+            } else {
+                url.searchParams.set("hours", select.value);
+            }
+            location.href = url;
+        }
+    </script>
+}

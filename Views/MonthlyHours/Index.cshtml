@@ -1,0 +1,107 @@
+@model BumboApp.ViewModels.MonthlyHoursViewModel
+@{
+    ViewData["Title"] = "Maand overzicht";
+}
+<div class="row align-items-center mb-3">
+    <div class="col">
+        <h3>@Model.Months[Model.SelectedMonth] @Model.SelectedYear</h3>
+    </div>
+
+    <div class="col-auto d-flex ms-auto">
+        <div class="d-flex justify-content-end gap-2">
+            <!-- Month Dropdown -->
+            <select class="form-select w-auto" onchange="GoToMonth(this)">
+                @for (int i = 0; i < Model.Months.Length; i++)
+                {
+                    <option value="@i" selected="@(i == Model.SelectedMonth)">@Model.Months[i]</option>
+                }
+            </select>
+
+            <!-- Year Dropdown -->
+            <select class="form-select w-auto" onchange="GoToYear(this)">
+                @for (int i = 0; i < 3; i++)
+                {
+                    <option value="@(DateTime.Now.Year - i)" selected="@(DateTime.Now.Year - i == Model.SelectedYear)">@(DateTime.Now.Year - i)</option>
+                }
+            </select>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-7 mb-4">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>Afgeweken van rooster</h5>
+                <p>Hoever is er afgeweken van het originele rooster?</p>
+
+                <div class="row g-3">
+                    <!-- Planned hours -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <p class="card-text mb-1">Ingeplande uren</p>
+                                <h3 class="fw-bold">@Model.PlannedHours uur</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Worked hours -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <p class="card-text mb-1">Gewerkte uren</p>
+                                <h3 class="fw-bold">@Model.WorkedHours uur</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Difference -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <p class="card-text mb-1">Verschil</p>
+                                <h3 class="fw-bold @(Model.Difference == 0 ? "" : "text-danger")">
+                                    @(Model.Difference > 0 ? "+" : "")@Model.Difference uur
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <a asp-controller="MonthlyHours" asp-action="Differing" class="btn btn-primary" type="button">Overzicht van afwijkende diensten</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="card p-3">
+            <h5>Verloning (uren export)</h5>
+            <p>Wil je de gewerkte uren met bijbehorende persoonsgegevens downloaden voor de verloning?</p>
+
+            <div class="d-flex justify-content-end mt-4">
+                <a asp-controller="HoursExport" asp-action="Index" class="btn btn-outline-primary mx-2" type="button"><i class="fa-solid fa-download"></i> Uren exporteren</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts
+{
+    <script>
+        function GoToMonth(select) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("selectedMonth", select.value);
+            location.href = url;
+        }
+        function GoToYear(select) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("selectedYear", select.value);
+            location.href = url;
+        }
+    </script>
+}

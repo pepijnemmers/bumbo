@@ -1,7 +1,6 @@
 ﻿@using BumboApp.Views.Components
 @using Microsoft.Data.SqlClient
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@using Microsoft.Data.SqlClient
 @model BumboApp.ViewModels.OpeningHoursViewModel
 @{
     ViewData["Title"] = "Openingstijden en speciale dagen";
@@ -30,7 +29,7 @@
                             <td>
                                 <div class="form-check form-switch">
                                     <input class="d-none form-check-input" type="checkbox" role="switch" id="opening-hours-switch-@i" onchange="toggleDay(@i, this.checked)" @(isOpen ? "checked" : "") disabled/>
-                                    <input type="hidden" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].WeekDay" value="@openingHours.WeekDay"/>
+                                    <input type="hidden" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].WeekDay" value="@openingHours.WeekDay" max="23:00"/>
                                     <p>@Model.DutchDays[(i + 1) % 7]</p>
                                 </div>
                             </td>
@@ -38,7 +37,7 @@
                                 <div class="@(isOpen ? "d-table-cell" : "d-none")" id="opening-hours-field-@i">
                                     <label for="opening-hour-@i">Vanaf</label>
                                     <div class="d-inline-block" id="opening-hour-text-@i">@openingHours.OpeningTime</div>
-                                    <input class="d-none" id="opening-hour-@i" type="time" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].OpeningTime" value="@openingHours.OpeningTime"/>
+                                    <input class="d-none" id="opening-hour-@i" type="time" min="06:00" max="23:00" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].OpeningTime" value="@openingHours.OpeningTime"/>
                                 </div>
                                 <div class="@(isOpen ? "d-none" : "d-block")" id="closedText-@i">
                                     <p>Gesloten</p>
@@ -48,7 +47,7 @@
                                 <div class="@(isOpen ? "d-table-cell" : "d-none")" id="closing-hours-field-@i">
                                     <label for="closingHour-@i">tot</label>
                                     <div class="d-inline-block" id="closing-hour-text-@i">@openingHours.ClosingTime</div>
-                                    <input class="d-none" id="closing-hour-@i" type="time" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].ClosingTime" value="@openingHours.ClosingTime"/>
+                                    <input class="d-none" id="closing-hour-@i" type="time" min="06:00" max="23:00" name="OpeningHours[@Model.OpeningHours.IndexOf(openingHours)].ClosingTime" value="@openingHours.ClosingTime"/>
                                 </div>
                             </td>
                         </tr>
@@ -148,58 +147,61 @@
     </div>
 </div>
 
-<script>
-    document.getElementById('opening-hours-edit-button').addEventListener('click', function () {
-        const div = document.getElementById('opening-hours-buttons');
-        div.classList.toggle('opening-hours-buttons-class');
-        const link = document.querySelector('#opening-hours-buttons a');
-        link.classList.toggle('btn-outline-primary');
-        link.classList.toggle('btn-primary');
-        link.innerHTML = link.innerHTML.toLowerCase() === 'bewerken' ? 'annuleren' : 'bewerken';
+@section Scripts
+{
+    <script>
+        document.getElementById('opening-hours-edit-button').addEventListener('click', function () {
+            const div = document.getElementById('opening-hours-buttons');
+            div.classList.toggle('opening-hours-buttons-class');
+            const link = document.querySelector('#opening-hours-buttons a');
+            link.classList.toggle('btn-outline-primary');
+            link.classList.toggle('btn-primary');
+            link.innerHTML = link.innerHTML.toLowerCase() === 'bewerken' ? 'annuleren' : 'bewerken';
 
-        for (let i = 0; i < 7; i++) {
-            const hoursSwitch = document.getElementById(`opening-hours-switch-${i}`);
-            const openingHour = document.getElementById(`opening-hour-${i}`);
-            const openingHourText = document.getElementById(`opening-hour-text-${i}`);
-            const closingHour = document.getElementById(`closing-hour-${i}`);
-            const closingHourText = document.getElementById(`closing-hour-text-${i}`);
+            for (let i = 0; i < 7; i++) {
+                const hoursSwitch = document.getElementById(`opening-hours-switch-${i}`);
+                const openingHour = document.getElementById(`opening-hour-${i}`);
+                const openingHourText = document.getElementById(`opening-hour-text-${i}`);
+                const closingHour = document.getElementById(`closing-hour-${i}`);
+                const closingHourText = document.getElementById(`closing-hour-text-${i}`);
 
-            const isEditable = !hoursSwitch.disabled;
-            toggleDisplay(openingHour, openingHourText, isEditable);
-            toggleDisplay(closingHour, closingHourText, isEditable);
+                const isEditable = !hoursSwitch.disabled;
+                toggleDisplay(openingHour, openingHourText, isEditable);
+                toggleDisplay(closingHour, closingHourText, isEditable);
 
-            hoursSwitch.disabled = isEditable;
-            hoursSwitch.classList.toggle('d-none', isEditable);
+                hoursSwitch.disabled = isEditable;
+                hoursSwitch.classList.toggle('d-none', isEditable);
+            }
+        });
+
+        function toggleDisplay(inputField, textField, isEditable) {
+            inputField.classList.toggle('d-none', isEditable);
+            textField.classList.toggle('d-none', !isEditable);
         }
-    });
 
-    function toggleDisplay(inputField, textField, isEditable) {
-        inputField.classList.toggle('d-none', isEditable);
-        textField.classList.toggle('d-none', !isEditable);
-    }
+        function toggleDay(id, isActive) {
+            const openingField = document.getElementById(`opening-hours-field-${id}`);
+            const closingField = document.getElementById(`closing-hours-field-${id}`);
+            const closedText = document.getElementById(`closedText-${id}`);
 
-    function toggleDay(id, isActive) {
-        const openingField = document.getElementById(`opening-hours-field-${id}`);
-        const closingField = document.getElementById(`closing-hours-field-${id}`);
-        const closedText = document.getElementById(`closedText-${id}`);
+            openingField.classList.toggle('d-none', !isActive);
+            closingField.classList.toggle('d-none', !isActive);
+            closedText.classList.toggle('d-none', isActive);
 
-        openingField.classList.toggle('d-none', !isActive);
-        closingField.classList.toggle('d-none', !isActive);
-        closedText.classList.toggle('d-none', isActive);
+            const openingHourElement = document.getElementById(`opening-hour-${id}`);
+            const closingHourElement = document.getElementById(`closing-hour-${id}`);
+            if (!isActive) {
+                const openingHour = openingHourElement.value = null;
+                const closingHour = closingHourElement.value = null;
+            } else {
+                const openingTime = new Date();
+                openingTime.setHours(8, 0);
+                openingHourElement.value = openingTime.toTimeString().slice(0, 5);
 
-        const openingHourElement = document.getElementById(`opening-hour-${id}`);
-        const closingHourElement = document.getElementById(`closing-hour-${id}`);
-        if (!isActive) {
-            const openingHour = openingHourElement.value = null;
-            const closingHour = closingHourElement.value = null;
-        } else {
-            const openingTime = new Date();
-            openingTime.setHours(8, 0);
-            openingHourElement.value = openingTime.toTimeString().slice(0, 5);
-
-            const closingTime = new Date();
-            closingTime.setHours(21, 0);
-            closingHourElement.value = closingTime.toTimeString().slice(0, 5);
+                const closingTime = new Date();
+                closingTime.setHours(21, 0);
+                closingHourElement.value = closingTime.toTimeString().slice(0, 5);
+            }
         }
-    }
-</script>
+    </script>
+}
