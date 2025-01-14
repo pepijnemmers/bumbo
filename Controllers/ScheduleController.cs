@@ -10,6 +10,7 @@ namespace BumboApp.Controllers
 {
     public class ScheduleController : MainController
     {
+        private const string ActionUrl = "~/Schedule?startDate="; //day will be added while making the Notification
         private readonly UserManager<User> _userManager;
         private readonly MaxScheduleTimeCalculationHelper _maxScheduleTimeCalculationHelper;
         public ScheduleController(UserManager<User> userManager)
@@ -28,7 +29,6 @@ namespace BumboApp.Controllers
             }
             return Role.Unknown;
         }
-
         public IActionResult Index(string? employeeNumber, string? startDate, bool dayView = true)
         {
             // Selected employee filter or logged in employee
@@ -158,7 +158,7 @@ namespace BumboApp.Controllers
                             Title = name + "heeft te weinig uren in week " + weekNumber + ".",
                             Description = name + "heeft minder dan " + e.ContractHours + " uren in week " + weekNumber + ".",
                             Employee = m,
-                            ActionUrl = "~/Schedule/index?=" + startDate.ToString("dd-MM-yyyy")
+                            ActionUrl = ActionUrl + startDate.ToString("dd-MM-yyyy")
                         });
                     }
                 }
@@ -646,7 +646,7 @@ namespace BumboApp.Controllers
                             Description = $"Er is een dienst voor jou toegevoegd op {shift.Start.ToString("dd-MM-yyyy")}",
                             SentAt = DateTime.Now,
                             HasBeenRead = false,
-                            ActionUrl = $"/Schedule?startDate={shift.Start.ToString("dd/MM/yyyy")}"
+                            ActionUrl = ActionUrl + shift.Start.ToString("dd/MM/yyyy")
                         });
                     }
                 }

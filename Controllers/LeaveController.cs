@@ -14,6 +14,7 @@ namespace BumboApp.Controllers
         private Employee? _loggedInEmployee;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private const string ActionUrl = "~/Leave";
 
         public LeaveController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
@@ -199,6 +200,7 @@ namespace BumboApp.Controllers
                         Employee = manager,
                         Title = "Nieuwe verlofaanvraag",
                         Description = "Er is een nieuwe verlofaanvraag om te beoordelen",
+                        ActionUrl = ActionUrl,
                         SentAt = DateTime.Now,
                         HasBeenRead = false
                     };
@@ -238,7 +240,8 @@ namespace BumboApp.Controllers
                     Title = "Nieuwe verlofaanvraag status",
                     Description = "Je verlofaanvraag is beoordeeld",
                     SentAt = DateTime.Now,
-                    HasBeenRead = false
+                    HasBeenRead = false,
+                    ActionUrl = ActionUrl,
                 };
                 Context.Notifications.Add(notification);
 

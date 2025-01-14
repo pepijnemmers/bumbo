@@ -13,6 +13,7 @@ namespace BumboApp.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private const string ActionUrl = "~/TakeOver?id="; // id gets added while making notification
 
         public TakeOverController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
@@ -141,6 +142,7 @@ namespace BumboApp.Controllers
                         Description = $"Je dienst op {shiftTakeOver.Shift.Start:dd-MM-yyyy} is succesvol overgenomen",
                         SentAt = DateTime.Now,
                         HasBeenRead = false,
+                        ActionUrl = ActionUrl + shiftTakeOver.ShiftId,
                     };
                     Console.WriteLine("Adding notification for owner: " + ownerNotification.Description);
                     Context.Notifications.Add(ownerNotification);
@@ -154,7 +156,8 @@ namespace BumboApp.Controllers
                         Title = "Dienst overgenomen",
                         Description = $"Je hebt met succes de dienst overgenomen op {shiftTakeOver.Shift.Start:dd-MM-yyyy}.",
                         SentAt = DateTime.Now,
-                        HasBeenRead = false
+                        HasBeenRead = false,
+                        ActionUrl = ActionUrl + shiftTakeOver.ShiftId,
                     };
                     Console.WriteLine("Adding notification for employee taking over: " + takingOverNotification.Description);
                     Context.Notifications.Add(takingOverNotification);
@@ -231,7 +234,8 @@ namespace BumboApp.Controllers
                         Title = "Nieuwe shift overname",
                         Description = $"{employee.FirstName} {employee.LastName} heeft een shift overgenomen.",
                         SentAt = DateTime.Now,
-                        HasBeenRead = false
+                        HasBeenRead = false,
+                        ActionUrl = ActionUrl + shiftTakeOver.ShiftId,
                     });
                 }
 
