@@ -66,8 +66,8 @@ namespace BumboApp.Controllers
                 .ToList();
             
             var shiftOfFullWeek = Context.Shifts
-                .Where(shift => DateOnly.FromDateTime(shift.Start) >= selectedStartDate 
-                                && DateOnly.FromDateTime(shift.Start) < selectedStartDate.AddDays(7))
+                .Where(shift => DateOnly.FromDateTime(shift.Start) >= DateConvertorHelper.GetMondayOfWeek(selectedStartDate) 
+                                && DateOnly.FromDateTime(shift.Start) < DateConvertorHelper.GetMondayOfWeek(selectedStartDate).AddDays(7))
                 .OrderBy(shift => shift.Department)
                 .ToList();
             
