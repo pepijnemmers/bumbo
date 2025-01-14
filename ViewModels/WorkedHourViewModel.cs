@@ -9,6 +9,7 @@ namespace BumboApp.ViewModels
         public Employee? Employee { get; set; }
         public TimeOnly? StartTime { get; set; }
         public TimeOnly? EndTime { get; set; }
+        public DateOnly? Date { get; set; }
         public TimeSpan? BreaksDuration { get; set; }
         public TimeSpan? TotalWorkedTime { get; set; }
         public HourStatus? Status { get; set; }
@@ -16,5 +17,6 @@ namespace BumboApp.ViewModels
         public bool IsFuture { get; set; }
 
         public bool HasHourDifference { get; set; }
+        public TimeSpan? HourDifference { get; set; }
     }
 }

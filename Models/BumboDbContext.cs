@@ -891,6 +891,30 @@ public partial class BumboDbContext : IdentityDbContext<User>
         );
 
         modelBuilder.Entity<Shift>().HasData(
+            //November 2024 (example for finished month)
+            new { Id = 121, Start = new DateTime(2024, 11, 4, 17, 0, 0), End = new DateTime(2024, 11, 4, 23, 0, 0), Department = Department.Vers, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 122, Start = new DateTime(2024, 11, 5, 6, 0, 0), End = new DateTime(2024, 11, 5, 14, 0, 0), Department = Department.Kassa, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 123, Start = new DateTime(2024, 11, 10, 10, 0, 0), End = new DateTime(2024, 11, 10, 18, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 124, Start = new DateTime(2024, 11, 7, 15, 0, 0), End = new DateTime(2024, 11, 7, 23, 0, 0), Department = Department.Vers, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 125, Start = new DateTime(2024, 11, 8, 6, 30, 0), End = new DateTime(2024, 11, 8, 14, 30, 0), Department = Department.Kassa, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 126, Start = new DateTime(2024, 11, 4, 8, 0, 0), End = new DateTime(2024, 11, 4, 16, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 127, Start = new DateTime(2024, 11, 5, 14, 0, 0), End = new DateTime(2024, 11, 5, 22, 0, 0), Department = Department.Kassa, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 128, Start = new DateTime(2024, 11, 9, 6, 30, 0), End = new DateTime(2024, 11, 11, 14, 30, 0), Department = Department.Vers, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 129, Start = new DateTime(2024, 11, 7, 13, 0, 0), End = new DateTime(2024, 11, 7, 21, 0, 0), Department = Department.Kassa, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 130, Start = new DateTime(2024, 11, 8, 10, 0, 0), End = new DateTime(2024, 11, 8, 18, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 3, IsFinal = true },
+
+            new { Id = 131, Start = new DateTime(2024, 11, 11, 17, 0, 0), End = new DateTime(2024, 11, 11, 23, 0, 0), Department = Department.Vers, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 132, Start = new DateTime(2024, 11, 12, 6, 0, 0), End = new DateTime(2024, 11, 12, 14, 0, 0), Department = Department.Kassa, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 133, Start = new DateTime(2024, 11, 17, 10, 0, 0), End = new DateTime(2024, 11, 17, 18, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 134, Start = new DateTime(2024, 11, 14, 15, 0, 0), End = new DateTime(2024, 11, 14, 23, 0, 0), Department = Department.Vers, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 135, Start = new DateTime(2024, 11, 15, 6, 30, 0), End = new DateTime(2024, 11, 15, 14, 30, 0), Department = Department.Kassa, EmployeeNumber = 2, IsFinal = true },
+            new { Id = 136, Start = new DateTime(2024, 11, 11, 8, 0, 0), End = new DateTime(2024, 11, 11, 16, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 137, Start = new DateTime(2024, 11, 12, 14, 0, 0), End = new DateTime(2024, 11, 12, 22, 0, 0), Department = Department.Kassa, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 138, Start = new DateTime(2024, 11, 17, 6, 30, 0), End = new DateTime(2024, 11, 17, 14, 30, 0), Department = Department.Vers, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 139, Start = new DateTime(2024, 11, 14, 13, 0, 0), End = new DateTime(2024, 11, 14, 21, 0, 0), Department = Department.Kassa, EmployeeNumber = 3, IsFinal = true },
+            new { Id = 140, Start = new DateTime(2024, 11, 15, 10, 0, 0), End = new DateTime(2024, 11, 15, 18, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 3, IsFinal = true },
+
+            //December 2024 (example for concept month)
             new { Id = 101, Start = new DateTime(2024, 12, 2, 9, 0, 0), End = new DateTime(2024, 12, 2, 17, 0, 0), Department = Department.Vers, EmployeeNumber = 2, IsFinal = true },
             new { Id = 102, Start = new DateTime(2024, 12, 3, 10, 0, 0), End = new DateTime(2024, 12, 3, 18, 0, 0), Department = Department.Kassa, EmployeeNumber = 2, IsFinal = true },
             new { Id = 103, Start = new DateTime(2024, 12, 4, 8, 0, 0), End = new DateTime(2024, 12, 4, 16, 0, 0), Department = Department.Vakkenvullen, EmployeeNumber = 2, IsFinal = true },
@@ -915,6 +939,30 @@ public partial class BumboDbContext : IdentityDbContext<User>
         );
 
         modelBuilder.Entity<WorkedHour>().HasData(
+            //November 2024 (example for finished month)
+            new { Id = 21, DateOnly = new DateOnly(2024, 11, 4), StartTime = new TimeOnly(17, 0), EndTime = new TimeOnly(23, 0), Status = HourStatus.Final, EmployeeNumber = 2 },
+            new { Id = 22, DateOnly = new DateOnly(2024, 11, 5), StartTime = new TimeOnly(6, 0), EndTime = new TimeOnly(14, 10), Status = HourStatus.Final, EmployeeNumber = 2 },
+            new { Id = 23, DateOnly = new DateOnly(2024, 11, 10), StartTime = new TimeOnly(10, 15), EndTime = new TimeOnly(18, 5), Status = HourStatus.Final, EmployeeNumber = 2 },
+            new { Id = 24, DateOnly = new DateOnly(2024, 11, 7), StartTime = new TimeOnly(15, 10), EndTime = new TimeOnly(23, 15), Status = HourStatus.Final, EmployeeNumber = 2 },
+            new { Id = 25, DateOnly = new DateOnly(2024, 11, 8), StartTime = new TimeOnly(6, 35), EndTime = new TimeOnly(14, 35), Status = HourStatus.Final, EmployeeNumber = 2 },
+            new { Id = 26, DateOnly = new DateOnly(2024, 11, 4), StartTime = new TimeOnly(8, 10), EndTime = new TimeOnly(16, 20), Status = HourStatus.Final, EmployeeNumber = 3 },
+            new { Id = 27, DateOnly = new DateOnly(2024, 11, 5), StartTime = new TimeOnly(14, 10), EndTime = new TimeOnly(22, 15), Status = HourStatus.Final, EmployeeNumber = 3 },
+            new { Id = 28, DateOnly = new DateOnly(2024, 11, 9), StartTime = new TimeOnly(6, 35), EndTime = new TimeOnly(14, 40), Status = HourStatus.Final, EmployeeNumber = 3 },
+            new { Id = 29, DateOnly = new DateOnly(2024, 11, 7), StartTime = new TimeOnly(13, 10), EndTime = new TimeOnly(21, 5), Status = HourStatus.Final, EmployeeNumber = 3 },
+            new { Id = 30, DateOnly = new DateOnly(2024, 11, 8), StartTime = new TimeOnly(10, 10), EndTime = new TimeOnly(18, 15), Status = HourStatus.Final, EmployeeNumber = 3 },
+
+            new { Id = 31, DateOnly = new DateOnly(2024, 11, 11), StartTime = new TimeOnly(17, 15), EndTime = new TimeOnly(23, 0), Status = HourStatus.Final, EmployeeNumber = 2 },
+            new { Id = 32, DateOnly = new DateOnly(2024, 11, 12), StartTime = new TimeOnly(6, 10), EndTime = new TimeOnly(14, 20), Status = HourStatus.Final, EmployeeNumber = 2 },
+            new { Id = 33, DateOnly = new DateOnly(2024, 11, 17), StartTime = new TimeOnly(10, 20), EndTime = new TimeOnly(18, 10), Status = HourStatus.Final, EmployeeNumber = 2 },
+            new { Id = 34, DateOnly = new DateOnly(2024, 11, 14), StartTime = new TimeOnly(15, 15), EndTime = new TimeOnly(23, 10), Status = HourStatus.Final, EmployeeNumber = 2 },
+            new { Id = 35, DateOnly = new DateOnly(2024, 11, 15), StartTime = new TimeOnly(6, 35), EndTime = new TimeOnly(14, 40), Status = HourStatus.Final, EmployeeNumber = 2 },
+            new { Id = 36, DateOnly = new DateOnly(2024, 11, 11), StartTime = new TimeOnly(8, 15), EndTime = new TimeOnly(16, 30), Status = HourStatus.Final, EmployeeNumber = 3 },
+            new { Id = 37, DateOnly = new DateOnly(2024, 11, 12), StartTime = new TimeOnly(14, 15), EndTime = new TimeOnly(22, 20), Status = HourStatus.Final, EmployeeNumber = 3 },
+            new { Id = 38, DateOnly = new DateOnly(2024, 11, 17), StartTime = new TimeOnly(6, 40), EndTime = new TimeOnly(14, 50), Status = HourStatus.Final, EmployeeNumber = 3 },
+            new { Id = 39, DateOnly = new DateOnly(2024, 11, 14), StartTime = new TimeOnly(13, 20), EndTime = new TimeOnly(21, 15), Status = HourStatus.Final, EmployeeNumber = 3 },
+            new { Id = 40, DateOnly = new DateOnly(2024, 11, 15), StartTime = new TimeOnly(10, 20), EndTime = new TimeOnly(18, 30), Status = HourStatus.Final, EmployeeNumber = 3 },
+
+            //December 2024 (example for concept month)
             new { Id = 1, DateOnly = new DateOnly(2024, 12, 2), StartTime = new TimeOnly(9, 15), EndTime = new TimeOnly(17, 10), Status = HourStatus.Final, EmployeeNumber = 2 },
             new { Id = 2, DateOnly = new DateOnly(2024, 12, 3), StartTime = new TimeOnly(10, 5), EndTime = new TimeOnly(18, 5), Status = HourStatus.Final, EmployeeNumber = 2 },
             new { Id = 3, DateOnly = new DateOnly(2024, 12, 4), StartTime = new TimeOnly(8, 10), EndTime = new TimeOnly(16, 5), Status = HourStatus.Final, EmployeeNumber = 2 },
@@ -939,6 +987,30 @@ public partial class BumboDbContext : IdentityDbContext<User>
         );
 
         modelBuilder.Entity<Break>().HasData(
+            //November 2024 (example for finished month)
+            new { Id = 11, StartTime = new TimeOnly(17, 30), EndTime = new TimeOnly(18, 0), WorkedHourId = 21 },
+            new { Id = 12, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(9, 30), WorkedHourId = 22 },
+            new { Id = 13, StartTime = new TimeOnly(12, 30), EndTime = new TimeOnly(13, 0), WorkedHourId = 23 },
+            new { Id = 14, StartTime = new TimeOnly(16, 30), EndTime = new TimeOnly(17, 0), WorkedHourId = 24 },
+            new { Id = 15, StartTime = new TimeOnly(7, 0), EndTime = new TimeOnly(7, 30), WorkedHourId = 25 },
+            new { Id = 16, StartTime = new TimeOnly(12, 0), EndTime = new TimeOnly(12, 30), WorkedHourId = 26 },
+            new { Id = 17, StartTime = new TimeOnly(15, 30), EndTime = new TimeOnly(16, 0), WorkedHourId = 27 },
+            new { Id = 18, StartTime = new TimeOnly(8, 30), EndTime = new TimeOnly(9, 0), WorkedHourId = 28 },
+            new { Id = 19, StartTime = new TimeOnly(15, 0), EndTime = new TimeOnly(15, 30), WorkedHourId = 29 },
+            new { Id = 20, StartTime = new TimeOnly(12, 30), EndTime = new TimeOnly(13, 0), WorkedHourId = 30 },
+
+            new { Id = 31, WorkedHourId = 31, StartTime = new TimeOnly(18, 0), EndTime = new TimeOnly(18, 30) },
+            new { Id = 32, WorkedHourId = 32, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(9, 30) },
+            new { Id = 33, WorkedHourId = 33, StartTime = new TimeOnly(12, 30), EndTime = new TimeOnly(13, 0) },
+            new { Id = 34, WorkedHourId = 34, StartTime = new TimeOnly(17, 0), EndTime = new TimeOnly(17, 30) },
+            new { Id = 35, WorkedHourId = 35, StartTime = new TimeOnly(10, 0), EndTime = new TimeOnly(10, 30) },
+            new { Id = 36, WorkedHourId = 36, StartTime = new TimeOnly(12, 30), EndTime = new TimeOnly(13, 0) },
+            new { Id = 37, WorkedHourId = 37, StartTime = new TimeOnly(15, 0), EndTime = new TimeOnly(15, 30) },
+            new { Id = 38, WorkedHourId = 38, StartTime = new TimeOnly(8, 30), EndTime = new TimeOnly(9, 0) },
+            new { Id = 39, WorkedHourId = 39, StartTime = new TimeOnly(16, 0), EndTime = new TimeOnly(16, 30) },
+            new { Id = 40, WorkedHourId = 40, StartTime = new TimeOnly(13, 0), EndTime = new TimeOnly(13, 30) },
+
+            //December 2024 (example for concept month)
             new { Id = 1, StartTime = new TimeOnly(12, 0), EndTime = new TimeOnly(12, 30), WorkedHourId = 1 },
             new { Id = 2, StartTime = new TimeOnly(13, 0), EndTime = new TimeOnly(13, 30), WorkedHourId = 2 },
             new { Id = 3, StartTime = new TimeOnly(12, 15), EndTime = new TimeOnly(12, 45), WorkedHourId = 3 },

@@ -1,3 +1,160 @@
+@using BumboApp.Views.Components
+@model BumboApp.ViewModels.DifferingMonthlyHoursViewModel
 @{
     ViewData["Title"] = "Afwijkende uren";
+}
+<div class="row align-items-center mb-3">
+
+    <div class="col-auto d-flex ms-auto">
+        <div class="d-flex justify-content-end gap-2">
+            <!-- Month Dropdown -->
+            <select class="form-select w-auto" onchange="GoToMonth(this)">
+                @for (int i = 0; i < Model.Months.Length; i++)
+                {
+                    <option value="@i" selected="@(i == Model.SelectedMonth)">@Model.Months[i]</option>
+                }
+            </select>
+
+            <!-- Year Dropdown -->
+            <select class="form-select w-auto" onchange="GoToYear(this)">
+                @for (int i = 0; i < 3; i++)
+                {
+                    <option value="@(DateTime.Now.Year - i)" selected="@(DateTime.Now.Year - i == Model.SelectedYear)">@(DateTime.Now.Year - i)</option>
+                }
+            </select>
+
+            <!-- Employee Dropdown -->
+            <select class="form-select w-100 w-lg-auto" onchange="GoToEmployee(this)">
+                <optgroup label="Toon alle werknemers">
+                    <option value="" selected="@(Model.Employee == null)">Alle werknemers</option>
+                </optgroup>
+                <optgroup label="Toon één werknemer">
+                    @foreach (var employee in ViewBag.AllEmployees)
+                    {
+                        <option value="@employee.EmployeeNumber" selected="@(employee == Model.Employee)">
+                            @employee.FirstName @employee.LastName
+                        </option>
+                    }
+                </optgroup>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Werknemer</th>
+                <th>Datum</th>
+                <th>Gewerkte tijden</th>
+                <th>Pauze</th>
+                <th>Gewerkte uren</th>
+                <th>Ingepland rooster</th>
+                <th>Afwijkend</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.WorkedHours.Any())
+            {
+                <tr>
+                    <td colspan="100" class="text-center">Er zijn geen afwijkende diensten deze maand</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var workedHour in Model.WorkedHours)
+                {
+                    <tr>
+                        <td>
+                            @(workedHour.Employee != null
+                                ? $"{workedHour.Employee.FirstName} {workedHour.Employee.LastName}"
+                                : "Geen werknemer")
+                        </td>
+                        <td>@workedHour.Date</td>
+                        <td>
+                            @if (workedHour.StartTime != null)
+                            {
+                                @if (workedHour.EndTime != null)
+                                {
+                                    @workedHour.StartTime <span> - </span> @workedHour.EndTime
+                                }
+                                else
+                                {
+                                    @workedHour.StartTime <span> - ...</span>
+                                }
+                            }
+                            else
+                            {
+                                <span>Niet ingeklokt</span>
+                            }
+                        </td>
+                        <td>
+                            @if (workedHour.BreaksDuration.HasValue)
+                            {
+                                <div>@workedHour.BreaksDuration.Value.ToString(@"hh\:mm")</div>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td>
+                            @if (workedHour.TotalWorkedTime.HasValue)
+                            {
+                                @workedHour.TotalWorkedTime.Value.ToString(@"hh\:mm")
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td>
+                            @if (workedHour.PlannedShift != null)
+                            {
+                                @workedHour.PlannedShift
+                            }
+                            else
+                            {
+                                <span>Niet ingepland</span>
+                            }
+                        </td>
+                        <td>@((workedHour.HourDifference.HasValue && workedHour.HourDifference > TimeSpan.Zero) ? "+" : (workedHour.HourDifference.HasValue && workedHour.HourDifference < TimeSpan.Zero) ? "-" : "")@workedHour.HourDifference?.ToString(@"hh\:mm")</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    @if (ViewBag.MaxPages > 1)
+    {
+        <Component type="typeof(Pagination)"
+                   render-mode="ServerPrerendered"
+                   param-PageNumber="ViewBag.PageNumber"
+                   param-MaxPages="ViewBag.MaxPages" />
+    }
+</div>
+
+@section Scripts
+{
+    <script>
+        function GoToMonth(select) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("selectedMonth", select.value);
+            location.href = url;
+        }
+        function GoToYear(select) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("selectedYear", select.value);
+            location.href = url;
+        }
+        function GoToEmployee(select) {
+            const url = new URL(window.location.href);
+            if (select.value.toLowerCase() === "") {
+                url.searchParams.delete("selectedEmployee");
+            } else {
+                url.searchParams.set("selectedEmployee", select.value);
+            }
+            location.href = url;
+        }
+    </script>
 }
