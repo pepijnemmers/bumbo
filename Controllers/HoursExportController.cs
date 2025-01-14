@@ -59,7 +59,7 @@ public class HoursExportController : MainController
             string userId = workedHour.Employee.UserId;
             string name = workedHour.Employee.FirstName;
             string workedTime = (workedHour.EndTime - workedHour.StartTime).Value.ToString();
-            double bonusPercent = CalculateBonusPercent(workedHour);
+            double bonusPercent = ExportHoursHelper.CalculateBonusPercent(workedHour);
 
             string dataString = $"{userId};{name};{workedTime};{bonusPercent}%";
             dataList.Add(dataString);
@@ -68,128 +68,6 @@ public class HoursExportController : MainController
         var excelStream = GenerateExcel(dataList);
         string fileName = $"gewerkteUren-{month}-{year}" + (isConcept ? "-CONCEPT" : "") + ".xlsx";
         return File(excelStream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
-    }
-
-    //Calculate the average bonus of a workedHour
-    private double CalculateBonusPercent(WorkedHour workedHour)
-    {
-        var intervals = GetWorkedIntervals(workedHour);
-        var bonusPeriods = GetBonusPeriods(workedHour.DateOnly.DayOfWeek);
-
-        double totalWorkedTime = 0;
-        double totalWeightedBonus = 0;
-        foreach (var interval in intervals)
-        {
-            totalWorkedTime += (interval.End - interval.Start).TotalSeconds;
-            foreach (var bonusPeriod in bonusPeriods)
-            {
-                totalWeightedBonus += CalculateWeightedTime(interval, bonusPeriod);
-            }
-        }
-        double bonus = ((totalWeightedBonus / totalWorkedTime) - 1) * 100;
-        return Math.Round(bonus, 1);
-    }
-
-    //Splits a workedHour into a list of intervals based on the breaks
-    private List<(TimeOnly Start, TimeOnly End)> GetWorkedIntervals(WorkedHour workedHour)
-    {
-        List<Break> breaks = workedHour.Breaks ?? new();
-        var intervals = new List<(TimeOnly Start, TimeOnly End)>();
-        TimeOnly currentStart = workedHour.StartTime;
-        foreach (var brk in breaks.OrderBy(b => b.StartTime))
-        {
-            if (brk != null && brk.EndTime.HasValue)
-            {
-                intervals.Add((currentStart, brk.StartTime));
-                currentStart = brk.EndTime.Value;
-            }
-        }
-
-        // Add the remaining time after the last break
-        if (currentStart < workedHour.EndTime)
-        {
-            intervals.Add((currentStart, workedHour.EndTime.Value));
-        }
-
-        return intervals;
-    }
-
-    //calculate the amount of seconds*factor of a period of work and a bonus period
-    private double CalculateWeightedTime((TimeOnly Start, TimeOnly End) period, BonusPeriod bonusPeriod)
-    {
-        if (period.Start >= bonusPeriod.EndTime || period.End <= bonusPeriod.StartTime)
-        {
-            return 0;
-        }
-        var overlapStart = Math.Max(period.Start.ToTimeSpan().TotalSeconds, bonusPeriod.StartTime.ToTimeSpan().TotalSeconds);
-        var overlapEnd = Math.Min(period.End.ToTimeSpan().TotalSeconds, bonusPeriod.EndTime.ToTimeSpan().TotalSeconds);
-
-        return (overlapEnd - overlapStart) * bonusPeriod.Multiplier;
-    }
-
-    //Should be retrieved from JSON, currently still here
-    private static List<BonusPeriod> GetBonusPeriods(DayOfWeek dayNumber)
-    {
-        var result = new List<BonusPeriod>();
-        switch (dayNumber)
-        {
-            case DayOfWeek.Sunday:
-                result.Add(new BonusPeriod
-                {
-                    StartTime = new TimeOnly(0, 0),
-                    EndTime = new TimeOnly(23, 59),
-                    Multiplier = 2d
-                });
-                break;
-            case DayOfWeek.Saturday:
-                result.Add(new BonusPeriod
-                {
-                    StartTime = new TimeOnly(0, 0),
-                    EndTime = new TimeOnly(6, 00),
-                    Multiplier = 1.5d
-                });
-                result.Add(new BonusPeriod
-                {
-                    StartTime = new TimeOnly(6, 0),
-                    EndTime = new TimeOnly(18, 00),
-                    Multiplier = 1d
-                });
-                result.Add(new BonusPeriod
-                {
-                    StartTime = new TimeOnly(18, 0),
-                    EndTime = new TimeOnly(23, 59),
-                    Multiplier = 1.5d
-                });
-                break;
-            default:
-                result.Add(new BonusPeriod
-                {
-                    StartTime = new TimeOnly(0, 0),
-                    EndTime = new TimeOnly(6, 00),
-                    Multiplier = 1.5d
-                });
-                result.Add(new BonusPeriod
-                {
-                    StartTime = new TimeOnly(6, 0),
-                    EndTime = new TimeOnly(20, 00),
-                    Multiplier = 1d
-                });
-                result.Add(new BonusPeriod
-                {
-                    StartTime = new TimeOnly(20, 0),
-                    EndTime = new TimeOnly(21, 0),
-                    //Multiplier = 4d / 3d,
-                    Multiplier = 1.333d, //TODO
-                });
-                result.Add(new BonusPeriod
-                {
-                    StartTime = new TimeOnly(21, 0),
-                    EndTime = new TimeOnly(23, 59),
-                    Multiplier = 1.5d
-                });
-                break;
-        }
-        return result;
     }
 
     private static MemoryStream GenerateExcel(List<string> inputData)
