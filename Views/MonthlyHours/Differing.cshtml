@@ -119,7 +119,7 @@
                                 <span>Niet ingepland</span>
                             }
                         </td>
-                        <td>@workedHour.HourDifference</td>
+                        <td>@((workedHour.HourDifference.HasValue && workedHour.HourDifference > TimeSpan.Zero) ? "+" : (workedHour.HourDifference.HasValue && workedHour.HourDifference < TimeSpan.Zero) ? "-" : "")@workedHour.HourDifference?.ToString(@"hh\:mm")</td>
                     </tr>
                 }
             }

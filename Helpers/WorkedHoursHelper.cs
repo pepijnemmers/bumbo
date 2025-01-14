@@ -32,7 +32,12 @@ namespace BumboApp.Helpers
             var plannedDuration = plannedEnd - plannedStart - BreakCalculationHelper.CalculateRequiredBreak(plannedStart.Value, plannedEnd.Value);
             var actualWorkedDuration = endTime - startTime - breakDuration;
 
-            return actualWorkedDuration - plannedDuration;
+            var span = actualWorkedDuration - plannedDuration;
+            if (span != null)
+            {
+                span = TimeSpan.FromMinutes(Math.Floor(((TimeSpan)span).TotalMinutes));
+            }
+            return span;
         }
     }
 }

@@ -131,7 +131,7 @@ public class MonthlyHoursController : MainController
                 TimeOnly? plannedStart = TimeOnly.Parse(x.Shift.Start.ToString("HH:mm"));
                 TimeOnly? plannedEnd = TimeOnly.Parse(x.Shift.End.ToString("HH:mm"));
                 bool hasHourDifference = workedHoursHelper.HasHourDifference(x.WorkedHour?.StartTime, x.WorkedHour?.EndTime, plannedStart, plannedEnd, breakDuration);
-                TimeSpan? hourDifference = workedHoursHelper.HourDifference(x.WorkedHour?.StartTime, x.WorkedHour?.EndTime, plannedStart, plannedEnd, breakDuration);
+                var hourDifference = workedHoursHelper.HourDifference(x.WorkedHour?.StartTime, x.WorkedHour?.EndTime, plannedStart, plannedEnd, breakDuration);
 
                 return new WorkedHourViewModel
                 {
