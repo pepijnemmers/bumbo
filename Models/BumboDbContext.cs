@@ -20,7 +20,7 @@ public partial class BumboDbContext : IdentityDbContext<User>
         .Build();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer(Configuration.GetConnectionString("BumboDbAzure"));
+        => optionsBuilder.UseSqlServer(Configuration.GetConnectionString("BumboDb"));
 
     //Module 1 classes
     public virtual DbSet<Expectation> Expectations { get; set; }
