@@ -2,31 +2,41 @@
 
 @{
     ViewData["Title"] = "Maand uren exporteren";
-    int month = ViewBag.Month ?? DateTime.Now.Month;
-    int year = ViewBag.Year ?? DateTime.Now.Year;
+    int selectedMonth = ViewBag.Month ?? DateTime.Now.Month;
+    int selectedYear = ViewBag.Year ?? DateTime.Now.Year;
+    List<int> monthsInCurrentYear = ((Dictionary<int, List<int>>)ViewData["PossibleCombinations"])[selectedYear];
 }
 
 <div class="d-flex gap-2">
     <form asp-action="CanDownload" class="col-xl-6 table-container p-3 d-flex flex-column" method="post">
         <p>Download de gewerkte uren met bijbehorende persoonsgegevens voor de verloning.</p>
-        <div class="d-flex gap-2">
-            <div class="d-flex flex-column">
+
+        <div class="row g-2">
+            <div class="col-6">
                 <label for="month" class="form-label">Maand</label>
                 <select class="form-select" name="month" required>
-                    @for (int i = 1; i <= 12; i++)
+                    @foreach (int dayNr in monthsInCurrentYear)
                     {
-                        <option value="@i" selected="@(i == month)">
-                            @CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i)
+                        <option value="@dayNr" selected="@(dayNr == selectedMonth)">
+                            @CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(dayNr)
                         </option>
                     }
                 </select>
             </div>
-            <div class="d-flex flex-column">
+
+            <div class="col-6">
                 <label for="year" class="form-label">Jaar</label>
-                <input class="form-control" type="number" name="year" value="@year" min="1900" required />
+                <input class="form-control"
+                       type="number"
+                       name="year"
+                       value="@selectedYear"
+                       min="1900"
+                       onchange="updateMonths()"
+                       required />
             </div>
         </div>
-        <div class="d-flex justify-content-end mt-auto">
+
+        <div class="d-flex justify-content-end mt-auto pt-2">
             <button class="btn btn-primary" type="submit">download</button>
         </div>
     </form>
@@ -38,3 +48,42 @@
         </div>
     </div>
 </div>
+
+@section Scripts
+{
+    <script>
+        var yearToMonth = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewData["PossibleCombinations"]));
+
+        function updateMonths() {
+            // Get the selected year from the input field
+            var yearInput = document.querySelector('input[name="year"]');
+            var selectedYear = parseInt(yearInput.value);
+
+            // Get the month select field
+            var monthSelect = document.querySelector('select[name="month"]');
+
+            // Clear existing options in the month select field
+            monthSelect.innerHTML = '';
+
+            // Check if the selected year exists in the dictionary
+            if (yearToMonth[selectedYear]) {
+                // Get the valid months for the selected year
+                var validMonths = yearToMonth[selectedYear];
+
+                // Populate the month select field with valid months
+                validMonths.forEach(function (month) {
+                    var option = document.createElement('option');
+                    option.value = month;
+                    option.text = new Intl.DateTimeFormat('default', { month: 'long' }).format(new Date(2000, month - 1));
+                    monthSelect.appendChild(option);
+                });
+            } else {
+                // If the year is not in the dictionary, you can show a default message or empty the options
+                var option = document.createElement('option');
+                option.value = '';
+                option.text = 'Geen beschikbare maanden'; // "No available months"
+                monthSelect.appendChild(option);
+            }
+        }
+    </script>
+}
