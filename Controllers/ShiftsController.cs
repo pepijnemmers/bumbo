@@ -1,7 +1,10 @@
-﻿using BumboApp.Models;
+﻿using BumboApp.Helpers;
+using BumboApp.Models;
 using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+using System.Runtime.Intrinsics.Arm;
 using System.Security.Claims;
 
 namespace BumboApp.Controllers
@@ -133,7 +136,7 @@ namespace BumboApp.Controllers
         [HttpPost]
         public IActionResult Create(DateOnly? date, TimeOnly? start, TimeOnly? end, Department? department, int? employee, bool? isFinal)
         {
-            // validation (TODO: check if is allowed cao)
+            // validation 
             bool valid = true;
             if (date == null || start == null || end == null || department == null || employee == null || isFinal == null)
             {
@@ -154,6 +157,17 @@ namespace BumboApp.Controllers
             {
                 NotifyService.Error("De afdeling is niet geldig");
                 valid = false;
+            }
+            Employee? emp = Context.Employees.Include(e => e.Shifts).Include(e => e.SchoolSchedules).FirstOrDefault(e => e.EmployeeNumber == employee);
+            if (emp != null && valid)
+            {
+                int maxHours = new MaxScheduleTimeCalculationHelper(Context).GetMaxTimeCao(emp, dep, (DateOnly)date, start.Value.Hour);
+                if (valid && maxHours < (end - start).Value.Hours)
+                {
+                    if (maxHours < 0) { maxHours = 0; }
+                    NotifyService.Error("aantal uren voldoet niet aan het maximum volgens de CAO. Het maximum aantal uren is " + maxHours);
+                    valid = false;
+                }
             }
             var openingHours = Context.OpeningHours.FirstOrDefault(oh => oh.WeekDay == date!.Value.DayOfWeek);
             if ((openingHours?.OpeningTime == null 
@@ -245,7 +259,7 @@ namespace BumboApp.Controllers
             var shiftStart = new DateTime(date, start);
             var shiftEnd = new DateTime(date, end);
             
-            // validation (TODO: check if is allowed cao)
+            // validation 
             if (ModelState.IsValid == false)
             {
                 NotifyService.Error("Niet alle velden zijn ingevuld");
@@ -288,7 +302,18 @@ namespace BumboApp.Controllers
                 NotifyService.Error("Deze werknemer heeft al een dienst op dat moment");
                 return RedirectToAction("Update", new { id = id });
             }
-            
+            Employee? emp = Context.Employees.Include(e => e.Shifts).Include(e => e.SchoolSchedules).FirstOrDefault(e => e == employee);
+            if (emp != null)
+            {
+                int maxHours = new MaxScheduleTimeCalculationHelper(Context).GetMaxTimeCao(emp, department, (DateOnly)date, start.Hour);
+                if (maxHours < (end - start).Hours)
+                {
+                    if (maxHours < 0) { maxHours = 0; }
+                    NotifyService.Error("aantal uren voldoet niet aan het maximum volgens de CAO. Het maximum aantal uren is " + maxHours);
+                    return RedirectToAction("Update", new { id = id });
+                }
+            }
+
             // update in database
             try
             {
