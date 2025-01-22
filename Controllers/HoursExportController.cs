@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
-using System.Numerics;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BumboApp.Controllers;
 
@@ -22,6 +20,20 @@ public class HoursExportController : MainController
     {
         ViewBag.Month = month;
         ViewBag.Year = year;
+
+        var workedHours = Context.WorkedHours;
+        Dictionary<int, List<int>> yearToMonths = workedHours
+            .GroupBy(workedHour => workedHour.DateOnly.Year)
+            .ToDictionary(
+                group => group.Key,
+                group => group
+                    .Select(WorkedHour => WorkedHour.DateOnly.Month)
+                    .Distinct()
+                    .OrderBy(month => month)
+                    .ToList()
+            );
+
+        ViewData["PossibleCombinations"] = yearToMonths;
         return View();
     }
 
