@@ -52,7 +52,7 @@
 @section Scripts
 {
     <script>
-        var yearToMonth = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewData["PossibleCombinations"]));
+        let yearToMonth = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewData["PossibleCombinations"]));
 
         function updateMonths() {
             var yearInput = document.querySelector('input[name="year"]');
