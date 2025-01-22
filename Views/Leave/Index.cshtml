@@ -193,7 +193,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="date" class="col-form-label">Datum</label>
-                        <input type="date" class="form-control" id="date" name="date" placeholder="Datum" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" required>
+                        <input type="date" class="form-control" id="date" name="date" placeholder="Datum" value="@DateTime.Now.ToString("yyyy-MM-dd")" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" required>
                     </div>
                     @if (User.IsInRole(Role.Manager.ToString()))
                     {
@@ -241,17 +241,24 @@
                     <input type="date" class="form-control" id="updateDate" name="newDate" placeholder="Datum" 
                            min="@DateTime.Now.ToString("yyyy-MM-dd")" max="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" required>
                 </div>
-                <div class="mb-3">
-                    <label for="updateEmployeeSelect" class="col-form-label">Werknemer</label>
-                    <select class="form-select" id="updateEmployeeSelect" aria-label="Employee" name="newEmployee" required>
-                        <option value="" disabled selected>Selecteer werknemer</option>
+                @if (User.IsInRole(Role.Manager.ToString()))
+                {
+                    <div class="mb-3">
+                        <label for="updateEmployeeSelect" class="col-form-label">Werknemer</label>
+                        <select class="form-select" id="updateEmployeeSelect" aria-label="Employee" name="newEmployee" required>
+                            <option value="" disabled selected>Selecteer werknemer</option>
 
-                        @foreach (var employee in Model.AllEmployees)
-                        {
-                            <option value="@employee.EmployeeNumber">@employee.FirstName @employee.LastName</option>
-                        }
-                    </select>
-                </div>
+                            @foreach (var employee in Model.AllEmployees)
+                            {
+                                <option value="@employee.EmployeeNumber">@employee.FirstName @employee.LastName</option>
+                            }
+                        </select>
+                    </div>
+                }
+                else
+                {
+                    <input type="hidden" name="newEmployee" value="@if (Model.LoggedInEmployee != null) { @Model.LoggedInEmployee.EmployeeNumber }"/>
+                }
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Annuleren</button>
@@ -306,7 +313,7 @@
             dateInput.value = date;
             
             const employeeSelect = document.getElementById('updateEmployeeSelect');
-            employeeSelect.value = employeeNumber;
+            if (employeeSelect != null) employeeSelect.value = employeeNumber;
             
             const form = document.getElementById('updateSickLeaveForm');
             form.action = `/Leave/UpdateSickLeave?employeeNumber=${employeeNumber}&date=${date}`;
