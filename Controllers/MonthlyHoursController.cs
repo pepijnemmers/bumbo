@@ -125,7 +125,7 @@ public class MonthlyHoursController : MainController
                 // Calculate total worked time 
                 var totalWorkedTime = (x.WorkedHour?.StartTime != null && x.WorkedHour?.EndTime != null)
                     ? x.WorkedHour.EndTime - x.WorkedHour.StartTime - breakDuration
-                    : (TimeSpan?)null;
+                    : null;
 
                 // Determine if there's a difference
                 TimeOnly? plannedStart = TimeOnly.Parse(x.Shift.Start.ToString("HH:mm"));
@@ -149,6 +149,53 @@ public class MonthlyHoursController : MainController
                     HourDifference = hourDifference
                 };
             })
+            .OrderBy(e => e.Date)
+            .ToList();
+
+        // Add worked hours without shifts
+        var unmatchedWorkedHours = workedHours
+            .Where(wh => wh.DateOnly.Year == selectedYear && wh.DateOnly.Month == selectedMonth)
+            .Where(wh => !plannedShifts.Any(shift =>
+                shift.Employee != null &&
+                shift.Employee.EmployeeNumber == wh.Employee.EmployeeNumber &&
+                DateOnly.FromDateTime(shift.Start) == wh.DateOnly))
+            .Select(wh =>
+            {
+                // Calculate breaks duration
+                var breakDuration = wh.Breaks
+                    ?.Where(b => b.EndTime != null)
+                    .Sum(b => (b.EndTime - b.StartTime)?.Ticks ?? 0) is long ticks && ticks > 0
+                    ? TimeSpan.FromTicks(ticks)
+                    : TimeSpan.Zero;
+
+                // Calculate total worked time
+                var totalWorkedTime = wh.EndTime != null
+                    ? wh.EndTime - wh.StartTime - breakDuration
+                    : null;
+
+                return new WorkedHourViewModel
+                {
+                    Id = wh.Id,
+                    Employee = wh.Employee,
+                    StartTime = wh.StartTime,
+                    EndTime = wh.EndTime,
+                    Date = wh.DateOnly,
+                    BreaksDuration = breakDuration,
+                    TotalWorkedTime = totalWorkedTime,
+                    Status = wh.Status,
+                    PlannedShift = null,
+                    IsFuture = wh.DateOnly <= DateOnly.FromDateTime(DateTime.Now) && wh.DateOnly.Month == DateOnly.FromDateTime(DateTime.Now).Month,
+                    HasHourDifference = true,
+                    HourDifference = workedHoursHelper.HourDifference(wh.StartTime, wh.EndTime, new TimeOnly(0, 0, 0), new TimeOnly(0, 0, 0), breakDuration)
+                };
+            })
+            .ToList();
+
+        // Combine both lists
+        combinedHours.AddRange(unmatchedWorkedHours);
+
+        // Sort the combined list
+        combinedHours = combinedHours
             .OrderBy(e => e.Date)
             .ToList();
 
