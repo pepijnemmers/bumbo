@@ -88,8 +88,53 @@ public class WorkedHoursController : MainController
                     HasHourDifference = hasHourDifference
                 };
             })
+            .ToList();
+
+
+        // Add worked hours without shifts
+        var unmatchedWorkedHours = workedHours
+            .Where(wh => !plannedShifts.Any(shift =>
+                shift.Employee != null &&
+                shift.Employee.EmployeeNumber == wh.Employee.EmployeeNumber &&
+                DateOnly.FromDateTime(shift.Start) == wh.DateOnly))
+            .Select(wh =>
+            {
+                // Calculate breaks duration
+                var breakDuration = wh.Breaks
+                    ?.Where(b => b.EndTime != null)
+                    .Sum(b => (b.EndTime - b.StartTime)?.Ticks ?? 0) is long ticks && ticks > 0
+                    ? TimeSpan.FromTicks(ticks)
+                    : TimeSpan.Zero;
+
+                // Calculate total worked time
+                var totalWorkedTime = (wh.EndTime != null)
+                    ? wh.EndTime - wh.StartTime - breakDuration
+                    : (TimeSpan?)null;
+
+                return new WorkedHourViewModel
+                {
+                    Id = wh.Id,
+                    Employee = wh.Employee,
+                    StartTime = wh.StartTime,
+                    EndTime = wh.EndTime,
+                    BreaksDuration = breakDuration,
+                    TotalWorkedTime = totalWorkedTime,
+                    Status = wh.Status,
+                    PlannedShift = null,
+                    IsFuture = wh.DateOnly <= DateOnly.FromDateTime(DateTime.Now) && wh.DateOnly.Month == DateOnly.FromDateTime(DateTime.Now).Month,
+                    HasHourDifference = true 
+                };
+            })
+            .ToList();
+
+        // Combine both lists
+        combinedHours.AddRange(unmatchedWorkedHours);
+
+        // Sort the combined list
+        combinedHours = combinedHours
             .OrderBy(e => e.StartTime)
             .ToList();
+
 
         // Apply employee filter
         if (selectedEmployee != null)
