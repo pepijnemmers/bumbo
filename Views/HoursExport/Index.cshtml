@@ -4,7 +4,17 @@
     ViewData["Title"] = "Maand uren exporteren";
     int selectedMonth = ViewBag.Month ?? DateTime.Now.Month;
     int selectedYear = ViewBag.Year ?? DateTime.Now.Year;
-    List<int> monthsInCurrentYear = ((Dictionary<int, List<int>>)ViewData["PossibleCombinations"])[selectedYear];
+    List<int> monthsInCurrentYear;
+
+    if (((Dictionary<int, List<int>>)ViewData["PossibleCombinations"])
+        .TryGetValue(selectedYear, out var months))
+    {
+        monthsInCurrentYear = months;
+    }
+    else
+    {
+        monthsInCurrentYear = new List<int>();
+    }
 }
 
 <div class="d-flex gap-2">
@@ -15,11 +25,18 @@
             <div class="col-6">
                 <label for="month" class="form-label">Maand</label>
                 <select class="form-select" name="month" required>
+                    @if (!monthsInCurrentYear.Any())
+                    {
+                    <option>Geen beschikbare maanden</option>
+                    }
+                    else
+                    {
                     @foreach (int dayNr in monthsInCurrentYear)
                     {
                         <option value="@dayNr" selected="@(dayNr == selectedMonth)">
                             @CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(dayNr)
                         </option>
+                    }
                     }
                 </select>
             </div>
