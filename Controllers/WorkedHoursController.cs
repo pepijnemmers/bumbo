@@ -5,7 +5,6 @@ using BumboApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BumboApp.Controllers;
 
@@ -47,48 +46,7 @@ public class WorkedHoursController : MainController
             .ToList();
 
         // Combine worked hours and planned shifts
-        var combinedHours = plannedShifts
-            .Select(shift => new
-            {
-                Shift = shift,
-                WorkedHour = workedHours.FirstOrDefault(wh =>
-                (shift.Employee != null && wh.Employee.EmployeeNumber == shift.Employee.EmployeeNumber) &&
-                wh.DateOnly == DateOnly.FromDateTime(shift.Start))
-            })
-            .Select(x =>
-            {
-                // Calculate breaks duration 
-                var breakDuration = x.WorkedHour?.Breaks
-                    ?.Where(b => b.EndTime != null)
-                    .Sum(b => (b.EndTime - b.StartTime)?.Ticks ?? 0) is long ticks && ticks > 0
-                    ? TimeSpan.FromTicks(ticks)
-                    : TimeSpan.Zero;
-
-                // Calculate total worked time 
-                var totalWorkedTime = (x.WorkedHour?.StartTime != null && x.WorkedHour?.EndTime != null)
-                    ? x.WorkedHour.EndTime - x.WorkedHour.StartTime - breakDuration
-                    : (TimeSpan?)null;
-
-                // Determine if there's a difference
-                TimeOnly? plannedStart = TimeOnly.Parse(x.Shift.Start.ToString("HH:mm"));
-                TimeOnly? plannedEnd = TimeOnly.Parse(x.Shift.End.ToString("HH:mm"));
-                bool hasHourDifference = workedHoursHelper.HasHourDifference(x.WorkedHour?.StartTime, x.WorkedHour?.EndTime, plannedStart, plannedEnd, breakDuration);
-
-                return new WorkedHourViewModel
-                {
-                    Id = x.WorkedHour?.Id,
-                    Employee = x.Shift.Employee,
-                    StartTime = x.WorkedHour?.StartTime, 
-                    EndTime = x.WorkedHour?.EndTime,     
-                    BreaksDuration = breakDuration,
-                    TotalWorkedTime = totalWorkedTime,
-                    Status = x.WorkedHour?.Status,
-                    PlannedShift = x.Shift.Start.ToString("HH:mm") + " - " + x.Shift.End.ToString("HH:mm"),
-                    IsFuture = DateOnly.FromDateTime(x.Shift.Start) <= DateOnly.FromDateTime(DateTime.Now) && DateOnly.FromDateTime(x.Shift.Start).Month == DateOnly.FromDateTime(DateTime.Now).Month,
-                    HasHourDifference = hasHourDifference
-                };
-            })
-            .ToList();
+        var combinedHours = workedHoursHelper.GetCombinedHours(plannedShifts, workedHours);
 
 
         // Add worked hours without shifts
@@ -107,9 +65,9 @@ public class WorkedHoursController : MainController
                     : TimeSpan.Zero;
 
                 // Calculate total worked time
-                var totalWorkedTime = (wh.EndTime != null)
+                var totalWorkedTime = wh.EndTime != null
                     ? wh.EndTime - wh.StartTime - breakDuration
-                    : (TimeSpan?)null;
+                    : null;
 
                 return new WorkedHourViewModel
                 {
@@ -175,7 +133,7 @@ public class WorkedHoursController : MainController
 
         //Pagination
         int currentPageNumber = page ?? DefaultPage;
-        int maxPages = (int)(Math.Ceiling((decimal)workedHours.Count / PageSize));
+        int maxPages = (int)(Math.Ceiling((decimal)combinedHours.Count / PageSize));
         if (currentPageNumber <= 0) { currentPageNumber = DefaultPage; }
         if (currentPageNumber > maxPages) { currentPageNumber = maxPages; }
 
