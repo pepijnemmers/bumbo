@@ -2,7 +2,7 @@ name: Build and deploy .NET Core application to Web App BumboApp20241028101918
 on:
   push:
     branches:
-    - develop
+    - livesite
 env:
   AZURE_WEBAPP_NAME: BumboApp20241028101918
   AZURE_WEBAPP_PACKAGE_PATH: .\published
